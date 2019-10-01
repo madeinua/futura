@@ -1,0 +1,42 @@
+body, html {
+	padding: 0;
+	margin: 0;
+}
+
+.content {
+    margin: 20px;
+}
+
+canvas {
+    box-shadow: 0 0 10px #777;
+    margin-bottom: 20px;
+}
+
+.left-bar {
+    overflow: scroll;
+    height: 650px;
+    background-color: #fff;
+    padding: 20px;
+}
+
+#worldWrapper {
+	width: 100%;
+	height: 650px;
+	overflow: scroll;
+}
+
+#world {
+	margin: 20px;
+}
+
+#miniMap {
+	cursor: crosshair;
+}
+
+#coordinates {
+	display: block;
+}
+
+body {
+	background-color: #eee;
+}

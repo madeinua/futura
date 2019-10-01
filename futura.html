@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>Futura</title>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="assets/bootstrap.min.css">
+    <link href="futura.css" type="text/css" rel="stylesheet" media="all" />
+    <script src="assets/jquery.slim.min.js"></script>
+    <script src="assets/popper.min.js"></script>
+    <script src="assets/bootstrap.min.js"></script>
+</head>
+<body>
+
+    <div class="content">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="left-bar">
+                    <div>
+                        <label>Mini map:</label>
+                        <p><canvas id="miniMap"></canvas><input id="coordinates" type="text" value="0,0" /></p>
+                    </div>
+                    <div>
+                        <label>Forest map:</label>
+                        <p><canvas id="forestMapCanvas"></canvas></p>
+                    </div>
+                    <div>
+                        <label>Humidity map:</label>
+                        <p><canvas id="humidityMapCanvas"></canvas></p>
+                    </div>
+                    <div>
+                        <label>Temperature map:</label>
+                        <p><canvas id="temperatureMapCanvas"></canvas></p>
+                    </div>
+                    <div>
+                        <label>Rivers map:</label>
+                        <p><canvas id="riversMapCanvas"></canvas></p>
+                    </div>
+                    <div>
+                        <label>River sources:</label>
+                        <p><canvas id="riverSourcesMapCanvas"></canvas></p>
+                    </div>
+                    <div>
+                        <label>Lakes map:</label>
+                        <p><canvas id="lakesMapCanvas"></canvas></p>
+                    </div>
+                    <div>
+                        <label>Ocean map:</label>
+                        <p><canvas id="oceanMapCanvas"></canvas></p>
+                    </div>
+                    <div>
+                        <label>Altitude map:</label>
+                        <p><canvas id="altitudeMapCanvas"></canvas></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div id="worldWrapper">
+                    <canvas id="world"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src='perlin.js'></script>
+    <script src='helpers.js'></script>
+    <script src='world.js'></script>
+    <script src='futura.js'></script>
+</body>
+</html>
