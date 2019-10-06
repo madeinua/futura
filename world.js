@@ -53,8 +53,8 @@ function getBiomeColor(biome, altitude) {
 
     let colors = [];
 
-    colors[BIOME_SNOW] = '#e1e1e1'; //@TODO use array of 3 colors for diff altitudes
-    colors[BIOME_TUNDRA] = '#c8cd23';
+    colors[BIOME_SNOW] = '#c4c4c4'; //@TODO use array of 3 colors for diff altitudes
+    colors[BIOME_TUNDRA] = '#cdbc73';
     colors[BIOME_GRASS] = '#73AA00';
     colors[BIOME_SANDS] = '#F0D75A';
     colors[BIOME_LOWLAND] = '#5a9600';
@@ -63,18 +63,16 @@ function getBiomeColor(biome, altitude) {
     colors[BIOME_TROPICS] = '#50AA00';
     colors[BIOME_COAST] = '#0ca0c8';
     colors[BIOME_RIVER] = '#0ca0c8';
-    colors[BIOME_LAKE] = '#3CC8F0';
+    colors[BIOME_LAKE] = '#0082ca';
     colors[BIOME_OCEAN] = '#0064be';
 
     let color = colors[biome.getType()];
 
-    if(typeof color === 'undefined') {
+    if (typeof color === 'undefined') {
         color = colors[BIOME_OCEAN];
     }
 
-    color = LightenDarkenColor(color, tval(altitude, 0, 60));
-
-    return color;
+    return hexToRgb(color);
 }
 
 /**
@@ -134,7 +132,7 @@ function World() {
         let map = new PointMatrix(worldWidth, worldHeight);
 
         map.map(function(x, y) {
-            return (noise.perlin2(x / power, y / power) + 1) * 0.5; // [0, 1] blurred height map
+            return (noise.simplex2(x / power, y / power) + 1) * 0.5; // [0, 1] blurred height map
         });
 
         return map;
@@ -154,12 +152,26 @@ function World() {
         let dx = Math.abs(x - maxX * 0.5),
             dy = Math.abs(y - maxY * 0.5),
             distance = Math.sqrt(dx * dx + dy * dy),
-            delta = distance / (maxX * 0.5 - 10),
+            delta = distance / (maxX * 0.5),
             gradient = delta * delta - 0.25;
 
-        altitude *= Math.max(0, 1 - gradient);
+        return Math.min(altitude, altitude * Math.max(0, 1 - gradient));
+    };
 
-        return altitude;
+    /**
+     * @param {number} worldWidth
+     * @return {number}
+     */
+    let calculateAltitudeOctaves = function(worldWidth) {
+
+        let octaves = 1;
+
+        while(worldWidth > 1) {
+            worldWidth = worldWidth / 3;
+            octaves++;
+        }
+
+        return octaves;
     };
 
     /**
@@ -167,28 +179,38 @@ function World() {
      */
     let generateAltitudeMap = function() {
 
-        let bigMap = createNoiseMap(50),
-            smallMap = createNoiseMap(10),
-            altitudeMap = new PointMatrix(worldWidth, worldHeight);
+        let altitudeMap = new PointMatrix(worldWidth, worldHeight),
+            octaves = calculateAltitudeOctaves(worldWidth),
+            distances = getEqualDistances(octaves, 10, 100),
+            maps = [];
 
-        // blend maps
-        altitudeMap.map(function(x, y) {
-            return (bigMap.getTile(x, y) * 2 + smallMap.getTile(x, y) * 0.5) * 0.5;
-        });
+        for(let i = 0; i < octaves; i++) {
+            maps[i] = createNoiseMap(distances[i]);
+        }
 
-        // stretch map
         altitudeMap.map(function(x, y) {
-            return Math.min(1, Math.pow(altitudeMap.getTile(x, y), WORLD_MAP_OCEAN_LEVEL + 1));
-        });
 
-        // make island
-        altitudeMap.map(function(x, y) {
-            return makeIsland(x, y, worldWidth, worldHeight, altitudeMap.getTile(x, y));
+            let val = 0;
+
+            // blend maps
+            for(let i = 0; i < maps.length; i++) {
+                val += maps[i].getTile(x, y);
+            }
+
+            val /= maps.length;
+
+            // stretch map
+            val = Math.min(1, Math.pow(val, WORLD_MAP_OCEAN_LEVEL + 1));
+
+            // make island
+            val = makeIsland(x, y, worldWidth, worldHeight, val);
+
+            return val;
         });
 
         altitudeMap = Filters.apply('altitudeMap', altitudeMap);
 
-        logTimeEvent('Altitude map created');
+        logTimeEvent('Altitude map blended using ' + octaves + ' noise maps');
 
         return altitudeMap;
     };
@@ -203,7 +225,7 @@ function World() {
             waterPoints = [];
 
         altitudeMap.foreach(function(x, y) {
-            if(isWater(altitudeMap.getTile(x, y))) {
+            if (isWater(altitudeMap.getTile(x, y))) {
                 waterPoints.push([x, y]);
             }
         });
@@ -222,7 +244,7 @@ function World() {
                     y = waterPoints[i][1],
                     isOcean = false;
 
-                if(!oceanMap.filled(x, y)) {
+                if (!oceanMap.filled(x, y)) {
 
                     let neighbors = oceanMap.getNeighbors(x, y, 1);
 
@@ -231,7 +253,7 @@ function World() {
                         let nx = neighbors[j][0],
                             ny = neighbors[j][1];
 
-                        if(oceanMap.filled(nx, ny)) {
+                        if (oceanMap.filled(nx, ny)) {
                             oceanMap.fill(x, y);
                             isOcean = true;
                         }
@@ -241,12 +263,12 @@ function World() {
                     isOcean = true;
                 }
 
-                if(!isOcean) {
+                if (!isOcean) {
                     newWaterPoints.push([x, y]);
                 }
             }
 
-            if(waterPoints.length === newWaterPoints.length) {
+            if (waterPoints.length === newWaterPoints.length) {
                 break;
             }
 
@@ -270,7 +292,7 @@ function World() {
         let lakesMap = new BinaryMatrix(worldWidth, worldHeight);
 
         altitudeMap.foreach(function(x, y) {
-            if(isWater(altitudeMap.getTile(x, y)) && !oceanMap.filled(x, y)) {
+            if (isWater(altitudeMap.getTile(x, y)) && !oceanMap.filled(x, y)) {
                 lakesMap.fill(x, y);
             }
         });
@@ -289,7 +311,7 @@ function World() {
      */
     let getPossibleRiversCount = function(altitudeMap, riverSources) {
 
-        if(RIVERS_DENSITY === 0) {
+        if (RIVERS_DENSITY === 0) {
             return 0;
         }
 
@@ -311,7 +333,7 @@ function World() {
         let fail = false;
 
         for(let i = 0; i < riverPoints.length; i++) {
-            if(closeness >= distance(x, y, riverPoints[i][0], riverPoints[i][1])) {
+            if (closeness >= distance(x, y, riverPoints[i][0], riverPoints[i][1])) {
                 fail = true;
                 break;
             }
@@ -341,7 +363,7 @@ function World() {
 
         altitudeMap.foreach(function(x, y) {
             let altitude = altitudeMap.getTile(x, y);
-            if(isGround(altitude) && altitude >= RIVER_SOURCE_MIN_ALTITUDE && RIVER_SOURCE_MAX_ALTITUDE >= altitude) {
+            if (isGround(altitude) && altitude >= RIVER_SOURCE_MIN_ALTITUDE && RIVER_SOURCE_MAX_ALTITUDE >= altitude) {
                 spawns.push([x, y]);
             }
         });
@@ -349,7 +371,7 @@ function World() {
         spawns = spawns.shuffle();
 
         for(let i = 0; i < spawns.length; i++) {
-            if(!tooCloseToRivers(spawns[i][0], spawns[i][1], riverSources)) {
+            if (!tooCloseToRivers(spawns[i][0], spawns[i][1], riverSources)) {
                 riverSources.push(spawns[i]);
             }
         }
@@ -388,15 +410,15 @@ function World() {
                 ny = neighbors[i][1],
                 altitude = altitudeMap.getTile(nx, ny);
 
-            if(altitude > currentAltitude) {
+            if (altitude > currentAltitude) {
                 continue;
             }
 
-            if(tooCloseToRivers(nx, ny, otherRiverPoints)) {
+            if (tooCloseToRivers(nx, ny, otherRiverPoints)) {
                 continue;
             }
 
-            if(prevPoint && distance(nx, ny, prevPoint[0], prevPoint[1]) === 1) {
+            if (prevPoint && distance(nx, ny, prevPoint[0], prevPoint[1]) === 1) {
                 continue;
             }
 
@@ -438,14 +460,14 @@ function World() {
             for(let j = 0; j < 1000; j++) {
 
                 let nextPoint = getRiverDirection(river, altitudeMap, otherRiverPoints);
-                if(!nextPoint.length) {
+                if (!nextPoint.length) {
                     break;
                 }
 
                 riverPoints.push(nextPoint);
 
                 // watter found - trie again and if not possible - terminate
-                if(isRiverDelta(altitudeMap, nextPoint)) {
+                if (isRiverDelta(altitudeMap, nextPoint)) {
                     finished = true;
                     break;
                 }
@@ -455,13 +477,13 @@ function World() {
 
             // @TODO Dig rivers (increase width depends on length)
 
-            if(finished && river.length >= RIVER_MIN_LENGTH) {
+            if (finished && river.length >= RIVER_MIN_LENGTH) {
                 rivers.push(river);
                 otherRiverPoints = otherRiverPoints.concat(river);
                 otherRiverPoints.unique();
             }
 
-            if(rivers.length === riversCount) {
+            if (rivers.length === riversCount) {
                 break;
             }
         }
@@ -535,11 +557,11 @@ function World() {
             let humidity = humidityMap.getTile(x, y),
                 distance = water.getClosestDistanceTo(x, y);
 
-            if(distance <= maxDistance) {
+            if (distance <= maxDistance) {
                 humidity += (1 - (distance / maxDistance)) * WATER_HUMIDITY_FACTOR;
             }
 
-            if(oceanMap.filled(x, y)) {
+            if (oceanMap.filled(x, y)) {
                 humidity -= OCEAN_HUMIDITY_FACTOR;
             }
 
@@ -624,12 +646,13 @@ function World() {
      * @param {BinaryMatrix} lakesMap
      * @return {number}
      */
-    let findBiomeType = function(x, y, altitude, temperature, humidity, riversMap, lakesMap) {
+    let findBiomeType = function(x, y, altitude, /*temperature, humidity, riversMap, */lakesMap) {
 
+        /*
         if(riversMap.filled(x, y)) {
             return BIOME_RIVER;
         }
-
+*/
         if(lakesMap.filled(x, y)) {
             return BIOME_LAKE;
         }
@@ -638,10 +661,11 @@ function World() {
             return BIOME_OCEAN;
         }
 
-        if(altitude < LEVEL_COAST) {
+        if (altitude < LEVEL_COAST) {
             return BIOME_COAST;
         }
-
+//@TODO
+        return BIOME_GRASS;
         /**
          * @param {number} value
          * @param {number} levels
@@ -653,7 +677,7 @@ function World() {
                 level = 0;
 
             for(let i = 1; i <= 4; i++) {
-                if(value > i * grad) {
+                if (value > i * grad) {
                     ++level;
                 }
             }
@@ -666,7 +690,7 @@ function World() {
             [BIOME_TUNDRA, BIOME_SWAMP, BIOME_SAVANNA, BIOME_TROPICS],
             [BIOME_TUNDRA, BIOME_LOWLAND, BIOME_GRASS, BIOME_GRASS],
             [BIOME_TUNDRA, BIOME_LOWLAND, BIOME_GRASS, BIOME_GRASS],
-            [BIOME_SNOW, BIOME_LOWLAND, BIOME_GRASS, BIOME_SANDS],
+            [BIOME_SNOW, BIOME_LOWLAND, BIOME_GRASS, BIOME_SANDS]
         ];
 
         let rand = randBetweenFloats(-0.02, 0.02),
@@ -682,19 +706,17 @@ function World() {
      * @param {CanvasRenderingContext2D} context
      * @return {ImageData}
      */
-    let fillWorld = function(context) {
+    let renderWorld = function(context) {
 
         let biome,
             altitudeMap = generateAltitudeMap(),
             oceanMap = getOceanMap(altitudeMap),
             lakesMap = getLakesMap(altitudeMap, oceanMap),
-            riversMap = generateRiversMap(altitudeMap),
-            temperatureMap = generateTemperatureMap(altitudeMap),
-            humidityMap = generateHumidityMap(oceanMap, riversMap, lakesMap),
-            objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
+            //riversMap = generateRiversMap(altitudeMap),
+            //temperatureMap = generateTemperatureMap(altitudeMap),
+            //humidityMap = generateHumidityMap(oceanMap, riversMap, lakesMap),
+            //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = context.createImageData(worldWidth, worldHeight);
-
-        logTimeEvent('All maps generated');
 
         altitudeMap.foreach(function(x, y) {
 
@@ -703,16 +725,20 @@ function World() {
                     x,
                     y,
                     altitudeMap.getTile(x, y),
-                    temperatureMap.getTile(x, y),
-                    humidityMap.getTile(x, y),
-                    riversMap,
+                    //temperatureMap.getTile(x, y),
+                    //humidityMap.getTile(x, y),
+                    //riversMap,
                     lakesMap
                 )
             );
 
-            fillCanvasPixel(image.data, (x + y * worldWidth) * 4, getBiomeColor(biome, altitudeMap.getTile(x, y)));
+            fillCanvasPixel(
+                image.data,
+                (x + y * worldWidth) * 4,
+                getBiomeColor(biome, altitudeMap.getTile(x, y))
+            );
 
-            displayPixelObject(objectsMap, x, y);
+            //displayPixelObject(objectsMap, x, y);
         });
 
         xyCoords = altitudeMap;
@@ -720,15 +746,6 @@ function World() {
         logTimeEvent('World filled');
 
         return image;
-    };
-
-    /**
-     * @param {CanvasRenderingContext2D} context
-     * @param {ImageData} image
-     * @return {ImageData}
-     */
-    let scaleWorld = function(context, image) {
-        return scaleImageData(context, image, WORLD_SCALE);
     };
 
     /**
@@ -761,7 +778,7 @@ function World() {
         wrapperWidth = (miniMapCanvas.width * worldWrapper.offsetWidth / miniMapCanvas.width) * 0.5;
         wrapperHeight = (miniMapCanvas.height * worldWrapper.offsetHeight / miniMapCanvas.height) * 0.5;
 
-        if(worldWrapper) {
+        if (worldWrapper) {
 
             let _this = this;
 
@@ -799,13 +816,13 @@ function World() {
     };
 
     let drawMiniMap = function() {
-        if(miniMapCanvas && miniMapImage) {
+        if (miniMapCanvas && miniMapImage) {
 
             let ctx = miniMapCanvas.getContext('2d');
 
             ctx.putImageData(miniMapImage, 0, 0);
 
-            if(worldWrapper) {
+            if (worldWrapper) {
                 ctx.strokeStyle = '#000000';
                 ctx.strokeRect(
                     toMiniMapPoint(worldWrapper.scrollLeft),
@@ -823,7 +840,7 @@ function World() {
     let drawWorld = function() {
 
         let context = worldCanvas.getContext('2d'),
-            image = fillWorld(context);
+            imageData = renderWorld(context);
 
         context.webkitImageSmoothingEnabled = false;
         context.mozImageSmoothingEnabled = false;
@@ -832,12 +849,17 @@ function World() {
         worldCanvas.width = toWorldMapPoint(worldCanvas.width);
         worldCanvas.height = toWorldMapPoint(worldCanvas.height);
 
-        context.putImageData(scaleWorld(context, image), 0, 0);
-
-        miniMapImage = image;
-        drawMiniMap();
+        context.putImageData(
+            scaleImageData(context, imageData, WORLD_SCALE),
+            0, 0
+        );
 
         logTimeEvent('World drawn');
+
+        miniMapImage = imageData;
+        drawMiniMap();
+
+        logTimeEvent('Mini map drawn');
 
         return context;
     };

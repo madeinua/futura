@@ -50,7 +50,7 @@ Filters
         return map;
     })
     .add('oceanMap', function(map) {
-        drawMap('oceanMapCanvas', map, true);
+        drawMap('oceanMapCanvas', map, false);
         return map;
     })
     .add('lakesMap', function(map) {

@@ -1,12 +1,14 @@
-let errorDisplayed = false;
+let errors = 0;
 
 /**
  * @param msg
+ * @param {Number} limit
  */
-function throwError(msg) {
-    if(!errorDisplayed) {
+function throwError(msg, limit) {
+    limit = typeof limit == 'undefined' ? 1 : limit;
+    if(errors < limit) {
         console.error(msg);
-        errorDisplayed = true;
+        errors++;
     }
 }
 
@@ -274,7 +276,7 @@ class Matrix {
      */
     toArray() {
 
-        var arr = [],
+        let arr = [],
             _this = this;
 
         _this.foreach(function(x, y) {
@@ -636,25 +638,26 @@ class PointMatrix extends Matrix {
 function scaleImageData(context, imageData, scale) {
 
     let scaled = context.createImageData(imageData.width * scale, imageData.height * scale);
+    let subLine = context.createImageData(scale, 1).data;
 
     for(let row = 0; row < imageData.height; row++) {
         for(let col = 0; col < imageData.width; col++) {
 
-            let sourcePixel = [
-                imageData.data[(row * imageData.width + col) * 4],
-                imageData.data[(row * imageData.width + col) * 4 + 1],
-                imageData.data[(row * imageData.width + col) * 4 + 2],
-                imageData.data[(row * imageData.width + col) * 4 + 3]
-            ];
+            let sourcePixel = imageData.data.subarray(
+                (row * imageData.width + col) * 4,
+                (row * imageData.width + col) * 4 + 4
+            );
+
+            for(let x = 0; x < scale; x++) {
+                subLine.set(sourcePixel, x * 4);
+            }
 
             for(let y = 0; y < scale; y++) {
+
                 let destRow = row * scale + y;
-                for(let x = 0; x < scale; x++) {
-                    let destCol = col * scale + x;
-                    for(let i = 0; i < 4; i++) {
-                        scaled.data[(destRow * scaled.width + destCol) * 4 + i] = sourcePixel[i];
-                    }
-                }
+                let destCol = col * scale;
+
+                scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4)
             }
         }
     }
@@ -700,39 +703,24 @@ function hexToRgb(hex) {
 }
 
 /**
- * Make a Hex color darken/brighten
- *
- * @param {number} col
- * @param {number} amt
- * @return {string}
+ * Split [0-100] range into equal parts "distances"
+ * @param {number} number
+ * @param {number} number
+ * @param {number} number
+ * @return {[number]}
  */
-function LightenDarkenColor(col, amt) {
+function getEqualDistances(number, start, end) {
 
-    let usePound = false;
+    let lines = [];
 
-    if(col[0] === "#") {
-        col = col.slice(1);
-        usePound = true;
+    if (number === 1) {
+        lines = [(end - start) / 2];
+    } else {
+        let parts = (end - start) / (number - 1);
+        for(let i = 0; i < number; i++) {
+            lines.push(start + Math.floor(parts * i));
+        }
     }
 
-    let num = parseInt(col, 16);
-
-    let r = (num >> 16) + amt;
-
-    if(r > 255) r = 255;
-    else if(r < 0) r = 0;
-
-    let b = ((num >> 8) & 0x00FF) + amt;
-
-    if(b > 255) b = 255;
-    else if(b < 0) b = 0;
-
-    let g = (num & 0x0000FF) + amt;
-
-    if(g > 255) g = 255;
-    else if(g < 0) g = 0;
-
-    return (usePound ? "#" : "") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
-
-
+    return lines;
 }
