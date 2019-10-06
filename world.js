@@ -221,58 +221,35 @@ function World() {
      */
     let getOceanMap = function(altitudeMap) {
 
-        let oceanMap = new BinaryMatrix(worldWidth, worldHeight),
-            waterPoints = [];
+        let oceanMap = new BinaryMatrix(worldWidth, worldHeight);
 
-        altitudeMap.foreach(function(x, y) {
-            if (isWater(altitudeMap.getTile(x, y))) {
-                waterPoints.push([x, y]);
-            }
-        });
+        if (!isWater(altitudeMap.getTile(0, 0))) {
+            return oceanMap;
+        }
 
-        oceanMap.map(function(x, y) {
-            return x === 0 || y === 0 || x === worldWidth - 1 || y === worldHeight - 1 ? 1 : 0;
-        });
+        let activePoints = [],
+            point;
 
-        for(let t = 0; t < 100000; t++) {
+        oceanMap.fill(0 ,0);
+        activePoints.push([0, 0]);
 
-            let newWaterPoints = [];
+        while (activePoints.length) {
 
-            for(let i = 0; i < waterPoints.length; i++) {
+            point = activePoints.pop();
 
-                let x = waterPoints[i][0],
-                    y = waterPoints[i][1],
-                    isOcean = false;
+            altitudeMap.foreachNeighbors(point[0], point[1], 1, function (x, y) {
 
-                if (!oceanMap.filled(x, y)) {
-
-                    let neighbors = oceanMap.getNeighbors(x, y, 1);
-
-                    for(let j = 0; j < neighbors.length; j++) {
-
-                        let nx = neighbors[j][0],
-                            ny = neighbors[j][1];
-
-                        if (oceanMap.filled(nx, ny)) {
-                            oceanMap.fill(x, y);
-                            isOcean = true;
-                        }
-                    }
-
-                } else {
-                    isOcean = true;
+                if (!isWater(altitudeMap.getTile(x, y))) {
+                    return;
                 }
 
-                if (!isOcean) {
-                    newWaterPoints.push([x, y]);
+                if (oceanMap.filled(x, y)) {
+                    return;
                 }
-            }
 
-            if (waterPoints.length === newWaterPoints.length) {
-                break;
-            }
-
-            waterPoints = newWaterPoints;
+                oceanMap.fill(x, y);
+                activePoints.push([x, y]);
+            });
         }
 
         oceanMap = Filters.apply('oceanMap', oceanMap);
@@ -653,11 +630,11 @@ function World() {
             return BIOME_RIVER;
         }
 */
-        if(lakesMap.filled(x, y)) {
+        if (lakesMap.filled(x, y)) {
             return BIOME_LAKE;
         }
 
-        if(altitude < LEVEL_OCEAN) {
+        if (altitude < LEVEL_OCEAN) {
             return BIOME_OCEAN;
         }
 
