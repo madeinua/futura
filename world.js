@@ -1,4 +1,4 @@
-let WORLD_SCALE = 33,
+let WORLD_SCALE = 33, // times
     WORLD_MAP_OCEAN_LEVEL = 0.5; // [0 - 1]
 
 let LEVEL_OCEAN = 0.2,
@@ -25,8 +25,8 @@ let BIOME_OCEAN = 0,
     BIOME_LAKE = 11;
 
 let RIVERS_DENSITY = 0.5, // [0-1]
-    RIVER_SOURCE_MIN_ALTITUDE = 0.6,
-    RIVER_SOURCE_MAX_ALTITUDE = 0.85,
+    RIVER_SOURCE_MIN_ALTITUDE = 0.5,
+    RIVER_SOURCE_MAX_ALTITUDE = 0.9,
     RIVERS_CLOSENESS = 3,
     RIVER_MIN_LENGTH = 5;
 
@@ -95,14 +95,11 @@ function World() {
      * @param {number} h
      */
     this.init = function(cnv, w, h) {
-
         worldCanvas = cnv;
         worldCanvas.width = w;
         worldWidth = w;
         worldCanvas.height = h;
         worldHeight = h;
-
-        logTimeEvent('World canvas initialized');
     };
 
     /**
@@ -216,6 +213,8 @@ function World() {
     };
 
     /**
+     * A region is ocean if it is a water region connected to the ghost region, which is outside the boundary of the map.
+     *
      * @param {PointMatrix} altitudeMap
      * @return {BinaryMatrix}
      */
@@ -238,23 +237,16 @@ function World() {
             point = activePoints.pop();
 
             altitudeMap.foreachNeighbors(point[0], point[1], 1, function (x, y) {
-
-                if (!isWater(altitudeMap.getTile(x, y))) {
-                    return;
+                if (isWater(altitudeMap.getTile(x, y)) && !oceanMap.filled(x, y)) {
+                    oceanMap.fill(x, y);
+                    activePoints.push([x, y]);
                 }
-
-                if (oceanMap.filled(x, y)) {
-                    return;
-                }
-
-                oceanMap.fill(x, y);
-                activePoints.push([x, y]);
             });
         }
 
         oceanMap = Filters.apply('oceanMap', oceanMap);
 
-        logTimeEvent('Ocean map initialized');
+        logTimeEvent('Ocean map calculated');
 
         return oceanMap;
     };
@@ -276,7 +268,7 @@ function World() {
 
         lakesMap = Filters.apply('lakesMap', lakesMap);
 
-        logTimeEvent('Lakes map initialized');
+        logTimeEvent('Lakes map calculated');
 
         return lakesMap;
     };
@@ -302,31 +294,10 @@ function World() {
      * @param {number} x
      * @param {number} y
      * @param {Array} riverPoints
-     * @param {number} closeness
      * @return {boolean}
      */
-    let tooCloseToArray = function(x, y, riverPoints, closeness) {
-
-        let fail = false;
-
-        for(let i = 0; i < riverPoints.length; i++) {
-            if (closeness >= distance(x, y, riverPoints[i][0], riverPoints[i][1])) {
-                fail = true;
-                break;
-            }
-        }
-
-        return fail;
-    };
-
-    /**
-     * @param {number} x
-     * @param {number} y
-     * @param {Array} riverPoints
-     * @return {boolean}
-     */
-    let tooCloseToRivers = function(x, y, riverPoints) {
-        return tooCloseToArray(x, y, riverPoints, RIVERS_CLOSENESS);
+    let isTooCloseToRivers = function(x, y, riverPoints) {
+        return RIVERS_CLOSENESS >= getClosestDistanceToPoints(x, y, riverPoints);
     };
 
     /**
@@ -348,12 +319,13 @@ function World() {
         spawns = spawns.shuffle();
 
         for(let i = 0; i < spawns.length; i++) {
-            if (!tooCloseToRivers(spawns[i][0], spawns[i][1], riverSources)) {
+            if (!isTooCloseToRivers(spawns[i][0], spawns[i][1], riverSources)) {
                 riverSources.push(spawns[i]);
             }
         }
 
         let map = new BinaryMatrix(worldWidth, worldHeight);
+
         for(let j = 0; j < riverSources.length; j++) {
             map.fill(riverSources[j][0], riverSources[j][1]);
         }
@@ -391,7 +363,7 @@ function World() {
                 continue;
             }
 
-            if (tooCloseToRivers(nx, ny, otherRiverPoints)) {
+            if (isTooCloseToRivers(nx, ny, otherRiverPoints)) {
                 continue;
             }
 
@@ -423,7 +395,6 @@ function World() {
 
         let riverSources = getRiverSources(altitudeMap),
             rivers = [],
-            riverPoints = [],
             otherRiverPoints = [],
             riversCount = getPossibleRiversCount(altitudeMap, riverSources);
 
@@ -440,8 +411,6 @@ function World() {
                 if (!nextPoint.length) {
                     break;
                 }
-
-                riverPoints.push(nextPoint);
 
                 // watter found - trie again and if not possible - terminate
                 if (isRiverDelta(altitudeMap, nextPoint)) {
@@ -623,13 +592,12 @@ function World() {
      * @param {BinaryMatrix} lakesMap
      * @return {number}
      */
-    let findBiomeType = function(x, y, altitude, /*temperature, humidity, riversMap, */lakesMap) {
+    let findBiomeType = function(x, y, altitude, /*temperature, humidity,*/ riversMap, lakesMap) {
 
-        /*
         if(riversMap.filled(x, y)) {
             return BIOME_RIVER;
         }
-*/
+
         if (lakesMap.filled(x, y)) {
             return BIOME_LAKE;
         }
@@ -689,7 +657,7 @@ function World() {
             altitudeMap = generateAltitudeMap(),
             oceanMap = getOceanMap(altitudeMap),
             lakesMap = getLakesMap(altitudeMap, oceanMap),
-            //riversMap = generateRiversMap(altitudeMap),
+            riversMap = generateRiversMap(altitudeMap),
             //temperatureMap = generateTemperatureMap(altitudeMap),
             //humidityMap = generateHumidityMap(oceanMap, riversMap, lakesMap),
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
@@ -704,7 +672,7 @@ function World() {
                     altitudeMap.getTile(x, y),
                     //temperatureMap.getTile(x, y),
                     //humidityMap.getTile(x, y),
-                    //riversMap,
+                    riversMap,
                     lakesMap
                 )
             );
@@ -772,8 +740,6 @@ function World() {
                 _this.moveMapTo(e.pageX - pos.x, e.pageY - pos.y);
             });
         }
-
-        logTimeEvent('Mini map initialized');
     };
 
     /**
@@ -859,6 +825,7 @@ function World() {
     };
 
     this.create = function() {
+        logTimeEvent('Initialized');
         drawWorld();
         //drawRectangles();
     };

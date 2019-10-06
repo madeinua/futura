@@ -724,3 +724,23 @@ function getEqualDistances(number, start, end) {
 
     return lines;
 }
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {Array} array
+ * @return {number}
+ */
+function getClosestDistanceToPoints(x, y, array) {
+
+    let closeness = Number.MAX_SAFE_INTEGER;
+
+    for(let i = 0; i < array.length; i++) {
+        closeness = Math.min(
+            closeness,
+            distance(x, y, array[i][0], array[i][1])
+        );
+    }
+
+    return closeness;
+}
