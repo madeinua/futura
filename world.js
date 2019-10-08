@@ -296,7 +296,11 @@ function World() {
 
             let altitude = altitudeMap.getTile(x, y);
 
-            if (isGround(altitude) && altitude >= RIVER_SOURCE_MIN_ALTITUDE && RIVER_SOURCE_MAX_ALTITUDE >= altitude) {
+            if (
+                isGround(altitude)
+                && altitude >= RIVER_SOURCE_MIN_ALTITUDE
+                && RIVER_SOURCE_MAX_ALTITUDE >= altitude
+            ) {
                 spawns.push([x, y]);
             }
         });
@@ -315,10 +319,6 @@ function World() {
             map.fill(riverSources[j][0], riverSources[j][1]);
         }
 
-        Filters.apply('riverSourcesMap', map);
-
-        logTimeEvent('River sources found');
-
         return riverSources;
     };
 
@@ -331,12 +331,12 @@ function World() {
     let getRiverDirection = function(river, altitudeMap, otherRiverPoints) {
 
         let currentPoint = river[river.length - 1],
-            prevPoint = river.length > 2 ? river[river.length - 2] : false,
-            x = currentPoint[0],
-            y = currentPoint[1],
-            currentAltitude = altitudeMap.getTile(currentPoint[0], currentPoint[1]),
-            lowerPoint = [],
-            neighbors = altitudeMap.getNeighbors(x, y, 2).shuffle();
+            prevPoint = river.length > 1 ? river[river.length - 2] : false,
+            cx = currentPoint[0],
+            cy = currentPoint[1],
+            currentAltitude = altitudeMap.getTile(cx, cy),
+            neighbors = altitudeMap.getNeighbors(cx, cy, 2).shuffle(),
+            lowerPoint = [];
 
         for(let i = 0; i < neighbors.length; i++) {
 
@@ -348,10 +348,12 @@ function World() {
                 continue;
             }
 
+            // prevent river being too close to the other river
             if (isTooCloseToRivers(nx, ny, otherRiverPoints)) {
                 continue;
             }
 
+            // prevent river being "too wide"
             if (prevPoint && distance(nx, ny, prevPoint[0], prevPoint[1]) === 1) {
                 continue;
             }
@@ -365,56 +367,50 @@ function World() {
 
     /**
      * @param {PointMatrix} altitudeMap
-     * @param {Array} point
-     * @return {boolean}
-     */
-    let isRiverDelta = function(altitudeMap, point) {
-        return isWater(altitudeMap.getTile(point[0], point[1]));
-    };
-
-    /**
-     * @param {PointMatrix} altitudeMap
      * @return {BinaryMatrix}
      */
     let generateRiversMap = function(altitudeMap) {
 
         let riverSources = getRiverSources(altitudeMap),
             rivers = [],
-            otherRiverPoints = [],
-            riversCount = Math.floor(tval(RIVERS_DENSITY, 1, riverSources.length));
+            allRiversPoints = [],
+            riversLimit = Math.floor(tval(RIVERS_DENSITY, 1, riverSources.length));
 
         for(let i = 0; i < riverSources.length; i++) {
 
             let river = [],
                 finished = false;
 
+            // source = starting point of each river
             river.push(riverSources[i]);
 
-            for(let j = 0; j < 1000; j++) {
+            // max river length = worldWidth
+            for(let j = 0; j < worldWidth; j++) {
 
-                let nextPoint = getRiverDirection(river, altitudeMap, otherRiverPoints);
-                if (!nextPoint.length) {
+                let nextRiverPoint = getRiverDirection(river, altitudeMap, allRiversPoints);
+
+                if (!nextRiverPoint.length) {
                     break;
                 }
 
-                // watter found - trie again and if not possible - terminate
-                if (isRiverDelta(altitudeMap, nextPoint)) {
+                // lake/ocean found. means river ending point found.
+                if (isWater(altitudeMap.getTile(nextRiverPoint[0], nextRiverPoint[1]))) {
                     finished = true;
                     break;
                 }
 
-                river.push(nextPoint);
+                river.push(nextRiverPoint);
             }
 
             // @TODO Dig rivers (increase width depends on length)
 
             if (finished && river.length >= RIVER_MIN_LENGTH) {
                 rivers.push(river);
-                otherRiverPoints = otherRiverPoints.concat(river);
-                otherRiverPoints.unique();
+                allRiversPoints = allRiversPoints.concat(river);
+                allRiversPoints.unique();
             }
 
-            if (rivers.length === riversCount) {
+            if (rivers.length === riversLimit) {
                 break;
             }
         }
@@ -596,6 +592,7 @@ function World() {
         }
 //@TODO
         return BIOME_GRASS;
+
         /**
          * @param {number} value
          * @param {number} levels

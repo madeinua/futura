@@ -57,10 +57,6 @@ Filters
         drawMap('lakesMapCanvas', map, true);
         return map;
     })
-    .add('riverSourcesMap', function(map) {
-        drawMap('riverSourcesMapCanvas', map, false);
-        return map;
-    })
     .add('riversMap', function(map) {
         drawMap('riversMapCanvas', map, false);
         return map;
