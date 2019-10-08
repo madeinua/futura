@@ -6,7 +6,7 @@ let errors = 0;
  */
 function throwError(msg, limit) {
     limit = typeof limit == 'undefined' ? 1 : limit;
-    if(errors < limit) {
+    if (errors < limit) {
         console.error(msg);
         errors++;
     }
@@ -37,7 +37,7 @@ let Filters = {
      */
     apply: function(tag, val) {
 
-        if(this.filters[tag]) {
+        if (this.filters[tag]) {
             let filters = this.filters[tag];
             for(let i = 0; i < filters.length; i++) {
                 val = filters[i](val);
@@ -121,7 +121,7 @@ Array.prototype.unique = function() {
     let a = this.concat();
     for(let i = 0; i < a.length; ++i) {
         for(let j = i + 1; j < a.length; ++j) {
-            if(a[i] === a[j]) {
+            if (a[i] === a[j]) {
                 a.splice(j--, 1);
             }
         }
@@ -141,12 +141,12 @@ Array.prototype.getClosestDistanceTo = function(x, y) {
 
     for(let i = 0; i < this.length; i++) {
 
-        if(this[i][0] === x && this[i][1] === y) {
+        if (this[i][0] === x && this[i][1] === y) {
             return 0;
         }
 
         let distance = Math.floor(Math.sqrt(Math.pow((x - this[i][0]), 2) + Math.pow((y - this[i][1]), 2)));
-        if(!closest || closest > distance) {
+        if (!closest || closest > distance) {
             closest = distance;
         }
     }
@@ -164,7 +164,7 @@ Array.prototype.getClosestDistanceTo = function(x, y) {
 function arrayHasPoint(arr, x, y) {
 
     for(let i = 0; i < arr.length; i++) {
-        if(arr[i][0] === x && arr[i][1] === y) {
+        if (arr[i][0] === x && arr[i][1] === y) {
             return true;
         }
     }
@@ -227,7 +227,7 @@ class Matrix {
      */
     setTile(x, y, value) {
 
-        if(this.width > x && this.height > y) {
+        if (this.width > x && this.height > y) {
             this.__values[x][y] = value;
         }
 
@@ -281,7 +281,7 @@ class Matrix {
 
         _this.foreach(function(x, y) {
 
-            if(typeof arr[x] === "undefined") {
+            if (typeof arr[x] === "undefined") {
                 arr[x] = [];
             }
 
@@ -373,12 +373,12 @@ class Matrix {
         for(let i = 0; i < points.length; i++) {
             let nx = x + points[i][0];
             let ny = y + points[i][1];
-            if(nx >= 0 && nx < w && ny >= 0 && ny < h) {
+            if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
                 neighbours.push([nx, ny]);
             }
         }
 
-        if(deep > 2) {
+        if (deep > 2) {
             let len = neighbours.length;
             for(let j = 0; j < len; j++) {
                 neighbours = neighbours.concat(
@@ -438,7 +438,7 @@ class Matrix {
             _this = this;
 
         this.foreach(function(x, y) {
-            if(_this.getTile(x, y) === value) {
+            if (_this.getTile(x, y) === value) {
                 found = true;
             }
         });
@@ -459,7 +459,7 @@ class Matrix {
         let surrounds = this.getNeighbors(x, y, deep);
 
         for(let i = 0; i < surrounds.length; i++) {
-            if(this.getTile(surrounds[i][0], surrounds[i][1]) === value) {
+            if (this.getTile(surrounds[i][0], surrounds[i][1]) === value) {
                 return true;
             }
         }
@@ -473,13 +473,13 @@ class Matrix {
      * @param {number} max
      */
     range(min, max) {
-        if(this.constructor.isValidValue(min) && this.constructor.isValidValue(max)) {
+        if (this.constructor.isValidValue(min) && this.constructor.isValidValue(max)) {
             let _this = this;
             this.map(function(x, y) {
                 let value = _this.getTile(x, y);
-                if(value > max) {
+                if (value > max) {
                     return max;
-                } else if(value < min) {
+                } else if (value < min) {
                     return min;
                 } else {
                     return value;
@@ -512,7 +512,7 @@ class BinaryMatrix extends Matrix {
      */
     setTile(x, y, value) {
 
-        if(this.width > x && this.height > y) {
+        if (this.width > x && this.height > y) {
             this.__values[x][y] = value >= 0.5 ? 1 : 0;
         }
 
@@ -562,11 +562,30 @@ class BinaryMatrix extends Matrix {
     foreachFilled(callback) {
         for(let x = 0; x < this.width; x++) {
             for(let y = 0; y < this.height; y++) {
-                if(this.filled(x, y)) {
+                if (this.filled(x, y)) {
                     callback(x, y);
                 }
             }
         }
+    }
+
+    /**
+     * Merge with the other binary matrix
+     * @param {BinaryMatrix} matrix
+     */
+    mergeWith (matrix) {
+
+        if (!(matrix instanceof BinaryMatrix)) {
+            return;
+        }
+
+        let _this = this;
+
+        this.foreachFilled(function (x, y) {
+            if (matrix.filled(x, y)) {
+                _this.fill(x, y);
+            }
+        });
     }
 
     /**
@@ -611,13 +630,13 @@ class PointMatrix extends Matrix {
      */
     setTile(x, y, value) {
 
-        if(this.width > x && this.height > y) {
+        if (this.width > x && this.height > y) {
 
-            if(value > 1) {
+            if (value > 1) {
                 value = 1;
             }
 
-            if(value < 0) {
+            if (value < 0) {
                 value = 0;
             }
 
@@ -684,7 +703,7 @@ let hexStorage = [];
  */
 function hexToRgb(hex) {
 
-    if(typeof hexStorage[hex] === "undefined") {
+    if (typeof hexStorage[hex] === "undefined") {
 
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
         let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;

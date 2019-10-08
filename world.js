@@ -150,7 +150,7 @@ function World() {
             dy = Math.abs(y - maxY * 0.5),
             distance = Math.sqrt(dx * dx + dy * dy),
             delta = distance / (maxX * 0.5),
-            gradient = delta * delta - 0.25;
+            gradient = delta * delta - 0.2;
 
         return Math.min(altitude, altitude * Math.max(0, 1 - gradient));
     };
@@ -229,14 +229,14 @@ function World() {
         let activePoints = [],
             point;
 
-        oceanMap.fill(0 ,0);
+        oceanMap.fill(0, 0);
         activePoints.push([0, 0]);
 
-        while (activePoints.length) {
+        while(activePoints.length) {
 
             point = activePoints.pop();
 
-            altitudeMap.foreachNeighbors(point[0], point[1], 1, function (x, y) {
+            altitudeMap.foreachNeighbors(point[0], point[1], 1, function(x, y) {
                 if (isWater(altitudeMap.getTile(x, y)) && !oceanMap.filled(x, y)) {
                     oceanMap.fill(x, y);
                     activePoints.push([x, y]);
@@ -274,23 +274,6 @@ function World() {
     };
 
     /**
-     * @param {PointMatrix} altitudeMap
-     * @param {Array} riverSources
-     * @return {number}
-     */
-    let getPossibleRiversCount = function(altitudeMap, riverSources) {
-
-        if (RIVERS_DENSITY === 0) {
-            return 0;
-        }
-
-        let minRiverLength = RIVER_MIN_LENGTH,
-            maxRivers = riverSources.length / (minRiverLength * RIVERS_CLOSENESS);
-
-        return Math.round(tval(RIVERS_DENSITY, 1, maxRivers));
-    };
-
-    /**
      * @param {number} x
      * @param {number} y
      * @param {Array} riverPoints
@@ -310,7 +293,9 @@ function World() {
             riverSources = [];
 
         altitudeMap.foreach(function(x, y) {
+
             let altitude = altitudeMap.getTile(x, y);
+
             if (isGround(altitude) && altitude >= RIVER_SOURCE_MIN_ALTITUDE && RIVER_SOURCE_MAX_ALTITUDE >= altitude) {
                 spawns.push([x, y]);
             }
@@ -396,7 +381,7 @@ function World() {
         let riverSources = getRiverSources(altitudeMap),
             rivers = [],
             otherRiverPoints = [],
-            riversCount = getPossibleRiversCount(altitudeMap, riverSources);
+            riversCount = Math.floor(tval(RIVERS_DENSITY, 1, riverSources.length));
 
         for(let i = 0; i < riverSources.length; i++) {
 
@@ -594,7 +579,7 @@ function World() {
      */
     let findBiomeType = function(x, y, altitude, /*temperature, humidity,*/ riversMap, lakesMap) {
 
-        if(riversMap.filled(x, y)) {
+        if (riversMap.filled(x, y)) {
             return BIOME_RIVER;
         }
 
