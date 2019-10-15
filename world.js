@@ -366,6 +366,51 @@ function World() {
     };
 
     /**
+     * Add river delta
+     *
+     * @param {BinaryMatrix} riversMap
+     * @param {Array} river
+     * @return {BinaryMatrix}
+     */
+    let addRiverDeltaToRiverMap = function (riversMap, river) {
+
+        let deltaLength = river.length * randBetweenFloats(0, 0.25),
+            notDeltaLength = river.length - deltaLength;
+
+        for(let p = 0; p < river.length; p++) {
+            if (p > notDeltaLength) {
+                riversMap.foreachNeighbors(river[p][0], river[p][1], 0, function (nx, ny) {
+                    if ([0, 1].randomElement() === 0) {
+                        riversMap.fill(nx, ny);
+                    }
+                });
+            }
+        }
+
+        return riversMap;
+    };
+
+    /**
+     * @param {Array} rivers
+     * @return {BinaryMatrix}
+     */
+    let createRiverMapFromRiversPoints = function (rivers) {
+
+        let riversMap = new BinaryMatrix(worldWidth, worldHeight);
+
+        for(let i = 0; i < rivers.length; i++) {
+
+            for(let p = 0; p < rivers[i].length; p++) {
+                riversMap.fill(rivers[i][p][0], rivers[i][p][1]);
+            }
+
+            riversMap = addRiverDeltaToRiverMap(riversMap, rivers[i]);
+        }
+
+        return riversMap;
+    };
+
+    /**
      * @param {PointMatrix} altitudeMap
      * @return {BinaryMatrix}
      */
@@ -402,8 +447,6 @@ function World() {
                 river.push(nextRiverPoint);
             }
 
-            // @TODO Dig rivers (increase width depends on length)
-
             if (finished && river.length >= RIVER_MIN_LENGTH) {
                 rivers.push(river);
                 allRiversPoints = allRiversPoints.concat(river);
@@ -415,13 +458,7 @@ function World() {
             }
         }
 
-        let riversMap = new BinaryMatrix(worldWidth, worldHeight);
-
-        for(let i = 0; i < rivers.length; i++) {
-            for(let p = 0; p < rivers[i].length; p++) {
-                riversMap.fill(rivers[i][p][0], rivers[i][p][1]);
-            }
-        }
+        let riversMap = createRiverMapFromRiversPoints(rivers);
 
         riversMap = Filters.apply('riversMap', riversMap);
 

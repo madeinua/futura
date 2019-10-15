@@ -50,7 +50,7 @@ let Filters = {
 
 /**
  * Retrieve random element of array
- * @return {Array}
+ * @return {string|number}
  */
 Array.prototype.randomElement = function() {
     return this[Math.floor(Math.random() * this.length)];
@@ -78,7 +78,35 @@ Array.prototype.shuffle = function() {
  * @return {number}
  */
 function randBetweenFloats(float1, float2) {
-    return Math.random() * (float2 - float1) + float1;
+    return normalRandom() * (float2 - float1) + float1;
+}
+
+/**
+ * Create normal randomization
+ * @see https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
+ * @return {number}
+ */
+function normalRandom() {
+
+    let u = 0, v = 0;
+
+    while(u === 0) {
+        u = Math.random();
+    }
+
+    while(v === 0) {
+        v = Math.random();
+    }
+
+    let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+
+    num = num / 10.0 + 0.5;
+
+    if (num > 1 || num < 0) {
+        return normalRandom();
+    }
+
+    return num;
 }
 
 /**
