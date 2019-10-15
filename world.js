@@ -1,13 +1,10 @@
 let WORLD_SCALE = 33, // times
-    WORLD_MAP_OCEAN_LEVEL = 0.5; // [0 - 1]
+    WORLD_MAP_OCEAN_LEVEL = 0.5; // [0-1]
 
 let LEVEL_OCEAN = 0.2,
     LEVEL_COAST = 0.3;
 
-let WATER_HUMIDITY_FACTOR = 0.4, // [0 - 1]
-    OCEAN_HUMIDITY_FACTOR = 0.2; // [0 - 1]
-
-let ALTITUDE_TEMPERATURE_FACTOR = 0.3; // [0 - 1]
+let ALTITUDE_TEMPERATURE_FACTOR = 0.3; // [0-1]
 
 let BIOME_OCEAN = 0,
     BIOME_COAST = 1,
@@ -28,7 +25,8 @@ let RIVERS_DENSITY = 0.5, // [0-1]
     RIVER_SOURCE_MIN_ALTITUDE = 0.5,
     RIVER_SOURCE_MAX_ALTITUDE = 0.9,
     RIVERS_CLOSENESS = 3,
-    RIVER_MIN_LENGTH = 5;
+    RIVER_MIN_LENGTH = 5,
+    RIVER_DELTA_MAX_LENGTH = 0.25; // [0-1] 1 = 100% of length
 
 /**
  * @constructor
@@ -216,14 +214,15 @@ function World() {
      * A region is ocean if it is a water region connected to the ghost region, which is outside the boundary of the map.
      *
      * @param {PointMatrix} altitudeMap
-     * @return {BinaryMatrix}
+     * @return {Array}
      */
-    let getOceanMap = function(altitudeMap) {
+    let getOceanAndCoastMaps = function(altitudeMap) {
 
-        let oceanMap = new BinaryMatrix(worldWidth, worldHeight);
+        let oceanMap = new BinaryMatrix(worldWidth, worldHeight),
+            coastMap = new BinaryMatrix(worldWidth, worldHeight);
 
         if (!isWater(altitudeMap.getTile(0, 0))) {
-            return oceanMap;
+            return [oceanMap, coastMap];
         }
 
         let activePoints = [],
@@ -237,18 +236,23 @@ function World() {
             point = activePoints.pop();
 
             altitudeMap.foreachNeighbors(point[0], point[1], 1, function(x, y) {
-                if (isWater(altitudeMap.getTile(x, y)) && !oceanMap.filled(x, y)) {
-                    oceanMap.fill(x, y);
-                    activePoints.push([x, y]);
+                if (isWater(altitudeMap.getTile(x, y))) {
+                    if (!oceanMap.filled(x, y)) {
+                        oceanMap.fill(x, y);
+                        activePoints.push([x, y]);
+                    }
+                } else {
+                    coastMap.fill(x, y);
                 }
             });
         }
 
         oceanMap = Filters.apply('oceanMap', oceanMap);
+        coastMap = Filters.apply('coastMap', coastMap);
 
-        logTimeEvent('Ocean map calculated');
+        logTimeEvent('Ocean & coast maps calculated');
 
-        return oceanMap;
+        return [oceanMap, coastMap];
     };
 
     /**
@@ -374,7 +378,7 @@ function World() {
      */
     let addRiverDeltaToRiverMap = function (riversMap, river) {
 
-        let deltaLength = river.length * randBetweenFloats(0, 0.25),
+        let deltaLength = river.length * randBetweenFloats(0, RIVER_DELTA_MAX_LENGTH),
             notDeltaLength = river.length - deltaLength;
 
         for(let p = 0; p < river.length; p++) {
@@ -469,6 +473,52 @@ function World() {
 
     /**
      * @param {PointMatrix} altitudeMap
+     * @param {BinaryMatrix} coastMap
+     * @param {BinaryMatrix} riversMap
+     * @param {BinaryMatrix} lakesMap
+     * @return {PointMatrix}
+     */
+    let generateHumidityMap = function(altitudeMap, coastMap, riversMap, lakesMap) {
+
+        let humidityMap = createNoiseMap(90);
+
+        // higher altitude = lower humidity
+        humidityMap.map(function(x, y) {
+            return humidityMap.getTile(x, y) - 0.25 + altitudeMap.getTile(x, y) * 0.5;
+        });
+
+        let lakes = lakesMap.getFilledTiles().makeStep(5), // divider by 5 to increase performance
+            rivers = riversMap.getFilledTiles(),
+            water = rivers.concat(lakes),
+            coasts = coastMap.getFilledTiles().makeStep(5), // divider by 5 to increase performance
+            maxDistance = worldWidth / 10;
+
+        // rivers/lakes increase humidity
+        humidityMap.map(function(x, y) {
+
+            let distance = water.getClosestDistanceTo(x, y),
+                md = Math.sqrt(maxDistance);
+
+            return humidityMap.getTile(x, y) + 0.1 + tval(distance / Math.max(distance, md), -0.2, 0.1);
+        });
+
+        // ocean decrease humidity
+        humidityMap.map(function(x, y) {
+
+            let distance = coasts.getClosestDistanceTo(x, y);
+
+            return humidityMap.getTile(x, y) - 0.2 + tval(distance / Math.max(distance, maxDistance), 0, 0.4);
+        });
+
+        humidityMap = Filters.apply('humidityMap', humidityMap);
+
+        logTimeEvent('Humidity map created');
+
+        return humidityMap;
+    };
+
+    /**
+     * @param {PointMatrix} altitudeMap
      * @return {PointMatrix}
      */
     let generateTemperatureMap = function(altitudeMap) {
@@ -491,52 +541,6 @@ function World() {
         logTimeEvent('Temperature map created');
 
         return temperatureMap;
-    };
-
-    /**
-     * @param {BinaryMatrix} oceanMap
-     * @param {BinaryMatrix} riversMap
-     * @param {BinaryMatrix} lakesMap
-     * @return {PointMatrix}
-     */
-    let generateHumidityMap = function(oceanMap, riversMap, lakesMap) {
-
-        let bigMap = createNoiseMap(90),
-            smallMap = createNoiseMap(5),
-            humidityMap = new PointMatrix(worldWidth, worldHeight);
-
-        // blend maps
-        humidityMap.map(function(x, y) {
-            return bigMap.getTile(x, y) / 2 + smallMap.getTile(x, y) / 8;
-        });
-
-        let lakes = lakesMap.getFilledTiles(),
-            rivers = riversMap.getFilledTiles(),
-            water = rivers.concat(lakes),
-            maxDistance = worldWidth / 10;
-
-        // rivers/lakes increase humidity and ocean decrease it
-        humidityMap.map(function(x, y) {
-
-            let humidity = humidityMap.getTile(x, y),
-                distance = water.getClosestDistanceTo(x, y);
-
-            if (distance <= maxDistance) {
-                humidity += (1 - (distance / maxDistance)) * WATER_HUMIDITY_FACTOR;
-            }
-
-            if (oceanMap.filled(x, y)) {
-                humidity -= OCEAN_HUMIDITY_FACTOR;
-            }
-
-            return humidity;
-        });
-
-        humidityMap = Filters.apply('humidityMap', humidityMap);
-
-        logTimeEvent('Humidity map created');
-
-        return humidityMap;
     };
 
     /**
@@ -674,11 +678,13 @@ function World() {
 
         let biome,
             altitudeMap = generateAltitudeMap(),
-            oceanMap = getOceanMap(altitudeMap),
+            oceanAndCoastMaps = getOceanAndCoastMaps(altitudeMap),
+            oceanMap = oceanAndCoastMaps[0],
+            coastMap = oceanAndCoastMaps[1],
             lakesMap = getLakesMap(altitudeMap, oceanMap),
             riversMap = generateRiversMap(altitudeMap),
+            humidityMap = generateHumidityMap(altitudeMap, coastMap, riversMap, lakesMap),
             //temperatureMap = generateTemperatureMap(altitudeMap),
-            //humidityMap = generateHumidityMap(oceanMap, riversMap, lakesMap),
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = context.createImageData(worldWidth, worldHeight);
 

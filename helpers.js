@@ -157,6 +157,17 @@ Array.prototype.unique = function() {
     return a;
 };
 
+Array.prototype.makeStep = function(stepSize) {
+
+    let result = [];
+
+    for(let i = 0; i < this.length; i += stepSize) {
+        result.push(this[i]);
+    }
+
+    return result;
+};
+
 /**
  * Retrieve closest distance to the tile
  * @param {number} x
@@ -174,6 +185,7 @@ Array.prototype.getClosestDistanceTo = function(x, y) {
         }
 
         let distance = Math.floor(Math.sqrt(Math.pow((x - this[i][0]), 2) + Math.pow((y - this[i][1]), 2)));
+
         if (!closest || closest > distance) {
             closest = distance;
         }
@@ -494,29 +506,6 @@ class Matrix {
 
         return false;
     }
-
-    /**
-     * Set min and max possible values to the matrix values
-     * @param {number} min
-     * @param {number} max
-     */
-    range(min, max) {
-        if (this.constructor.isValidValue(min) && this.constructor.isValidValue(max)) {
-            let _this = this;
-            this.map(function(x, y) {
-                let value = _this.getTile(x, y);
-                if (value > max) {
-                    return max;
-                } else if (value < min) {
-                    return min;
-                } else {
-                    return value;
-                }
-            });
-        } else {
-            console.error('Invalid min/max values for the range figure');
-        }
-    }
 }
 
 class BinaryMatrix extends Matrix {
@@ -752,8 +741,8 @@ function hexToRgb(hex) {
 /**
  * Split [0-100] range into equal parts "distances"
  * @param {number} number
- * @param {number} number
- * @param {number} number
+ * @param {number} start
+ * @param {number} end
  * @return {[number]}
  */
 function getEqualDistances(number, start, end) {

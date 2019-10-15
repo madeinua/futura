@@ -46,11 +46,15 @@ Filters
         return map;
     })
     .add('humidityMap', function(map) {
-        drawMap('humidityMapCanvas', map, true);
+        drawMap('humidityMapCanvas', map, false);
         return map;
     })
     .add('oceanMap', function(map) {
         drawMap('oceanMapCanvas', map, false);
+        return map;
+    })
+    .add('coastMap', function(map) {
+        drawMap('coastMapCanvas', map, true);
         return map;
     })
     .add('lakesMap', function(map) {
