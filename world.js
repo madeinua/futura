@@ -2,24 +2,27 @@ let WORLD_SCALE = 33, // times
     WORLD_MAP_OCEAN_LEVEL = 0.5; // [0-1]
 
 let LEVEL_OCEAN = 0.2,
-    LEVEL_COAST = 0.3;
+    LEVEL_COAST = 0.3,
+    LEVEL_BEACH = 0.32,
+    LEVEL_LAND = 0.4,
+    LEVEL_HILLS = 0.6;
 
-let ALTITUDE_TEMPERATURE_FACTOR = 0.3; // [0-1]
+let ALTITUDE_TEMPERATURE_FACTOR = 0.7; // [0-1]
 
 let BIOME_OCEAN = 0,
     BIOME_COAST = 1,
+    BIOME_RIVER = 2,
+    BIOME_LAKE = 3,
 
-    BIOME_SNOW = 2,
-    BIOME_TUNDRA = 3,
-    BIOME_GRASS = 4,
-    BIOME_SANDS = 5,
-    BIOME_LOWLAND = 6,
-    BIOME_SWAMP = 7,
-    BIOME_SAVANNA = 8,
-    BIOME_TROPICS = 9,
+    BIOME_BEACH = 10,
 
-    BIOME_RIVER = 10,
-    BIOME_LAKE = 11;
+    BOIME_DESERT = 20,
+    BOIME_GRASSLAND = 21,
+    BIOME_SAVANNA = 22,
+    BIOME_TROPICS = 23,
+    BIOME_FOREST = 24,
+    BIOME_TAIGA = 25,
+    BIOME_TUNDRA = 26;
 
 let RIVERS_DENSITY = 0.5, // [0-1]
     RIVER_SOURCE_MIN_ALTITUDE = 0.5,
@@ -45,24 +48,29 @@ function Biome(biomeType) {
 /**
  * @param {Biome} biome
  * @param {number} altitude
+ * @param {number} temperature
+ * @param {number} humidity
  * @return {array}
  */
-function getBiomeColor(biome, altitude) {
+function getBiomeColor(biome, altitude, temperature, humidity) {
 
     let colors = [];
 
-    colors[BIOME_SNOW] = '#c4c4c4'; //@TODO use array of 3 colors for diff altitudes
-    colors[BIOME_TUNDRA] = '#cdbc73';
+    colors[BIOME_OCEAN] = '#003eb2';
+    colors[BIOME_COAST] = '#0952c6';
+
+    colors[BIOME_BEACH] = LightenDarkenColor('#c2b281', temperature * 60 - 30);
+
+    colors[BIOME_MOUNTAINS] = '#c4c4c4';
+    colors[BIOME_TUNDRA] = '#867645';
     colors[BIOME_GRASS] = '#73AA00';
     colors[BIOME_SANDS] = '#F0D75A';
     colors[BIOME_LOWLAND] = '#5a9600';
     colors[BIOME_SWAMP] = '#0FA055';
     colors[BIOME_SAVANNA] = '#82AF00';
     colors[BIOME_TROPICS] = '#50AA00';
-    colors[BIOME_COAST] = '#0ca0c8';
-    colors[BIOME_RIVER] = '#0ca0c8';
-    colors[BIOME_LAKE] = '#0082ca';
-    colors[BIOME_OCEAN] = '#0064be';
+    colors[BIOME_RIVER] = '#0952c6';
+    colors[BIOME_LAKE] = '#007bbf';
 
     let color = colors[biome.getType()];
 
@@ -524,14 +532,15 @@ function World() {
 
         let temperatureMap = new PointMatrix(worldWidth, worldHeight);
 
-        let gradient = [];
+        let gradient = [],
+            revFactor = (1 - ALTITUDE_TEMPERATURE_FACTOR) * 10;
 
         for (let i=0; i<worldHeight; i++) {
             gradient[i] = i / worldHeight;
         }
 
         temperatureMap.map(function (x, y) {
-            return (altitudeMap.getTile(x, y) + gradient[y] * 3) / 3;
+            return (altitudeMap.getTile(x, y) + gradient[y] * revFactor) / revFactor;
         });
 
         temperatureMap = Filters.apply('temperatureMap', temperatureMap);
@@ -608,11 +617,16 @@ function World() {
      * @param {number} altitude
      * @param {number} temperature
      * @param {number} humidity
+     * @param {BinaryMatrix} oceanMap
      * @param {BinaryMatrix} riversMap
      * @param {BinaryMatrix} lakesMap
      * @return {number}
      */
-    let findBiomeType = function(x, y, altitude, /*temperature, humidity,*/ riversMap, lakesMap) {
+    let findBiomeType = function(x, y, altitude, temperature, humidity, oceanMap, riversMap, lakesMap) {
+
+        if (oceanMap.filled(x, y)) {
+            return altitude > LEVEL_OCEAN ? BIOME_COAST : BIOME_OCEAN;
+        }
 
         if (riversMap.filled(x, y)) {
             return BIOME_RIVER;
@@ -622,48 +636,19 @@ function World() {
             return BIOME_LAKE;
         }
 
-        if (altitude < LEVEL_OCEAN) {
-            return BIOME_OCEAN;
+        if (LEVEL_BEACH > altitude) {
+            return BIOME_BEACH;
         }
 
-        if (altitude < LEVEL_COAST) {
-            return BIOME_COAST;
+        if (LEVEL_LAND > altitude) {
+            return BIOME_LOWLAND;
         }
-//@TODO
-        return BIOME_GRASS;
 
-        /**
-         * @param {number} value
-         * @param {number} levels
-         * @return {number}
-         */
-        let evaluateLevel = function(value, levels) {
+        if (LEVEL_HILLS > altitude) {
+            return BIOME_GRASS;
+        }
 
-            let grad = 1 / levels,
-                level = 0;
-
-            for(let i = 1; i <= 4; i++) {
-                if (value > i * grad) {
-                    ++level;
-                }
-            }
-
-            return level;
-        };
-
-        // @TODO Not working
-        let biomeMatrix = [
-            [BIOME_TUNDRA, BIOME_SWAMP, BIOME_SAVANNA, BIOME_TROPICS],
-            [BIOME_TUNDRA, BIOME_LOWLAND, BIOME_GRASS, BIOME_GRASS],
-            [BIOME_TUNDRA, BIOME_LOWLAND, BIOME_GRASS, BIOME_GRASS],
-            [BIOME_SNOW, BIOME_LOWLAND, BIOME_GRASS, BIOME_SANDS]
-        ];
-
-        let rand = randBetweenFloats(-0.02, 0.02),
-            humidityLevel = evaluateLevel(humidity - rand, 4),
-            tempLevel = evaluateLevel(temperature + rand, 4);
-
-        return biomeMatrix[humidityLevel][tempLevel];
+        return BIOME_MOUNTAINS;
     };
 
     let xyCoords;
@@ -693,8 +678,9 @@ function World() {
                     x,
                     y,
                     altitudeMap.getTile(x, y),
-                    //temperatureMap.getTile(x, y),
-                    //humidityMap.getTile(x, y),
+                    temperatureMap.getTile(x, y),
+                    humidityMap.getTile(x, y),
+                    oceanMap,
                     riversMap,
                     lakesMap
                 )
@@ -703,7 +689,12 @@ function World() {
             fillCanvasPixel(
                 image.data,
                 (x + y * worldWidth) * 4,
-                getBiomeColor(biome, altitudeMap.getTile(x, y))
+                getBiomeColor(
+                    biome,
+                    altitudeMap.getTile(x, y),
+                    temperatureMap.getTile(x, y),
+                    humidityMap.getTile(x, y)
+                )
             );
 
             //displayPixelObject(objectsMap, x, y);
