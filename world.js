@@ -518,22 +518,20 @@ function World() {
     };
 
     /**
-     * @param {PointMatrix} altitudeMap
      * @return {PointMatrix}
      */
     let generateTemperatureMap = function(altitudeMap) {
 
-        let temperatureMap = createNoiseMap(75),
-            half = worldHeight / 2;
+        let temperatureMap = new PointMatrix(worldWidth, worldHeight);
 
-        // higher temperature to the middle
-        temperatureMap.map(function(x, y) {
-            return (temperatureMap.getTile(x, y) + (Math.abs(y - half) / half)) * 0.5;
-        });
+        let gradient = [];
 
-        // change temperature depends on altitude
-        temperatureMap.map(function(x, y) {
-            return temperatureMap.getTile(x, y) - altitudeMap.getTile(x, y) * ALTITUDE_TEMPERATURE_FACTOR;
+        for (let i=0; i<worldHeight; i++) {
+            gradient[i] = i / worldHeight;
+        }
+
+        temperatureMap.map(function (x, y) {
+            return (altitudeMap.getTile(x, y) + gradient[y] * 3) / 3;
         });
 
         temperatureMap = Filters.apply('temperatureMap', temperatureMap);
@@ -684,7 +682,7 @@ function World() {
             lakesMap = getLakesMap(altitudeMap, oceanMap),
             riversMap = generateRiversMap(altitudeMap),
             humidityMap = generateHumidityMap(altitudeMap, coastMap, riversMap, lakesMap),
-            //temperatureMap = generateTemperatureMap(altitudeMap),
+            temperatureMap = generateTemperatureMap(altitudeMap),
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = context.createImageData(worldWidth, worldHeight);
 
