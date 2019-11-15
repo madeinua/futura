@@ -176,22 +176,16 @@ Array.prototype.makeStep = function(stepSize) {
  */
 Array.prototype.getClosestDistanceTo = function(x, y) {
 
-    let closest = false;
+    let closeness = Number.MAX_SAFE_INTEGER;
 
     for(let i = 0; i < this.length; i++) {
-
-        if (this[i][0] === x && this[i][1] === y) {
-            return 0;
-        }
-
-        let distance = Math.floor(Math.sqrt(Math.pow((x - this[i][0]), 2) + Math.pow((y - this[i][1]), 2)));
-
-        if (!closest || closest > distance) {
-            closest = distance;
-        }
+        closeness = Math.min(
+            closeness,
+            distance(x, y, this[i][0], this[i][1])
+        );
     }
 
-    return closest;
+    return closeness;
 };
 
 /**
@@ -759,26 +753,6 @@ function getEqualDistances(number, start, end) {
     }
 
     return lines;
-}
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {Array} array
- * @return {number}
- */
-function getClosestDistanceToPoints(x, y, array) {
-
-    let closeness = Number.MAX_SAFE_INTEGER;
-
-    for(let i = 0; i < array.length; i++) {
-        closeness = Math.min(
-            closeness,
-            distance(x, y, array[i][0], array[i][1])
-        );
-    }
-
-    return closeness;
 }
 
 /**

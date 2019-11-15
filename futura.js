@@ -53,8 +53,8 @@ Filters
         drawMap('oceanMapCanvas', map, false);
         return map;
     })
-    .add('coastMap', function(map) {
-        drawMap('coastMapCanvas', map, true);
+    .add('beachesMap', function(map) {
+        drawMap('beachesMapCanvas', map, true);
         return map;
     })
     .add('lakesMap', function(map) {

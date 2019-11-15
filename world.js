@@ -22,7 +22,8 @@ let BIOME_OCEAN = 0,
     BIOME_TROPICS = 23,
     BIOME_FOREST = 24,
     BIOME_TAIGA = 25,
-    BIOME_TUNDRA = 26;
+    BIOME_TUNDRA = 26,
+    BIOME_SWAMP = 27;
 
 let RIVERS_DENSITY = 0.5, // [0-1]
     RIVER_SOURCE_MIN_ALTITUDE = 0.5,
@@ -61,12 +62,7 @@ function getBiomeColor(biome, altitude, temperature, humidity) {
 
     colors[BIOME_BEACH] = LightenDarkenColor('#c2b281', temperature * 60 - 30);
 
-    colors[BIOME_MOUNTAINS] = '#c4c4c4';
     colors[BIOME_TUNDRA] = '#867645';
-    colors[BIOME_GRASS] = '#73AA00';
-    colors[BIOME_SANDS] = '#F0D75A';
-    colors[BIOME_LOWLAND] = '#5a9600';
-    colors[BIOME_SWAMP] = '#0FA055';
     colors[BIOME_SAVANNA] = '#82AF00';
     colors[BIOME_TROPICS] = '#50AA00';
     colors[BIOME_RIVER] = '#0952c6';
@@ -219,18 +215,16 @@ function World() {
     };
 
     /**
-     * A region is ocean if it is a water region connected to the ghost region, which is outside the boundary of the map.
-     *
      * @param {PointMatrix} altitudeMap
      * @return {Array}
      */
-    let getOceanAndCoastMaps = function(altitudeMap) {
+    let getOceanAndBeachesMap = function(altitudeMap) {
 
         let oceanMap = new BinaryMatrix(worldWidth, worldHeight),
-            coastMap = new BinaryMatrix(worldWidth, worldHeight);
+            beachesMap = new BinaryMatrix(worldWidth, worldHeight);
 
         if (!isWater(altitudeMap.getTile(0, 0))) {
-            return [oceanMap, coastMap];
+            return [oceanMap, beachesMap];
         }
 
         let activePoints = [],
@@ -243,24 +237,27 @@ function World() {
 
             point = activePoints.pop();
 
-            altitudeMap.foreachNeighbors(point[0], point[1], 1, function(x, y) {
-                if (isWater(altitudeMap.getTile(x, y))) {
+            altitudeMap.foreachNeighbors(point[0], point[1], 3, function(x, y) {
+
+                let altitude = altitudeMap.getTile(x, y);
+
+                if (isWater(altitude)) {
                     if (!oceanMap.filled(x, y)) {
                         oceanMap.fill(x, y);
                         activePoints.push([x, y]);
                     }
-                } else {
-                    coastMap.fill(x, y);
+                } else if (LEVEL_BEACH > altitude) {
+                    beachesMap.fill(x, y);
                 }
             });
         }
 
         oceanMap = Filters.apply('oceanMap', oceanMap);
-        coastMap = Filters.apply('coastMap', coastMap);
+        beachesMap = Filters.apply('beachesMap', beachesMap);
 
-        logTimeEvent('Ocean & coast maps calculated');
+        logTimeEvent('Ocean, coast, beaches maps calculated');
 
-        return [oceanMap, coastMap];
+        return [oceanMap, beachesMap];
     };
 
     /**
@@ -292,7 +289,7 @@ function World() {
      * @return {boolean}
      */
     let isTooCloseToRivers = function(x, y, riverPoints) {
-        return RIVERS_CLOSENESS >= getClosestDistanceToPoints(x, y, riverPoints);
+        return RIVERS_CLOSENESS >= riverPoints.getClosestDistanceTo(x, y);
     };
 
     /**
@@ -384,14 +381,14 @@ function World() {
      * @param {Array} river
      * @return {BinaryMatrix}
      */
-    let addRiverDeltaToRiverMap = function (riversMap, river) {
+    let addRiverDeltaToRiverMap = function(riversMap, river) {
 
         let deltaLength = river.length * randBetweenFloats(0, RIVER_DELTA_MAX_LENGTH),
             notDeltaLength = river.length - deltaLength;
 
         for(let p = 0; p < river.length; p++) {
             if (p > notDeltaLength) {
-                riversMap.foreachNeighbors(river[p][0], river[p][1], 0, function (nx, ny) {
+                riversMap.foreachNeighbors(river[p][0], river[p][1], 0, function(nx, ny) {
                     if ([0, 1].randomElement() === 0) {
                         riversMap.fill(nx, ny);
                     }
@@ -406,7 +403,7 @@ function World() {
      * @param {Array} rivers
      * @return {BinaryMatrix}
      */
-    let createRiverMapFromRiversPoints = function (rivers) {
+    let createRiverMapFromRiversPoints = function(rivers) {
 
         let riversMap = new BinaryMatrix(worldWidth, worldHeight);
 
@@ -481,12 +478,12 @@ function World() {
 
     /**
      * @param {PointMatrix} altitudeMap
-     * @param {BinaryMatrix} coastMap
+     * @param {BinaryMatrix} beachesMap
      * @param {BinaryMatrix} riversMap
      * @param {BinaryMatrix} lakesMap
      * @return {PointMatrix}
      */
-    let generateHumidityMap = function(altitudeMap, coastMap, riversMap, lakesMap) {
+    let generateHumidityMap = function(altitudeMap, beachesMap, riversMap, lakesMap) {
 
         let humidityMap = createNoiseMap(90);
 
@@ -498,7 +495,7 @@ function World() {
         let lakes = lakesMap.getFilledTiles().makeStep(5), // divider by 5 to increase performance
             rivers = riversMap.getFilledTiles(),
             water = rivers.concat(lakes),
-            coasts = coastMap.getFilledTiles().makeStep(5), // divider by 5 to increase performance
+            beaches = beachesMap.getFilledTiles(),
             maxDistance = worldWidth / 10;
 
         // rivers/lakes increase humidity
@@ -513,7 +510,7 @@ function World() {
         // ocean decrease humidity
         humidityMap.map(function(x, y) {
 
-            let distance = coasts.getClosestDistanceTo(x, y);
+            let distance = beaches.getClosestDistanceTo(x, y);
 
             return humidityMap.getTile(x, y) - 0.2 + tval(distance / Math.max(distance, maxDistance), 0, 0.4);
         });
@@ -535,11 +532,11 @@ function World() {
         let gradient = [],
             revFactor = (1 - ALTITUDE_TEMPERATURE_FACTOR) * 10;
 
-        for (let i=0; i<worldHeight; i++) {
+        for(let i = 0; i < worldHeight; i++) {
             gradient[i] = i / worldHeight;
         }
 
-        temperatureMap.map(function (x, y) {
+        temperatureMap.map(function(x, y) {
             return (altitudeMap.getTile(x, y) + gradient[y] * revFactor) / revFactor;
         });
 
@@ -636,19 +633,11 @@ function World() {
             return BIOME_LAKE;
         }
 
-        if (LEVEL_BEACH > altitude) {
+        if (LEVEL_BEACH > altitude && 3 > oceanMap.getAll().getClosestDistanceTo(x, y)) {
             return BIOME_BEACH;
         }
 
-        if (LEVEL_LAND > altitude) {
-            return BIOME_LOWLAND;
-        }
-
-        if (LEVEL_HILLS > altitude) {
-            return BIOME_GRASS;
-        }
-
-        return BIOME_MOUNTAINS;
+        return BIOME_FOREST; // @TODO
     };
 
     let xyCoords;
@@ -661,12 +650,12 @@ function World() {
 
         let biome,
             altitudeMap = generateAltitudeMap(),
-            oceanAndCoastMaps = getOceanAndCoastMaps(altitudeMap),
-            oceanMap = oceanAndCoastMaps[0],
-            coastMap = oceanAndCoastMaps[1],
+            oceanAndBeachesMaps = getOceanAndBeachesMap(altitudeMap),
+            oceanMap = oceanAndBeachesMaps[0],
+            beachesMap = oceanAndBeachesMaps[1],
             lakesMap = getLakesMap(altitudeMap, oceanMap),
             riversMap = generateRiversMap(altitudeMap),
-            humidityMap = generateHumidityMap(altitudeMap, coastMap, riversMap, lakesMap),
+            humidityMap = generateHumidityMap(altitudeMap, beachesMap, riversMap, lakesMap),
             temperatureMap = generateTemperatureMap(altitudeMap),
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = context.createImageData(worldWidth, worldHeight);
