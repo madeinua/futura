@@ -98,7 +98,7 @@ function normalRandom() {
         v = Math.random();
     }
 
-    let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 
     num = num / 10.0 + 0.5;
 
@@ -155,17 +155,6 @@ Array.prototype.unique = function() {
         }
     }
     return a;
-};
-
-Array.prototype.makeStep = function(stepSize) {
-
-    let result = [];
-
-    for(let i = 0; i < this.length; i += stepSize) {
-        result.push(this[i]);
-    }
-
-    return result;
 };
 
 /**
@@ -253,6 +242,18 @@ class Matrix {
     }
 
     /**
+     * Set all tiles of matrix
+     * @param {Array} values
+     * @return {Matrix}
+     */
+    setAll(values) {
+
+        this.__values = values;
+
+        return this;
+    }
+
+    /**
      * Set tile value
      * @param {number} x
      * @param {number} y
@@ -261,9 +262,7 @@ class Matrix {
      */
     setTile(x, y, value) {
 
-        if (this.width > x && this.height > y) {
-            this.__values[x][y] = value;
-        }
+        this.__values[x][y] = value;
 
         return this;
     };
@@ -387,20 +386,23 @@ class Matrix {
      */
     getNeighbors(x, y, deep) {
 
-        let CORNERS_EXCLUDED = [
-            [-1, 0],
-            [0, -1], [0, 1],
-            [1, 0]
-        ];
+        let points;
 
-        let CORNERS_INCLUDED = [
-            [-1, -1], [-1, 0], [-1, 1],
-            [0, -1], [0, 1],
-            [1, -1], [1, 0], [1, 1]
-        ];
+        if (deep % 2 === 0) {
+            points = [
+                [-1, -1], [-1, 0], [-1, 1],
+                [0, -1], [0, 1],
+                [1, -1], [1, 0], [1, 1]
+            ];
+        } else {
+            points = [
+                [-1, 0],
+                [0, -1], [0, 1],
+                [1, 0]
+            ];
+        }
 
-        let points = deep % 2 === 0 ? CORNERS_INCLUDED : CORNERS_EXCLUDED,
-            w = this.getWidth(),
+        let w = this.getWidth(),
             h = this.getHeight(),
             neighbours = [];
 
@@ -435,6 +437,7 @@ class Matrix {
     foreachNeighbors(x, y, deep, callback) {
 
         let neighbors = this.getNeighbors(x, y, deep);
+
         for(let i = 0; i < neighbors.length; i++) {
             callback(neighbors[i][0], neighbors[i][1]);
         }
@@ -459,6 +462,25 @@ class Matrix {
         });
 
         return sum;
+    }
+
+    /**
+     * Add value to all neighbors of the point [x, y]
+     * @param {number} x
+     * @param {number} y
+     * @param {number} deep
+     * @param {number} value
+     * @return {Matrix}
+     */
+    addToNeighborTiles(x, y, deep, value) {
+
+        let _this = this;
+
+        this.foreachNeighbors(x, y, deep, function(nx, ny) {
+            _this.addToTile(nx, ny, value);
+        });
+
+        return this;
     }
 
     /**
@@ -500,6 +522,35 @@ class Matrix {
 
         return false;
     }
+
+    /**
+     * Set min/max possible values of the matrix
+     * @param {number} min
+     * @param {number} max
+     * @return {Matrix}
+     */
+    setRange(min, max) {
+
+        let _this = this,
+            val;
+
+        this.map(function(x, y) {
+
+            val = _this.getTile(x, y);
+
+            if (val > max) {
+                val = max;
+            }
+
+            if (min > val) {
+                val = min;
+            }
+
+            return val;
+        });
+
+        return this;
+    }
 }
 
 class BinaryMatrix extends Matrix {
@@ -523,9 +574,7 @@ class BinaryMatrix extends Matrix {
      */
     setTile(x, y, value) {
 
-        if (this.width > x && this.height > y) {
-            this.__values[x][y] = value >= 0.5 ? 1 : 0;
-        }
+        this.__values[x][y] = value >= 0.5 ? 1 : 0;
 
         return this;
     };
@@ -584,7 +633,7 @@ class BinaryMatrix extends Matrix {
      * Merge with the other binary matrix
      * @param {BinaryMatrix} matrix
      */
-    mergeWith (matrix) {
+    mergeWith(matrix) {
 
         if (!(matrix instanceof BinaryMatrix)) {
             return;
@@ -592,7 +641,7 @@ class BinaryMatrix extends Matrix {
 
         let _this = this;
 
-        this.foreachFilled(function (x, y) {
+        this.foreachFilled(function(x, y) {
             if (matrix.filled(x, y)) {
                 _this.fill(x, y);
             }
@@ -628,34 +677,55 @@ class BinaryMatrix extends Matrix {
 
         return map;
     }
+
+    /**
+     * Apply callback to all neighbors of all
+     * @param deep
+     * @param callback
+     * @return {Matrix}
+     */
+    foreachAllFilledNeighbors (deep, callback) {
+
+        let _this = this;
+
+        _this.foreach(function (x, y) {
+            if (_this.filled(x, y)) {
+                _this.foreachNeighbors(x, y, deep, function(nx, ny) {
+                    callback(nx, ny);
+                });
+            }
+        });
+
+        return _this;
+    }
 }
 
 class PointMatrix extends Matrix {
 
-    /**
-     * Set tile value
-     * @param {number} x
-     * @param {number} y
-     * @param {number} value
-     * @return {Matrix}
-     */
-    setTile(x, y, value) {
-
-        if (this.width > x && this.height > y) {
-
-            if (value > 1) {
-                value = 1;
-            }
-
-            if (value < 0) {
-                value = 0;
-            }
-
-            this.__values[x][y] = value;
-        }
-
+    // @TODO -> normalize each class after generation!
+    normalize() {
+        this.setRange(0, 1);
         return this;
-    };
+    }
+}
+
+/**
+ * @param {number} w
+ * @param {number} h
+ * @param {number} power
+ * @return {PointMatrix}
+ */
+function createNoiseMap(w, h, power) {
+
+    noise.seed(Math.random());
+
+    let map = new PointMatrix(w, h);
+
+    map.map(function(x, y) {
+        return (noise.simplex2(x / power, y / power) + 1) * 0.5; // [0, 1] blurred height map
+    });
+
+    return map;
 }
 
 /**
@@ -766,7 +836,7 @@ function LightenDarkenColor(col, amt) {
 
     let usePound = false;
 
-    if(col[0] === "#") {
+    if (col[0] === "#") {
         col = col.slice(1);
         usePound = true;
     }
@@ -775,18 +845,18 @@ function LightenDarkenColor(col, amt) {
 
     let r = (num >> 16) + amt;
 
-    if(r > 255) r = 255;
-    else if(r < 0) r = 0;
+    if (r > 255) r = 255;
+    else if (r < 0) r = 0;
 
     let b = ((num >> 8) & 0x00FF) + amt;
 
-    if(b > 255) b = 255;
-    else if(b < 0) b = 0;
+    if (b > 255) b = 255;
+    else if (b < 0) b = 0;
 
     let g = (num & 0x0000FF) + amt;
 
-    if(g > 255) g = 255;
-    else if(g < 0) g = 0;
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
 
     return (usePound ? "#" : "") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
 }

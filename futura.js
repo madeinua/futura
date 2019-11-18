@@ -27,11 +27,15 @@ function drawMap(id, map, reverse) {
     ctx.putImageData(image, 0, 0);
 }
 
-let worldCanvas = document.getElementById('world'),
-    coordinatesField = document.getElementById('coordinates'),
-    worldWrapper = document.getElementById('worldWrapper'),
-    miniMapCanvas = document.getElementById('miniMap'),
-    world = new World();
+let world = new World({
+    worldWidth: 250,
+    worldHeight: 250,
+    worldCanvas: document.getElementById('world'),
+    worldWrapper: document.getElementById('worldWrapper'),
+    miniMapCanvas: document.getElementById('miniMap')
+});
+
+let coordinatesField = document.getElementById('coordinates');
 
 Filters
     .add('mapMoved', function(point) {
@@ -50,7 +54,7 @@ Filters
         return map;
     })
     .add('oceanMap', function(map) {
-        drawMap('oceanMapCanvas', map, false);
+        drawMap('oceanMapCanvas', map, true);
         return map;
     })
     .add('beachesMap', function(map) {
@@ -70,9 +74,6 @@ Filters
         return map;
     });
 
-world.init(worldCanvas, 250, 250);
-world.setMapWrapper(worldWrapper);
-world.setMiniMap(miniMapCanvas);
 world.create();
 
 coordinatesField.addEventListener("change", function() {
