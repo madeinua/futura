@@ -747,16 +747,29 @@ function createNoiseMap(w, h, power) {
 }
 
 /**
+ * @param {Uint8ClampedArray} data
+ * @param {number} point
+ * @param {Array} RGB
+ */
+function fillCanvasPixel(data, point, RGB) {
+    data[point] = RGB[0];
+    data[point + 1] = RGB[1];
+    data[point + 2] = RGB[2];
+    data[point + 3] = 255; // Alpha
+}
+
+/**
  * Scale canvas image
  * @param {CanvasRenderingContext2D} context
  * @param {ImageData} imageData
- * @param {number} scale
+ * @param {number} scaleX
+ * @param {number} scaleY
  * @return {ImageData}
  */
-function scaleImageData(context, imageData, scale) {
+function scaleImageData(context, imageData, scaleX, scaleY) {
 
-    let scaled = context.createImageData(imageData.width * scale, imageData.height * scale);
-    let subLine = context.createImageData(scale, 1).data;
+    let scaled = context.createImageData(imageData.width * scaleX, imageData.height * scaleY);
+    let subLine = context.createImageData(scaleX, 1).data;
 
     for(let row = 0; row < imageData.height; row++) {
         for(let col = 0; col < imageData.width; col++) {
@@ -766,14 +779,14 @@ function scaleImageData(context, imageData, scale) {
                 (row * imageData.width + col) * 4 + 4
             );
 
-            for(let x = 0; x < scale; x++) {
+            for(let x = 0; x < scaleX; x++) {
                 subLine.set(sourcePixel, x * 4);
             }
 
-            for(let y = 0; y < scale; y++) {
+            for(let y = 0; y < scaleY; y++) {
 
-                let destRow = row * scale + y;
-                let destCol = col * scale;
+                let destRow = row * scaleX + y;
+                let destCol = col * scaleY;
 
                 scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4)
             }

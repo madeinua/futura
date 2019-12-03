@@ -29,9 +29,10 @@ function drawMap(id, map, reverse) {
 
 let world = new World({
     worldWidth: 400,
-    worldHeight: 300,
+    worldHeight: 400,
+    visibleCols: 30,
+    visibleRows: 30,
     worldCanvas: document.getElementById('world'),
-    worldWrapper: document.getElementById('worldWrapper'),
     miniMapCanvas: document.getElementById('miniMap')
 });
 

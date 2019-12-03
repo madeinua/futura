@@ -6,10 +6,6 @@ class World {
             console.error('World Canvas not defined');
         }
 
-        if (typeof config.worldWrapper === 'undefined') {
-            console.error('World Wrapper not defined');
-        }
-
         if (typeof config.worldWidth === 'undefined') {
             config.worldWidth = 100;
         }
@@ -18,23 +14,39 @@ class World {
             config.worldHeight = 100;
         }
 
-        if (typeof config.WORLD_SCALE === 'undefined') {
-            config.WORLD_SCALE = 30;
+        if (typeof config.visibleCols === 'undefined') {
+            config.visibleCols = 10;
+        }
+
+        if (typeof config.visibleRows === 'undefined') {
+            config.visibleRows = 10;
         }
 
         if (typeof config.storeData === 'undefined') {
             config.storeData = true;
         }
 
-        config.worldCanvas.width = config.worldWidth;
-        config.worldCanvas.height = config.worldHeight;
+        if (typeof config.defaultCameraPosX === 'undefined') {
+            config.defaultCameraPosX = Math.ceil(config.worldWidth / 2 - config.visibleCols / 2);
+        }
 
-        this.worldWidth = config.worldWidth;
-        this.worldHeight = config.worldHeight;
-        this.worldCanvas = config.worldCanvas;
-        this.worldWrapper = config.worldWrapper;
+        if (typeof config.defaultCameraPosY === 'undefined') {
+            config.defaultCameraPosY = Math.ceil(config.worldHeight / 2 - config.visibleRows / 2);
+        }
 
         this.config = config;
+
+        this.worldCanvas = config.worldCanvas;
+
+        this.worldCanvas.width = this.worldCanvas.offsetWidth;
+        this.worldCanvas.height = this.worldCanvas.offsetHeight;
+
+        this.cameraPosX = config.defaultCameraPosX;
+        this.cameraPosY = config.defaultCameraPosY;
+
+        this.renderCanvas = document.createElement('canvas');
+        this.renderCanvas.width = config.worldWidth;
+        this.renderCanvas.height = config.worldHeight;
 
         if (typeof config.miniMapCanvas !== 'undefined') {
             this.setMiniMap(config);
@@ -43,7 +55,7 @@ class World {
         if (config.storeData) {
 
             let worldSize = localStorage.getItem('worldSize'),
-                actualSize = this.worldWidth + 'x' + this.worldHeight;
+                actualSize = this.config.worldWidth + 'x' + this.config.worldHeight;
 
             if (actualSize !== worldSize) {
                 localStorage.clear();
@@ -54,6 +66,27 @@ class World {
 
         logTimeEvent('Initialized');
     }
+
+    /**
+     * @param {Object} config
+     */
+    setMiniMap = function(config) {
+
+        let _this = this;
+
+        _this.miniMapCanvas = config.miniMapCanvas;
+        _this.miniMapCanvas.width = config.worldWidth;
+        _this.miniMapCanvas.height = config.worldHeight;
+        _this.miniMapScaleFX = config.worldWidth / _this.miniMapCanvas.offsetWidth;
+        _this.miniMapScaleFY = config.worldHeight / _this.miniMapCanvas.offsetHeight;
+
+        _this.miniMapCanvas.addEventListener("click", function(e) {
+
+            let pos = getPosition(_this.miniMapCanvas);
+
+            _this.moveMapTo(e.pageX - pos.x, e.pageY - pos.y);
+        });
+    };
 
     /**
      * @return {AltitudeMap}
@@ -298,26 +331,13 @@ class World {
         let _this = this,
             ctx = this.miniMapCanvas.getContext('2d');
 
-        ctx.fillText('F', _this.toWorldMapPoint(x), _this.toWorldMapPoint(y) + 20);
+        //ctx.fillText('F', _this.toWorldMapPoint(x), _this.toWorldMapPoint(y) + 20);
     };
 
     /**
-     * @param {Uint8ClampedArray} data
-     * @param {number} point
-     * @param {Array} RGB
-     */
-    fillCanvasPixel = function(data, point, RGB) {
-        data[point] = RGB[0];
-        data[point + 1] = RGB[1];
-        data[point + 2] = RGB[2];
-        data[point + 3] = 255; // Alpha
-    };
-
-    /**
-     * @param {CanvasRenderingContext2D} context
      * @return {ImageData}
      */
-    renderWorld = function(context) {
+    generateWorld = function() {
 
         let _this = this,
             altitudeMap = _this.generateAltitudeMap(),
@@ -328,32 +348,36 @@ class World {
             humidityMap = _this.generateHumidityMap(altitudeMap, beachesMap, riversMap, lakesMap),
             temperatureMap = _this.generateTemperatureMap(altitudeMap);
 
+        let ctx = _this.renderCanvas.getContext('2d');
+
         let
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
-            image = context.createImageData(_this.worldWidth, _this.worldHeight),
-            biomes = new Biomes(altitudeMap, oceanMap, beachesMap, lakesMap, riversMap, humidityMap, temperatureMap);
+            image = ctx.createImageData(_this.config.worldWidth, _this.config.worldHeight),
+            biomes = new Biomes(altitudeMap, oceanMap, beachesMap, lakesMap, riversMap, humidityMap, temperatureMap),
+            color;
 
         altitudeMap.foreach(function(x, y) {
 
-            _this.fillCanvasPixel(
+            color = biomes.getBiomeColor(
+                biomes.findBiome(x, y),
+                altitudeMap.getTile(x, y),
+                temperatureMap.getTile(x, y),
+                humidityMap.getTile(x, y)
+            );
+
+            fillCanvasPixel(
                 image.data,
-                (x + y * _this.worldWidth) * 4,
-                biomes.getBiomeColor(
-                    biomes.findBiome(x, y),
-                    altitudeMap.getTile(x, y),
-                    temperatureMap.getTile(x, y),
-                    humidityMap.getTile(x, y)
-                )
+                (x + y * _this.config.worldWidth) * 4,
+                color
             );
 
             //displayPixelObject(objectsMap, x, y);
         });
 
         _this.xyCoords = altitudeMap;
+        _this.worldImageData = image;
 
         logTimeEvent('World filled');
-
-        return image;
     };
 
     /**
@@ -362,137 +386,117 @@ class World {
      */
     moveMapTo = function(x, y) {
 
-        let _this = this;
+        let point = this.centeredPointToCameraPoint(
+            this.miniMapPointToRenderPoint([x, y])
+        );
 
-        this.worldWrapper.scrollLeft = _this.toWorldMapPoint(x) - _this.miniMapWrapperWidth;
-        this.worldWrapper.scrollTop = _this.toWorldMapPoint(y) - _this.miniMapWrapperHeight;
+        this.cameraPosX = point[0];
+        this.cameraPosY = point[1];
+
+        this.update();
 
         Filters.apply('mapMoved', [x, y]);
     };
 
     /**
-     * @param {number} c
-     * @return {number}
+     * @param {[number, number]} point
+     * @return {[number, number]}
      */
-    toMiniMapPoint = function(c) {
-        return Math.floor(c / this.config.WORLD_SCALE);
+    miniMapPointToRenderPoint = function(point) {
+        return [
+            Math.floor(point[0] * this.miniMapScaleFX),
+            Math.floor(point[1] * this.miniMapScaleFY)
+        ];
     };
 
     /**
-     * @param {number} c
-     * @return {number}
+     * @param {[number, number]} point
+     * @return {[number, number]}
      */
-    toWorldMapPoint = function(c) {
-        return c * this.config.WORLD_SCALE;
+    centeredPointToCameraPoint = function(point) {
+        return [
+            Math.max(0, point[0] - Math.floor(this.config.visibleCols / 2)),
+            Math.max(0, point[1] - Math.floor(this.config.visibleRows / 2))
+        ];
     };
 
     drawMiniMap = function() {
 
         let _this = this;
 
-        if (_this.miniMapCanvas && _this.miniMapImage) {
+        if (_this.miniMapCanvas && _this.worldImageData) {
 
             let ctx = _this.miniMapCanvas.getContext('2d');
 
-            ctx.putImageData(
-                _this.miniMapImage, 0, 0
-            );
+            ctx.putImageData(_this.worldImageData, 0, 0);
 
-            ctx.strokeStyle = '#000000';
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
             ctx.strokeRect(
-                _this.toMiniMapPoint(_this.worldWrapper.scrollLeft),
-                _this.toMiniMapPoint(_this.worldWrapper.scrollTop),
-                _this.toMiniMapPoint(_this.worldWrapper.offsetWidth),
-                _this.toMiniMapPoint(_this.worldWrapper.offsetHeight)
+                _this.cameraPosX,
+                _this.cameraPosY,
+                _this.config.visibleCols,
+                _this.config.visibleRows
             );
         }
     };
 
-    /**
-     * @return {ImageData}
-     */
     drawWorld = function() {
 
-        let _this = this,
-            context = _this.worldCanvas.getContext('2d'),
-            imageData = _this.renderWorld(context);
+        let _this = this;
 
-        context.webkitImageSmoothingEnabled = false;
-        context.mozImageSmoothingEnabled = false;
-        context.imageSmoothingEnabled = false;
+        if (_this.worldImageData) {
 
-        _this.worldCanvas.width = _this.toWorldMapPoint(_this.worldCanvas.width);
-        _this.worldCanvas.height = _this.toWorldMapPoint(_this.worldCanvas.height);
+            let ctx = _this.worldCanvas.getContext('2d');
 
-        context.putImageData(
-            imageData, 0, 0
-        );
+            ctx.imageSmoothingEnabled = false;
+            ctx.putImageData(_this.worldImageData, 0, 0);
 
-        _this.miniMapImage = imageData;
+            let scaledData = scaleImageData(
+                ctx,
+                ctx.getImageData(_this.cameraPosX, _this.cameraPosY, _this.config.visibleCols, _this.config.visibleRows),
+                _this.config.visibleCols,
+                _this.config.visibleRows
+            );
 
-        logTimeEvent('World drawn');
+            ctx.putImageData(scaledData, 0, 0);
 
-        return imageData;
+            logTimeEvent('World drawn');
+        }
     };
 
     drawRectangles = function() {
 
         let _this = this,
-            context = _this.worldCanvas.getContext('2d');
+            ctx = _this.worldCanvas.getContext('2d'),
+            x, y;
 
-        context.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.imageSmoothingEnabled = false;
 
-        for(let x = 0; x < _this.worldWidth; x++) {
-            for(let y = 0; y < _this.worldHeight; y++) {
-                context.strokeRect(_this.toWorldMapPoint(x), _this.toWorldMapPoint(y), this.config.WORLD_SCALE, this.config.WORLD_SCALE);
-                context.font = '8px senf';
-                context.fillText(x + ',' + y, _this.toWorldMapPoint(x) + 2, _this.toWorldMapPoint(y) + 10);
-                //context.font = '10px senf';
-                //context.fillText(Math.round(_this.xyCoords.getTile(x, y) * 100) / 100, _this.toWorldMapPoint(x) + 5, _this.toWorldMapPoint(y) + 20);
+        for(x = 0; x < _this.renderCanvas.width; x++) {
+            for(y = 0; y < _this.renderCanvas.height; y++) {
+                ctx.strokeRect(
+                    x * _this.config.visibleCols,
+                    y * _this.config.visibleRows,
+                    _this.config.visibleCols,
+                    _this.config.visibleRows
+                );
             }
         }
 
         logTimeEvent('Rectangles added');
     };
 
-    /**
-     * @param {Object} config
-     */
-    setMiniMap = function(config) {
-
-        let _this = this;
-
-        _this.miniMapCanvas = config.miniMapCanvas;
-        _this.miniMapCanvas.width = config.worldWidth;
-        _this.miniMapCanvas.height = config.worldHeight;
-        _this.miniMapWrapperWidth = (_this.miniMapCanvas.width * config.worldWrapper.offsetWidth / _this.miniMapCanvas.width) * 0.5;
-        _this.miniMapWrapperHeight = (_this.miniMapCanvas.height * config.worldWrapper.offsetHeight / _this.miniMapCanvas.height) * 0.5;
-        _this.miniMapWidth = typeof config.miniMapWidth === 'undefined' ? 200 : config.miniMapWidth;
-
-        _this.worldWrapper.addEventListener("scroll", function() {
-
-            _this.drawMiniMap();
-
-            Filters.apply('mapMoved', [
-                _this.toMiniMapPoint(_this.worldWrapper.scrollLeft + _this.miniMapWrapperWidth),
-                _this.toMiniMapPoint(_this.worldWrapper.scrollTop + _this.miniMapWrapperHeight)
-            ]);
-        });
-
-        _this.miniMapCanvas.addEventListener("click", function(e) {
-
-            let pos = getPosition(_this.miniMapCanvas);
-
-            _this.moveMapTo(e.pageX - pos.x, e.pageY - pos.y);
-        });
+    create = function() {
+        this.generateWorld();
+        this.drawMiniMap();
+        this.drawWorld();
+        this.drawRectangles();
     };
 
-    create = function() {
-
-        let _this = this;
-
-        _this.drawWorld();
-        //_this.drawRectangles();
-        _this.drawMiniMap();
+    update = function() {
+        this.drawMiniMap();
+        this.drawWorld();
     };
 }
