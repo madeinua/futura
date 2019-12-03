@@ -224,7 +224,6 @@ class Matrix {
         this.height = height;
         this.__values = [];
 
-        // Initialization
         for(let x = 0; x < width; x++) {
             this.__values[x] = [];
             for(let y = 0; y < height; y++) {
@@ -252,6 +251,25 @@ class Matrix {
 
         return this;
     }
+
+    /**
+     * @return {string}
+     */
+    toString = function() {
+        return JSON.stringify(
+            this.getAll()
+        );
+    };
+
+    /**
+     * @param {string} string
+     * @return {Matrix}
+     */
+    fromString = function (string) {
+        return this.setAll(
+            JSON.parse(string)
+        );
+    };
 
     /**
      * Set tile value
@@ -684,11 +702,11 @@ class BinaryMatrix extends Matrix {
      * @param callback
      * @return {Matrix}
      */
-    foreachAllFilledNeighbors (deep, callback) {
+    foreachAllFilledNeighbors(deep, callback) {
 
         let _this = this;
 
-        _this.foreach(function (x, y) {
+        _this.foreach(function(x, y) {
             if (_this.filled(x, y)) {
                 _this.foreachNeighbors(x, y, deep, function(nx, ny) {
                     callback(nx, ny);

@@ -19,7 +19,11 @@ class World {
         }
 
         if (typeof config.WORLD_SCALE === 'undefined') {
-            config.WORLD_SCALE = 33;
+            config.WORLD_SCALE = 30;
+        }
+
+        if (typeof config.storeData === 'undefined') {
+            config.storeData = true;
         }
 
         config.worldCanvas.width = config.worldWidth;
@@ -36,6 +40,18 @@ class World {
             this.setMiniMap(config);
         }
 
+        if (config.storeData) {
+
+            let worldSize = localStorage.getItem('worldSize'),
+                actualSize = this.worldWidth + 'x' + this.worldHeight;
+
+            if (actualSize !== worldSize) {
+                localStorage.clear();
+            }
+
+            localStorage.setItem('worldSize', actualSize);
+        }
+
         logTimeEvent('Initialized');
     }
 
@@ -44,7 +60,19 @@ class World {
      */
     generateAltitudeMap = function() {
 
-        let altitudeMap = new AltitudeMap(this.config);
+        let altitudeMap = new AltitudeMap(this.config),
+            storage = localStorage.getItem('altitudeMap');
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            altitudeMap.fromString(storage);
+        } else {
+
+            altitudeMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('altitudeMap', altitudeMap.toString());
+            }
+        }
 
         altitudeMap = Filters.apply('altitudeMap', altitudeMap);
 
@@ -59,7 +87,19 @@ class World {
      */
     generateOceanMap = function(altitudeMap) {
 
-        let oceanMap = new OceanMap(altitudeMap, this.config);
+        let oceanMap = new OceanMap(altitudeMap, this.config),
+            storage = localStorage.getItem('oceanMap');
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            oceanMap.fromString(storage);
+        } else {
+
+            oceanMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('oceanMap', oceanMap.toString());
+            }
+        }
 
         oceanMap = Filters.apply('oceanMap', oceanMap);
 
@@ -75,7 +115,19 @@ class World {
      */
     generateBeachesMap = function(altitudeMap, oceanMap) {
 
-        let beachesMap = new BeachesMap(altitudeMap, oceanMap, this.config);
+        let beachesMap = new BeachesMap(altitudeMap, oceanMap, this.config),
+            storage = localStorage.getItem('beachesMap');
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            beachesMap.fromString(storage);
+        } else {
+
+            beachesMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('beachesMap', beachesMap.toString());
+            }
+        }
 
         beachesMap = Filters.apply('beachesMap', beachesMap);
 
@@ -91,7 +143,19 @@ class World {
      */
     generateLakesMap = function(altitudeMap, oceanMap) {
 
-        let lakesMap = new LakesMap(altitudeMap, oceanMap, this.config);
+        let lakesMap = new LakesMap(altitudeMap, oceanMap, this.config),
+            storage = localStorage.getItem('lakesMap');
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            lakesMap.fromString(storage);
+        } else {
+
+            lakesMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('lakesMap', lakesMap.toString());
+            }
+        }
 
         lakesMap = Filters.apply('lakesMap', lakesMap);
 
@@ -106,7 +170,19 @@ class World {
      */
     generateRiversMap = function(altitudeMap) {
 
-        let riversMap = new RiversMap(altitudeMap, this.config);
+        let riversMap = new RiversMap(altitudeMap, this.config),
+            storage = localStorage.getItem('riversMap');
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            riversMap.fromString(storage);
+        } else {
+
+            riversMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('riversMap', riversMap.toString());
+            }
+        }
 
         riversMap = Filters.apply('riversMap', riversMap);
 
@@ -124,7 +200,19 @@ class World {
      */
     generateHumidityMap = function(altitudeMap, beachesMap, riversMap, lakesMap) {
 
-        let humidityMap = new HumidityMap(altitudeMap, beachesMap, riversMap, lakesMap, this.config);
+        let humidityMap = new HumidityMap(altitudeMap, beachesMap, riversMap, lakesMap, this.config),
+            storage = localStorage.getItem('humidityMap');
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            humidityMap.fromString(storage);
+        } else {
+
+            humidityMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('humidityMap', humidityMap.toString());
+            }
+        }
 
         humidityMap = Filters.apply('humidityMap', humidityMap);
 
@@ -139,7 +227,19 @@ class World {
      */
     generateTemperatureMap = function(altitudeMap) {
 
-        let temperatureMap = new TemperatureMap(altitudeMap, this.config);
+        let temperatureMap = new TemperatureMap(altitudeMap, this.config),
+            storage = localStorage.getItem('temperatureMap');
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            temperatureMap.fromString(storage);
+        } else {
+
+            temperatureMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('temperatureMap', temperatureMap.toString());
+            }
+        }
 
         temperatureMap = Filters.apply('temperatureMap', temperatureMap);
 
@@ -156,7 +256,19 @@ class World {
      */
     generateForest = function(altitudeMap, temperatureMap, humidityMap) {
 
-        let forestMap = new ForestMap(altitudeMap, temperatureMap, humidityMap, this.config);
+        let forestMap = new ForestMap(altitudeMap, temperatureMap, humidityMap, this.config),
+            storage = localStorage.getItem('forestMap');
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            forestMap.fromString(storage);
+        } else {
+
+            forestMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('forestMap', forestMap.toString());
+            }
+        }
 
         forestMap = Filters.apply('forestMap', forestMap);
 
@@ -214,7 +326,9 @@ class World {
             lakesMap = _this.generateLakesMap(altitudeMap, oceanMap),
             riversMap = _this.generateRiversMap(altitudeMap),
             humidityMap = _this.generateHumidityMap(altitudeMap, beachesMap, riversMap, lakesMap),
-            temperatureMap = _this.generateTemperatureMap(altitudeMap),
+            temperatureMap = _this.generateTemperatureMap(altitudeMap);
+
+        let
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = context.createImageData(_this.worldWidth, _this.worldHeight),
             biomes = new Biomes(altitudeMap, oceanMap, beachesMap, lakesMap, riversMap, humidityMap, temperatureMap);
@@ -249,7 +363,7 @@ class World {
     moveMapTo = function(x, y) {
 
         let _this = this;
-        
+
         this.worldWrapper.scrollLeft = _this.toWorldMapPoint(x) - _this.miniMapWrapperWidth;
         this.worldWrapper.scrollTop = _this.toWorldMapPoint(y) - _this.miniMapWrapperHeight;
 
@@ -280,17 +394,17 @@ class World {
 
             let ctx = _this.miniMapCanvas.getContext('2d');
 
-            ctx.putImageData(_this.miniMapImage, 0, 0);
+            ctx.putImageData(
+                _this.miniMapImage, 0, 0
+            );
 
-            if (_this.worldWrapper) {
-                ctx.strokeStyle = '#000000';
-                ctx.strokeRect(
-                    _this.toMiniMapPoint(_this.worldWrapper.scrollLeft),
-                    _this.toMiniMapPoint(_this.worldWrapper.scrollTop),
-                    _this.toMiniMapPoint(_this.worldWrapper.offsetWidth),
-                    _this.toMiniMapPoint(_this.worldWrapper.offsetHeight)
-                );
-            }
+            ctx.strokeStyle = '#000000';
+            ctx.strokeRect(
+                _this.toMiniMapPoint(_this.worldWrapper.scrollLeft),
+                _this.toMiniMapPoint(_this.worldWrapper.scrollTop),
+                _this.toMiniMapPoint(_this.worldWrapper.offsetWidth),
+                _this.toMiniMapPoint(_this.worldWrapper.offsetHeight)
+            );
         }
     };
 
@@ -311,8 +425,7 @@ class World {
         _this.worldCanvas.height = _this.toWorldMapPoint(_this.worldCanvas.height);
 
         context.putImageData(
-            scaleImageData(context, imageData, this.config.WORLD_SCALE),
-            0, 0
+            imageData, 0, 0
         );
 
         _this.miniMapImage = imageData;
@@ -354,22 +467,24 @@ class World {
         _this.miniMapCanvas.height = config.worldHeight;
         _this.miniMapWrapperWidth = (_this.miniMapCanvas.width * config.worldWrapper.offsetWidth / _this.miniMapCanvas.width) * 0.5;
         _this.miniMapWrapperHeight = (_this.miniMapCanvas.height * config.worldWrapper.offsetHeight / _this.miniMapCanvas.height) * 0.5;
+        _this.miniMapWidth = typeof config.miniMapWidth === 'undefined' ? 200 : config.miniMapWidth;
 
-        if (_this.worldWrapper) {
+        _this.worldWrapper.addEventListener("scroll", function() {
 
-            _this.worldWrapper.addEventListener("scroll", function() {
-                _this.drawMiniMap();
-                Filters.apply('mapMoved', [
-                    _this.toMiniMapPoint(_this.worldWrapper.scrollLeft + _this.miniMapWrapperWidth),
-                    _this.toMiniMapPoint(_this.worldWrapper.scrollTop + _this.miniMapWrapperHeight)
-                ]);
-            });
+            _this.drawMiniMap();
 
-            _this.miniMapCanvas.addEventListener("click", function(e) {
-                let pos = getPosition(_this.miniMapCanvas);
-                _this.moveMapTo(e.pageX - pos.x, e.pageY - pos.y);
-            });
-        }
+            Filters.apply('mapMoved', [
+                _this.toMiniMapPoint(_this.worldWrapper.scrollLeft + _this.miniMapWrapperWidth),
+                _this.toMiniMapPoint(_this.worldWrapper.scrollTop + _this.miniMapWrapperHeight)
+            ]);
+        });
+
+        _this.miniMapCanvas.addEventListener("click", function(e) {
+
+            let pos = getPosition(_this.miniMapCanvas);
+
+            _this.moveMapTo(e.pageX - pos.x, e.pageY - pos.y);
+        });
     };
 
     create = function() {

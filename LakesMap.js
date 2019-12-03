@@ -1,5 +1,8 @@
 class LakesMap extends BinaryMatrix {
 
+    altitudeMap;
+    oceanMap;
+
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {OceanMap} oceanMap
@@ -10,14 +13,26 @@ class LakesMap extends BinaryMatrix {
 
         super(config.worldWidth, config.worldHeight);
 
+        this.altitudeMap = altitudeMap;
+        this.oceanMap = oceanMap;
+
+        return this;
+    };
+
+    /**
+     *
+     * @return {LakesMap}
+     */
+    generateMap = function () {
+
         let _this = this;
 
-        altitudeMap.foreach(function(x, y) {
-            if (altitudeMap.isWater(altitudeMap.getTile(x, y)) && !oceanMap.filled(x, y)) {
+        _this.altitudeMap.foreach(function(x, y) {
+            if (_this.altitudeMap.isWater(_this.altitudeMap.getTile(x, y)) && !_this.oceanMap.filled(x, y)) {
                 _this.fill(x, y);
             }
         });
 
         return _this;
-    };
+    }
 }

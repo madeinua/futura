@@ -28,8 +28,8 @@ function drawMap(id, map, reverse) {
 }
 
 let world = new World({
-    worldWidth: 250,
-    worldHeight: 250,
+    worldWidth: 400,
+    worldHeight: 300,
     worldCanvas: document.getElementById('world'),
     worldWrapper: document.getElementById('worldWrapper'),
     miniMapCanvas: document.getElementById('miniMap')

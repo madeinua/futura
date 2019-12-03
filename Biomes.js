@@ -119,7 +119,7 @@ class Biomes {
             return _this.BIOME_DESERT;
         }
 
-        var rb = function(biome1, biome2) {
+        let rb = function(biome1, biome2) {
             return Math.random() > 0.5 ? biome1 : biome2;
         };
 

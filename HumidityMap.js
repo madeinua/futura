@@ -1,5 +1,11 @@
 class HumidityMap extends PointMatrix {
 
+    altitudeMap;
+    beachesMap;
+    riversMap;
+    lakesMap;
+    config;
+
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {BeachesMap} beachesMap
@@ -12,12 +18,29 @@ class HumidityMap extends PointMatrix {
 
         super(config.worldWidth, config.worldHeight);
 
+        this.altitudeMap = altitudeMap;
+        this.beachesMap = beachesMap;
+        this.riversMap = riversMap;
+        this.lakesMap = lakesMap;
+        this.config = config;
+
+        return this;
+    };
+
+    /**
+     * @return {HumidityMap}
+     */
+    generateMap = function() {
+
         let _this = this;
 
         _this.setAll(
-            createNoiseMap(config.worldWidth, config.worldHeight, 90).getAll()
+            createNoiseMap(
+                _this.config.worldWidth,
+                _this.config.worldHeight,
+                90
+            ).getAll()
         );
-
 
         // @TODO
 

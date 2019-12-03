@@ -1,5 +1,7 @@
 class AltitudeMap extends PointMatrix {
 
+    config;
+
     WORLD_MAP_OCEAN_LEVEL = 0.5; // [0-1]
     MAX_COAST_LEVEL = 0.3;
 
@@ -11,21 +13,32 @@ class AltitudeMap extends PointMatrix {
 
         super(config.worldWidth, config.worldHeight);
 
+        this.WORLD_MAP_OCEAN_LEVEL = typeof config.WORLD_MAP_OCEAN_LEVEL === 'undefined'
+                ? this.WORLD_MAP_OCEAN_LEVEL
+                : config.WORLD_MAP_OCEAN_LEVEL;
+
+            this.MAX_COAST_LEVEL = typeof config.MAX_COAST_LEVEL === 'undefined'
+                ? this.MAX_COAST_LEVEL
+                : config.MAX_COAST_LEVEL;
+
+        this.config = config;
+
+        return this;
+    }
+
+    generateMap = function () {
+
         let _this = this,
-            octaves = _this.calculateOctaves(config.worldWidth),
+            octaves = _this.calculateOctaves(_this.config.worldWidth),
             distances = getEqualDistances(octaves, 10, 100),
             maps = [];
 
-        _this.WORLD_MAP_OCEAN_LEVEL = typeof config.WORLD_MAP_OCEAN_LEVEL === 'undefined'
-            ? _this.WORLD_MAP_OCEAN_LEVEL
-            : config.WORLD_MAP_OCEAN_LEVEL;
-
-        _this.MAX_COAST_LEVEL = typeof config.MAX_COAST_LEVEL === 'undefined'
-            ? _this.MAX_COAST_LEVEL
-            : config.MAX_COAST_LEVEL;
-
         for(let i = 0; i < octaves; i++) {
-            maps[i] = createNoiseMap(config.worldWidth, config.worldHeight, distances[i]);
+            maps[i] = createNoiseMap(
+                _this.config.worldWidth,
+                _this.config.worldHeight,
+                distances[i]
+            );
         }
 
         _this.map(function(x, y) {
@@ -43,13 +56,11 @@ class AltitudeMap extends PointMatrix {
             val = Math.min(1, Math.pow(val, _this.WORLD_MAP_OCEAN_LEVEL + 1));
 
             // make island
-            val = _this.makeIsland(x, y, config.worldWidth, config.worldHeight, val);
+            val = _this.makeIsland(x, y, _this.config.worldWidth, _this.config.worldHeight, val);
 
             return val;
         });
-
-        return _this;
-    }
+    };
 
     /**
      * @param {number} worldWidth

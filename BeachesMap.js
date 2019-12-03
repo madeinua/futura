@@ -3,6 +3,7 @@ class BeachesMap extends BinaryMatrix {
     MAX_BEACH_LEVEL = 0.32;
 
     altitudeMap;
+    oceanMap;
 
     /**
      * @param {AltitudeMap} altitudeMap
@@ -14,16 +15,25 @@ class BeachesMap extends BinaryMatrix {
 
         super(config.worldWidth, config.worldHeight);
 
-        let _this = this;
+        this.altitudeMap = altitudeMap;
+        this.oceanMap = oceanMap;
 
-        _this.altitudeMap = altitudeMap;
-
-        _this.MAX_BEACH_LEVEL = typeof config.MAX_BEACH_LEVEL === 'undefined'
-            ? _this.MAX_BEACH_LEVEL
+        this.MAX_BEACH_LEVEL = typeof config.MAX_BEACH_LEVEL === 'undefined'
+            ? this.MAX_BEACH_LEVEL
             : config.MAX_BEACH_LEVEL;
 
-        oceanMap.foreachAllFilledNeighbors(1, function(x, y) {
-            if (_this.isBeach(altitudeMap.getTile(x, y))) {
+        return this;
+    };
+
+    /**
+     * @return {BeachesMap}
+     */
+    generateMap = function () {
+
+        let _this = this;
+
+        _this.oceanMap.foreachAllFilledNeighbors(1, function(x, y) {
+            if (_this.isBeach(_this.altitudeMap.getTile(x, y))) {
                 _this.fill(x, y);
             }
         });
