@@ -14,7 +14,7 @@ class ForestMap extends BinaryMatrix {
      */
     constructor(altitudeMap, temperatureMap, humidityMap, config) {
 
-        super(config.worldWidth, config.worldHeight);
+        super(config.worldSize, config.worldSize);
 
         this.altitudeMap = altitudeMap;
         this.temperatureMap = temperatureMap;
@@ -27,8 +27,8 @@ class ForestMap extends BinaryMatrix {
     generateMap = function() {
 
         let _this = this,
-            bigMap = createNoiseMap(_this.config.worldWidth, _this.config.worldHeight, 25),
-            smallMap = createNoiseMap(_this.config.worldWidth, _this.config.worldHeight, 5);
+            bigMap = createNoiseMap(_this.config.worldSize, 25),
+            smallMap = createNoiseMap(_this.config.worldSize, 5);
 
         // blend maps
         _this.map(function(x, y) {

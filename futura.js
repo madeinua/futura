@@ -28,10 +28,9 @@ function drawMap(id, map, reverse) {
 }
 
 let world = new World({
-    worldWidth: 400,
-    worldHeight: 400,
+    //storeData: false,
+    worldSize: 300,
     visibleCols: 30,
-    visibleRows: 30,
     worldCanvas: document.getElementById('world'),
     miniMapCanvas: document.getElementById('miniMap')
 });
@@ -83,7 +82,7 @@ coordinatesField.addEventListener("change", function() {
         x = 0,
         y = 0;
 
-    if(point.length === 2) {
+    if (point.length === 2) {
         x = parseInt(point[0], 10);
         y = parseInt(point[1], 10);
     }

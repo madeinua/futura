@@ -11,32 +11,31 @@ class AltitudeMap extends PointMatrix {
      */
     constructor(config) {
 
-        super(config.worldWidth, config.worldHeight);
+        super(config.worldSize, config.worldSize);
 
         this.WORLD_MAP_OCEAN_LEVEL = typeof config.WORLD_MAP_OCEAN_LEVEL === 'undefined'
-                ? this.WORLD_MAP_OCEAN_LEVEL
-                : config.WORLD_MAP_OCEAN_LEVEL;
+            ? this.WORLD_MAP_OCEAN_LEVEL
+            : config.WORLD_MAP_OCEAN_LEVEL;
 
-            this.MAX_COAST_LEVEL = typeof config.MAX_COAST_LEVEL === 'undefined'
-                ? this.MAX_COAST_LEVEL
-                : config.MAX_COAST_LEVEL;
+        this.MAX_COAST_LEVEL = typeof config.MAX_COAST_LEVEL === 'undefined'
+            ? this.MAX_COAST_LEVEL
+            : config.MAX_COAST_LEVEL;
 
         this.config = config;
 
         return this;
     }
 
-    generateMap = function () {
+    generateMap = function() {
 
         let _this = this,
-            octaves = _this.calculateOctaves(_this.config.worldWidth),
+            octaves = _this.calculateOctaves(_this.config.worldSize),
             distances = getEqualDistances(octaves, 10, 100),
             maps = [];
 
-        for(let i = 0; i < octaves; i++) {
+        for (let i = 0; i < octaves; i++) {
             maps[i] = createNoiseMap(
-                _this.config.worldWidth,
-                _this.config.worldHeight,
+                _this.config.worldSize,
                 distances[i]
             );
         }
@@ -46,7 +45,7 @@ class AltitudeMap extends PointMatrix {
             let val = 0;
 
             // blend maps
-            for(let i = 0; i < maps.length; i++) {
+            for (let i = 0; i < maps.length; i++) {
                 val += maps[i].getTile(x, y);
             }
 
@@ -56,22 +55,22 @@ class AltitudeMap extends PointMatrix {
             val = Math.min(1, Math.pow(val, _this.WORLD_MAP_OCEAN_LEVEL + 1));
 
             // make island
-            val = _this.makeIsland(x, y, _this.config.worldWidth, _this.config.worldHeight, val);
+            val = _this.makeIsland(x, y, _this.config.worldSize, val);
 
             return val;
         });
     };
 
     /**
-     * @param {number} worldWidth
+     * @param {number} worldSize
      * @return {number}
      */
-    calculateOctaves = function(worldWidth) {
+    calculateOctaves = function(worldSize) {
 
         let octaves = 1;
 
-        while(worldWidth > 1) {
-            worldWidth = worldWidth / 3;
+        while(worldSize > 1) {
+            worldSize = worldSize / 3;
             octaves++;
         }
 
@@ -81,18 +80,17 @@ class AltitudeMap extends PointMatrix {
     /**
      * @param {number} x
      * @param {number} y
-     * @param {number} maxX
-     * @param {number} maxY
+     * @param {number} islandSize
      * @param {number} altitude
      * @return {number}
      */
-    makeIsland = function(x, y, maxX, maxY, altitude) {
+    makeIsland = function(x, y, islandSize, altitude) {
 
         // Circular Distance
-        let dx = Math.abs(x - maxX * 0.5),
-            dy = Math.abs(y - maxY * 0.5),
+        let dx = Math.abs(x - islandSize * 0.5),
+            dy = Math.abs(y - islandSize * 0.5),
             distance = Math.sqrt(dx * dx + dy * dy),
-            delta = distance / (maxX * 0.4),
+            delta = distance / (islandSize * 0.4),
             gradient = delta * delta - 0.2;
 
         return Math.min(altitude, altitude * Math.max(0, 1 - gradient));

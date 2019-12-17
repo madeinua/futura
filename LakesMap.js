@@ -11,7 +11,7 @@ class LakesMap extends BinaryMatrix {
      */
     constructor(altitudeMap, oceanMap, config) {
 
-        super(config.worldWidth, config.worldHeight);
+        super(config.worldSize, config.worldSize);
 
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;
@@ -23,7 +23,7 @@ class LakesMap extends BinaryMatrix {
      *
      * @return {LakesMap}
      */
-    generateMap = function () {
+    generateMap = function() {
 
         let _this = this;
 

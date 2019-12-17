@@ -17,7 +17,7 @@ class RiversMap extends BinaryMatrix {
      */
     constructor(altitudeMap, config) {
 
-        super(config.worldWidth, config.worldHeight);
+        super(config.worldSize, config.worldSize);
 
         this.RIVERS_DENSITY = typeof config.RIVERS_DENSITY === 'undefined'
             ? this.RIVERS_DENSITY
@@ -61,7 +61,7 @@ class RiversMap extends BinaryMatrix {
             allRiversPoints = [],
             riversLimit = Math.floor(tval(_this.RIVERS_DENSITY, 1, riverSources.length));
 
-        for(let i = 0; i < riverSources.length; i++) {
+        for (let i = 0; i < riverSources.length; i++) {
 
             let river = [],
                 finished = false;
@@ -69,8 +69,8 @@ class RiversMap extends BinaryMatrix {
             // source = starting point of each river
             river.push(riverSources[i]);
 
-            // max river length = worldWidth
-            for(let j = 0; j < _this.config.worldWidth; j++) {
+            // max river length = worldSize
+            for (let j = 0; j < _this.config.worldSize; j++) {
 
                 let nextRiverPoint = _this.getRiverDirection(river, _this.altitudeMap, allRiversPoints);
 
@@ -138,7 +138,7 @@ class RiversMap extends BinaryMatrix {
 
         spawns = spawns.shuffle();
 
-        for(let i = 0; i < spawns.length; i++) {
+        for (let i = 0; i < spawns.length; i++) {
             if (!_this.isTooCloseToRivers(spawns[i][0], spawns[i][1], riverSources)) {
                 riverSources.push(spawns[i]);
             }
@@ -164,7 +164,7 @@ class RiversMap extends BinaryMatrix {
             neighbors = altitudeMap.getNeighbors(cx, cy, 2).shuffle(),
             lowerPoint = [];
 
-        for(let i = 0; i < neighbors.length; i++) {
+        for (let i = 0; i < neighbors.length; i++) {
 
             let nx = neighbors[i][0],
                 ny = neighbors[i][1],
@@ -202,7 +202,7 @@ class RiversMap extends BinaryMatrix {
             deltaLength = river.length * randBetweenFloats(0, _this.RIVER_DELTA_MAX_LENGTH),
             notDeltaLength = river.length - deltaLength;
 
-        for(let p = 0; p < river.length; p++) {
+        for (let p = 0; p < river.length; p++) {
             if (p > notDeltaLength) {
                 _this.foreachNeighbors(river[p][0], river[p][1], 0, function(nx, ny) {
                     if ([0, 1].randomElement() === 0) {
@@ -221,9 +221,9 @@ class RiversMap extends BinaryMatrix {
 
         let _this = this;
 
-        for(let i = 0; i < rivers.length; i++) {
+        for (let i = 0; i < rivers.length; i++) {
 
-            for(let p = 0; p < rivers[i].length; p++) {
+            for (let p = 0; p < rivers[i].length; p++) {
                 _this.fill(rivers[i][p][0], rivers[i][p][1]);
             }
 

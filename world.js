@@ -6,47 +6,37 @@ class World {
             console.error('World Canvas not defined');
         }
 
-        if (typeof config.worldWidth === 'undefined') {
-            config.worldWidth = 100;
-        }
-
-        if (typeof config.worldHeight === 'undefined') {
-            config.worldHeight = 100;
+        if (typeof config.worldSize === 'undefined') {
+            config.worldSize = 100;
         }
 
         if (typeof config.visibleCols === 'undefined') {
-            config.visibleCols = 10;
-        }
-
-        if (typeof config.visibleRows === 'undefined') {
-            config.visibleRows = 10;
+            config.visibleCols = 20;
         }
 
         if (typeof config.storeData === 'undefined') {
             config.storeData = true;
         }
 
-        if (typeof config.defaultCameraPosX === 'undefined') {
-            config.defaultCameraPosX = Math.ceil(config.worldWidth / 2 - config.visibleCols / 2);
-        }
-
-        if (typeof config.defaultCameraPosY === 'undefined') {
-            config.defaultCameraPosY = Math.ceil(config.worldHeight / 2 - config.visibleRows / 2);
+        if (typeof config.defaultCameraPos === 'undefined') {
+            config.defaultCameraPos = Math.ceil(config.worldSize / 2 - config.visibleCols / 2);
         }
 
         this.config = config;
+        this.logs = true;
 
         this.worldCanvas = config.worldCanvas;
-
         this.worldCanvas.width = this.worldCanvas.offsetWidth;
         this.worldCanvas.height = this.worldCanvas.offsetHeight;
 
-        this.cameraPosX = config.defaultCameraPosX;
-        this.cameraPosY = config.defaultCameraPosY;
+        this.cellSize = this.worldCanvas.width / config.visibleCols;
+
+        this.cameraPosX = config.defaultCameraPos;
+        this.cameraPosY = config.defaultCameraPos;
 
         this.renderCanvas = document.createElement('canvas');
-        this.renderCanvas.width = config.worldWidth;
-        this.renderCanvas.height = config.worldHeight;
+        this.renderCanvas.width = config.worldSize;
+        this.renderCanvas.height = config.worldSize;
 
         if (typeof config.miniMapCanvas !== 'undefined') {
             this.setMiniMap(config);
@@ -55,7 +45,7 @@ class World {
         if (config.storeData) {
 
             let worldSize = localStorage.getItem('worldSize'),
-                actualSize = this.config.worldWidth + 'x' + this.config.worldHeight;
+                actualSize = this.config.worldSize + 'x' + this.config.worldSize;
 
             if (actualSize !== worldSize) {
                 localStorage.clear();
@@ -64,7 +54,9 @@ class World {
             localStorage.setItem('worldSize', actualSize);
         }
 
-        logTimeEvent('Initialized');
+        if (this.logs) {
+            logTimeEvent('Initialized');
+        }
     }
 
     /**
@@ -75,10 +67,9 @@ class World {
         let _this = this;
 
         _this.miniMapCanvas = config.miniMapCanvas;
-        _this.miniMapCanvas.width = config.worldWidth;
-        _this.miniMapCanvas.height = config.worldHeight;
-        _this.miniMapScaleFX = config.worldWidth / _this.miniMapCanvas.offsetWidth;
-        _this.miniMapScaleFY = config.worldHeight / _this.miniMapCanvas.offsetHeight;
+        _this.miniMapCanvas.width = config.worldSize;
+        _this.miniMapCanvas.height = config.worldSize;
+        _this.miniMapScale = config.worldSize / _this.miniMapCanvas.offsetWidth;
 
         _this.miniMapCanvas.addEventListener("click", function(e) {
 
@@ -109,7 +100,9 @@ class World {
 
         altitudeMap = Filters.apply('altitudeMap', altitudeMap);
 
-        logTimeEvent('Altitude map generated');
+        if (this.logs) {
+            logTimeEvent('Altitude map generated');
+        }
 
         return altitudeMap;
     };
@@ -136,7 +129,9 @@ class World {
 
         oceanMap = Filters.apply('oceanMap', oceanMap);
 
-        logTimeEvent('Ocean map calculated');
+        if (this.logs) {
+            logTimeEvent('Ocean map calculated');
+        }
 
         return oceanMap;
     };
@@ -164,7 +159,9 @@ class World {
 
         beachesMap = Filters.apply('beachesMap', beachesMap);
 
-        logTimeEvent('Beaches map calculated');
+        if (this.logs) {
+            logTimeEvent('Beaches map calculated');
+        }
 
         return beachesMap;
     };
@@ -192,7 +189,9 @@ class World {
 
         lakesMap = Filters.apply('lakesMap', lakesMap);
 
-        logTimeEvent('Lakes map calculated');
+        if (this.logs) {
+            logTimeEvent('Lakes map calculated');
+        }
 
         return lakesMap;
     };
@@ -219,7 +218,9 @@ class World {
 
         riversMap = Filters.apply('riversMap', riversMap);
 
-        logTimeEvent('Rivers generated');
+        if (this.logs) {
+            logTimeEvent('Rivers generated');
+        }
 
         return riversMap;
     };
@@ -249,7 +250,9 @@ class World {
 
         humidityMap = Filters.apply('humidityMap', humidityMap);
 
-        logTimeEvent('Humidity map created');
+        if (this.logs) {
+            logTimeEvent('Humidity map created');
+        }
 
         return humidityMap;
     };
@@ -276,7 +279,9 @@ class World {
 
         temperatureMap = Filters.apply('temperatureMap', temperatureMap);
 
-        logTimeEvent('Temperature map created');
+        if (this.logs) {
+            logTimeEvent('Temperature map created');
+        }
 
         return temperatureMap;
     };
@@ -352,7 +357,7 @@ class World {
 
         let
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
-            image = ctx.createImageData(_this.config.worldWidth, _this.config.worldHeight),
+            image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
             biomes = new Biomes(altitudeMap, oceanMap, beachesMap, lakesMap, riversMap, humidityMap, temperatureMap),
             color;
 
@@ -367,7 +372,7 @@ class World {
 
             fillCanvasPixel(
                 image.data,
-                (x + y * _this.config.worldWidth) * 4,
+                (x + y * _this.config.worldSize) * 4,
                 color
             );
 
@@ -377,7 +382,9 @@ class World {
         _this.xyCoords = altitudeMap;
         _this.worldImageData = image;
 
-        logTimeEvent('World filled');
+        if (this.logs) {
+            logTimeEvent('World filled');
+        }
     };
 
     /**
@@ -404,8 +411,8 @@ class World {
      */
     miniMapPointToRenderPoint = function(point) {
         return [
-            Math.floor(point[0] * this.miniMapScaleFX),
-            Math.floor(point[1] * this.miniMapScaleFY)
+            Math.floor(point[0] * this.miniMapScale),
+            Math.floor(point[1] * this.miniMapScale)
         ];
     };
 
@@ -414,9 +421,12 @@ class World {
      * @return {[number, number]}
      */
     centeredPointToCameraPoint = function(point) {
+
+        let c = Math.floor(this.config.visibleCols / 2);
+
         return [
-            Math.max(0, point[0] - Math.floor(this.config.visibleCols / 2)),
-            Math.max(0, point[1] - Math.floor(this.config.visibleRows / 2))
+            Math.max(0, point[0] - c),
+            Math.max(0, point[1] - c)
         ];
     };
 
@@ -436,7 +446,7 @@ class World {
                 _this.cameraPosX,
                 _this.cameraPosY,
                 _this.config.visibleCols,
-                _this.config.visibleRows
+                _this.config.visibleCols
             );
         }
     };
@@ -452,16 +462,20 @@ class World {
             ctx.imageSmoothingEnabled = false;
             ctx.putImageData(_this.worldImageData, 0, 0);
 
-            let scaledData = scaleImageData(
-                ctx,
-                ctx.getImageData(_this.cameraPosX, _this.cameraPosY, _this.config.visibleCols, _this.config.visibleRows),
+            let imageData = ctx.getImageData(
+                _this.cameraPosX,
+                _this.cameraPosY,
                 _this.config.visibleCols,
-                _this.config.visibleRows
+                _this.config.visibleCols
             );
+
+            let scaledData = scaleImageData(ctx, imageData, _this.cellSize);
 
             ctx.putImageData(scaledData, 0, 0);
 
-            logTimeEvent('World drawn');
+            if (this.logs) {
+                logTimeEvent('World drawn');
+            }
         }
     };
 
@@ -474,29 +488,35 @@ class World {
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
         ctx.imageSmoothingEnabled = false;
 
-        for(x = 0; x < _this.renderCanvas.width; x++) {
-            for(y = 0; y < _this.renderCanvas.height; y++) {
+        for (x = 0; x < _this.config.visibleCols; x++) {
+            for (y = 0; y < _this.config.visibleCols; y++) {
                 ctx.strokeRect(
-                    x * _this.config.visibleCols,
-                    y * _this.config.visibleRows,
-                    _this.config.visibleCols,
-                    _this.config.visibleRows
+                    x * _this.cellSize,
+                    y * _this.cellSize,
+                    _this.cellSize,
+                    _this.cellSize
                 );
             }
         }
 
-        logTimeEvent('Rectangles added');
+        if (this.logs) {
+            logTimeEvent('Rectangles added');
+        }
     };
 
     create = function() {
+
         this.generateWorld();
         this.drawMiniMap();
         this.drawWorld();
         this.drawRectangles();
+
+        this.logs = false;
     };
 
     update = function() {
         this.drawMiniMap();
         this.drawWorld();
+        this.drawRectangles();
     };
 }

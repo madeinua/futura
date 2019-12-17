@@ -12,7 +12,7 @@ class TemperatureMap extends PointMatrix {
      */
     constructor(altitudeMap, config) {
 
-        super(config.worldWidth, config.worldHeight);
+        super(config.worldSize, config.worldSize);
 
         this.ALTITUDE_TEMPERATURE_FACTOR = typeof config.ALTITUDE_TEMPERATURE_FACTOR === 'undefined'
             ? this.ALTITUDE_TEMPERATURE_FACTOR
@@ -33,8 +33,8 @@ class TemperatureMap extends PointMatrix {
             gradient = [],
             revFactor = (1 - _this.ALTITUDE_TEMPERATURE_FACTOR) * 10;
 
-        for(let i = 0; i < this.config.worldHeight; i++) {
-            gradient[i] = i / this.config.worldHeight;
+        for (let i = 0; i < this.config.worldSize; i++) {
+            gradient[i] = i / this.config.worldSize;
         }
 
         _this.map(function(x, y) {

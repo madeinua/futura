@@ -16,7 +16,7 @@ class HumidityMap extends PointMatrix {
      */
     constructor(altitudeMap, beachesMap, riversMap, lakesMap, config) {
 
-        super(config.worldWidth, config.worldHeight);
+        super(config.worldSize, config.worldSize);
 
         this.altitudeMap = altitudeMap;
         this.beachesMap = beachesMap;
@@ -35,11 +35,7 @@ class HumidityMap extends PointMatrix {
         let _this = this;
 
         _this.setAll(
-            createNoiseMap(
-                _this.config.worldWidth,
-                _this.config.worldHeight,
-                90
-            ).getAll()
+            createNoiseMap(_this.config.worldSize, 90).getAll()
         );
 
         // @TODO
@@ -62,7 +58,7 @@ class HumidityMap extends PointMatrix {
             rivers = riversMap.getFilledTiles(),
             water = rivers.concat(lakes),
             beaches = beachesMap.getFilledTiles(),
-            maxDistance = worldWidth / 10;
+            maxDistance = worldSize / 10;
 
         // rivers/lakes increase humidity
         humidityMap.map(function(x, y) {

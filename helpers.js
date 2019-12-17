@@ -39,7 +39,7 @@ let Filters = {
 
         if (this.filters[tag]) {
             let filters = this.filters[tag];
-            for(let i = 0; i < filters.length; i++) {
+            for (let i = 0; i < filters.length; i++) {
                 val = filters[i](val);
             }
         }
@@ -62,7 +62,7 @@ Array.prototype.randomElement = function() {
  */
 Array.prototype.shuffle = function() {
     let j, x, i;
-    for(i = this.length - 1; i > 0; i--) {
+    for (i = this.length - 1; i > 0; i--) {
         j = Math.floor(Math.random() * (i + 1));
         x = this[i];
         this[i] = this[j];
@@ -147,8 +147,8 @@ function distance(x1, y1, x2, y2) {
  */
 Array.prototype.unique = function() {
     let a = this.concat();
-    for(let i = 0; i < a.length; ++i) {
-        for(let j = i + 1; j < a.length; ++j) {
+    for (let i = 0; i < a.length; ++i) {
+        for (let j = i + 1; j < a.length; ++j) {
             if (a[i] === a[j]) {
                 a.splice(j--, 1);
             }
@@ -167,7 +167,7 @@ Array.prototype.getClosestDistanceTo = function(x, y) {
 
     let closeness = Number.MAX_SAFE_INTEGER;
 
-    for(let i = 0; i < this.length; i++) {
+    for (let i = 0; i < this.length; i++) {
         closeness = Math.min(
             closeness,
             distance(x, y, this[i][0], this[i][1])
@@ -186,7 +186,7 @@ Array.prototype.getClosestDistanceTo = function(x, y) {
  */
 function arrayHasPoint(arr, x, y) {
 
-    for(let i = 0; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
         if (arr[i][0] === x && arr[i][1] === y) {
             return true;
         }
@@ -224,9 +224,9 @@ class Matrix {
         this.height = height;
         this.__values = [];
 
-        for(let x = 0; x < width; x++) {
+        for (let x = 0; x < width; x++) {
             this.__values[x] = [];
-            for(let y = 0; y < height; y++) {
+            for (let y = 0; y < height; y++) {
                 this.__values[x][y] = null;
             }
         }
@@ -265,7 +265,7 @@ class Matrix {
      * @param {string} string
      * @return {Matrix}
      */
-    fromString = function (string) {
+    fromString = function(string) {
         return this.setAll(
             JSON.parse(string)
         );
@@ -360,8 +360,8 @@ class Matrix {
 
         let isFunc = typeof value === 'function';
 
-        for(let x = 0; x < this.width; x++) {
-            for(let y = 0; y < this.height; y++) {
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
                 this.setTile(x, y, isFunc ? value(x, y) : value);
             }
         }
@@ -374,8 +374,8 @@ class Matrix {
      * @param {function} callback
      */
     foreach(callback) {
-        for(let x = 0; x < this.width; x++) {
-            for(let y = 0; y < this.height; y++) {
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
                 callback(x, y);
             }
         }
@@ -424,7 +424,7 @@ class Matrix {
             h = this.getHeight(),
             neighbours = [];
 
-        for(let i = 0; i < points.length; i++) {
+        for (let i = 0; i < points.length; i++) {
             let nx = x + points[i][0];
             let ny = y + points[i][1];
             if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
@@ -434,7 +434,7 @@ class Matrix {
 
         if (deep > 2) {
             let len = neighbours.length;
-            for(let j = 0; j < len; j++) {
+            for (let j = 0; j < len; j++) {
                 neighbours = neighbours.concat(
                     this.getNeighbors(neighbours[j][0], neighbours[j][1], deep - 2)
                 );
@@ -456,7 +456,7 @@ class Matrix {
 
         let neighbors = this.getNeighbors(x, y, deep);
 
-        for(let i = 0; i < neighbors.length; i++) {
+        for (let i = 0; i < neighbors.length; i++) {
             callback(neighbors[i][0], neighbors[i][1]);
         }
 
@@ -532,7 +532,7 @@ class Matrix {
 
         let surrounds = this.getNeighbors(x, y, deep);
 
-        for(let i = 0; i < surrounds.length; i++) {
+        for (let i = 0; i < surrounds.length; i++) {
             if (this.getTile(surrounds[i][0], surrounds[i][1]) === value) {
                 return true;
             }
@@ -638,8 +638,8 @@ class BinaryMatrix extends Matrix {
      * @param {function} callback
      */
     foreachFilled(callback) {
-        for(let x = 0; x < this.width; x++) {
-            for(let y = 0; y < this.height; y++) {
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
                 if (this.filled(x, y)) {
                     callback(x, y);
                 }
@@ -688,7 +688,7 @@ class BinaryMatrix extends Matrix {
 
         this.foreachFilled(function(x, y) {
             let neighbors = map.getNeighbors(x, y, deep);
-            for(let i = 0; i < neighbors.length; i++) {
+            for (let i = 0; i < neighbors.length; i++) {
                 map.fill(neighbors[i][0], neighbors[i][1]);
             }
         });
@@ -728,16 +728,15 @@ class PointMatrix extends Matrix {
 }
 
 /**
- * @param {number} w
- * @param {number} h
+ * @param {number} size
  * @param {number} power
  * @return {PointMatrix}
  */
-function createNoiseMap(w, h, power) {
+function createNoiseMap(size, power) {
 
     noise.seed(Math.random());
 
-    let map = new PointMatrix(w, h);
+    let map = new PointMatrix(size, size);
 
     map.map(function(x, y) {
         return (noise.simplex2(x / power, y / power) + 1) * 0.5; // [0, 1] blurred height map
@@ -762,31 +761,30 @@ function fillCanvasPixel(data, point, RGB) {
  * Scale canvas image
  * @param {CanvasRenderingContext2D} context
  * @param {ImageData} imageData
- * @param {number} scaleX
- * @param {number} scaleY
+ * @param {number} scale
  * @return {ImageData}
  */
-function scaleImageData(context, imageData, scaleX, scaleY) {
+function scaleImageData(context, imageData, scale) {
 
-    let scaled = context.createImageData(imageData.width * scaleX, imageData.height * scaleY);
-    let subLine = context.createImageData(scaleX, 1).data;
+    let scaled = context.createImageData(imageData.width * scale, imageData.height * scale);
+    let subLine = context.createImageData(scale, 1).data;
 
-    for(let row = 0; row < imageData.height; row++) {
-        for(let col = 0; col < imageData.width; col++) {
+    for (let row = 0; row < imageData.height; row++) {
+        for (let col = 0; col < imageData.width; col++) {
 
             let sourcePixel = imageData.data.subarray(
                 (row * imageData.width + col) * 4,
                 (row * imageData.width + col) * 4 + 4
             );
 
-            for(let x = 0; x < scaleX; x++) {
+            for (let x = 0; x < scale; x++) {
                 subLine.set(sourcePixel, x * 4);
             }
 
-            for(let y = 0; y < scaleY; y++) {
+            for (let x = 0; x < scale; x++) {
 
-                let destRow = row * scaleX + y;
-                let destCol = col * scaleY;
+                let destRow = row * scale + x;
+                let destCol = col * scale;
 
                 scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4)
             }
@@ -848,7 +846,7 @@ function getEqualDistances(number, start, end) {
         lines = [(end - start) / 2];
     } else {
         let parts = (end - start) / (number - 1);
-        for(let i = 0; i < number; i++) {
+        for (let i = 0; i < number; i++) {
             lines.push(start + Math.floor(parts * i));
         }
     }

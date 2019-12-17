@@ -11,7 +11,7 @@ class OceanMap extends BinaryMatrix {
      */
     constructor(altitudeMap, config) {
 
-        super(config.worldWidth, config.worldHeight);
+        super(config.worldSize, config.worldSize);
 
         this.MAX_OCEAN_LEVEL = typeof config.MAX_OCEAN_LEVEL === 'undefined'
             ? this.MAX_OCEAN_LEVEL
