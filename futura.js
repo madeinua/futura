@@ -1,3 +1,22 @@
+let coordinatesField = document.getElementById('coordinates'),
+    worldCanvas = document.getElementById('world'),
+    miniMapCanvas = document.getElementById('miniMap');
+
+let config = {
+    //storeData: false,
+    worldSize: 300,
+    visibleCols: 30,
+    worldCanvas: worldCanvas,
+    miniMapCanvas: miniMapCanvas
+};
+
+let cameraPos = getCenteredCameraPosition(config.visibleCols);
+
+config.cameraPosX = cameraPos[0];
+config.cameraPosY = cameraPos[1];
+
+let world = new World(config);
+
 /**
  * @param {string} id
  * @param {Matrix} map
@@ -27,21 +46,9 @@ function drawMap(id, map, reverse) {
     ctx.putImageData(image, 0, 0);
 }
 
-let coordinatesField = document.getElementById('coordinates'),
-    miniMapCanvas = document.getElementById('miniMap');
-
-let world = new World({
-    //storeData: false,
-    worldSize: 300,
-    visibleCols: 30,
-    worldCanvas: document.getElementById('world'),
-    miniMapCanvas: miniMapCanvas,
-    cameraPosX: getCameraPosition()[0],
-    cameraPosY: getCameraPosition()[1]
-});
-
 Filters
     .add('mapMoved', function(point) {
+        point = centeredCameraPointToXY(point, config.visibleCols);
         coordinatesField.value = point[0] + ',' + point[1];
     })
     .add('altitudeMap', function(map) {
@@ -96,20 +103,63 @@ function getCameraPosition() {
     return [x, y];
 }
 
+/**
+ * @param {[number, number]} point
+ * @param {number} size
+ * @return {[number, number]}
+ */
+function centerCameraPoint(point, size) {
+
+    let c = Math.floor(size / 2);
+
+    return [
+        Math.max(0, point[0] - c),
+        Math.max(0, point[1] - c)
+    ];
+}
+
+/**
+ * @param {number} size
+ * @return {number[]}
+ */
+function getCenteredCameraPosition(size) {
+    return centerCameraPoint(
+        getCameraPosition(),
+        size
+    );
+}
+
+/**
+ * @param {[number, number]} point
+ * @param {number} size
+ * @return {[number, number]}
+ */
+function centeredCameraPointToXY(point, size) {
+
+    let c = Math.floor(size / 2);
+
+    return [
+        Math.max(0, point[0] + c),
+        Math.max(0, point[1] + c)
+    ];
+}
+
 coordinatesField.addEventListener("change", function() {
     world.moveMapTo(
-        getCameraPosition(),
-        false
+        getCenteredCameraPosition(config.visibleCols)
     );
 });
 
 miniMapCanvas.addEventListener("click", function(e) {
 
     let pos = getPosition(this),
+        scale = config.worldSize / miniMapCanvas.offsetWidth,
         point = [
-            Math.floor((e.pageX - pos.x) * world.miniMapScale),
-            Math.floor((e.pageY - pos.y) * world.miniMapScale)
+            Math.floor((e.pageX - pos.x) * scale),
+            Math.floor((e.pageY - pos.y) * scale)
         ];
 
-    world.moveMapTo(point, true);
+    world.moveMapTo(
+        centerCameraPoint(point, config.visibleCols)
+    );
 });

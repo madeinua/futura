@@ -74,7 +74,6 @@ class World {
         this.miniMapCanvas = config.miniMapCanvas;
         this.miniMapCanvas.width = config.worldSize;
         this.miniMapCanvas.height = config.worldSize;
-        this.miniMapScale = config.worldSize / this.miniMapCanvas.offsetWidth;
     };
 
     /**
@@ -387,13 +386,8 @@ class World {
 
     /**
      * @param {number[]} point
-     * @param {boolean} centered
      */
-    moveMapTo = function(point, centered) {
-
-        if (centered) {
-            point = this.centeredPointToCameraPoint(point);
-        }
+    moveMapTo = function(point) {
 
         let max = this.config.worldSize - this.config.visibleCols;
 
@@ -406,20 +400,6 @@ class World {
         this.update();
 
         Filters.apply('mapMoved', point);
-    };
-
-    /**
-     * @param {[number, number]} point
-     * @return {[number, number]}
-     */
-    centeredPointToCameraPoint = function(point) {
-
-        let c = Math.floor(this.config.visibleCols / 2);
-
-        return [
-            Math.max(0, point[0] - c),
-            Math.max(0, point[1] - c)
-        ];
     };
 
     drawMiniMap = function() {
