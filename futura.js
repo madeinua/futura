@@ -27,15 +27,18 @@ function drawMap(id, map, reverse) {
     ctx.putImageData(image, 0, 0);
 }
 
+let coordinatesField = document.getElementById('coordinates'),
+    miniMapCanvas = document.getElementById('miniMap');
+
 let world = new World({
     //storeData: false,
     worldSize: 300,
     visibleCols: 30,
     worldCanvas: document.getElementById('world'),
-    miniMapCanvas: document.getElementById('miniMap')
+    miniMapCanvas: miniMapCanvas,
+    cameraPosX: getCameraPosition()[0],
+    cameraPosY: getCameraPosition()[1]
 });
-
-let coordinatesField = document.getElementById('coordinates');
 
 Filters
     .add('mapMoved', function(point) {
@@ -76,7 +79,10 @@ Filters
 
 world.create();
 
-coordinatesField.addEventListener("change", function() {
+/**
+ * @return {number[]}
+ */
+function getCameraPosition() {
 
     let point = coordinatesField.value.split(','),
         x = 0,
@@ -87,5 +93,23 @@ coordinatesField.addEventListener("change", function() {
         y = parseInt(point[1], 10);
     }
 
-    world.moveMapTo(x, y);
+    return [x, y];
+}
+
+coordinatesField.addEventListener("change", function() {
+    world.moveMapTo(
+        getCameraPosition(),
+        false
+    );
+});
+
+miniMapCanvas.addEventListener("click", function(e) {
+
+    let pos = getPosition(this),
+        point = [
+            Math.floor((e.pageX - pos.x) * world.miniMapScale),
+            Math.floor((e.pageY - pos.y) * world.miniMapScale)
+        ];
+
+    world.moveMapTo(point, true);
 });

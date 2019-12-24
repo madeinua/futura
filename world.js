@@ -18,8 +18,16 @@ class World {
             config.storeData = true;
         }
 
-        if (typeof config.defaultCameraPos === 'undefined') {
-            config.defaultCameraPos = Math.ceil(config.worldSize / 2 - config.visibleCols / 2);
+        if (typeof config.cameraPosX === 'undefined') {
+            config.cameraPosX = Math.ceil(
+                config.worldSize / 2 - config.visibleCols / 2
+            );
+        }
+
+        if (typeof config.cameraPosY === 'undefined') {
+            config.cameraPosY = Math.ceil(
+                config.worldSize / 2 - config.visibleCols / 2
+            );
         }
 
         this.config = config;
@@ -29,10 +37,10 @@ class World {
         this.worldCanvas.width = this.worldCanvas.offsetWidth;
         this.worldCanvas.height = this.worldCanvas.offsetHeight;
 
-        this.cellSize = this.worldCanvas.width / config.visibleCols;
+        this.cellSize = Math.ceil(this.worldCanvas.width / config.visibleCols);
 
-        this.cameraPosX = config.defaultCameraPos;
-        this.cameraPosY = config.defaultCameraPos;
+        this.cameraPosX = config.cameraPosX;
+        this.cameraPosY = config.cameraPosY;
 
         this.renderCanvas = document.createElement('canvas');
         this.renderCanvas.width = config.worldSize;
@@ -63,20 +71,10 @@ class World {
      * @param {Object} config
      */
     setMiniMap = function(config) {
-
-        let _this = this;
-
-        _this.miniMapCanvas = config.miniMapCanvas;
-        _this.miniMapCanvas.width = config.worldSize;
-        _this.miniMapCanvas.height = config.worldSize;
-        _this.miniMapScale = config.worldSize / _this.miniMapCanvas.offsetWidth;
-
-        _this.miniMapCanvas.addEventListener("click", function(e) {
-
-            let pos = getPosition(_this.miniMapCanvas);
-
-            _this.moveMapTo(e.pageX - pos.x, e.pageY - pos.y);
-        });
+        this.miniMapCanvas = config.miniMapCanvas;
+        this.miniMapCanvas.width = config.worldSize;
+        this.miniMapCanvas.height = config.worldSize;
+        this.miniMapScale = config.worldSize / this.miniMapCanvas.offsetWidth;
     };
 
     /**
@@ -388,32 +386,26 @@ class World {
     };
 
     /**
-     * @param {number} x
-     * @param {number} y
+     * @param {number[]} point
+     * @param {boolean} centered
      */
-    moveMapTo = function(x, y) {
+    moveMapTo = function(point, centered) {
 
-        let point = this.centeredPointToCameraPoint(
-            this.miniMapPointToRenderPoint([x, y])
-        );
+        if (centered) {
+            point = this.centeredPointToCameraPoint(point);
+        }
+
+        let max = this.config.worldSize - this.config.visibleCols;
+
+        point[0] = Math.max(0, Math.min(point[0], max));
+        point[1] = Math.max(0, Math.min(point[1], max));
 
         this.cameraPosX = point[0];
         this.cameraPosY = point[1];
 
         this.update();
 
-        Filters.apply('mapMoved', [x, y]);
-    };
-
-    /**
-     * @param {[number, number]} point
-     * @return {[number, number]}
-     */
-    miniMapPointToRenderPoint = function(point) {
-        return [
-            Math.floor(point[0] * this.miniMapScale),
-            Math.floor(point[1] * this.miniMapScale)
-        ];
+        Filters.apply('mapMoved', point);
     };
 
     /**
@@ -485,17 +477,22 @@ class World {
             ctx = _this.worldCanvas.getContext('2d'),
             x, y;
 
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
         ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
 
         for (x = 0; x < _this.config.visibleCols; x++) {
             for (y = 0; y < _this.config.visibleCols; y++) {
+
                 ctx.strokeRect(
                     x * _this.cellSize,
                     y * _this.cellSize,
                     _this.cellSize,
                     _this.cellSize
                 );
+
+                ctx.font = '10px senf';
+                ctx.fillText((_this.cameraPosX + x).toString(), x * _this.cellSize + 2, y * _this.cellSize + 10);
+                ctx.fillText((_this.cameraPosY + y).toString(), x * _this.cellSize + 2, y * _this.cellSize + 21);
             }
         }
 

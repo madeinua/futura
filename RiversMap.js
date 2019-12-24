@@ -19,29 +19,35 @@ class RiversMap extends BinaryMatrix {
 
         super(config.worldSize, config.worldSize);
 
-        this.RIVERS_DENSITY = typeof config.RIVERS_DENSITY === 'undefined'
-            ? this.RIVERS_DENSITY
-            : config.RIVERS_DENSITY;
+        this.RIVERS_DENSITY =
+            typeof config.RIVERS_DENSITY === 'undefined'
+                ? this.RIVERS_DENSITY
+                : config.RIVERS_DENSITY;
 
-        this.RIVER_SOURCE_MIN_ALTITUDE = typeof config.RIVER_SOURCE_MIN_ALTITUDE === 'undefined'
-            ? this.RIVER_SOURCE_MIN_ALTITUDE
-            : config.RIVER_SOURCE_MIN_ALTITUDE;
+        this.RIVER_SOURCE_MIN_ALTITUDE =
+            typeof config.RIVER_SOURCE_MIN_ALTITUDE === 'undefined'
+                ? this.RIVER_SOURCE_MIN_ALTITUDE
+                : config.RIVER_SOURCE_MIN_ALTITUDE;
 
-        this.RIVER_SOURCE_MAX_ALTITUDE = typeof config.RIVER_SOURCE_MAX_ALTITUDE === 'undefined'
-            ? this.RIVER_SOURCE_MAX_ALTITUDE
-            : config.RIVER_SOURCE_MAX_ALTITUDE;
+        this.RIVER_SOURCE_MAX_ALTITUDE =
+            typeof config.RIVER_SOURCE_MAX_ALTITUDE === 'undefined'
+                ? this.RIVER_SOURCE_MAX_ALTITUDE
+                : config.RIVER_SOURCE_MAX_ALTITUDE;
 
-        this.RIVERS_CLOSENESS = typeof config.RIVERS_CLOSENESS === 'undefined'
-            ? this.RIVERS_CLOSENESS
-            : config.RIVERS_CLOSENESS;
+        this.RIVERS_CLOSENESS =
+            typeof config.RIVERS_CLOSENESS === 'undefined'
+                ? this.RIVERS_CLOSENESS
+                : config.RIVERS_CLOSENESS;
 
-        this.RIVER_MIN_LENGTH = typeof config.RIVER_MIN_LENGTH === 'undefined'
-            ? this.RIVER_MIN_LENGTH
-            : config.RIVER_MIN_LENGTH;
+        this.RIVER_MIN_LENGTH =
+            typeof config.RIVER_MIN_LENGTH === 'undefined'
+                ? this.RIVER_MIN_LENGTH
+                : config.RIVER_MIN_LENGTH;
 
-        this.RIVER_DELTA_MAX_LENGTH = typeof config.RIVER_DELTA_MAX_LENGTH === 'undefined'
-            ? this.RIVER_DELTA_MAX_LENGTH
-            : config.RIVER_DELTA_MAX_LENGTH;
+        this.RIVER_DELTA_MAX_LENGTH =
+            typeof config.RIVER_DELTA_MAX_LENGTH === 'undefined'
+                ? this.RIVER_DELTA_MAX_LENGTH
+                : config.RIVER_DELTA_MAX_LENGTH;
 
         this.config = config;
         this.altitudeMap = altitudeMap;
@@ -64,7 +70,8 @@ class RiversMap extends BinaryMatrix {
         for (let i = 0; i < riverSources.length; i++) {
 
             let river = [],
-                finished = false;
+                finished = false,
+                tile;
 
             // source = starting point of each river
             river.push(riverSources[i]);
@@ -78,8 +85,10 @@ class RiversMap extends BinaryMatrix {
                     break;
                 }
 
+                tile = _this.altitudeMap.getTile(nextRiverPoint[0], nextRiverPoint[1]);
+
                 // lake/ocean found. means river ending point found.
-                if (_this.altitudeMap.isWater(_this.altitudeMap.getTile(nextRiverPoint[0], nextRiverPoint[1]))) {
+                if (_this.altitudeMap.isWater(tile)) {
                     finished = true;
                     break;
                 }

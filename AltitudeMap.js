@@ -13,13 +13,15 @@ class AltitudeMap extends PointMatrix {
 
         super(config.worldSize, config.worldSize);
 
-        this.WORLD_MAP_OCEAN_LEVEL = typeof config.WORLD_MAP_OCEAN_LEVEL === 'undefined'
-            ? this.WORLD_MAP_OCEAN_LEVEL
-            : config.WORLD_MAP_OCEAN_LEVEL;
+        this.WORLD_MAP_OCEAN_LEVEL =
+            typeof config.WORLD_MAP_OCEAN_LEVEL === 'undefined'
+                ? this.WORLD_MAP_OCEAN_LEVEL
+                : config.WORLD_MAP_OCEAN_LEVEL;
 
-        this.MAX_COAST_LEVEL = typeof config.MAX_COAST_LEVEL === 'undefined'
-            ? this.MAX_COAST_LEVEL
-            : config.MAX_COAST_LEVEL;
+        this.MAX_COAST_LEVEL =
+            typeof config.MAX_COAST_LEVEL === 'undefined'
+                ? this.MAX_COAST_LEVEL
+                : config.MAX_COAST_LEVEL;
 
         this.config = config;
 

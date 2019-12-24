@@ -71,7 +71,7 @@ class Biomes {
         colors[_this.BIOME_TAIGA] = '#176b56';
         colors[_this.BIOME_TROP_TS] = '#b39b29';
         colors[_this.BIOME_SAVANNA] = '#bcca5d';
-        colors[_this.BIOME_TUNDRA] = '#b9ffe6';
+        colors[_this.BIOME_TUNDRA] = '#ff000e';//b9ffe6
         colors[_this.BIOME_DESERT] = '#fcfda5';
         colors[_this.BIOME_SWAMP] = '#008f5c';
         colors[_this.BIOME_RIVER] = '#0952c6';
@@ -97,7 +97,9 @@ class Biomes {
         let _this = this;
 
         if (_this.oceanMap.filled(x, y)) {
-            return _this.altitudeMap.getTile(x, y) > _this.oceanMap.MAX_OCEAN_LEVEL ? _this.BIOME_COAST : _this.BIOME_OCEAN;
+            return _this.altitudeMap.getTile(x, y) > _this.oceanMap.MAX_OCEAN_LEVEL
+                ? _this.BIOME_COAST
+                : _this.BIOME_OCEAN;
         }
 
         if (_this.beachesMap.filled(x, y)) {

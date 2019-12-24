@@ -18,9 +18,10 @@ class BeachesMap extends BinaryMatrix {
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;
 
-        this.MAX_BEACH_LEVEL = typeof config.MAX_BEACH_LEVEL === 'undefined'
-            ? this.MAX_BEACH_LEVEL
-            : config.MAX_BEACH_LEVEL;
+        this.MAX_BEACH_LEVEL =
+            typeof config.MAX_BEACH_LEVEL === 'undefined'
+                ? this.MAX_BEACH_LEVEL
+                : config.MAX_BEACH_LEVEL;
 
         return this;
     };
@@ -46,6 +47,7 @@ class BeachesMap extends BinaryMatrix {
      * @return {boolean}
      */
     isBeach = function(level) {
-        return level > this.altitudeMap.MAX_COAST_LEVEL && this.MAX_BEACH_LEVEL > level;
+        return level > this.altitudeMap.MAX_COAST_LEVEL
+            && this.MAX_BEACH_LEVEL > level;
     };
 }

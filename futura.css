@@ -3,10 +3,6 @@ body, html {
     margin: 0;
 }
 
-.content {
-    margin: 20px;
-}
-
 canvas {
 
     box-shadow: 0 0 10px #777;
@@ -33,8 +29,8 @@ canvas {
 
 #world {
     margin: 20px;
-    width: 600px;
-    height: 600px;
+    width: 700px;
+    height: 700px;
 }
 
 #miniMap {

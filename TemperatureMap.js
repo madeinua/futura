@@ -14,9 +14,10 @@ class TemperatureMap extends PointMatrix {
 
         super(config.worldSize, config.worldSize);
 
-        this.ALTITUDE_TEMPERATURE_FACTOR = typeof config.ALTITUDE_TEMPERATURE_FACTOR === 'undefined'
-            ? this.ALTITUDE_TEMPERATURE_FACTOR
-            : config.ALTITUDE_TEMPERATURE_FACTOR;
+        this.ALTITUDE_TEMPERATURE_FACTOR =
+            typeof config.ALTITUDE_TEMPERATURE_FACTOR === 'undefined'
+                ? this.ALTITUDE_TEMPERATURE_FACTOR
+                : config.ALTITUDE_TEMPERATURE_FACTOR;
 
         this.altitudeMap = altitudeMap;
         this.config = config;
