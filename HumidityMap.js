@@ -1,25 +1,22 @@
 class HumidityMap extends PointMatrix {
 
     altitudeMap;
-    beachesMap;
     riversMap;
     lakesMap;
     config;
 
     /**
      * @param {AltitudeMap} altitudeMap
-     * @param {BeachesMap} beachesMap
      * @param {RiversMap} riversMap
      * @param {LakesMap} lakesMap
      * @param {Object} config
      * @return {HumidityMap}
      */
-    constructor(altitudeMap, beachesMap, riversMap, lakesMap, config) {
+    constructor(altitudeMap, riversMap, lakesMap, config) {
 
         super(config.worldSize, config.worldSize);
 
         this.altitudeMap = altitudeMap;
-        this.beachesMap = beachesMap;
         this.riversMap = riversMap;
         this.lakesMap = lakesMap;
         this.config = config;
@@ -28,57 +25,63 @@ class HumidityMap extends PointMatrix {
     };
 
     /**
+     * 0 = wet
+     * 1 = dry
      * @return {HumidityMap}
      */
     generateMap = function() {
 
+        this.generateNoiseMap();
+        this.considerAltitude();
+        this.considerRivers();
+        this.considerLakes();
+        this.normalize();
+
+        return this;
+    };
+
+    generateNoiseMap() {
+        this.setAll(
+            createNoiseMap(this.config.worldSize, 150).getAll()
+        );
+    };
+
+    considerAltitude() {
+
         let _this = this;
 
-        _this.setAll(
-            createNoiseMap(_this.config.worldSize, 90).getAll()
-        );
-
-        // @TODO
-
-        /*
-                // higher altitude = lower humidity
-                humidityMap.map(function(x, y) {
-                    return humidityMap.getTile(x, y) - 0.5 + altitudeMap.getTile(x, y) * 0.5;
-                });
-        */
-        // rivers/lakes increase humidity
-        /*      riversMap.foreach(function(x ,y) {
-                  humidityMap.addToTile(x, y, 0.25);
-                  humidityMap.addToNeighborTiles(x, y, 2, 0.1);
-              });
-      */
-        /*
-
-        let lakes = lakesMap.getFilledTiles().makeStep(5), // divider by 5 to increase performance
-            rivers = riversMap.getFilledTiles(),
-            water = rivers.concat(lakes),
-            beaches = beachesMap.getFilledTiles(),
-            maxDistance = worldSize / 10;
-
-        // rivers/lakes increase humidity
-        humidityMap.map(function(x, y) {
-
-            let distance = water.getClosestDistanceTo(x, y),
-                md = Math.sqrt(maxDistance);
-
-            return humidityMap.getTile(x, y) + 0.1 + tval(distance / Math.max(distance, md), -0.2, 0.1);
+        // higher altitude = lower humidity
+        _this.foreach(function(x, y) {
+            _this.addToTile(x, y, -_this.altitudeMap.getTile(x, y));
         });
+    };
 
-        // ocean decrease humidity
-        humidityMap.map(function(x, y) {
+    considerRivers() {
 
-            let distance = beaches.getClosestDistanceTo(x, y);
+        let _this = this;
 
-            return humidityMap.getTile(x, y) - 0.2 + tval(distance / Math.max(distance, maxDistance), 0, 0.4);
+        // rivers increase humidity
+        _this.riversMap.foreachFilled(function(x, y) {
+
+            _this.addToTile(x, y, -0.2);
+
+            _this.foreachNeighbors(x, y, 5, function(nx, ny) {
+                if (!_this.riversMap.filled(nx, ny)) {
+                    _this.addToTile(nx, ny, -0.02);
+                }
+            });
         });
+    };
 
-         */
+    considerLakes() {
 
-        return _this;
+        let _this = this;
+
+        // lakes increase humidity
+        _this.lakesMap.foreachFilled(function(x, y) {
+            _this.foreachNeighbors(x, y, 5, function (nx, ny) {
+                _this.addToTile(nx, ny, - 0.015);
+            });
+        });
     };
 }

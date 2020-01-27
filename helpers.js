@@ -121,6 +121,19 @@ function tval(value, min, max) {
 }
 
 /**
+ * Convert range [minOld-maxOld] to another range [minNew-maxNew]
+ * @param {number} value
+ * @param {number} minOld
+ * @param {number} maxOld
+ * @param {number} minNew
+ * @param {number} maxNew
+ * @return {number}
+ */
+function rval(value, minOld, maxOld, minNew, maxNew) {
+    return (((value - minOld) * (maxNew - minNew)) / (maxOld - minOld)) + minNew;
+}
+
+/**
  * Convert value in between [0-1] to RGB range [0-255]
  * @param {number} value
  * @return {number}
@@ -146,14 +159,22 @@ function distance(x1, y1, x2, y2) {
  * @return {Array}
  */
 Array.prototype.unique = function() {
-    let a = this.concat();
+
+    let a = this.concat(),
+        isArray = a.length > 0 && a[0] instanceof Array;
+
     for (let i = 0; i < a.length; ++i) {
         for (let j = i + 1; j < a.length; ++j) {
-            if (a[i] === a[j]) {
+            if (
+                isArray
+                    ? a[i][0] === a[j][0] && a[i][1] === a[j][1]
+                    : a[i] === a[j]
+            ) {
                 a.splice(j--, 1);
             }
         }
     }
+
     return a;
 };
 
@@ -241,13 +262,38 @@ class Matrix {
     }
 
     /**
+     * Retrieve all values of the matrix
+     * @return {Array}
+     */
+    values() {
+
+        let values = [];
+
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                values.push(
+                    this.__values[x][y]
+                );
+            }
+        }
+
+        return values;
+    }
+
+    /**
      * Set all tiles of matrix
      * @param {Array} values
      * @return {Matrix}
      */
     setAll(values) {
 
-        this.__values = values;
+        if (values instanceof Array) {
+            this.__values = values;
+        } else {
+            this.map(function() {
+                return values;
+            });
+        }
 
         return this;
     }
@@ -404,44 +450,64 @@ class Matrix {
      */
     getNeighbors(x, y, deep) {
 
-        let points;
-
-        if (deep % 2 === 0) {
-            points = [
-                [-1, -1], [-1, 0], [-1, 1],
-                [0, -1], [0, 1],
-                [1, -1], [1, 0], [1, 1]
-            ];
-        } else {
-            points = [
-                [-1, 0],
-                [0, -1], [0, 1],
-                [1, 0]
-            ];
+        if (deep === 0) {
+            return [];
         }
 
-        let w = this.getWidth(),
-            h = this.getHeight(),
-            neighbours = [];
+        let _this = this,
+            _getNeighbours = function(x1, y1, deep1) {
 
-        for (let i = 0; i < points.length; i++) {
-            let nx = x + points[i][0];
-            let ny = y + points[i][1];
-            if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                neighbours.push([nx, ny]);
-            }
-        }
+                let points;
 
-        if (deep > 2) {
-            let len = neighbours.length;
-            for (let j = 0; j < len; j++) {
-                neighbours = neighbours.concat(
-                    this.getNeighbors(neighbours[j][0], neighbours[j][1], deep - 2)
-                );
-            }
-        }
+                if (deep1 % 2 === 0) {
+                    points = [
+                        [-1, -1], [-1, 0], [-1, 1],
+                        [0, -1], [0, 1],
+                        [1, -1], [1, 0], [1, 1]
+                    ];
+                } else {
+                    points = [
+                        [-1, 0],
+                        [0, -1], [0, 1],
+                        [1, 0]
+                    ];
+                }
 
-        return neighbours.unique();
+                let w = _this.getWidth(),
+                    h = _this.getHeight(),
+                    neighbours = [];
+
+                for (let i = 0; i < points.length; i++) {
+
+                    let nx = x1 + points[i][0];
+                    let ny = y1 + points[i][1];
+
+                    if (
+                        nx >= 0
+                        && nx < w
+                        && ny >= 0
+                        && ny < h
+                        && !(nx === x && ny === y)
+                    ) {
+                        neighbours.push([nx, ny]);
+                    }
+                }
+
+                if (deep1 > 2) {
+
+                    let len = neighbours.length;
+
+                    for (let j = 0; j < len; j++) {
+                        neighbours = neighbours.concat(
+                            _getNeighbours(neighbours[j][0], neighbours[j][1], deep1 - 2)
+                        );
+                    }
+                }
+
+                return neighbours.unique();
+            };
+
+        return _getNeighbours(x, y, deep);
     }
 
     /**
@@ -494,11 +560,11 @@ class Matrix {
 
         let _this = this;
 
-        this.foreachNeighbors(x, y, deep, function(nx, ny) {
+        _this.foreachNeighbors(x, y, deep, function(nx, ny) {
             _this.addToTile(nx, ny, value);
         });
 
-        return this;
+        return _this;
     }
 
     /**
@@ -511,7 +577,7 @@ class Matrix {
         let found = false,
             _this = this;
 
-        this.foreach(function(x, y) {
+        _this.foreach(function(x, y) {
             if (_this.getTile(x, y) === value) {
                 found = true;
             }
@@ -542,7 +608,7 @@ class Matrix {
     }
 
     /**
-     * Set min/max possible values of the matrix
+     * Scale matrix to fit min/max ranges
      * @param {number} min
      * @param {number} max
      * @return {Matrix}
@@ -550,24 +616,21 @@ class Matrix {
     setRange(min, max) {
 
         let _this = this,
-            val;
+            values = _this.values(),
+            currMin = Math.min(...values),
+            currMax = Math.max(...values);
 
-        this.map(function(x, y) {
-
-            val = _this.getTile(x, y);
-
-            if (val > max) {
-                val = max;
-            }
-
-            if (min > val) {
-                val = min;
-            }
-
-            return val;
+        _this.map(function(x, y) {
+            return rval(
+                _this.getTile(x, y),
+                currMin,
+                currMax,
+                min,
+                max
+            );
         });
 
-        return this;
+        return _this;
     }
 }
 
@@ -659,10 +722,8 @@ class BinaryMatrix extends Matrix {
 
         let _this = this;
 
-        this.foreachFilled(function(x, y) {
-            if (matrix.filled(x, y)) {
-                _this.fill(x, y);
-            }
+        _this.foreachFilled(function(x, y) {
+            _this.fill(x, y);
         });
     }
 
@@ -706,12 +767,10 @@ class BinaryMatrix extends Matrix {
 
         let _this = this;
 
-        _this.foreach(function(x, y) {
-            if (_this.filled(x, y)) {
-                _this.foreachNeighbors(x, y, deep, function(nx, ny) {
-                    callback(nx, ny);
-                });
-            }
+        _this.foreachFilled(function(x, y) {
+            _this.foreachNeighbors(x, y, deep, function(nx, ny) {
+                callback(nx, ny);
+            });
         });
 
         return _this;
@@ -720,10 +779,11 @@ class BinaryMatrix extends Matrix {
 
 class PointMatrix extends Matrix {
 
-    // @TODO -> normalize each class after generation!
+    /**
+     * @return {Matrix}
+     */
     normalize() {
-        this.setRange(0, 1);
-        return this;
+        return this.setRange(0, 1);
     }
 }
 

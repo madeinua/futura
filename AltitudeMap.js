@@ -61,6 +61,8 @@ class AltitudeMap extends PointMatrix {
 
             return val;
         });
+
+        _this.normalize();
     };
 
     /**

@@ -231,7 +231,7 @@ class World {
      */
     generateHumidityMap = function(altitudeMap, beachesMap, riversMap, lakesMap) {
 
-        let humidityMap = new HumidityMap(altitudeMap, beachesMap, riversMap, lakesMap, this.config),
+        let humidityMap = new HumidityMap(altitudeMap, riversMap, lakesMap, this.config),
             storage = localStorage.getItem('humidityMap');
 
         if (typeof storage !== 'undefined' && storage !== null) {
@@ -263,7 +263,7 @@ class World {
         let temperatureMap = new TemperatureMap(altitudeMap, this.config),
             storage = localStorage.getItem('temperatureMap');
 
-        if (typeof storage !== 'undefined' && storage !== null) {
+        if (false && typeof storage !== 'undefined' && storage !== null) { // @TODO
             temperatureMap.fromString(storage);
         } else {
 
