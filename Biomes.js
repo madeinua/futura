@@ -71,7 +71,7 @@ class Biomes {
         colors[_this.BIOME_TAIGA] = '#176b56';
         colors[_this.BIOME_TROP_TS] = '#b39b29';
         colors[_this.BIOME_SAVANNA] = '#bcca5d';
-        colors[_this.BIOME_TUNDRA] = '#ff000e';//b9ffe6
+        colors[_this.BIOME_TUNDRA] = '#9c9f73';
         colors[_this.BIOME_DESERT] = '#fcfda5';
         colors[_this.BIOME_SWAMP] = '#008f5c';
         colors[_this.BIOME_RIVER] = '#0952c6';

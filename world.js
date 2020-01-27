@@ -263,7 +263,7 @@ class World {
         let temperatureMap = new TemperatureMap(altitudeMap, this.config),
             storage = localStorage.getItem('temperatureMap');
 
-        if (false && typeof storage !== 'undefined' && storage !== null) { // @TODO
+        if (typeof storage !== 'undefined' && storage !== null) {
             temperatureMap.fromString(storage);
         } else {
 
