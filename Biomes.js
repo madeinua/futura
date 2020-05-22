@@ -1,46 +1,52 @@
 class Biomes {
 
-    BIOME_OCEAN = 0;
-    BIOME_COAST = 1;
-    BIOME_RIVER = 2;
-    BIOME_LAKE = 3;
-
-    BIOME_BEACH = 10;
-
-    BIOME_TROP_RF = 20; // Tropical rain forest
-    BIOME_TMPR_RF = 21; // Temperate rain forest
-    BIOME_TROP_SEF = 22; // Tropical seasonal forest
-    BIOME_TMPR_FST = 23; // Temperate forest
-    BIOME_TAIGA = 24;
-    BIOME_TROP_TS = 25; // Tropical thorn scrub and woodland
-    BIOME_SAVANNA = 26;
-    BIOME_TUNDRA = 27;
-    BIOME_DESERT = 28;
-
-    BIOME_SWAMP = 30;
-
-    BIOME_ICE = 40;
+    SMOOTHING = false;
 
     // @TODO
-    MAX_OCEAN_LEVEL = 0.2;
+    BIOME_OCEAN = 0;
+    BIOME_RIVER = 1;
+    BIOME_LAKE = 2;
+    BIOME_COAST = 3;
+    BIOME_BEACH = 4;
+    BIOME_TUNDRA = 5;
+    BIOME_GRASS = 6;
+    BIOME_DESERT = 7;
+    BIOME_SAVANNA = 8;
+    BIOME_SWAMP = 9;
+    BIOME_TUNDRA_HILLS = 10;
+    BIOME_GRASS_HILLS = 11;
+    BIOME_DESERT_HILLS = 12;
+    BIOME_SAVANNA_HILLS = 13;
+    BIOME_ROCKS = 14;
+    BIOME_ICE_ROCKS = 15;
+
+    MAX_OCEAN_LEVEL = 0.25;
     MAX_COAST_LEVEL = 0.3;
     MAX_BEACH_LEVEL = 0.32;
-    MAX_LOWLAND_LEVEL = 0.4;
-    MAX_HILLS_LEVEL = 0.6;
+    MAX_LOWLAND_LEVEL = 0.6;
+    MAX_HILLS_LEVEL = 0.8;
+    //MAX_MOUNTAINS_LEVEL = 1;
+
+    COAST_TEMPERATURE_RATIO = 0.05;
+    BEACH_TEMPERATURE_RATIO = -0.02;
+    BEACH_HUMIDITY_RATIO = 0.01;
+
+    // @TODO
+    FOREST_TROPICAL = 1;
+    FOREST_TEMPARATE = 2;
+    FOREST_BOREAL = 3;
 
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {OceanMap} oceanMap
-     * @param {BeachesMap} beachesMap
      * @param {RiversMap} riversMap
      * @param {LakesMap} lakesMap
      * @param {TemperatureMap} temperatureMap
      * @param {HumidityMap} humidityMap
      */
-    constructor(altitudeMap, oceanMap, beachesMap, riversMap, lakesMap, temperatureMap, humidityMap) {
+    constructor(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap) {
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;
-        this.beachesMap = beachesMap;
         this.riversMap = riversMap;
         this.lakesMap = lakesMap;
         this.temperatureMap = temperatureMap;
@@ -61,22 +67,46 @@ class Biomes {
             powAltitude = (altitude - 0.5) * 200,
             powTemperature = (temperature - 0.5) * 60;
 
-        colors[_this.BIOME_OCEAN] = '#003eb2';
-        colors[_this.BIOME_COAST] = LightenDarkenColor('#4bbeff', powAltitude);
-        colors[_this.BIOME_BEACH] = LightenDarkenColor('#c2b281', powTemperature);
-        colors[_this.BIOME_TROP_RF] = '#0e3d17';
-        colors[_this.BIOME_TMPR_RF] = '#143128';
-        colors[_this.BIOME_TROP_SEF] = '#618a19';
-        colors[_this.BIOME_TMPR_FST] = '#4bae60';
-        colors[_this.BIOME_TAIGA] = '#176b56';
-        colors[_this.BIOME_TROP_TS] = '#b39b29';
-        colors[_this.BIOME_SAVANNA] = '#bcca5d';
-        colors[_this.BIOME_TUNDRA] = '#9c9f73';
-        colors[_this.BIOME_DESERT] = '#fcfda5';
-        colors[_this.BIOME_SWAMP] = '#008f5c';
-        colors[_this.BIOME_RIVER] = '#0952c6';
-        colors[_this.BIOME_LAKE] = '#007bbf';
-        colors[_this.BIOME_ICE] = '#eeeeee';
+        if (_this.SMOOTHING) {
+
+            colors[_this.BIOME_OCEAN] = LightenDarkenColor('#00daff', powAltitude);
+            colors[_this.BIOME_RIVER] = LightenDarkenColor('#74aece', powAltitude);
+            colors[_this.BIOME_LAKE] = LightenDarkenColor('#74aece', powAltitude);
+            colors[_this.BIOME_COAST] = LightenDarkenColor('#81e6ff', (altitude - 0.5) * 150);
+            colors[_this.BIOME_BEACH] = LightenDarkenColor('#c2b281', powTemperature);
+
+            // @TODO
+            colors[_this.BIOME_TUNDRA] = '#9c9f73';
+            colors[_this.BIOME_TUNDRA_HILLS] = '#747658';
+            colors[_this.BIOME_GRASS] = '#618a19';
+            colors[_this.BIOME_GRASS_HILLS] = '#3f5713';
+            colors[_this.BIOME_DESERT] = '#fcfda5';
+            colors[_this.BIOME_DESERT_HILLS] = '#919261';
+            colors[_this.BIOME_SAVANNA] = '#bcca5d';
+            colors[_this.BIOME_SAVANNA_HILLS] = '#7c8445';
+            colors[_this.BIOME_SWAMP] = '#008f5c';
+            colors[_this.BIOME_ROCKS] = '#727461';
+            colors[_this.BIOME_ICE_ROCKS] = '#eeeeee';
+
+        } else {
+
+            colors[_this.BIOME_OCEAN] = '#0687cb';
+            colors[_this.BIOME_RIVER] = '#0952c6';
+            colors[_this.BIOME_LAKE] = '#007bbf';
+            colors[_this.BIOME_COAST] = '#4bbeff';
+            colors[_this.BIOME_BEACH] = '#eed58b';
+            colors[_this.BIOME_TUNDRA] = '#9c9f73';
+            colors[_this.BIOME_TUNDRA_HILLS] = '#747658';
+            colors[_this.BIOME_GRASS] = '#618a19';
+            colors[_this.BIOME_GRASS_HILLS] = '#3f5713';
+            colors[_this.BIOME_DESERT] = '#fcfda5';
+            colors[_this.BIOME_DESERT_HILLS] = '#919261';
+            colors[_this.BIOME_SAVANNA] = '#bcca5d';
+            colors[_this.BIOME_SAVANNA_HILLS] = '#7c8445';
+            colors[_this.BIOME_SWAMP] = '#008f5c';
+            colors[_this.BIOME_ROCKS] = '#727461';
+            colors[_this.BIOME_ICE_ROCKS] = '#eeeeee';
+        }
 
         let color = colors[biome.getType()];
 
@@ -88,6 +118,29 @@ class Biomes {
     }
 
     /**
+     * @param {number} altitude
+     * @param {number} temperature
+     * @return {boolean}
+     */
+    isCoast(altitude, temperature) {
+        return altitude > this.MAX_OCEAN_LEVEL - (temperature * this.COAST_TEMPERATURE_RATIO * 2 - this.COAST_TEMPERATURE_RATIO)
+            && altitude <= this.MAX_COAST_LEVEL;
+    }
+
+    /**
+     * @param {number} altitude
+     * @param {number} temperature
+     * @param {number} humidity
+     * @return {boolean}
+     */
+    isBeach(altitude, temperature, humidity) {
+        return altitude > this.MAX_COAST_LEVEL
+            && altitude <= this.MAX_BEACH_LEVEL
+            - (temperature * this.BEACH_TEMPERATURE_RATIO * 2 - this.BEACH_TEMPERATURE_RATIO)
+            - (humidity * this.BEACH_HUMIDITY_RATIO * 2 - this.BEACH_HUMIDITY_RATIO);
+    }
+
+    /**
      * @param {number} x
      * @param {number} y
      * @return {number}
@@ -95,16 +148,6 @@ class Biomes {
     findBiomeType(x, y) {
 
         let _this = this;
-
-        if (_this.oceanMap.filled(x, y)) {
-            return _this.altitudeMap.getTile(x, y) > _this.oceanMap.MAX_OCEAN_LEVEL
-                ? _this.BIOME_COAST
-                : _this.BIOME_OCEAN;
-        }
-
-        if (_this.beachesMap.filled(x, y)) {
-            return _this.BIOME_BEACH;
-        }
 
         if (_this.riversMap.filled(x, y)) {
             return _this.BIOME_RIVER;
@@ -114,27 +157,41 @@ class Biomes {
             return _this.BIOME_LAKE;
         }
 
-        let temperature = _this.temperatureMap.getTile(x, y),
+        let altitude = _this.altitudeMap.getTile(x, y),
+            temperature = _this.temperatureMap.getTile(x, y),
             humidity = _this.humidityMap.getTile(x, y);
 
-        if (temperature > 0.9 || humidity < 0.1) {
-            return _this.BIOME_DESERT;
+        if (_this.oceanMap.filled(x, y)) {
+            return _this.isCoast(altitude, temperature)
+                ? _this.BIOME_COAST
+                : _this.BIOME_OCEAN;
         }
+
+        if (_this.isBeach(altitude, temperature, humidity)) {
+            return _this.BIOME_BEACH;
+        }
+
+
+
+        return _this.BIOME_GRASS;
+    };
+
+    getWideBiome(temperature, humidity) {
 
         let rb = function(biome1, biome2) {
             return Math.random() > 0.5 ? biome1 : biome2;
         };
 
         let map = [
-            [_this.BIOME_TROP_RF, _this.BIOME_TROP_RF, _this.BIOME_TROP_RF, rb(_this.BIOME_TROP_RF, _this.BIOME_TMPR_RF), _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, _this.BIOME_TUNDRA, _this.BIOME_TUNDRA],
-            [_this.BIOME_TROP_RF, _this.BIOME_TROP_RF, _this.BIOME_TROP_RF, _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, rb(_this.BIOME_TMPR_RF, _this.BIOME_TUNDRA), _this.BIOME_TUNDRA, _this.BIOME_TUNDRA],
-            [_this.BIOME_TROP_RF, _this.BIOME_TROP_RF, rb(_this.BIOME_TROP_RF, _this.BIOME_TMPR_RF), _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, _this.BIOME_TUNDRA, _this.BIOME_TUNDRA, _this.BIOME_TUNDRA],
-            [_this.BIOME_TROP_RF, _this.BIOME_TROP_RF, rb(_this.BIOME_TROP_RF, _this.BIOME_TMPR_RF), _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, _this.BIOME_TUNDRA, _this.BIOME_TUNDRA, _this.BIOME_TUNDRA],
-            [rb(_this.BIOME_TROP_RF, _this.BIOME_TROP_SEF), _this.BIOME_TROP_RF, rb(_this.BIOME_TROP_RF, _this.BIOME_TMPR_RF), _this.BIOME_TMPR_RF, _this.BIOME_TMPR_RF, rb(_this.BIOME_TMPR_RF, _this.BIOME_TUNDRA), _this.BIOME_TUNDRA, _this.BIOME_TUNDRA, rb(_this.BIOME_TUNDRA, _this.BIOME_TAIGA)],
-            [_this.BIOME_TROP_SEF, _this.BIOME_TROP_SEF, rb(_this.BIOME_TROP_SEF, _this.BIOME_TMPR_FST), rb(_this.BIOME_TMPR_RF, _this.BIOME_TMPR_FST), _this.BIOME_TMPR_RF, _this.BIOME_TUNDRA, _this.BIOME_TUNDRA, rb(_this.BIOME_TUNDRA, _this.BIOME_TAIGA), _this.BIOME_TAIGA],
-            [_this.BIOME_TROP_SEF, _this.BIOME_TROP_SEF, rb(_this.BIOME_TROP_SEF, _this.BIOME_TMPR_FST), _this.BIOME_TMPR_FST, _this.BIOME_TMPR_FST, _this.BIOME_TUNDRA, _this.BIOME_TUNDRA, _this.BIOME_TAIGA, _this.BIOME_TAIGA],
-            [rb(_this.BIOME_DESERT, _this.BIOME_TROP_TS), _this.BIOME_TROP_TS, rb(_this.BIOME_TROP_TS, _this.BIOME_SAVANNA), rb(_this.BIOME_SAVANNA, _this.BIOME_TMPR_FST), _this.BIOME_TMPR_FST, _this.BIOME_TUNDRA, rb(_this.BIOME_TUNDRA, _this.BIOME_TAIGA), _this.BIOME_TAIGA, _this.BIOME_TAIGA],
-            [_this.BIOME_DESERT, rb(_this.BIOME_DESERT, _this.BIOME_TROP_TS), rb(_this.BIOME_DESERT, _this.BIOME_TROP_TS), _this.BIOME_SAVANNA, _this.BIOME_SAVANNA, rb(_this.BIOME_SAVANNA, _this.BIOME_TUNDRA), rb(_this.BIOME_TUNDRA, _this.BIOME_TAIGA), _this.BIOME_TAIGA, _this.BIOME_TAIGA]
+            [this.BIOME_TROP_RF, this.BIOME_TROP_RF, this.BIOME_TROP_RF, rb(this.BIOME_TROP_RF, this.BIOME_TMPR_RF), this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TUNDRA, this.BIOME_TUNDRA],
+            [this.BIOME_TROP_RF, this.BIOME_TROP_RF, this.BIOME_TROP_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, rb(this.BIOME_TMPR_RF, this.BIOME_TUNDRA), this.BIOME_TUNDRA, this.BIOME_TUNDRA],
+            [this.BIOME_TROP_RF, this.BIOME_TROP_RF, rb(this.BIOME_TROP_RF, this.BIOME_TMPR_RF), this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TUNDRA, this.BIOME_TUNDRA, this.BIOME_TUNDRA],
+            [this.BIOME_TROP_RF, this.BIOME_TROP_RF, rb(this.BIOME_TROP_RF, this.BIOME_TMPR_RF), this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TUNDRA, this.BIOME_TUNDRA, this.BIOME_TUNDRA],
+            [rb(this.BIOME_TROP_RF, this.BIOME_TROP_SEF), this.BIOME_TROP_RF, rb(this.BIOME_TROP_RF, this.BIOME_TMPR_RF), this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, rb(this.BIOME_TMPR_RF, this.BIOME_TUNDRA), this.BIOME_TUNDRA, this.BIOME_TUNDRA, rb(this.BIOME_TUNDRA, this.BIOME_TAIGA)],
+            [this.BIOME_TROP_SEF, this.BIOME_TROP_SEF, rb(this.BIOME_TROP_SEF, this.BIOME_TMPR_FST), rb(this.BIOME_TMPR_RF, this.BIOME_TMPR_FST), this.BIOME_TMPR_RF, this.BIOME_TUNDRA, this.BIOME_TUNDRA, rb(this.BIOME_TUNDRA, this.BIOME_TAIGA), this.BIOME_TAIGA],
+            [this.BIOME_TROP_SEF, this.BIOME_TROP_SEF, rb(this.BIOME_TROP_SEF, this.BIOME_TMPR_FST), this.BIOME_TMPR_FST, this.BIOME_TMPR_FST, this.BIOME_TUNDRA, this.BIOME_TUNDRA, this.BIOME_TAIGA, this.BIOME_TAIGA],
+            [rb(this.BIOME_DESERT, this.BIOME_TROP_TS), this.BIOME_TROP_TS, rb(this.BIOME_TROP_TS, this.BIOME_SAVANNA), rb(this.BIOME_SAVANNA, this.BIOME_TMPR_FST), this.BIOME_TMPR_FST, this.BIOME_TUNDRA, rb(this.BIOME_TUNDRA, this.BIOME_TAIGA), this.BIOME_TAIGA, this.BIOME_TAIGA],
+            [this.BIOME_DESERT, rb(this.BIOME_DESERT, this.BIOME_TROP_TS), rb(this.BIOME_DESERT, this.BIOME_TROP_TS), this.BIOME_SAVANNA, this.BIOME_SAVANNA, rb(this.BIOME_SAVANNA, this.BIOME_TUNDRA), rb(this.BIOME_TUNDRA, this.BIOME_TAIGA), this.BIOME_TAIGA, this.BIOME_TAIGA]
         ];
 
         let w = map[0].length - 1,
@@ -143,7 +200,7 @@ class Biomes {
             row = Math.floor(humidity * h);
 
         return map[row][col];
-    };
+    }
 
     /**
      * @param {number} x

@@ -7,7 +7,8 @@ let config = {
     worldSize: 300,
     visibleCols: 30,
     worldCanvas: worldCanvas,
-    miniMapCanvas: miniMapCanvas
+    miniMapCanvas: miniMapCanvas,
+    showCoordinates: false
 };
 
 let cameraPos = getCenteredCameraPosition(config.visibleCols);
@@ -65,10 +66,6 @@ Filters
     })
     .add('oceanMap', function(map) {
         drawMap('oceanMapCanvas', map, true);
-        return map;
-    })
-    .add('beachesMap', function(map) {
-        drawMap('beachesMapCanvas', map, true);
         return map;
     })
     .add('lakesMap', function(map) {

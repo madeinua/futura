@@ -136,36 +136,6 @@ class World {
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {OceanMap} oceanMap
-     * @return {BeachesMap}
-     */
-    generateBeachesMap = function(altitudeMap, oceanMap) {
-
-        let beachesMap = new BeachesMap(altitudeMap, oceanMap, this.config),
-            storage = localStorage.getItem('beachesMap');
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            beachesMap.fromString(storage);
-        } else {
-
-            beachesMap.generateMap();
-
-            if (this.config.storeData) {
-                localStorage.setItem('beachesMap', beachesMap.toString());
-            }
-        }
-
-        beachesMap = Filters.apply('beachesMap', beachesMap);
-
-        if (this.logs) {
-            logTimeEvent('Beaches map calculated');
-        }
-
-        return beachesMap;
-    };
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @param {OceanMap} oceanMap
      * @return {LakesMap}
      */
     generateLakesMap = function(altitudeMap, oceanMap) {
@@ -224,12 +194,11 @@ class World {
 
     /**
      * @param {AltitudeMap} altitudeMap
-     * @param {BeachesMap} beachesMap
      * @param {RiversMap} riversMap
      * @param {LakesMap} lakesMap
      * @return {HumidityMap}
      */
-    generateHumidityMap = function(altitudeMap, beachesMap, riversMap, lakesMap) {
+    generateHumidityMap = function(altitudeMap, riversMap, lakesMap) {
 
         let humidityMap = new HumidityMap(altitudeMap, riversMap, lakesMap, this.config),
             storage = localStorage.getItem('humidityMap');
@@ -344,10 +313,9 @@ class World {
         let _this = this,
             altitudeMap = _this.generateAltitudeMap(),
             oceanMap = _this.generateOceanMap(altitudeMap),
-            beachesMap = _this.generateBeachesMap(altitudeMap, oceanMap),
             lakesMap = _this.generateLakesMap(altitudeMap, oceanMap),
             riversMap = _this.generateRiversMap(altitudeMap),
-            humidityMap = _this.generateHumidityMap(altitudeMap, beachesMap, riversMap, lakesMap),
+            humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
             temperatureMap = _this.generateTemperatureMap(altitudeMap);
 
         let ctx = _this.renderCanvas.getContext('2d');
@@ -355,7 +323,7 @@ class World {
         let
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
-            biomes = new Biomes(altitudeMap, oceanMap, beachesMap, lakesMap, riversMap, humidityMap, temperatureMap),
+            biomes = new Biomes(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
             color;
 
         altitudeMap.foreach(function(x, y) {
@@ -470,9 +438,11 @@ class World {
                     _this.cellSize
                 );
 
-                ctx.font = '10px senf';
-                ctx.fillText((_this.cameraPosX + x).toString(), x * _this.cellSize + 2, y * _this.cellSize + 10);
-                ctx.fillText((_this.cameraPosY + y).toString(), x * _this.cellSize + 2, y * _this.cellSize + 21);
+                if (_this.config.showCoordinates) {
+                    ctx.font = '10px senf';
+                    ctx.fillText((_this.cameraPosX + x).toString(), x * _this.cellSize + 2, y * _this.cellSize + 10);
+                    ctx.fillText((_this.cameraPosY + y).toString(), x * _this.cellSize + 2, y * _this.cellSize + 21);
+                }
             }
         }
 

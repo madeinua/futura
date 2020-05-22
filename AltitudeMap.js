@@ -3,7 +3,7 @@ class AltitudeMap extends PointMatrix {
     config;
 
     WORLD_MAP_OCEAN_LEVEL = 0.5; // [0-1]
-    MAX_COAST_LEVEL = 0.3;
+    MAX_WATER_LEVEL = 0.3;
 
     /**
      * @param {Object} config
@@ -18,10 +18,10 @@ class AltitudeMap extends PointMatrix {
                 ? this.WORLD_MAP_OCEAN_LEVEL
                 : config.WORLD_MAP_OCEAN_LEVEL;
 
-        this.MAX_COAST_LEVEL =
-            typeof config.MAX_COAST_LEVEL === 'undefined'
-                ? this.MAX_COAST_LEVEL
-                : config.MAX_COAST_LEVEL;
+        this.MAX_WATER_LEVEL =
+            typeof config.MAX_WATER_LEVEL === 'undefined'
+                ? this.MAX_WATER_LEVEL
+                : config.MAX_WATER_LEVEL;
 
         this.config = config;
 
@@ -103,7 +103,7 @@ class AltitudeMap extends PointMatrix {
      * @return {boolean}
      */
     isGround = function(level) {
-        return level > this.MAX_COAST_LEVEL;
+        return level > this.MAX_WATER_LEVEL;
     };
 
     /**
@@ -111,6 +111,6 @@ class AltitudeMap extends PointMatrix {
      * @return {boolean}
      */
     isWater = function(level) {
-        return this.MAX_COAST_LEVEL >= level;
+        return this.MAX_WATER_LEVEL >= level;
     };
 }
