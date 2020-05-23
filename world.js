@@ -329,7 +329,7 @@ class World {
         altitudeMap.foreach(function(x, y) {
 
             color = biomes.getBiomeColor(
-                biomes.findBiome(x, y),
+                biomes.getBiome(x, y),
                 altitudeMap.getTile(x, y),
                 temperatureMap.getTile(x, y),
                 humidityMap.getTile(x, y)

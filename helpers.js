@@ -180,9 +180,10 @@ Array.prototype.unique = function() {
 
 /**
  * Retrieve closest distance to the tile
+ * Note: Array([x1, y1], [x2, y2], ...)
  * @param {number} x
  * @param {number} y
- * @return {boolean|number}
+ * @return {number}
  */
 Array.prototype.getClosestDistanceTo = function(x, y) {
 
@@ -587,27 +588,6 @@ class Matrix {
     }
 
     /**
-     * Check if at least one tile around the tile has specified value
-     * @param {number} x
-     * @param {number} y
-     * @param {number} deep
-     * @param {number} value
-     * @return {boolean}
-     */
-    around(x, y, deep, value) {
-
-        let surrounds = this.getNeighbors(x, y, deep);
-
-        for (let i = 0; i < surrounds.length; i++) {
-            if (this.getTile(surrounds[i][0], surrounds[i][1]) === value) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Scale matrix to fit min/max ranges
      * @param {number} min
      * @param {number} max
@@ -711,6 +691,43 @@ class BinaryMatrix extends Matrix {
     }
 
     /**
+     * Get closest distance to the specified coordinates
+     * @param {number} x
+     * @param {number} y
+     * @param {number} max Maximum possible value. Bigger = slower performance!
+     * @return {number}
+     */
+    distanceTo(x, y, max) {
+
+        let result = Number.MAX_SAFE_INTEGER,
+            minX = Math.max(0, x - max),
+            maxX = Math.min(this.width - 1, x + max),
+            minY = Math.max(0, y - max),
+            maxY = Math.min(this.height - 1, y + max);
+
+        for (let nx = minX; nx <= maxX; nx++) {
+            for (let ny = minY; ny <= maxY; ny++) {
+                if (this.filled(nx, ny)) {
+                    result = Math.min(result, distance(nx, ny, x, y));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Whether is any filled point around the specified coordinates
+     * @param x
+     * @param y
+     * @param max Maximum possible value. Bigger = slower performance!
+     * @return {boolean}
+     */
+    aroundFilled(x, y, max) {
+        return max >= this.distanceTo(x, y, max);
+    }
+
+    /**
      * Merge with the other binary matrix
      * @param {BinaryMatrix} matrix
      */
@@ -725,17 +742,6 @@ class BinaryMatrix extends Matrix {
         _this.foreachFilled(function(x, y) {
             _this.fill(x, y);
         });
-    }
-
-    /**
-     * Check if at least one tile around the tile has specified value
-     * @param {number} x
-     * @param {number} y
-     * @param {number} deep
-     * @return {boolean}
-     */
-    aroundFilled(x, y, deep) {
-        return this.around(x, y, deep, 1);
     }
 
     /**

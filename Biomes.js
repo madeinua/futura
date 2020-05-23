@@ -31,6 +31,8 @@ class Biomes {
     BEACH_TEMPERATURE_RATIO = -0.02;
     BEACH_HUMIDITY_RATIO = 0.01;
 
+    MAX_BEACH_DISTANCE_FROM_OCEAN = 5;
+
     // @TODO
     FOREST_TROPICAL = 1;
     FOREST_TEMPARATE = 2;
@@ -123,21 +125,25 @@ class Biomes {
      * @return {boolean}
      */
     isCoast(altitude, temperature) {
-        return altitude > this.MAX_OCEAN_LEVEL - (temperature * this.COAST_TEMPERATURE_RATIO * 2 - this.COAST_TEMPERATURE_RATIO)
+        return altitude > this.MAX_OCEAN_LEVEL
+            - (temperature * this.COAST_TEMPERATURE_RATIO * 2 - this.COAST_TEMPERATURE_RATIO)
             && altitude <= this.MAX_COAST_LEVEL;
     }
 
     /**
+     * @param {number} x
+     * @param {number} y
      * @param {number} altitude
      * @param {number} temperature
      * @param {number} humidity
      * @return {boolean}
      */
-    isBeach(altitude, temperature, humidity) {
+    isBeach(x, y, altitude, temperature, humidity) {
         return altitude > this.MAX_COAST_LEVEL
             && altitude <= this.MAX_BEACH_LEVEL
             - (temperature * this.BEACH_TEMPERATURE_RATIO * 2 - this.BEACH_TEMPERATURE_RATIO)
-            - (humidity * this.BEACH_HUMIDITY_RATIO * 2 - this.BEACH_HUMIDITY_RATIO);
+            - (humidity * this.BEACH_HUMIDITY_RATIO * 2 - this.BEACH_HUMIDITY_RATIO)
+            && this.oceanMap.aroundFilled(x, y, this.MAX_BEACH_DISTANCE_FROM_OCEAN);
     }
 
     /**
@@ -167,11 +173,9 @@ class Biomes {
                 : _this.BIOME_OCEAN;
         }
 
-        if (_this.isBeach(altitude, temperature, humidity)) {
+        if (_this.isBeach(x, y, altitude, temperature, humidity)) {
             return _this.BIOME_BEACH;
         }
-
-
 
         return _this.BIOME_GRASS;
     };
@@ -207,7 +211,7 @@ class Biomes {
      * @param {number} y
      * @return {Biome}
      */
-    findBiome(x, y) {
+    getBiome(x, y) {
         return new Biome(
             this.findBiomeType(x, y)
         );
