@@ -1,8 +1,8 @@
 class Biomes {
 
-    SMOOTHING = false;
+    SMOOTHING = true;
 
-    // @TODO
+    BIOME_UNKNOWN = -1;
     BIOME_OCEAN = 0;
     BIOME_RIVER = 1;
     BIOME_LAKE = 2;
@@ -12,20 +12,21 @@ class Biomes {
     BIOME_GRASS = 6;
     BIOME_DESERT = 7;
     BIOME_SAVANNA = 8;
-    BIOME_SWAMP = 9;
-    BIOME_TUNDRA_HILLS = 10;
-    BIOME_GRASS_HILLS = 11;
-    BIOME_DESERT_HILLS = 12;
-    BIOME_SAVANNA_HILLS = 13;
-    BIOME_ROCKS = 14;
-    BIOME_ICE_ROCKS = 15;
+    BIOME_TROPIC = 9;
+    BIOME_SWAMP = 10;
+    BIOME_TUNDRA_HILLS = 11;
+    BIOME_GRASS_HILLS = 12;
+    BIOME_DESERT_HILLS = 13;
+    BIOME_SAVANNA_HILLS = 14;
+    BIOME_ROCKS = 15;
+    BIOME_ICE_ROCKS = 16;
 
     MAX_OCEAN_LEVEL = 0.25;
     MAX_COAST_LEVEL = 0.3;
     MAX_BEACH_LEVEL = 0.32;
-    MAX_LOWLAND_LEVEL = 0.6;
-    MAX_HILLS_LEVEL = 0.8;
-    //MAX_MOUNTAINS_LEVEL = 1;
+    MAX_LOWLAND_LEVEL = 0.43;
+    MAX_HILLS_LEVEL = 0.55;
+    MAX_MOUNTAINS_LEVEL = 1;
 
     COAST_TEMPERATURE_RATIO = 0.05;
     BEACH_TEMPERATURE_RATIO = -0.02;
@@ -53,6 +54,7 @@ class Biomes {
         this.lakesMap = lakesMap;
         this.temperatureMap = temperatureMap;
         this.humidityMap = humidityMap;
+        this.biomesConfig = this.getBiomesConfiguration();
     }
 
     /**
@@ -76,19 +78,18 @@ class Biomes {
             colors[_this.BIOME_LAKE] = LightenDarkenColor('#74aece', powAltitude);
             colors[_this.BIOME_COAST] = LightenDarkenColor('#81e6ff', (altitude - 0.5) * 150);
             colors[_this.BIOME_BEACH] = LightenDarkenColor('#c2b281', powTemperature);
-
-            // @TODO
-            colors[_this.BIOME_TUNDRA] = '#9c9f73';
-            colors[_this.BIOME_TUNDRA_HILLS] = '#747658';
-            colors[_this.BIOME_GRASS] = '#618a19';
-            colors[_this.BIOME_GRASS_HILLS] = '#3f5713';
-            colors[_this.BIOME_DESERT] = '#fcfda5';
-            colors[_this.BIOME_DESERT_HILLS] = '#919261';
-            colors[_this.BIOME_SAVANNA] = '#bcca5d';
-            colors[_this.BIOME_SAVANNA_HILLS] = '#7c8445';
-            colors[_this.BIOME_SWAMP] = '#008f5c';
-            colors[_this.BIOME_ROCKS] = '#727461';
-            colors[_this.BIOME_ICE_ROCKS] = '#eeeeee';
+            colors[_this.BIOME_TUNDRA] = LightenDarkenColor('#9c9f73', powAltitude);
+            colors[_this.BIOME_TUNDRA_HILLS] = LightenDarkenColor('#747658', -powAltitude);
+            colors[_this.BIOME_GRASS] = LightenDarkenColor('#618a19', powAltitude);
+            colors[_this.BIOME_GRASS_HILLS] = LightenDarkenColor('#486612', -powAltitude);
+            colors[_this.BIOME_DESERT] = LightenDarkenColor('#e3ca78', powAltitude);
+            colors[_this.BIOME_DESERT_HILLS] = LightenDarkenColor('#c4ae68', -powAltitude);
+            colors[_this.BIOME_SAVANNA] = LightenDarkenColor('#bcca5d', powAltitude);
+            colors[_this.BIOME_SAVANNA_HILLS] = LightenDarkenColor('#9ba74d', -powAltitude);
+            colors[_this.BIOME_TROPIC] = LightenDarkenColor('#19b460', powAltitude);
+            colors[_this.BIOME_SWAMP] = LightenDarkenColor('#258779', powAltitude);
+            colors[_this.BIOME_ROCKS] = LightenDarkenColor('#575757', powAltitude * 3);
+            colors[_this.BIOME_ICE_ROCKS] = LightenDarkenColor('#eeeeee', powAltitude * 5);
 
         } else {
 
@@ -100,20 +101,23 @@ class Biomes {
             colors[_this.BIOME_TUNDRA] = '#9c9f73';
             colors[_this.BIOME_TUNDRA_HILLS] = '#747658';
             colors[_this.BIOME_GRASS] = '#618a19';
-            colors[_this.BIOME_GRASS_HILLS] = '#3f5713';
-            colors[_this.BIOME_DESERT] = '#fcfda5';
-            colors[_this.BIOME_DESERT_HILLS] = '#919261';
+            colors[_this.BIOME_GRASS_HILLS] = '#486612';
+            colors[_this.BIOME_DESERT] = '#e3ca78';
+            colors[_this.BIOME_DESERT_HILLS] = '#c4ae68';
             colors[_this.BIOME_SAVANNA] = '#bcca5d';
-            colors[_this.BIOME_SAVANNA_HILLS] = '#7c8445';
-            colors[_this.BIOME_SWAMP] = '#008f5c';
-            colors[_this.BIOME_ROCKS] = '#727461';
+            colors[_this.BIOME_SAVANNA_HILLS] = '#9ba74d';
+            colors[_this.BIOME_TROPIC] = '#19b460';
+            colors[_this.BIOME_SWAMP] = '#258779';
+            colors[_this.BIOME_ROCKS] = '#878787';
             colors[_this.BIOME_ICE_ROCKS] = '#eeeeee';
         }
+
+        colors[_this.BIOME_UNKNOWN] = '#000000';
 
         let color = colors[biome.getType()];
 
         if (typeof color === 'undefined') {
-            color = colors[_this.BIOME_OCEAN];
+            color = colors[_this.BIOME_UNKNOWN];
         }
 
         return hexToRgb(color);
@@ -147,6 +151,139 @@ class Biomes {
     }
 
     /**
+     * @internal
+     * @return {[]}
+     */
+    getBiomesConfiguration() {
+
+        let biomesConfig = [];
+
+        biomesConfig.push({
+            key: this.BIOME_TUNDRA,
+            h: [0, 0.33],
+            t: [0, 0.33],
+            a: [0, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_GRASS,
+            h: [0.33, 0.66],
+            t: [0, 0.66],
+            a: [0, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_SWAMP,
+            h: [0.66, 1],
+            t: [0, 0.33],
+            a: [0, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_SAVANNA,
+            h: [0, 0.33],
+            t: [0.33, 0.66],
+            a: [0, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_DESERT,
+            h: [0, 0.33],
+            t: [0.66, 1],
+            a: [0, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_SAVANNA,
+            h: [0.33, 0.66],
+            t: [0.66, 1],
+            a: [0, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_GRASS,
+            h: [0.66, 1],
+            t: [0.33, 0.66],
+            a: [0, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_TROPIC,
+            h: [0.66, 1],
+            t: [0.66, 1],
+            a: [0, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_TUNDRA_HILLS,
+            h: [0, 0.33],
+            t: [0, 0.33],
+            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_GRASS_HILLS,
+            h: [0.33, 1],
+            t: [0, 0.66],
+            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_SAVANNA_HILLS,
+            h: [0, 0.33],
+            t: [0.33, 0.66],
+            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_DESERT_HILLS,
+            h: [0, 0.33],
+            t: [0.66, 1],
+            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_SAVANNA_HILLS,
+            h: [0.33, 1],
+            t: [0.66, 1],
+            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_ICE_ROCKS,
+            h: [0, 1],
+            t: [0, 0.5],
+            a: [this.MAX_HILLS_LEVEL, this.MAX_MOUNTAINS_LEVEL]
+        });
+
+        biomesConfig.push({
+            key: this.BIOME_ROCKS,
+            h: [0, 1],
+            t: [0.5, 1],
+            a: [this.MAX_HILLS_LEVEL, this.MAX_MOUNTAINS_LEVEL]
+        });
+
+        return biomesConfig;
+    }
+
+    /**
+     * @internal
+     * @param {Array} fig
+     * @param {number} index
+     * @return {boolean}
+     */
+    checkBiomeIndex = function (fig, index) {
+
+        if (fig[0] === 0 && index === 0) {
+            return true;
+        } else if (index > fig[0] && index <= fig[1]) {
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
      * @param {number} x
      * @param {number} y
      * @return {number}
@@ -177,34 +314,29 @@ class Biomes {
             return _this.BIOME_BEACH;
         }
 
-        return _this.BIOME_GRASS;
+        let biomeName = null;
+
+        for (let i = 0; i < _this.biomesConfig.length; i++) {
+
+            let cfg = _this.biomesConfig[i];
+
+            if (
+                _this.checkBiomeIndex(cfg.h, humidity)
+                && _this.checkBiomeIndex(cfg.t, temperature)
+                && _this.checkBiomeIndex(cfg.a, altitude)
+            ) {
+                biomeName = cfg.key;
+                break;
+            }
+        }
+
+        if (biomeName === null) {
+            throwError('Unknown biome. H:' + humidity + ' T:' + temperature + ' A:' + altitude);
+            biomeName = _this.BIOME_UNKNOWN;
+        }
+
+        return biomeName;
     };
-
-    getWideBiome(temperature, humidity) {
-
-        let rb = function(biome1, biome2) {
-            return Math.random() > 0.5 ? biome1 : biome2;
-        };
-
-        let map = [
-            [this.BIOME_TROP_RF, this.BIOME_TROP_RF, this.BIOME_TROP_RF, rb(this.BIOME_TROP_RF, this.BIOME_TMPR_RF), this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TUNDRA, this.BIOME_TUNDRA],
-            [this.BIOME_TROP_RF, this.BIOME_TROP_RF, this.BIOME_TROP_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, rb(this.BIOME_TMPR_RF, this.BIOME_TUNDRA), this.BIOME_TUNDRA, this.BIOME_TUNDRA],
-            [this.BIOME_TROP_RF, this.BIOME_TROP_RF, rb(this.BIOME_TROP_RF, this.BIOME_TMPR_RF), this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TUNDRA, this.BIOME_TUNDRA, this.BIOME_TUNDRA],
-            [this.BIOME_TROP_RF, this.BIOME_TROP_RF, rb(this.BIOME_TROP_RF, this.BIOME_TMPR_RF), this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, this.BIOME_TUNDRA, this.BIOME_TUNDRA, this.BIOME_TUNDRA],
-            [rb(this.BIOME_TROP_RF, this.BIOME_TROP_SEF), this.BIOME_TROP_RF, rb(this.BIOME_TROP_RF, this.BIOME_TMPR_RF), this.BIOME_TMPR_RF, this.BIOME_TMPR_RF, rb(this.BIOME_TMPR_RF, this.BIOME_TUNDRA), this.BIOME_TUNDRA, this.BIOME_TUNDRA, rb(this.BIOME_TUNDRA, this.BIOME_TAIGA)],
-            [this.BIOME_TROP_SEF, this.BIOME_TROP_SEF, rb(this.BIOME_TROP_SEF, this.BIOME_TMPR_FST), rb(this.BIOME_TMPR_RF, this.BIOME_TMPR_FST), this.BIOME_TMPR_RF, this.BIOME_TUNDRA, this.BIOME_TUNDRA, rb(this.BIOME_TUNDRA, this.BIOME_TAIGA), this.BIOME_TAIGA],
-            [this.BIOME_TROP_SEF, this.BIOME_TROP_SEF, rb(this.BIOME_TROP_SEF, this.BIOME_TMPR_FST), this.BIOME_TMPR_FST, this.BIOME_TMPR_FST, this.BIOME_TUNDRA, this.BIOME_TUNDRA, this.BIOME_TAIGA, this.BIOME_TAIGA],
-            [rb(this.BIOME_DESERT, this.BIOME_TROP_TS), this.BIOME_TROP_TS, rb(this.BIOME_TROP_TS, this.BIOME_SAVANNA), rb(this.BIOME_SAVANNA, this.BIOME_TMPR_FST), this.BIOME_TMPR_FST, this.BIOME_TUNDRA, rb(this.BIOME_TUNDRA, this.BIOME_TAIGA), this.BIOME_TAIGA, this.BIOME_TAIGA],
-            [this.BIOME_DESERT, rb(this.BIOME_DESERT, this.BIOME_TROP_TS), rb(this.BIOME_DESERT, this.BIOME_TROP_TS), this.BIOME_SAVANNA, this.BIOME_SAVANNA, rb(this.BIOME_SAVANNA, this.BIOME_TUNDRA), rb(this.BIOME_TUNDRA, this.BIOME_TAIGA), this.BIOME_TAIGA, this.BIOME_TAIGA]
-        ];
-
-        let w = map[0].length - 1,
-            h = map.length - 1,
-            col = Math.floor(temperature * w),
-            row = Math.floor(humidity * h);
-
-        return map[row][col];
-    }
 
     /**
      * @param {number} x

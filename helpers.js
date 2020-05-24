@@ -2,7 +2,7 @@ let errors = 0;
 
 /**
  * @param msg
- * @param {Number} limit
+ * @param {string} limit
  */
 function throwError(msg, limit) {
     limit = typeof limit == 'undefined' ? 1 : limit;
@@ -70,6 +70,16 @@ Array.prototype.shuffle = function() {
     }
     return this;
 };
+
+/**
+ * @param {number} value
+ * @param {number} precision
+ * @return {number}
+ */
+function round(value, precision)
+{
+    return parseFloat(value.toFixed(precision));
+}
 
 /**
  * Get random value between two float values
@@ -374,17 +384,37 @@ class Matrix {
      */
     toArray() {
 
-        let arr = [],
-            _this = this;
+        let arr = [];
 
-        _this.foreach(function(x, y) {
+        for (let x = 0; x < this.width; x++) {
 
             if (typeof arr[x] === "undefined") {
                 arr[x] = [];
             }
 
-            arr[x][y] = _this.getTile(x, y);
-        });
+            for (let y = 0; y < this.height; y++) {
+                arr[x][y] = this.getTile(x, y);
+            }
+        }
+
+        return arr;
+    }
+
+    /**
+     * Convert Matrix to list
+     * @return {Array}
+     */
+    toList() {
+
+        let arr = [];
+
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                arr.push(
+                    this.getTile(x, y)
+                );
+            }
+        }
 
         return arr;
     }
@@ -612,6 +642,30 @@ class Matrix {
 
         return _this;
     }
+
+    /**
+     * Retrieve minimum value
+     * @return {number}
+     */
+    getMin() {
+        return round(Math.min.apply(null, this.toList()), 2);
+    }
+
+    /**
+     * Retrieve maximum value
+     * @return {number}
+     */
+    getMax() {
+        return round(Math.max.apply(null, this.toList()), 2);
+    }
+
+    /**
+     * Retrieve average value
+     * @return {number}
+     */
+    getAvgValue() {
+        return round(this.values().reduce((a, b) => a + b, 0) / (this.width * this.height), 2);
+    }
 }
 
 class BinaryMatrix extends Matrix {
@@ -780,6 +834,14 @@ class BinaryMatrix extends Matrix {
         });
 
         return _this;
+    }
+
+    /**
+     * Retrieve size of the array compared to the total number size of the map
+     * @return {number}
+     */
+    getSize() {
+        return round(this.getFilledTiles().length / (this.width * this.height), 2) * 100;
     }
 }
 

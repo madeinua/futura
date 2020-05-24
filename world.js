@@ -98,7 +98,7 @@ class World {
         altitudeMap = Filters.apply('altitudeMap', altitudeMap);
 
         if (this.logs) {
-            logTimeEvent('Altitude map generated');
+            logTimeEvent('Altitude map generated. Min: ' + altitudeMap.getMin() + ' Max: ' + altitudeMap.getMax() + ' Avg: ' + altitudeMap.getAvgValue());
         }
 
         return altitudeMap;
@@ -127,7 +127,7 @@ class World {
         oceanMap = Filters.apply('oceanMap', oceanMap);
 
         if (this.logs) {
-            logTimeEvent('Ocean map calculated');
+            logTimeEvent('Ocean map calculated. Size: ' + oceanMap.getSize() + '%');
         }
 
         return oceanMap;
@@ -157,7 +157,7 @@ class World {
         lakesMap = Filters.apply('lakesMap', lakesMap);
 
         if (this.logs) {
-            logTimeEvent('Lakes map calculated');
+            logTimeEvent('Lakes map calculated. Size: ' + lakesMap.getSize() + '%');
         }
 
         return lakesMap;
@@ -186,7 +186,7 @@ class World {
         riversMap = Filters.apply('riversMap', riversMap);
 
         if (this.logs) {
-            logTimeEvent('Rivers generated');
+            logTimeEvent('Rivers generated. Length: ' + riversMap.getFilledTiles().length);
         }
 
         return riversMap;
@@ -217,7 +217,7 @@ class World {
         humidityMap = Filters.apply('humidityMap', humidityMap);
 
         if (this.logs) {
-            logTimeEvent('Humidity map created');
+            logTimeEvent('Humidity map created. Min: ' + humidityMap.getMin() + ' Max: ' + humidityMap.getMax() + ' Avg: ' + humidityMap.getAvgValue());
         }
 
         return humidityMap;
@@ -246,7 +246,7 @@ class World {
         temperatureMap = Filters.apply('temperatureMap', temperatureMap);
 
         if (this.logs) {
-            logTimeEvent('Temperature map created');
+            logTimeEvent('Temperature map created. Min: ' + temperatureMap.getMin() + ' Max: ' + temperatureMap.getMax() + ' Avg.: ' + temperatureMap.getAvgValue());
         }
 
         return temperatureMap;

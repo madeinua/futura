@@ -8,7 +8,7 @@ let config = {
     visibleCols: 30,
     worldCanvas: worldCanvas,
     miniMapCanvas: miniMapCanvas,
-    showCoordinates: true
+    showCoordinates: false
 };
 
 let cameraPos = getCenteredCameraPosition(config.visibleCols);
