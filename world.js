@@ -330,9 +330,7 @@ class World {
 
             color = biomes.getBiomeColor(
                 biomes.getBiome(x, y),
-                altitudeMap.getTile(x, y),
-                temperatureMap.getTile(x, y),
-                humidityMap.getTile(x, y)
+                altitudeMap.getTile(x, y)
             );
 
             fillCanvasPixel(

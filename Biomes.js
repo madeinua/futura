@@ -1,7 +1,5 @@
 class Biomes {
 
-    SMOOTHING = false;
-
     BIOME_UNKNOWN = -1;
     BIOME_OCEAN = 0;
     BIOME_RIVER = 1;
@@ -60,64 +58,36 @@ class Biomes {
     /**
      * @param {Biome} biome
      * @param {number} altitude
-     * @param {number} temperature
-     * @param {number} humidity
      * @return {array}
      */
-    getBiomeColor(biome, altitude, temperature, humidity) {
+    getBiomeColor(biome, altitude) {
 
-        let _this = this,
-            colors = [],
-            powAltitude = (altitude - 0.5) * 200,
-            powTemperature = (temperature - 0.5) * 60;
+        let colors = [],
+            powAltitude = (altitude - 0.5) * 200;
 
-        if (_this.SMOOTHING) {
-
-            colors[_this.BIOME_OCEAN] = '#0687cb';
-            colors[_this.BIOME_RIVER] = LightenDarkenColor('#74aece', powAltitude);
-            colors[_this.BIOME_LAKE] = LightenDarkenColor('#74aece', powAltitude);
-            colors[_this.BIOME_COAST] = LightenDarkenColor('#81e6ff', (altitude - 0.5) * 150);
-            colors[_this.BIOME_BEACH] = LightenDarkenColor('#c2b281', powTemperature);
-            colors[_this.BIOME_TUNDRA] = LightenDarkenColor('#9c9f73', powAltitude);
-            colors[_this.BIOME_TUNDRA_HILLS] = LightenDarkenColor('#747658', -powAltitude);
-            colors[_this.BIOME_GRASS] = LightenDarkenColor('#618a19', powAltitude);
-            colors[_this.BIOME_GRASS_HILLS] = LightenDarkenColor('#486612', -powAltitude);
-            colors[_this.BIOME_DESERT] = LightenDarkenColor('#e3ca78', powAltitude);
-            colors[_this.BIOME_DESERT_HILLS] = LightenDarkenColor('#c4ae68', -powAltitude);
-            colors[_this.BIOME_SAVANNA] = LightenDarkenColor('#bcca5d', powAltitude);
-            colors[_this.BIOME_SAVANNA_HILLS] = LightenDarkenColor('#9ba74d', -powAltitude);
-            colors[_this.BIOME_TROPIC] = LightenDarkenColor('#19b460', powAltitude);
-            colors[_this.BIOME_SWAMP] = LightenDarkenColor('#258779', powAltitude);
-            colors[_this.BIOME_ROCKS] = LightenDarkenColor('#575757', powAltitude * 3);
-            colors[_this.BIOME_ICE_ROCKS] = LightenDarkenColor('#eeeeee', powAltitude * 5);
-
-        } else {
-
-            colors[_this.BIOME_OCEAN] = '#003eb2';
-            colors[_this.BIOME_RIVER] = LightenDarkenColor('#74aece', powAltitude);
-            colors[_this.BIOME_LAKE] = LightenDarkenColor('#74aece', powAltitude);
-            colors[_this.BIOME_COAST] = LightenDarkenColor('#003eb2', - powAltitude);
-            colors[_this.BIOME_BEACH] = '#c2b281';
-            colors[_this.BIOME_TUNDRA] = LightenDarkenColor('#9c9f73', powAltitude);
-            colors[_this.BIOME_TUNDRA_HILLS] = LightenDarkenColor('#747658', -powAltitude);
-            colors[_this.BIOME_GRASS] = LightenDarkenColor('#3c6114', powAltitude);
-            colors[_this.BIOME_GRASS_HILLS] = LightenDarkenColor('#1e3900', -powAltitude);
-            colors[_this.BIOME_DESERT] = LightenDarkenColor('#ceb25d', powAltitude);
-            colors[_this.BIOME_DESERT_HILLS] = LightenDarkenColor('#ad9d6c', -powAltitude);
-            colors[_this.BIOME_SAVANNA] = LightenDarkenColor('#8f9e3f', powAltitude);
-            colors[_this.BIOME_SAVANNA_HILLS] = LightenDarkenColor('#7d7c3e', - powAltitude);
-            colors[_this.BIOME_TROPIC] = '#19b460';
-            colors[_this.BIOME_SWAMP] = '#258779';
-            colors[_this.BIOME_ROCKS] = LightenDarkenColor('#575757', powAltitude * 3);
-            colors[_this.BIOME_ICE_ROCKS] = LightenDarkenColor('#eeeeee', powAltitude * 5);
-        }
-
-        colors[_this.BIOME_UNKNOWN] = '#000000';
+        colors[this.BIOME_OCEAN] = '#003eb2';
+        colors[this.BIOME_RIVER] = LightenDarkenColor('#74aece', powAltitude);
+        colors[this.BIOME_LAKE] = LightenDarkenColor('#74aece', powAltitude);
+        colors[this.BIOME_COAST] = LightenDarkenColor('#003eb2', - powAltitude);
+        colors[this.BIOME_BEACH] = '#c2b281';
+        colors[this.BIOME_TUNDRA] = LightenDarkenColor('#9c9f73', powAltitude);
+        colors[this.BIOME_TUNDRA_HILLS] = LightenDarkenColor('#747658', -powAltitude);
+        colors[this.BIOME_GRASS] = LightenDarkenColor('#659c29', powAltitude);
+        colors[this.BIOME_GRASS_HILLS] = LightenDarkenColor('#518719', -powAltitude);
+        colors[this.BIOME_DESERT] = LightenDarkenColor('#cec35d', powAltitude);
+        colors[this.BIOME_DESERT_HILLS] = LightenDarkenColor('#af8a62', -powAltitude);
+        colors[this.BIOME_SAVANNA] = LightenDarkenColor('#8f9e3f', powAltitude);
+        colors[this.BIOME_SAVANNA_HILLS] = LightenDarkenColor('#7d7c3e', - powAltitude);
+        colors[this.BIOME_TROPIC] = '#19b460';
+        colors[this.BIOME_SWAMP] = '#258779';
+        colors[this.BIOME_ROCKS] = LightenDarkenColor('#575757', powAltitude * 3);
+        colors[this.BIOME_ICE_ROCKS] = LightenDarkenColor('#eeeeee', powAltitude * 5);
+        colors[this.BIOME_UNKNOWN] = '#000000';
 
         let color = colors[biome.getType()];
 
         if (typeof color === 'undefined') {
-            color = colors[_this.BIOME_UNKNOWN];
+            color = colors[this.BIOME_UNKNOWN];
         }
 
         return hexToRgb(color);

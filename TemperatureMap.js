@@ -43,7 +43,7 @@ class TemperatureMap extends PointMatrix {
             gradient = [];
 
         for (let i = 0; i < this.config.worldSize; i++) {
-            gradient[i] = i / this.config.worldSize;
+            gradient[i] = 1 - (i / this.config.worldSize);
         }
 
         _this.foreach(function(x, y) {
