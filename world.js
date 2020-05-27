@@ -323,13 +323,13 @@ class World {
         let
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
-            biomes = new Biomes(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
+            grounds = new Grounds(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
             color;
 
         altitudeMap.foreach(function(x, y) {
 
-            color = biomes.getBiomeColor(
-                biomes.getBiome(x, y),
+            color = grounds.getGroundColor(
+                grounds.getGround(x, y),
                 altitudeMap.getTile(x, y)
             );
 

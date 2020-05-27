@@ -1,23 +1,23 @@
-class Biomes {
+class Grounds {
 
-    BIOME_UNKNOWN = -1;
-    BIOME_OCEAN = 0;
-    BIOME_RIVER = 1;
-    BIOME_LAKE = 2;
-    BIOME_COAST = 3;
-    BIOME_BEACH = 4;
-    BIOME_TUNDRA = 5;
-    BIOME_GRASS = 6;
-    BIOME_DESERT = 7;
-    BIOME_SAVANNA = 8;
-    BIOME_TROPIC = 9;
-    BIOME_SWAMP = 10;
-    BIOME_TUNDRA_HILLS = 11;
-    BIOME_GRASS_HILLS = 12;
-    BIOME_DESERT_HILLS = 13;
-    BIOME_SAVANNA_HILLS = 14;
-    BIOME_ROCKS = 15;
-    BIOME_ICE_ROCKS = 16;
+    GROUND_UNKNOWN = -1;
+    GROUND_OCEAN = 0;
+    GROUND_RIVER = 1;
+    GROUND_LAKE = 2;
+    GROUND_COAST = 3;
+    GROUND_BEACH = 4;
+    GROUND_TUNDRA = 5;
+    GROUND_GRASS = 6;
+    GROUND_DESERT = 7;
+    GROUND_SAVANNA = 8;
+    GROUND_TROPIC = 9;
+    GROUND_SWAMP = 10;
+    GROUND_TUNDRA_HILLS = 11;
+    GROUND_GRASS_HILLS = 12;
+    GROUND_DESERT_HILLS = 13;
+    GROUND_SAVANNA_HILLS = 14;
+    GROUND_ROCKS = 15;
+    GROUND_ICE_ROCKS = 16;
 
     MAX_OCEAN_LEVEL = 0.25;
     MAX_COAST_LEVEL = 0.3;
@@ -52,42 +52,42 @@ class Biomes {
         this.lakesMap = lakesMap;
         this.temperatureMap = temperatureMap;
         this.humidityMap = humidityMap;
-        this.biomesConfig = this.getBiomesConfiguration();
+        this.groundsConfig = this.getGroundsConfiguration();
     }
 
     /**
-     * @param {Biome} biome
+     * @param {Ground} ground
      * @param {number} altitude
      * @return {array}
      */
-    getBiomeColor(biome, altitude) {
+    getGroundColor(ground, altitude) {
 
         let colors = [],
             powAltitude = (altitude - 0.5) * 200;
 
-        colors[this.BIOME_OCEAN] = '#003eb2';
-        colors[this.BIOME_RIVER] = LightenDarkenColor('#74aece', powAltitude);
-        colors[this.BIOME_LAKE] = LightenDarkenColor('#74aece', powAltitude);
-        colors[this.BIOME_COAST] = LightenDarkenColor('#003eb2', - powAltitude);
-        colors[this.BIOME_BEACH] = '#c2b281';
-        colors[this.BIOME_TUNDRA] = LightenDarkenColor('#9c9f73', powAltitude);
-        colors[this.BIOME_TUNDRA_HILLS] = LightenDarkenColor('#747658', -powAltitude);
-        colors[this.BIOME_GRASS] = LightenDarkenColor('#659c29', powAltitude);
-        colors[this.BIOME_GRASS_HILLS] = LightenDarkenColor('#518719', -powAltitude);
-        colors[this.BIOME_DESERT] = LightenDarkenColor('#cec35d', powAltitude);
-        colors[this.BIOME_DESERT_HILLS] = LightenDarkenColor('#af8a62', -powAltitude);
-        colors[this.BIOME_SAVANNA] = LightenDarkenColor('#8f9e3f', powAltitude);
-        colors[this.BIOME_SAVANNA_HILLS] = LightenDarkenColor('#7d7c3e', - powAltitude);
-        colors[this.BIOME_TROPIC] = '#19b460';
-        colors[this.BIOME_SWAMP] = '#258779';
-        colors[this.BIOME_ROCKS] = LightenDarkenColor('#575757', powAltitude * 3);
-        colors[this.BIOME_ICE_ROCKS] = LightenDarkenColor('#eeeeee', powAltitude * 5);
-        colors[this.BIOME_UNKNOWN] = '#000000';
+        colors[this.GROUND_OCEAN] = '#003eb2';
+        colors[this.GROUND_RIVER] = LightenDarkenColor('#74aece', powAltitude);
+        colors[this.GROUND_LAKE] = LightenDarkenColor('#74aece', powAltitude);
+        colors[this.GROUND_COAST] = LightenDarkenColor('#003eb2', - powAltitude);
+        colors[this.GROUND_BEACH] = '#c2b281';
+        colors[this.GROUND_TUNDRA] = LightenDarkenColor('#9c9f73', powAltitude);
+        colors[this.GROUND_TUNDRA_HILLS] = LightenDarkenColor('#747658', -powAltitude);
+        colors[this.GROUND_GRASS] = LightenDarkenColor('#659c29', powAltitude);
+        colors[this.GROUND_GRASS_HILLS] = LightenDarkenColor('#518719', -powAltitude);
+        colors[this.GROUND_DESERT] = LightenDarkenColor('#cec35d', powAltitude);
+        colors[this.GROUND_DESERT_HILLS] = LightenDarkenColor('#af8a62', -powAltitude);
+        colors[this.GROUND_SAVANNA] = LightenDarkenColor('#8f9e3f', powAltitude);
+        colors[this.GROUND_SAVANNA_HILLS] = LightenDarkenColor('#7d7c3e', - powAltitude);
+        colors[this.GROUND_TROPIC] = '#19b460';
+        colors[this.GROUND_SWAMP] = '#258779';
+        colors[this.GROUND_ROCKS] = LightenDarkenColor('#575757', powAltitude * 3);
+        colors[this.GROUND_ICE_ROCKS] = LightenDarkenColor('#eeeeee', powAltitude * 5);
+        colors[this.GROUND_UNKNOWN] = '#000000';
 
-        let color = colors[biome.getType()];
+        let color = colors[ground.getType()];
 
         if (typeof color === 'undefined') {
-            color = colors[this.BIOME_UNKNOWN];
+            color = colors[this.GROUND_UNKNOWN];
         }
 
         return hexToRgb(color);
@@ -124,116 +124,116 @@ class Biomes {
      * @internal
      * @return {[]}
      */
-    getBiomesConfiguration() {
+    getGroundsConfiguration() {
 
-        let biomesConfig = [];
+        let groundsConfig = [];
 
-        biomesConfig.push({
-            key: this.BIOME_TUNDRA,
+        groundsConfig.push({
+            key: this.GROUND_TUNDRA,
             h: [0, 0.33],
             t: [0, 0.33],
             a: [0, this.MAX_LOWLAND_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_GRASS,
+        groundsConfig.push({
+            key: this.GROUND_GRASS,
             h: [0.33, 0.66],
             t: [0, 0.66],
             a: [0, this.MAX_LOWLAND_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_SWAMP,
+        groundsConfig.push({
+            key: this.GROUND_SWAMP,
             h: [0.66, 1],
             t: [0, 0.33],
             a: [0, this.MAX_LOWLAND_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_SAVANNA,
+        groundsConfig.push({
+            key: this.GROUND_SAVANNA,
             h: [0, 0.33],
             t: [0.33, 0.66],
             a: [0, this.MAX_LOWLAND_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_DESERT,
+        groundsConfig.push({
+            key: this.GROUND_DESERT,
             h: [0, 0.33],
             t: [0.66, 1],
             a: [0, this.MAX_LOWLAND_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_SAVANNA,
+        groundsConfig.push({
+            key: this.GROUND_SAVANNA,
             h: [0.33, 0.66],
             t: [0.66, 1],
             a: [0, this.MAX_LOWLAND_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_GRASS,
+        groundsConfig.push({
+            key: this.GROUND_GRASS,
             h: [0.66, 1],
             t: [0.33, 0.66],
             a: [0, this.MAX_LOWLAND_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_TROPIC,
+        groundsConfig.push({
+            key: this.GROUND_TROPIC,
             h: [0.66, 1],
             t: [0.66, 1],
             a: [0, this.MAX_LOWLAND_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_TUNDRA_HILLS,
+        groundsConfig.push({
+            key: this.GROUND_TUNDRA_HILLS,
             h: [0, 0.33],
             t: [0, 0.33],
             a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_GRASS_HILLS,
+        groundsConfig.push({
+            key: this.GROUND_GRASS_HILLS,
             h: [0.33, 1],
             t: [0, 0.66],
             a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_SAVANNA_HILLS,
+        groundsConfig.push({
+            key: this.GROUND_SAVANNA_HILLS,
             h: [0, 0.33],
             t: [0.33, 0.66],
             a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_DESERT_HILLS,
+        groundsConfig.push({
+            key: this.GROUND_DESERT_HILLS,
             h: [0, 0.33],
             t: [0.66, 1],
             a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_SAVANNA_HILLS,
+        groundsConfig.push({
+            key: this.GROUND_SAVANNA_HILLS,
             h: [0.33, 1],
             t: [0.66, 1],
             a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_ICE_ROCKS,
+        groundsConfig.push({
+            key: this.GROUND_ICE_ROCKS,
             h: [0, 1],
             t: [0, 0.5],
             a: [this.MAX_HILLS_LEVEL, this.MAX_MOUNTAINS_LEVEL]
         });
 
-        biomesConfig.push({
-            key: this.BIOME_ROCKS,
+        groundsConfig.push({
+            key: this.GROUND_ROCKS,
             h: [0, 1],
             t: [0.5, 1],
             a: [this.MAX_HILLS_LEVEL, this.MAX_MOUNTAINS_LEVEL]
         });
 
-        return biomesConfig;
+        return groundsConfig;
     }
 
     /**
@@ -242,7 +242,7 @@ class Biomes {
      * @param {number} index
      * @return {boolean}
      */
-    checkBiomeIndex = function (fig, index) {
+    checkGroundIndex = function (fig, index) {
 
         if (fig[0] === 0 && index === 0) {
             return true;
@@ -258,16 +258,16 @@ class Biomes {
      * @param {number} y
      * @return {number}
      */
-    findBiomeType(x, y) {
+    findGroundType(x, y) {
 
         let _this = this;
 
         if (_this.riversMap.filled(x, y)) {
-            return _this.BIOME_RIVER;
+            return _this.GROUND_RIVER;
         }
 
         if (_this.lakesMap.filled(x, y)) {
-            return _this.BIOME_LAKE;
+            return _this.GROUND_LAKE;
         }
 
         let altitude = _this.altitudeMap.getTile(x, y),
@@ -276,46 +276,46 @@ class Biomes {
 
         if (_this.oceanMap.filled(x, y)) {
             return _this.isCoast(altitude, temperature)
-                ? _this.BIOME_COAST
-                : _this.BIOME_OCEAN;
+                ? _this.GROUND_COAST
+                : _this.GROUND_OCEAN;
         }
 
         if (_this.isBeach(x, y, altitude, temperature, humidity)) {
-            return _this.BIOME_BEACH;
+            return _this.GROUND_BEACH;
         }
 
-        let biomeName = null;
+        let groundName = null;
 
-        for (let i = 0; i < _this.biomesConfig.length; i++) {
+        for (let i = 0; i < _this.groundsConfig.length; i++) {
 
-            let cfg = _this.biomesConfig[i];
+            let cfg = _this.groundsConfig[i];
 
             if (
-                _this.checkBiomeIndex(cfg.h, humidity)
-                && _this.checkBiomeIndex(cfg.t, temperature)
-                && _this.checkBiomeIndex(cfg.a, altitude)
+                _this.checkGroundIndex(cfg.h, humidity)
+                && _this.checkGroundIndex(cfg.t, temperature)
+                && _this.checkGroundIndex(cfg.a, altitude)
             ) {
-                biomeName = cfg.key;
+                groundName = cfg.key;
                 break;
             }
         }
 
-        if (biomeName === null) {
-            throwError('Unknown biome. H:' + humidity + ' T:' + temperature + ' A:' + altitude);
-            biomeName = _this.BIOME_UNKNOWN;
+        if (groundName === null) {
+            throwError('Unknown ground. H:' + humidity + ' T:' + temperature + ' A:' + altitude);
+            groundName = _this.GROUND_UNKNOWN;
         }
 
-        return biomeName;
+        return groundName;
     };
 
     /**
      * @param {number} x
      * @param {number} y
-     * @return {Biome}
+     * @return {Ground}
      */
-    getBiome(x, y) {
-        return new Biome(
-            this.findBiomeType(x, y)
+    getGround(x, y) {
+        return new Ground(
+            this.findGroundType(x, y)
         );
     }
 }

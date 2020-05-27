@@ -1,4 +1,4 @@
-class Biome {
+class Ground {
 
     /**
      * @param {number} type
