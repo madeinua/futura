@@ -323,20 +323,16 @@ class World {
         let
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
-            grounds = new Grounds(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
-            color;
+            groundsGenerator = new Grounds(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap);
 
         altitudeMap.foreach(function(x, y) {
 
-            color = grounds.getGroundColor(
-                grounds.getGround(x, y),
-                altitudeMap.getTile(x, y)
-            );
+            let ground = groundsGenerator.getGround(x, y);
 
             fillCanvasPixel(
                 image.data,
                 (x + y * _this.config.worldSize) * 4,
-                color
+                hexToRgb(ground.getColor())
             );
 
             //displayPixelObject(objectsMap, x, y);
