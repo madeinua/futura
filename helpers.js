@@ -1,14 +1,20 @@
-let errors = 0;
+let errors = [];
 
 /**
- * @param msg
- * @param {string} limit
+ * @param {string} msg
+ * @param {number} limit
+ * @param {boolean} unique
  */
-function throwError(msg, limit) {
-    limit = typeof limit == 'undefined' ? 1 : limit;
-    if (errors < limit) {
-        console.error(msg);
-        errors++;
+function throwError(msg, limit, unique) {
+
+    limit = typeof limit == 'undefined' ? 5 : limit;
+    unique = typeof unique == 'undefined' ? true : unique;
+
+    if (errors.length < limit) {
+        if (!unique || !errors.includes(msg)) {
+            console.error(msg);
+            errors.push(msg);
+        }
     }
 }
 

@@ -242,11 +242,20 @@ class Grounds {
 
 class Ground {
 
+    static NAME = '';
+
     /**
      * @param {number} altitude
      */
     constructor(altitude) {
         this.altitude = altitude;
+    }
+
+    /**
+     * @return {string}
+     */
+    getName() {
+        return this.constructor.NAME;
     }
 
     /**
@@ -259,6 +268,8 @@ class Ground {
 
 class Ground_River extends Ground {
 
+    static NAME = 'river';
+
     /**
      * @return {string}
      */
@@ -268,6 +279,8 @@ class Ground_River extends Ground {
 }
 
 class Ground_Lake extends Ground {
+
+    static NAME = 'lake';
 
     /**
      * @return {string}
@@ -279,6 +292,8 @@ class Ground_Lake extends Ground {
 
 class Ground_Coast extends Ground {
 
+    static NAME = 'coast';
+
     /**
      * @return {string}
      */
@@ -288,6 +303,8 @@ class Ground_Coast extends Ground {
 }
 
 class Ground_Ocean extends Ground {
+
+    static NAME = 'ocean';
 
     /**
      * @return {string}
@@ -299,6 +316,8 @@ class Ground_Ocean extends Ground {
 
 class Ground_Beach extends Ground {
 
+    static NAME = 'beach';
+
     /**
      * @return {string}
      */
@@ -308,6 +327,8 @@ class Ground_Beach extends Ground {
 }
 
 class Ground_Tundra extends Ground {
+
+    static NAME = 'tundra';
 
     /**
      * @return {string}
@@ -319,6 +340,8 @@ class Ground_Tundra extends Ground {
 
 class Ground_Tundra_Hills extends Ground {
 
+    static NAME = 'tundra-hills';
+
     /**
      * @return {string}
      */
@@ -328,6 +351,8 @@ class Ground_Tundra_Hills extends Ground {
 }
 
 class Ground_Grass extends Ground {
+
+    static NAME = 'grass';
 
     /**
      * @return {string}
@@ -339,6 +364,8 @@ class Ground_Grass extends Ground {
 
 class Ground_Grass_Hills extends Ground {
 
+    static NAME = 'grass-hills';
+
     /**
      * @return {string}
      */
@@ -348,6 +375,8 @@ class Ground_Grass_Hills extends Ground {
 }
 
 class Ground_Savanna extends Ground {
+
+    static NAME = 'savanna';
 
     /**
      * @return {string}
@@ -359,6 +388,8 @@ class Ground_Savanna extends Ground {
 
 class Ground_Savanna_Hills extends Ground {
 
+    static NAME = 'savanna-hills';
+
     /**
      * @return {string}
      */
@@ -368,6 +399,8 @@ class Ground_Savanna_Hills extends Ground {
 }
 
 class Ground_Desert extends Ground {
+
+    static NAME = 'desert';
 
     /**
      * @return {string}
@@ -379,6 +412,8 @@ class Ground_Desert extends Ground {
 
 class Ground_Desert_Hills extends Ground {
 
+    static NAME = 'desert-hills';
+
     /**
      * @return {string}
      */
@@ -388,6 +423,8 @@ class Ground_Desert_Hills extends Ground {
 }
 
 class Ground_Tropic extends Ground {
+
+    static NAME = 'tropic';
 
     /**
      * @return {string}
@@ -399,6 +436,8 @@ class Ground_Tropic extends Ground {
 
 class Ground_Swamp extends Ground {
 
+    static NAME = 'swamp';
+
     /**
      * @return {string}
      */
@@ -409,6 +448,8 @@ class Ground_Swamp extends Ground {
 
 class Ground_Rocks extends Ground {
 
+    static NAME = 'rocks';
+
     /**
      * @return {string}
      */
@@ -418,6 +459,8 @@ class Ground_Rocks extends Ground {
 }
 
 class Ground_Ice_Rocks extends Ground {
+
+    static NAME = 'ice-rocks';
 
     /**
      * @return {string}

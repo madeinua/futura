@@ -323,7 +323,8 @@ class World {
         let
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
-            groundsGenerator = new Grounds(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap);
+            groundsGenerator = new Grounds(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
+            biomesGenerator = new Biomes();
 
         altitudeMap.foreach(function(x, y) {
 
@@ -334,6 +335,12 @@ class World {
                 (x + y * _this.config.worldSize) * 4,
                 hexToRgb(ground.getColor())
             );
+
+            let biome = biomesGenerator.getBiome(x, y, ground);
+
+            if (biome) {
+                throwError(biome.getName());
+            }
 
             //displayPixelObject(objectsMap, x, y);
         });

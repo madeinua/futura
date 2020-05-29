@@ -1,53 +1,93 @@
 class Biomes {
 
     // @TODO
-    BIOME_FOREST_TROPICAL = 1;
-    BIOME_FOREST_TEMPARATE = 2;
-    BIOME_FOREST_BOREAL = 3;
 
     constructor() {
-
+        
+        this.biomes = [];
+        
+        this.biomes.push(Biome_Tropical_Forest);
+        this.biomes.push(Biome_Temperate_Forest);
+        this.biomes.push(Biome_Boreal_Forest);
     }
 
     /**
-     * @param {Ground} ground
      * @param {number} x
      * @param {number} y
-     * @return {number}
-     */
-    findBiomeType(ground, x, y) {
-
-
-
-        return '';
-    };
-
-    /**
      * @param {Ground} ground
-     * @param {number} x
-     * @param {number} y
-     * @return {Biome}
+     * @return {boolean|Biome}
      */
-    getBiome(ground, x, y) {
-        return new Biome(
-            this.findBiomeType(ground, x, y)
-        );
+    getBiome(x, y, ground) {
+        
+        for (let i in this.biomes) {
+            if (this.biomes.hasOwnProperty(i) && this.biomes[i].matchConditions(x, y, ground)) {
+                return new this.biomes[i];
+            }
+        }
+
+        return false;
     }
 }
 
 class Biome {
 
     /**
-     * @param {number} type
+     * @param {number} x
+     * @param {number} y
+     * @param {Ground} ground
+     * @return {boolean}
      */
-    constructor(type) {
-        this.type = type;
+    static matchConditions (x, y, ground) {
+        return false;
     }
 
     /**
-     * @return {number}
+     * @return {string}
      */
-    getType() {
-        return this.type;
-    };
+    getName() {
+        return this.constructor.name;
+    }
+}
+
+class Biome_Tropical_Forest extends Biome
+{
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {Ground} ground
+     * @return {boolean}
+     */
+    static matchConditions (x, y, ground) {
+        return ground.getName() === Ground_Tropic.NAME
+            || ground.getName() === Ground_Desert.NAME;
+    }
+}
+
+class Biome_Temperate_Forest extends Biome
+{
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {Ground} ground
+     * @return {boolean}
+     */
+    static matchConditions (x, y, ground) {
+        return ground.getName() === Ground_Grass.NAME
+            || ground.getName() === Ground_Tundra.NAME
+            || ground.getName() === Ground_Savanna.NAME
+    }
+}
+
+class Biome_Boreal_Forest extends Biome
+{
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {Ground} ground
+     * @return {boolean}
+     */
+    static matchConditions (x, y, ground) {
+        return ground.getName() === Ground_Grass_Hills.NAME
+            || ground.getName() === Ground_Tundra_Hills.NAME;
+    }
 }
