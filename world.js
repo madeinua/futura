@@ -6,14 +6,6 @@ class World {
             console.error('World Canvas not defined');
         }
 
-        if (typeof config.worldSize === 'undefined') {
-            config.worldSize = 100;
-        }
-
-        if (typeof config.visibleCols === 'undefined') {
-            config.visibleCols = 20;
-        }
-
         if (typeof config.storeData === 'undefined') {
             config.storeData = true;
         }
@@ -323,24 +315,25 @@ class World {
         let
             //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
             image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
-            groundsGenerator = new Grounds(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
-            biomesGenerator = new Biomes();
+            biomesGenerator = new Biomes(
+                altitudeMap,
+                oceanMap,
+                riversMap,
+                lakesMap,
+                temperatureMap,
+                humidityMap,
+                this.config
+            );
 
         altitudeMap.foreach(function(x, y) {
 
-            let ground = groundsGenerator.getGround(x, y);
+            let biome = biomesGenerator.getBiome(x, y);
 
             fillCanvasPixel(
                 image.data,
                 (x + y * _this.config.worldSize) * 4,
-                hexToRgb(ground.getColor())
+                hexToRgb(biome.getColor())
             );
-
-            let biome = biomesGenerator.getBiome(x, y, ground);
-
-            if (biome) {
-                throwError(biome.getName());
-            }
 
             //displayPixelObject(objectsMap, x, y);
         });

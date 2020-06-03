@@ -1,17 +1,8 @@
 let coordinatesField = document.getElementById('coordinates'),
     worldCanvas = document.getElementById('world'),
-    miniMapCanvas = document.getElementById('miniMap');
-
-let config = {
-    //storeData: false,
-    worldSize: 300,
-    visibleCols: 30,
-    worldCanvas: worldCanvas,
-    miniMapCanvas: miniMapCanvas,
-    showCoordinates: false
-};
-
-let cameraPos = getCenteredCameraPosition(config.visibleCols);
+    miniMapCanvas = document.getElementById('miniMap'),
+    config = getConfig(),
+    cameraPos = getCenteredCameraPosition(config.visibleCols);
 
 config.cameraPosX = cameraPos[0];
 config.cameraPosY = cameraPos[1];

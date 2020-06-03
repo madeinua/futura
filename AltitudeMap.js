@@ -2,9 +2,6 @@ class AltitudeMap extends PointMatrix {
 
     config;
 
-    WORLD_MAP_OCEAN_LEVEL = 0.5; // [0-1]
-    MAX_WATER_LEVEL = 0.3;
-
     /**
      * @param {Object} config
      * @return {AltitudeMap}
@@ -12,16 +9,6 @@ class AltitudeMap extends PointMatrix {
     constructor(config) {
 
         super(config.worldSize, config.worldSize);
-
-        this.WORLD_MAP_OCEAN_LEVEL =
-            typeof config.WORLD_MAP_OCEAN_LEVEL === 'undefined'
-                ? this.WORLD_MAP_OCEAN_LEVEL
-                : config.WORLD_MAP_OCEAN_LEVEL;
-
-        this.MAX_WATER_LEVEL =
-            typeof config.MAX_WATER_LEVEL === 'undefined'
-                ? this.MAX_WATER_LEVEL
-                : config.MAX_WATER_LEVEL;
 
         this.config = config;
 
@@ -31,52 +18,37 @@ class AltitudeMap extends PointMatrix {
     generateMap = function() {
 
         let _this = this,
-            octaves = _this.calculateOctaves(_this.config.worldSize),
-            distances = getEqualDistances(octaves, 10, 100),
             maps = [];
 
-        for (let i = 0; i < octaves; i++) {
+        for (let i in this.config.ALTITUDE_OCTAVES) {
             maps[i] = createNoiseMap(
                 _this.config.worldSize,
-                distances[i]
+                this.config.ALTITUDE_OCTAVES[i]
             );
         }
 
         _this.map(function(x, y) {
 
-            let val = 0;
+            let val = 0,
+                size = 0;
 
             // blend maps
             for (let i = 0; i < maps.length; i++) {
-                val += maps[i].getTile(x, y);
+                let s = Math.pow(2, i);
+                size += s;
+                val += maps[i].getTile(x, y) * s;
             }
 
-            val /= maps.length;
+            val /= size;
 
             // stretch map
-            val = Math.min(1, Math.pow(val, _this.WORLD_MAP_OCEAN_LEVEL + 1));
+            val = Math.min(1, Math.pow(val, _this.config.WORLD_MAP_OCEAN_LEVEL + 1));
 
             // make island
             val = _this.makeIsland(x, y, _this.config.worldSize, val);
 
             return val;
         });
-    };
-
-    /**
-     * @param {number} worldSize
-     * @return {number}
-     */
-    calculateOctaves = function(worldSize) {
-
-        let octaves = 1;
-
-        while(worldSize > 1) {
-            worldSize = worldSize / 3;
-            octaves++;
-        }
-
-        return octaves;
     };
 
     /**
@@ -103,7 +75,7 @@ class AltitudeMap extends PointMatrix {
      * @return {boolean}
      */
     isGround = function(level) {
-        return level > this.MAX_WATER_LEVEL;
+        return level > this.config.MAX_WATER_LEVEL;
     };
 
     /**
@@ -111,6 +83,6 @@ class AltitudeMap extends PointMatrix {
      * @return {boolean}
      */
     isWater = function(level) {
-        return this.MAX_WATER_LEVEL >= level;
+        return this.config.MAX_WATER_LEVEL >= level;
     };
 }

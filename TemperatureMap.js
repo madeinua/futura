@@ -1,7 +1,5 @@
 class TemperatureMap extends PointMatrix {
 
-    ALTITUDE_TEMPERATURE_FACTOR = 0.5; // [0-1]
-
     altitudeMap;
     config;
 
@@ -13,11 +11,6 @@ class TemperatureMap extends PointMatrix {
     constructor(altitudeMap, config) {
 
         super(config.worldSize, config.worldSize);
-
-        this.ALTITUDE_TEMPERATURE_FACTOR =
-            typeof config.ALTITUDE_TEMPERATURE_FACTOR === 'undefined'
-                ? this.ALTITUDE_TEMPERATURE_FACTOR
-                : config.ALTITUDE_TEMPERATURE_FACTOR;
 
         this.altitudeMap = altitudeMap;
         this.config = config;
@@ -54,7 +47,7 @@ class TemperatureMap extends PointMatrix {
     considerAltitude = function() {
 
         let _this = this,
-            revFactor = tval(_this.ALTITUDE_TEMPERATURE_FACTOR, 5, 1);
+            revFactor = tval(_this.config.ALTITUDE_TEMPERATURE_FACTOR, 5, 1);
 
         _this.foreach(function(x, y) {
             _this.addToTile(x, y, _this.altitudeMap.getTile(x, y) / revFactor);

@@ -1,12 +1,5 @@
 class RiversMap extends BinaryMatrix {
 
-    RIVERS_DENSITY = 0.5; // [0-1]
-    RIVER_SOURCE_MIN_ALTITUDE = 0.5;
-    RIVER_SOURCE_MAX_ALTITUDE = 0.9;
-    RIVERS_CLOSENESS = 3;
-    RIVER_MIN_LENGTH = 5;
-    RIVER_DELTA_MAX_LENGTH = 0.25; // [0-1] 1 = 100% of length
-
     altitudeMap;
     config;
 
@@ -18,36 +11,6 @@ class RiversMap extends BinaryMatrix {
     constructor(altitudeMap, config) {
 
         super(config.worldSize, config.worldSize);
-
-        this.RIVERS_DENSITY =
-            typeof config.RIVERS_DENSITY === 'undefined'
-                ? this.RIVERS_DENSITY
-                : config.RIVERS_DENSITY;
-
-        this.RIVER_SOURCE_MIN_ALTITUDE =
-            typeof config.RIVER_SOURCE_MIN_ALTITUDE === 'undefined'
-                ? this.RIVER_SOURCE_MIN_ALTITUDE
-                : config.RIVER_SOURCE_MIN_ALTITUDE;
-
-        this.RIVER_SOURCE_MAX_ALTITUDE =
-            typeof config.RIVER_SOURCE_MAX_ALTITUDE === 'undefined'
-                ? this.RIVER_SOURCE_MAX_ALTITUDE
-                : config.RIVER_SOURCE_MAX_ALTITUDE;
-
-        this.RIVERS_CLOSENESS =
-            typeof config.RIVERS_CLOSENESS === 'undefined'
-                ? this.RIVERS_CLOSENESS
-                : config.RIVERS_CLOSENESS;
-
-        this.RIVER_MIN_LENGTH =
-            typeof config.RIVER_MIN_LENGTH === 'undefined'
-                ? this.RIVER_MIN_LENGTH
-                : config.RIVER_MIN_LENGTH;
-
-        this.RIVER_DELTA_MAX_LENGTH =
-            typeof config.RIVER_DELTA_MAX_LENGTH === 'undefined'
-                ? this.RIVER_DELTA_MAX_LENGTH
-                : config.RIVER_DELTA_MAX_LENGTH;
 
         this.config = config;
         this.altitudeMap = altitudeMap;
@@ -65,7 +28,7 @@ class RiversMap extends BinaryMatrix {
         let riverSources = _this.getRiverSources(_this.altitudeMap),
             rivers = [],
             allRiversPoints = [],
-            riversLimit = Math.floor(tval(_this.RIVERS_DENSITY, 1, riverSources.length));
+            riversLimit = Math.floor(tval(_this.config.RIVERS_DENSITY, 1, riverSources.length));
 
         for (let i = 0; i < riverSources.length; i++) {
 
@@ -96,7 +59,7 @@ class RiversMap extends BinaryMatrix {
                 river.push(nextRiverPoint);
             }
 
-            if (finished && river.length >= _this.RIVER_MIN_LENGTH) {
+            if (finished && river.length >= _this.config.RIVER_MIN_LENGTH) {
                 rivers.push(river);
                 allRiversPoints = allRiversPoints.concat(river);
                 allRiversPoints.unique();
@@ -119,7 +82,7 @@ class RiversMap extends BinaryMatrix {
      * @return {boolean}
      */
     isTooCloseToRivers = function(x, y, riverPoints) {
-        return this.RIVERS_CLOSENESS >= riverPoints.getClosestDistanceTo(x, y);
+        return this.config.RIVERS_CLOSENESS >= riverPoints.getClosestDistanceTo(x, y);
     };
 
     /**
@@ -138,8 +101,8 @@ class RiversMap extends BinaryMatrix {
 
             if (
                 altitudeMap.isGround(altitude)
-                && altitude >= _this.RIVER_SOURCE_MIN_ALTITUDE
-                && _this.RIVER_SOURCE_MAX_ALTITUDE >= altitude
+                && altitude >= _this.config.RIVER_SOURCE_MIN_ALTITUDE
+                && _this.config.RIVER_SOURCE_MAX_ALTITUDE >= altitude
             ) {
                 spawns.push([x, y]);
             }
@@ -208,7 +171,7 @@ class RiversMap extends BinaryMatrix {
     addRiverDeltaToRiverMap = function(river) {
 
         let _this = this,
-            deltaLength = river.length * randBetweenFloats(0, _this.RIVER_DELTA_MAX_LENGTH),
+            deltaLength = river.length * randBetweenFloats(0, _this.config.RIVER_DELTA_MAX_LENGTH),
             notDeltaLength = river.length - deltaLength;
 
         for (let p = 0; p < river.length; p++) {
