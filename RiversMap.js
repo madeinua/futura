@@ -1,19 +1,22 @@
 class RiversMap extends BinaryMatrix {
 
     altitudeMap;
+    lakesMap;
     config;
 
     /**
      * @param {AltitudeMap} altitudeMap
+     * @param {LakesMap} lakesMap
      * @param {Object} config
      * @return {RiversMap}
      */
-    constructor(altitudeMap, config) {
+    constructor(altitudeMap, lakesMap, config) {
 
         super(config.worldSize, config.worldSize);
 
         this.config = config;
         this.altitudeMap = altitudeMap;
+        this.lakesMap = lakesMap;
 
         return this;
     };
@@ -52,8 +55,21 @@ class RiversMap extends BinaryMatrix {
 
                 // lake/ocean found. means river ending point found.
                 if (_this.altitudeMap.isWater(tile)) {
-                    finished = true;
-                    break;
+
+                    if (_this.lakesMap.filled(nextRiverPoint[0], nextRiverPoint[1])) {
+
+                        let lakeSize = _this.lakesMap.getLakeSizeFromPoint(nextRiverPoint[0], nextRiverPoint[1]);
+
+                        // if river is bigger than lake than this is not the final target
+                        if (lakeSize > river.length * config.LAKE_TO_RIVER_RATIO) {
+                            finished = true;
+                            break;
+                        }
+
+                    } else {
+                        finished = true;
+                        break;
+                    }
                 }
 
                 river.push(nextRiverPoint);

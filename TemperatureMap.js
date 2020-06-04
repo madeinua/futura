@@ -52,5 +52,5 @@ class TemperatureMap extends PointMatrix {
         _this.foreach(function(x, y) {
             _this.addToTile(x, y, _this.altitudeMap.getTile(x, y) / revFactor);
         });
-    }
+    };
 }

@@ -157,11 +157,12 @@ class World {
 
     /**
      * @param {AltitudeMap} altitudeMap
+     * @param {LakesMap} lakesMap
      * @return {RiversMap}
      */
-    generateRiversMap = function(altitudeMap) {
+    generateRiversMap = function(altitudeMap, lakesMap) {
 
-        let riversMap = new RiversMap(altitudeMap, this.config),
+        let riversMap = new RiversMap(altitudeMap, lakesMap, this.config),
             storage = localStorage.getItem('riversMap');
 
         if (typeof storage !== 'undefined' && storage !== null) {
@@ -306,7 +307,7 @@ class World {
             altitudeMap = _this.generateAltitudeMap(),
             oceanMap = _this.generateOceanMap(altitudeMap),
             lakesMap = _this.generateLakesMap(altitudeMap, oceanMap),
-            riversMap = _this.generateRiversMap(altitudeMap),
+            riversMap = _this.generateRiversMap(altitudeMap, lakesMap),
             humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
             temperatureMap = _this.generateTemperatureMap(altitudeMap);
 

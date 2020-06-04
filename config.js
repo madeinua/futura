@@ -3,7 +3,7 @@ function getConfig() {
     return {
 
         // Global
-        //storeData: false,
+        storeData: true,
         worldSize: 300,
         visibleCols: 30,
         worldCanvas: worldCanvas,
@@ -22,6 +22,7 @@ function getConfig() {
         RIVERS_CLOSENESS: 3,
         RIVER_MIN_LENGTH: 5,
         RIVER_DELTA_MAX_LENGTH: 0.25, // [0-1] 1 = 100% of length
+        LAKE_TO_RIVER_RATIO: 1.3,
 
         // Humidity
         MIN_HUMIDITY: 0,

@@ -21,17 +21,19 @@ class OceanMap extends BinaryMatrix {
      */
     generateMap = function() {
 
-        let _this = this;
+        let _this = this,
+            startX = 0,
+            startY = 0;
 
-        if (!_this.altitudeMap.isWater(_this.altitudeMap.getTile(0, 0))) {
+        if (!_this.altitudeMap.isWater(_this.altitudeMap.getTile(startX, startY))) {
             return _this;
         }
 
         let activePoints = [],
             point;
 
-        _this.fill(0, 0);
-        activePoints.push([0, 0]);
+        _this.fill(startX, startY);
+        activePoints.push([startX, startY]);
 
         while(activePoints.length) {
 

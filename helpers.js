@@ -1,7 +1,7 @@
 let errors = [];
 
 /**
- * @param {string} msg
+ * @param msg
  * @param {number} limit
  * @param {boolean} unique
  */

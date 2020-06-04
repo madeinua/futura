@@ -275,6 +275,7 @@ class Biome {
      * @return {string}
      */
     getColor() {
+        throwError('Unknown biome color', 1, true);
         return '#FFFFFF';
     }
 
@@ -481,7 +482,7 @@ class Biome_Rocks extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#727272', (this.altitude - 0.5) * 600);
+        return LightenDarkenColor('#726f62', (this.altitude - 0.5) * 250);
     }
 }
 
@@ -493,6 +494,6 @@ class Biome_Ice_Rocks extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#eeeeee', (this.altitude - 0.5) * 1000);
+        return LightenDarkenColor('#eeeeee', (this.altitude - 0.5) * 500);
     }
 }
