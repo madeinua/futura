@@ -410,7 +410,7 @@ class Biome_Savanna extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#8f9e3f', (this.altitude - 0.5) * 200);
+        return LightenDarkenColor('#9b9e3f', (this.altitude - 0.5) * 200);
     }
 }
 
@@ -422,7 +422,7 @@ class Biome_Savanna_Hills extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#7f7e46', -(this.altitude - 0.5) * 200);
+        return LightenDarkenColor('#7f7946', -(this.altitude - 0.5) * 200);
     }
 }
 
@@ -458,7 +458,7 @@ class Biome_Tropic extends Biome {
      * @return {string}
      */
     getColor() {
-        return '#5eb62e';
+        return LightenDarkenColor('#3c8045', -(this.altitude - 0.5) * 200);
     }
 }
 

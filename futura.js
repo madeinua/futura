@@ -52,7 +52,7 @@ Filters
         return map;
     })
     .add('humidityMap', function(map) {
-        drawMap('humidityMapCanvas', map, false);
+        drawMap('humidityMapCanvas', map, true);
         return map;
     })
     .add('oceanMap', function(map) {
