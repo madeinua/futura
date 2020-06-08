@@ -247,6 +247,41 @@ class World {
 
     /**
      * @param {AltitudeMap} altitudeMap
+     * @param {OceanMap} oceanMap
+     * @param {RiversMap} riversMap
+     * @param {LakesMap} lakesMap
+     * @param {TemperatureMap} temperatureMap
+     * @param {HumidityMap} humidityMap
+     * @return {Matrix}
+     */
+    generateBiomes = function (altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap) {
+
+        let biomes = new Matrix(altitudeMap.getWidth(), altitudeMap.getHeight()),
+            biomesGenerator = new Biomes(
+                altitudeMap,
+                oceanMap,
+                riversMap,
+                lakesMap,
+                temperatureMap,
+                humidityMap,
+                this.config
+            );
+
+        altitudeMap.foreach(function(x, y) {
+            biomes.setTile(x, y, biomesGenerator.getBiome(x, y));
+        });
+
+        if (this.logs) {
+            logTimeEvent('Biomes calculated');
+        }
+
+        biomes = Filters.apply('biomes', biomes);
+
+        return biomes;
+    };
+
+    /**
+     * @param {AltitudeMap} altitudeMap
      * @param {TemperatureMap} temperatureMap
      * @param {HumidityMap} humidityMap
      * @return {ForestMap}
@@ -279,10 +314,7 @@ class World {
      * @return {BinaryMatrix}
      */
     generateObjectsMap = function(altitudeMap, temperatureMap, humidityMap) {
-
-        let map = this.generateForest(altitudeMap, temperatureMap, humidityMap);
-
-        return map;
+        return new BinaryMatrix(this.config.width, this.config.height);
     };
 
     /**
@@ -309,31 +341,17 @@ class World {
             lakesMap = _this.generateLakesMap(altitudeMap, oceanMap),
             riversMap = _this.generateRiversMap(altitudeMap, lakesMap),
             humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
-            temperatureMap = _this.generateTemperatureMap(altitudeMap);
-
-        let ctx = _this.renderCanvas.getContext('2d');
-
-        let
-            //objectsMap = generateObjectsMap(altitudeMap, temperatureMap, humidityMap),
-            image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
-            biomesGenerator = new Biomes(
-                altitudeMap,
-                oceanMap,
-                riversMap,
-                lakesMap,
-                temperatureMap,
-                humidityMap,
-                this.config
-            );
+            temperatureMap = _this.generateTemperatureMap(altitudeMap),
+            biomes = _this.generateBiomes(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
+            ctx = _this.renderCanvas.getContext('2d'),
+            image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize);
 
         altitudeMap.foreach(function(x, y) {
-
-            let biome = biomesGenerator.getBiome(x, y);
 
             fillCanvasPixel(
                 image.data,
                 (x + y * _this.config.worldSize) * 4,
-                hexToRgb(biome.getColor())
+                biomes.getTile(x, y).getHexColor()
             );
 
             //displayPixelObject(objectsMap, x, y);

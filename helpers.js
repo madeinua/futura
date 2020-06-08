@@ -28,11 +28,10 @@ let Filters = {
     /**
      * @param {String} tag
      * @param {function} filter
-     * @return {Matrix}
+     * @return {*}
      */
     add: function(tag, filter) {
         (this.filters[tag] || (this.filters[tag] = [])).push(filter);
-        return this;
     },
 
     /**
@@ -244,7 +243,18 @@ function getPosition(element) {
 }
 
 /**
- * Generate matrix of tiles
+ * Create 2D array
+ * @param {number} width
+ * @param {number} height
+ * @param value
+ * @return {[][]}
+ */
+function create2DArray(width, height, value) {
+    return [...Array(height)].map(() => [...Array(width)].map(() => value));
+}
+
+/**
+ * Generate 2D matrix from the array
  * @param {number} width
  * @param {number} height
  * @constructor
@@ -257,17 +267,9 @@ class Matrix {
      * @param {number} height
      */
     constructor(width, height) {
-
         this.width = width;
         this.height = height;
-        this.__values = [];
-
-        for (let x = 0; x < width; x++) {
-            this.__values[x] = [];
-            for (let y = 0; y < height; y++) {
-                this.__values[x][y] = null;
-            }
-        }
+        this.__values = create2DArray(width, height, null);
     }
 
     /**
@@ -298,47 +300,10 @@ class Matrix {
     }
 
     /**
-     * Set all tiles of matrix
-     * @param {Array} values
-     * @return {Matrix}
-     */
-    setAll(values) {
-
-        if (values instanceof Array) {
-            this.__values = values;
-        } else {
-            this.map(function() {
-                return values;
-            });
-        }
-
-        return this;
-    }
-
-    /**
-     * @return {string}
-     */
-    toString = function() {
-        return JSON.stringify(
-            this.getAll()
-        );
-    };
-
-    /**
-     * @param {string} string
-     * @return {Matrix}
-     */
-    fromString = function(string) {
-        return this.setAll(
-            JSON.parse(string)
-        );
-    };
-
-    /**
      * Set tile value
      * @param {number} x
      * @param {number} y
-     * @param {number} value
+     * @param {*} value
      * @return {Matrix}
      */
     setTile(x, y, value) {
@@ -352,20 +317,10 @@ class Matrix {
      * Retrieve tile value
      * @param x
      * @param y
-     * @return {number}
+     * @return {*}
      */
     getTile(x, y) {
         return this.__values[x][y];
-    }
-
-    /**
-     * Add value to a current tile value
-     * @param {number} x
-     * @param {number} y
-     * @param {number} value
-     */
-    addToTile(x, y, value) {
-        this.setTile(x, y, this.getTile(x, y) + value);
     }
 
     /**
@@ -382,28 +337,6 @@ class Matrix {
      */
     getHeight() {
         return this.height;
-    }
-
-    /**
-     * Convert Matrix to array
-     * @return {Array}
-     */
-    toArray() {
-
-        let arr = [];
-
-        for (let x = 0; x < this.width; x++) {
-
-            if (typeof arr[x] === "undefined") {
-                arr[x] = [];
-            }
-
-            for (let y = 0; y < this.height; y++) {
-                arr[x][y] = this.getTile(x, y);
-            }
-        }
-
-        return arr;
     }
 
     /**
@@ -426,17 +359,8 @@ class Matrix {
     }
 
     /**
-     * Compare current matrix to the other one
-     * @param {Matrix} matrix
-     * @return {boolean}
-     */
-    equals(matrix) {
-        return this.getAll().toString() === matrix.getAll().toString();
-    }
-
-    /**
      * Applies the callback to the elements of the Matrix and accepts return value as the Matrix tile value
-     * @param {number|function} value
+     * @param {*|function} value
      * @return {Matrix}
      */
     map(value) {
@@ -462,6 +386,88 @@ class Matrix {
                 callback(x, y);
             }
         }
+    }
+
+    /**
+     * Set all tiles of matrix
+     * @param {Array} values
+     * @return {Matrix}
+     */
+    setAll(values) {
+
+        if (values instanceof Array) {
+            this.__values = values;
+        } else {
+            this.map(function() {
+                return values;
+            });
+        }
+
+        return this;
+    }
+
+    /**
+     * Convert Matrix to array
+     * @return {Array}
+     */
+    toArray() {
+
+        let arr = create2DArray(this.width, this.height, null);
+
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                arr[x][y] = this.getTile(x, y);
+            }
+        }
+
+        return arr;
+    }
+}
+
+/**
+ * Generate matrix of tiles
+ * @param {number} width
+ * @param {number} height
+ * @constructor
+ */
+class NumericMatrix extends Matrix {
+
+    /**
+     * @return {string}
+     */
+    toString = function() {
+        return JSON.stringify(
+            this.getAll()
+        );
+    };
+
+    /**
+     * @param {string} string
+     * @return {NumericMatrix}
+     */
+    fromString = function(string) {
+        return this.setAll(
+            JSON.parse(string)
+        );
+    };
+
+    /**
+     * Add value to a current tile value
+     * @param {number} x
+     * @param {number} y
+     * @param {number} value
+     */
+    addToTile(x, y, value) {
+        this.setTile(x, y, this.getTile(x, y) + value);
+    }
+
+    /**
+     * Compare current matrix to the other one
+     * @param {NumericMatrix} matrix
+     * @return {boolean}
+     */
+    equals(matrix) {
+        return this.getAll().toString() === matrix.getAll().toString();
     }
 
     /**
@@ -553,7 +559,7 @@ class Matrix {
      * @param {number} y
      * @param {number} deep
      * @param {function} callback
-     * @return {Matrix}
+     * @return {NumericMatrix}
      */
     foreachNeighbors(x, y, deep, callback) {
 
@@ -591,7 +597,7 @@ class Matrix {
      * @param {number} y
      * @param {number} deep
      * @param {number} value
-     * @return {Matrix}
+     * @return {NumericMatrix}
      */
     addToNeighborTiles(x, y, deep, value) {
 
@@ -627,7 +633,7 @@ class Matrix {
      * Scale matrix to fit min/max ranges
      * @param {number} min
      * @param {number} max
-     * @return {Matrix}
+     * @return {NumericMatrix}
      */
     setRange(min, max) {
 
@@ -674,7 +680,7 @@ class Matrix {
     }
 }
 
-class BinaryMatrix extends Matrix {
+class BinaryMatrix extends NumericMatrix {
 
     /**
      * Constructor
@@ -691,7 +697,7 @@ class BinaryMatrix extends Matrix {
      * @param {number} x
      * @param {number} y
      * @param {number} value
-     * @return {Matrix}
+     * @return {BinaryMatrix}
      */
     setTile(x, y, value) {
 
@@ -827,7 +833,7 @@ class BinaryMatrix extends Matrix {
      * Apply callback to all neighbors of all
      * @param deep
      * @param callback
-     * @return {Matrix}
+     * @return {BinaryMatrix}
      */
     foreachAllFilledNeighbors(deep, callback) {
 
@@ -851,13 +857,14 @@ class BinaryMatrix extends Matrix {
     }
 }
 
-class PointMatrix extends Matrix {
+class PointMatrix extends NumericMatrix {
 
     /**
-     * @return {Matrix}
+     * @return {PointMatrix}
      */
     normalize() {
-        return this.setRange(0, 1);
+        this.setRange(0, 1);
+        return this;
     }
 }
 

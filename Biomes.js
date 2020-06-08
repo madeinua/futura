@@ -221,22 +221,6 @@ class Biomes {
                 && this.checkBiomeIndex(cfg.t, temperature)
                 && this.checkBiomeIndex(cfg.a, altitude)
             ) {
-
-                // 1. temp
-                // 2. hum
-                // 3. nearly forest
-                // 4. random
-
-                let forestType = 0;
-
-                if (altitude >= this.config.BOREAL_FOREST_MIN_ALTITUDE) {
-                    forestType = this.config.FOREST_BOREAL;
-                } else if (cfg.class === Biome_Tropic) {
-                    forestType = this.config.FOREST_TROPICAL;
-                } else {
-                    forestType = this.config.FOREST_TEMPERATE;
-                }
-
                 return new cfg.class(x, y, altitude, temperature, humidity);
             }
         }
@@ -248,6 +232,8 @@ class Biomes {
 class Biome {
 
     static NAME = '';
+
+    forestType = 0;
 
     /**
      * @param {number} x
@@ -280,17 +266,26 @@ class Biome {
     }
 
     /**
-     * @return {boolean}
+     * @return {Array}
      */
-    hasForest() {
-        return this.getForestType() !== 0;
+    getHexColor() {
+        return hexToRgb(
+            this.getColor()
+        );
+    }
+
+    /**
+     * @param {int} forestType
+     */
+    setForestType(forestType) {
+        this.forestType = forestType;
     }
 
     /**
      * @return {number}
      */
     getForestType() {
-        return 0;
+        return this.forestType;
     }
 }
 
@@ -446,7 +441,7 @@ class Biome_Desert_Hills extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#a88f73', -(this.altitude - 0.5) * 200);
+        return LightenDarkenColor('#c4a37e', -(this.altitude - 0.5) * 200);
     }
 }
 

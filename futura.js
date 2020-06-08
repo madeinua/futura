@@ -12,6 +12,37 @@ let world = new World(config);
 /**
  * @param {string} id
  * @param {Matrix} map
+ */
+function drawColorMap(id, map) {
+
+    let canvas = document.getElementById(id);
+
+    canvas.width = map.getWidth();
+    canvas.height = map.getHeight();
+
+    let ctx = canvas.getContext('2d'),
+        image = ctx.createImageData(canvas.width, canvas.height),
+        x, y;
+
+    for (x = 0; x < map.getWidth(); x++) {
+        for (y = 0; y < map.getHeight(); y++) {
+
+            let point = (x + y * canvas.width) * 4,
+                color = map.getTile(x, y).getHexColor();
+
+            image.data[point] = color[0];
+            image.data[point + 1] = color[1];
+            image.data[point + 2] = color[2];
+            image.data[point + 3] = 255; // Alpha
+        }
+    }
+
+    ctx.putImageData(image, 0, 0);
+}
+
+/**
+ * @param {string} id
+ * @param {NumericMatrix} map
  * @param {boolean} reverse
  */
 function drawMap(id, map, reverse) {
@@ -38,39 +69,50 @@ function drawMap(id, map, reverse) {
     ctx.putImageData(image, 0, 0);
 }
 
-Filters
-    .add('mapMoved', function(point) {
-        point = centeredCameraPointToXY(point, config.visibleCols);
-        coordinatesField.value = point[0] + ',' + point[1];
-    })
-    .add('altitudeMap', function(map) {
-        drawMap('altitudeMapCanvas', map, false);
-        return map;
-    })
-    .add('temperatureMap', function(map) {
-        drawMap('temperatureMapCanvas', map, false);
-        return map;
-    })
-    .add('humidityMap', function(map) {
-        drawMap('humidityMapCanvas', map, true);
-        return map;
-    })
-    .add('oceanMap', function(map) {
-        drawMap('oceanMapCanvas', map, true);
-        return map;
-    })
-    .add('lakesMap', function(map) {
-        drawMap('lakesMapCanvas', map, true);
-        return map;
-    })
-    .add('riversMap', function(map) {
-        drawMap('riversMapCanvas', map, false);
-        return map;
-    })
-    .add('forestMap', function(map) {
-        drawMap('forestMapCanvas', map, false);
-        return map;
-    });
+Filters.add('mapMoved', function(point) {
+    point = centeredCameraPointToXY(point, config.visibleCols);
+    coordinatesField.value = point[0] + ',' + point[1];
+});
+
+Filters.add('altitudeMap', function(map) {
+    drawMap('altitudeMapCanvas', map, false);
+    return map;
+});
+
+Filters.add('temperatureMap', function(map) {
+    drawMap('temperatureMapCanvas', map, false);
+    return map;
+});
+
+Filters.add('humidityMap', function(map) {
+    drawMap('humidityMapCanvas', map, true);
+    return map;
+});
+
+Filters.add('oceanMap', function(map) {
+    drawMap('oceanMapCanvas', map, true);
+    return map;
+});
+
+Filters.add('lakesMap', function(map) {
+    drawMap('lakesMapCanvas', map, true);
+    return map;
+});
+
+Filters.add('riversMap', function(map) {
+    drawMap('riversMapCanvas', map, false);
+    return map;
+});
+
+Filters.add('biomes', function(map) {
+    drawColorMap('biomesCanvas', map);
+    return map;
+});
+
+Filters.add('forestMap', function(map) {
+    drawMap('forestMapCanvas', map, false);
+    return map;
+});
 
 world.create();
 
