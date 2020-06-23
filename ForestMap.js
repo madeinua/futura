@@ -47,9 +47,7 @@ class ForestMap extends BinaryMatrix {
 
         let forestType;
 
-        if (altitude >= this.config.BOREAL_FOREST_MIN_ALTITUDE) {
-            forestType = this.config.FOREST_BOREAL;
-        } else if (groundClass === Biome_Tropic) {
+        if (groundClass === Biome_Tropic) {
             forestType = this.config.FOREST_TROPICAL;
         } else {
             forestType = this.config.FOREST_TEMPERATE;

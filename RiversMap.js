@@ -31,13 +31,18 @@ class RiversMap extends BinaryMatrix {
         let riverSources = _this.getRiverSources(_this.altitudeMap),
             rivers = [],
             allRiversPoints = [],
-            riversLimit = Math.floor(tval(_this.config.RIVERS_DENSITY, 1, riverSources.length));
+            riversLimit = Math.floor(tval(_this.config.RIVERS_DENSITY, 1, riverSources.length)),
+            startCloseness = Math.max(_this.config.RIVER_MIN_LENGTH, this.config.RIVER_START_CLOSENESS);
 
         for (let i = 0; i < riverSources.length; i++) {
 
+            // Start point is too close to the other river -> skip
+            if (i > 0 && startCloseness >= allRiversPoints.getClosestDistanceTo(riverSources[i][0], riverSources[i][1])) {
+                continue;
+            }
+
             let river = [],
-                finished = false,
-                tile;
+                finished = false;
 
             // source = starting point of each river
             river.push(riverSources[i]);
@@ -45,22 +50,24 @@ class RiversMap extends BinaryMatrix {
             // max river length = worldSize
             for (let j = 0; j < _this.config.worldSize; j++) {
 
-                let nextRiverPoint = _this.getRiverDirection(river, _this.altitudeMap, allRiversPoints);
+                let nextRiverPoint = _this.getRiverDirection(river, _this.altitudeMap);
 
                 if (!nextRiverPoint.length) {
                     break;
                 }
 
-                tile = _this.altitudeMap.getTile(nextRiverPoint[0], nextRiverPoint[1]);
+                let x = nextRiverPoint[0],
+                    y = nextRiverPoint[1],
+                    altitude = _this.altitudeMap.getTile(x, y);
 
-                // lake/ocean found. means river ending point found.
-                if (_this.altitudeMap.isWater(tile)) {
+                // lake/ocean or another river found. means river ending point found.
+                if (_this.altitudeMap.isWater(altitude) || arrayHasPoint(allRiversPoints, x, y)) {
 
-                    if (_this.lakesMap.filled(nextRiverPoint[0], nextRiverPoint[1])) {
+                    if (_this.lakesMap.filled(x, y)) {
 
-                        let lakeSize = _this.lakesMap.getLakeSizeFromPoint(nextRiverPoint[0], nextRiverPoint[1]);
+                        let lakeSize = _this.lakesMap.getLakeSizeFromPoint(x, y);
 
-                        // if river is bigger than lake than this is not the final target
+                        // finish only when the lake size is bigger than the river length
                         if (lakeSize > river.length * config.LAKE_TO_RIVER_RATIO) {
                             finished = true;
                             break;
@@ -72,7 +79,9 @@ class RiversMap extends BinaryMatrix {
                     }
                 }
 
-                river.push(nextRiverPoint);
+                if (!finished) {
+                    river.push(nextRiverPoint);
+                }
             }
 
             if (finished && river.length >= _this.config.RIVER_MIN_LENGTH) {
@@ -92,24 +101,13 @@ class RiversMap extends BinaryMatrix {
     };
 
     /**
-     * @param {number} x
-     * @param {number} y
-     * @param {Array} riverPoints
-     * @return {boolean}
-     */
-    isTooCloseToRivers = function(x, y, riverPoints) {
-        return this.config.RIVERS_CLOSENESS >= riverPoints.getClosestDistanceTo(x, y);
-    };
-
-    /**
      * @param {AltitudeMap} altitudeMap
      * @return {Array}
      */
     getRiverSources = function(altitudeMap) {
 
         let _this = this,
-            spawns = [],
-            riverSources = [];
+            spawns = [];
 
         altitudeMap.foreach(function(x, y) {
 
@@ -124,27 +122,17 @@ class RiversMap extends BinaryMatrix {
             }
         });
 
-        spawns = spawns.shuffle();
-
-        for (let i = 0; i < spawns.length; i++) {
-            if (!_this.isTooCloseToRivers(spawns[i][0], spawns[i][1], riverSources)) {
-                riverSources.push(spawns[i]);
-            }
-        }
-
-        return riverSources;
+        return spawns.shuffle();
     };
 
     /**
      * @param {Array} river
      * @param {AltitudeMap} altitudeMap
-     * @param {Array} otherRiverPoints
      * @return {Array}
      */
-    getRiverDirection = function(river, altitudeMap, otherRiverPoints) {
+    getRiverDirection = function(river, altitudeMap) {
 
-        let _this = this,
-            currentPoint = river[river.length - 1],
+        let currentPoint = river[river.length - 1],
             prevPoint = river.length > 1 ? river[river.length - 2] : false,
             cx = currentPoint[0],
             cy = currentPoint[1],
@@ -159,11 +147,6 @@ class RiversMap extends BinaryMatrix {
                 altitude = altitudeMap.getTile(nx, ny);
 
             if (altitude > currentAltitude) {
-                continue;
-            }
-
-            // prevent river being too close to the other river
-            if (_this.isTooCloseToRivers(nx, ny, otherRiverPoints)) {
                 continue;
             }
 

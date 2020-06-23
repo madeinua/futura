@@ -3,7 +3,7 @@ function getConfig() {
     return {
 
         // Global
-        storeData: true,
+        storeData: false,
         worldSize: 300,
         visibleCols: 30,
         worldCanvas: worldCanvas,
@@ -19,7 +19,7 @@ function getConfig() {
         RIVERS_DENSITY: 0.5, // [0-1]
         RIVER_SOURCE_MIN_ALTITUDE: 0.5,
         RIVER_SOURCE_MAX_ALTITUDE: 0.9,
-        RIVERS_CLOSENESS: 3,
+        RIVER_START_CLOSENESS: 6,
         RIVER_MIN_LENGTH: 5,
         RIVER_DELTA_MAX_LENGTH: 0.25, // [0-1] 1 = 100% of length
         LAKE_TO_RIVER_RATIO: 1.3,
@@ -53,7 +53,6 @@ function getConfig() {
 
         FOREST_TROPICAL: 1,
         FOREST_TEMPERATE: 2,
-        FOREST_BOREAL: 3,
 
         BOREAL_FOREST_MIN_ALTITUDE: 0.7,
     };

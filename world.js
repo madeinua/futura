@@ -74,7 +74,7 @@ class World {
     generateAltitudeMap = function() {
 
         let altitudeMap = new AltitudeMap(this.config),
-            storage = localStorage.getItem('altitudeMap');
+            storage = this.config.storeData ? localStorage.getItem('altitudeMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             altitudeMap.fromString(storage);
@@ -103,7 +103,7 @@ class World {
     generateOceanMap = function(altitudeMap) {
 
         let oceanMap = new OceanMap(altitudeMap, this.config),
-            storage = localStorage.getItem('oceanMap');
+            storage = this.config.storeData ? localStorage.getItem('oceanMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             oceanMap.fromString(storage);
@@ -133,7 +133,7 @@ class World {
     generateLakesMap = function(altitudeMap, oceanMap) {
 
         let lakesMap = new LakesMap(altitudeMap, oceanMap, this.config),
-            storage = localStorage.getItem('lakesMap');
+            storage = this.config.storeData ? localStorage.getItem('lakesMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             lakesMap.fromString(storage);
@@ -163,7 +163,7 @@ class World {
     generateRiversMap = function(altitudeMap, lakesMap) {
 
         let riversMap = new RiversMap(altitudeMap, lakesMap, this.config),
-            storage = localStorage.getItem('riversMap');
+            storage = this.config.storeData ? localStorage.getItem('riversMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             riversMap.fromString(storage);
@@ -194,7 +194,7 @@ class World {
     generateHumidityMap = function(altitudeMap, riversMap, lakesMap) {
 
         let humidityMap = new HumidityMap(altitudeMap, riversMap, lakesMap, this.config),
-            storage = localStorage.getItem('humidityMap');
+            storage = this.config.storeData ? localStorage.getItem('humidityMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             humidityMap.fromString(storage);
@@ -223,7 +223,7 @@ class World {
     generateTemperatureMap = function(altitudeMap) {
 
         let temperatureMap = new TemperatureMap(altitudeMap, this.config),
-            storage = localStorage.getItem('temperatureMap');
+            storage = this.config.storeData ? localStorage.getItem('temperatureMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             temperatureMap.fromString(storage);
@@ -289,7 +289,7 @@ class World {
     generateForest = function(altitudeMap, temperatureMap, humidityMap) {
 
         let forestMap = new ForestMap(altitudeMap, temperatureMap, humidityMap, this.config),
-            storage = localStorage.getItem('forestMap');
+            storage = this.config.storeData ? localStorage.getItem('forestMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             forestMap.fromString(storage);
