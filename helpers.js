@@ -81,8 +81,7 @@ Array.prototype.shuffle = function() {
  * @param {number} precision
  * @return {number}
  */
-function round(value, precision)
-{
+function round(value, precision) {
     return parseFloat(value.toFixed(precision));
 }
 
@@ -131,8 +130,27 @@ function normalRandom() {
  * @param {number} max
  * @return {number}
  */
-function tval(value, min, max) {
+function fromFraction(value, min, max) {
     return (value * (max - min)) + min;
+}
+
+/**
+ * Convert middle-best value to highest-best value:
+ * E.g. if the value 0.5 is the best option in between the range [0-1]
+ * then the function will return 1 for 0.5 and 0 for 0/1.
+ *
+ * @param {number} value
+ * @param {number} highestValue
+ * @return {number}
+ */
+function fromMiddleFractionValue(highestValue, value) {
+
+    if (highestValue === 0) {
+        return 0;
+    }
+
+    return Math.max(0, 1 - Math.abs(value - highestValue)
+        / (highestValue === 1 ? 1 : Math.min(highestValue, 1 - highestValue)));
 }
 
 /**
@@ -144,7 +162,7 @@ function tval(value, min, max) {
  * @param {number} maxNew
  * @return {number}
  */
-function rval(value, minOld, maxOld, minNew, maxNew) {
+function changeRange(value, minOld, maxOld, minNew, maxNew) {
     return (((value - minOld) * (maxNew - minNew)) / (maxOld - minOld)) + minNew;
 }
 
@@ -153,7 +171,7 @@ function rval(value, minOld, maxOld, minNew, maxNew) {
  * @param {number} value
  * @return {number}
  */
-function tvalRGB(value) {
+function fractionToRGB(value) {
     return value * 255;
 }
 
@@ -477,7 +495,7 @@ class NumericMatrix extends Matrix {
      * @return {number}
      */
     getGrayscale(x, y) {
-        return tval(this.getTile(x, y), 0, 255);
+        return fromFraction(this.getTile(x, y), 0, 255);
     }
 
     /**
@@ -643,7 +661,7 @@ class NumericMatrix extends Matrix {
             currMax = Math.max(...values);
 
         _this.map(function(x, y) {
-            return rval(
+            return changeRange(
                 _this.getTile(x, y),
                 currMin,
                 currMax,

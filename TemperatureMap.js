@@ -47,7 +47,7 @@ class TemperatureMap extends PointMatrix {
     considerAltitude = function() {
 
         let _this = this,
-            revFactor = tval(_this.config.ALTITUDE_TEMPERATURE_FACTOR, 5, 1);
+            revFactor = fromFraction(_this.config.ALTITUDE_TEMPERATURE_FACTOR, 5, 1);
 
         _this.foreach(function(x, y) {
             _this.addToTile(x, y, _this.altitudeMap.getTile(x, y) / revFactor);

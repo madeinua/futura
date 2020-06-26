@@ -31,7 +31,7 @@ class RiversMap extends BinaryMatrix {
         let riverSources = _this.getRiverSources(_this.altitudeMap),
             rivers = [],
             allRiversPoints = [],
-            riversLimit = Math.floor(tval(_this.config.RIVERS_DENSITY, 1, riverSources.length)),
+            riversLimit = Math.floor(fromFraction(_this.config.RIVERS_DENSITY, 1, riverSources.length)),
             startCloseness = Math.max(_this.config.RIVER_MIN_LENGTH, this.config.RIVER_START_CLOSENESS);
 
         for (let i = 0; i < riverSources.length; i++) {

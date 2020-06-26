@@ -3,7 +3,7 @@ function getConfig() {
     return {
 
         // Global
-        storeData: false,
+        storeData: true,
         worldSize: 300,
         visibleCols: 30,
         worldCanvas: worldCanvas,
