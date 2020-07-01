@@ -86,17 +86,8 @@ function round(value, precision) {
 }
 
 /**
- * Get random value between two float values
- * @param {number} float1
- * @param {number} float2
- * @return {number}
- */
-function randBetweenFloats(float1, float2) {
-    return normalRandom() * (float2 - float1) + float1;
-}
-
-/**
- * Create normal randomization
+ * @TODO Usages?
+ * Create normal randomization (more chance to get 0.5 rather than 0 or 1)
  * @see https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
  * @return {number}
  */
@@ -124,6 +115,33 @@ function normalRandom() {
 }
 
 /**
+ * Get random value between two float values
+ * @param {number} float1
+ * @param {number} float2
+ * @return {number}
+ */
+function randBetweenNumbers(float1, float2) {
+    return Math.random() * (float2 - float1) + float1;
+}
+
+/**
+ * Flip the coin!
+ * True = matched, False = failed :D
+ *
+ * @param {number} chance
+ * @return {boolean}
+ */
+function flipCoin(chance) {
+    return chance === 100
+        ? true
+        : (
+            chance === 0
+                ? 0
+                : chance >= randBetweenNumbers(0, 100)
+        );
+}
+
+/**
  * Convert range [0-1] to another range [min-max]
  * @param {number} value
  * @param {number} min
@@ -139,8 +157,8 @@ function fromFraction(value, min, max) {
  * E.g. if the value 0.5 is the best option in between the range [0-1]
  * then the function will return 1 for 0.5 and 0 for 0/1.
  *
- * @param {number} value
  * @param {number} highestValue
+ * @param {number} value
  * @return {number}
  */
 function fromMiddleFractionValue(highestValue, value) {
@@ -440,63 +458,6 @@ class Matrix {
 
         return arr;
     }
-}
-
-/**
- * Generate matrix of tiles
- * @param {number} width
- * @param {number} height
- * @constructor
- */
-class NumericMatrix extends Matrix {
-
-    /**
-     * @return {string}
-     */
-    toString = function() {
-        return JSON.stringify(
-            this.getAll()
-        );
-    };
-
-    /**
-     * @param {string} string
-     * @return {NumericMatrix}
-     */
-    fromString = function(string) {
-        return this.setAll(
-            JSON.parse(string)
-        );
-    };
-
-    /**
-     * Add value to a current tile value
-     * @param {number} x
-     * @param {number} y
-     * @param {number} value
-     */
-    addToTile(x, y, value) {
-        this.setTile(x, y, this.getTile(x, y) + value);
-    }
-
-    /**
-     * Compare current matrix to the other one
-     * @param {NumericMatrix} matrix
-     * @return {boolean}
-     */
-    equals(matrix) {
-        return this.getAll().toString() === matrix.getAll().toString();
-    }
-
-    /**
-     * Get matrix greyscale level
-     * @param {number} x
-     * @param {number} y
-     * @return {number}
-     */
-    getGrayscale(x, y) {
-        return fromFraction(this.getTile(x, y), 0, 255);
-    }
 
     /**
      * Retrieve tile neighbors
@@ -577,7 +538,7 @@ class NumericMatrix extends Matrix {
      * @param {number} y
      * @param {number} deep
      * @param {function} callback
-     * @return {NumericMatrix}
+     * @return {Matrix}
      */
     foreachNeighbors(x, y, deep, callback) {
 
@@ -588,6 +549,63 @@ class NumericMatrix extends Matrix {
         }
 
         return this;
+    }
+}
+
+/**
+ * Generate matrix of tiles
+ * @param {number} width
+ * @param {number} height
+ * @constructor
+ */
+class NumericMatrix extends Matrix {
+
+    /**
+     * @return {string}
+     */
+    toString = function() {
+        return JSON.stringify(
+            this.getAll()
+        );
+    };
+
+    /**
+     * @param {string} string
+     * @return {NumericMatrix}
+     */
+    fromString = function(string) {
+        return this.setAll(
+            JSON.parse(string)
+        );
+    };
+
+    /**
+     * Add value to a current tile value
+     * @param {number} x
+     * @param {number} y
+     * @param {number} value
+     */
+    addToTile(x, y, value) {
+        this.setTile(x, y, this.getTile(x, y) + value);
+    }
+
+    /**
+     * Compare current matrix to the other one
+     * @param {NumericMatrix} matrix
+     * @return {boolean}
+     */
+    equals(matrix) {
+        return this.getAll().toString() === matrix.getAll().toString();
+    }
+
+    /**
+     * Get matrix greyscale level
+     * @param {number} x
+     * @param {number} y
+     * @return {number}
+     */
+    getGrayscale(x, y) {
+        return fromFraction(this.getTile(x, y), 0, 255);
     }
 
     /**
@@ -714,7 +732,7 @@ class BinaryMatrix extends NumericMatrix {
      * Set tile value
      * @param {number} x
      * @param {number} y
-     * @param {number} value
+     * @param {boolean} value
      * @return {BinaryMatrix}
      */
     setTile(x, y, value) {
@@ -761,13 +779,27 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Applies the callback to the elements of the Matrix
+     * Applies the callback to the filled elements of the Matrix
      * @param {function} callback
      */
     foreachFilled(callback) {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 if (this.filled(x, y)) {
+                    callback(x, y);
+                }
+            }
+        }
+    }
+
+    /**
+     * Applies the callback to the unfilled elements of the Matrix
+     * @param {function} callback
+     */
+    foreachUnfilled(callback) {
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                if (!this.filled(x, y)) {
                     callback(x, y);
                 }
             }

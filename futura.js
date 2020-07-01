@@ -110,7 +110,7 @@ Filters.add('biomes', function(map) {
 });
 
 Filters.add('forestMap', function(map) {
-    drawMap('forestMapCanvas', map, false);
+    drawMap('forestMapCanvas', map, true);
     return map;
 });
 

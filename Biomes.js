@@ -233,8 +233,6 @@ class Biome {
 
     static NAME = '';
 
-    forestType = 0;
-
     /**
      * @param {number} x
      * @param {number} y
@@ -275,17 +273,24 @@ class Biome {
     }
 
     /**
-     * @param {int} forestType
+     * @return {number}
      */
-    setForestType(forestType) {
-        this.forestType = forestType;
+    getHumidity() {
+        return this.humidity;
     }
 
     /**
      * @return {number}
      */
-    getForestType() {
-        return this.forestType;
+    getTemperature() {
+        return this.temperature;
+    }
+
+    /**
+     * @return {number}
+     */
+    getAltitude() {
+        return this.altitude;
     }
 }
 

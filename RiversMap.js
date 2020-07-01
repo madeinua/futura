@@ -170,7 +170,7 @@ class RiversMap extends BinaryMatrix {
     addRiverDeltaToRiverMap = function(river) {
 
         let _this = this,
-            deltaLength = river.length * randBetweenFloats(0, _this.config.RIVER_DELTA_MAX_LENGTH),
+            deltaLength = river.length * randBetweenNumbers(0, _this.config.RIVER_DELTA_MAX_LENGTH),
             notDeltaLength = river.length - deltaLength;
 
         for (let p = 0; p < river.length; p++) {

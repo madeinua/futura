@@ -254,7 +254,7 @@ class World {
      * @param {HumidityMap} humidityMap
      * @return {Matrix}
      */
-    generateBiomes = function (altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap) {
+    generateBiomes = function(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap) {
 
         let biomes = new Matrix(altitudeMap.getWidth(), altitudeMap.getHeight()),
             biomesGenerator = new Biomes(
@@ -281,30 +281,58 @@ class World {
     };
 
     /**
-     * @param {AltitudeMap} altitudeMap
-     * @param {TemperatureMap} temperatureMap
-     * @param {HumidityMap} humidityMap
+     * @param {Matrix} biomes
      * @return {ForestMap}
      */
-    generateForest = function(altitudeMap, temperatureMap, humidityMap) {
+    generateForest = function(biomes) {
 
-        let forestMap = new ForestMap(altitudeMap, temperatureMap, humidityMap, this.config),
+        let _this = this,
+            forestMap = new ForestMap(biomes, this.config),
             storage = this.config.storeData ? localStorage.getItem('forestMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             forestMap.fromString(storage);
         } else {
 
-            forestMap.generateMap();
+            forestMap.init();
 
-            if (this.config.storeData) {
-                localStorage.setItem('forestMap', forestMap.toString());
-            }
+            this.tick(function() {
+
+                forestMap.tickGeneration();
+                forestMap = Filters.apply('forestMap', forestMap);
+
+            }, 30, 100, function() {
+
+                if (_this.config.storeData) {
+                    localStorage.setItem('forestMap', forestMap.toString());
+                }
+
+            });
         }
 
         forestMap = Filters.apply('forestMap', forestMap);
 
         return forestMap;
+    };
+
+    /**
+     * @param {Function} func
+     * @param {number} sleep
+     * @param {number} iterations
+     * @param {Function} finishFunc
+     */
+    tick = function(func, sleep, iterations, finishFunc) {
+        let step = 0,
+            ite = setInterval(function() {
+
+                func();
+
+                if (++step === iterations) {
+                    finishFunc();
+                    clearInterval(ite);
+                }
+
+            }, sleep);
     };
 
     /**
@@ -356,6 +384,8 @@ class World {
 
             //displayPixelObject(objectsMap, x, y);
         });
+
+        let forestMap = _this.generateForest(biomes);
 
         _this.xyCoords = altitudeMap;
         _this.worldImageData = image;

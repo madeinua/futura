@@ -8,7 +8,7 @@ function getConfig() {
         visibleCols: 30,
         worldCanvas: worldCanvas,
         miniMapCanvas: miniMapCanvas,
-        showCoordinates: false,
+        showCoordinates: true,
 
         // Altitude
         ALTITUDE_OCTAVES: [12, 20, 80],
@@ -51,9 +51,19 @@ function getConfig() {
 
         MAX_BEACH_DISTANCE_FROM_OCEAN: 5,
 
+        // Forests
+
         FOREST_TROPICAL: 1,
         FOREST_TEMPERATE: 2,
 
-        BOREAL_FOREST_MIN_ALTITUDE: 0.7,
+        FOREST_BEST_TEMPERATE_HUMIDITY: 0.4,
+        FOREST_BEST_TEMPERATE_TEMPERATURE: 0.4,
+        FOREST_BEST_TEMPERATE_ALTITUDE: 0.4,
+
+        FOREST_BEST_TROPICAL_HUMIDITY: 0.6,
+        FOREST_BEST_TROPICAL_TEMPERATURE: 0.6,
+        FOREST_BEST_TROPICAL_ALTITUDE: 0.3,
+
+        FOREST_DEAD_CHANCE: 0.05
     };
 }
