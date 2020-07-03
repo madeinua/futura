@@ -42,6 +42,9 @@ class World {
             this.setMiniMap(config);
         }
 
+        this.tickHandlers = [];
+        this.tickFinalHandlers = [];
+
         if (config.storeData) {
 
             let worldSize = localStorage.getItem('worldSize'),
@@ -282,9 +285,9 @@ class World {
 
     /**
      * @param {Matrix} biomes
-     * @return {ForestMap}
+     * @return {Array}
      */
-    generateForest = function(biomes) {
+    initForestGeneration = function(biomes) {
 
         let _this = this,
             forestMap = new ForestMap(biomes, this.config),
@@ -292,70 +295,49 @@ class World {
 
         if (typeof storage !== 'undefined' && storage !== null) {
             forestMap.fromString(storage);
+            forestMap = Filters.apply('forestMap', forestMap);
         } else {
 
             forestMap.init();
 
-            this.tick(function() {
-
-                forestMap.tickGeneration();
+            this.tickHandlers.push(function() {
+                forestMap.generate();
                 forestMap = Filters.apply('forestMap', forestMap);
-
-            }, 30, 100, function() {
-
-                if (_this.config.storeData) {
-                    localStorage.setItem('forestMap', forestMap.toString());
-                }
-
             });
-        }
 
-        forestMap = Filters.apply('forestMap', forestMap);
+            if (_this.config.storeData) {
+                this.tickFinalHandlers.push(function() {
+                    localStorage.setItem('forestMap', forestMap.toString());
+                });
+            }
+        }
 
         return forestMap;
     };
 
     /**
-     * @param {Function} func
      * @param {number} sleep
      * @param {number} iterations
-     * @param {Function} finishFunc
      */
-    tick = function(func, sleep, iterations, finishFunc) {
-        let step = 0,
+    tickTimer = function(sleep, iterations) {
+        let _this = this,
+            step = 0,
             ite = setInterval(function() {
 
-                func();
+                for (let i = 0; i < _this.tickHandlers.length; i++) {
+                    _this.tickHandlers[i]();
+                }
 
                 if (++step === iterations) {
-                    finishFunc();
+
+                    for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
+                        _this.tickFinalHandlers[i]();
+                    }
+
                     clearInterval(ite);
                 }
 
             }, sleep);
-    };
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @param {TemperatureMap} temperatureMap
-     * @param {HumidityMap} humidityMap
-     * @return {BinaryMatrix}
-     */
-    generateObjectsMap = function(altitudeMap, temperatureMap, humidityMap) {
-        return new BinaryMatrix(this.config.width, this.config.height);
-    };
-
-    /**
-     * @param {BinaryMatrix} objectMap
-     * @param {number} x
-     * @param {number} y
-     */
-    displayPixelObject = function(objectMap, x, y) {
-
-        let _this = this,
-            ctx = this.miniMapCanvas.getContext('2d');
-
-        //ctx.fillText('F', _this.toWorldMapPoint(x), _this.toWorldMapPoint(y) + 20);
     };
 
     /**
@@ -375,17 +357,16 @@ class World {
             image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize);
 
         altitudeMap.foreach(function(x, y) {
-
             fillCanvasPixel(
                 image.data,
                 (x + y * _this.config.worldSize) * 4,
                 biomes.getTile(x, y).getHexColor()
             );
-
-            //displayPixelObject(objectsMap, x, y);
         });
 
-        let forestMap = _this.generateForest(biomes);
+        _this.initForestGeneration(biomes);
+
+        _this.tickTimer(50, 100);
 
         _this.xyCoords = altitudeMap;
         _this.worldImageData = image;

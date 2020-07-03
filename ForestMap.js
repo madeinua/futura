@@ -174,7 +174,7 @@ class ForestMap extends BinaryMatrix {
         return ((100 - 4 * FA) / K1) * this.config.FOREST_DEAD_CHANCE;
     }
 
-    tickGeneration() {
+    generate() {
 
         let _this = this;
 
