@@ -259,7 +259,7 @@ class World {
      */
     generateBiomes = function(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap) {
 
-        let biomes = new Matrix(altitudeMap.getWidth(), altitudeMap.getHeight()),
+        let biomes = new Matrix(this.config.worldSize, this.config.worldSize),
             biomesGenerator = new Biomes(
                 altitudeMap,
                 oceanMap,
@@ -301,8 +301,12 @@ class World {
             forestMap.init();
 
             this.tickHandlers.push(function() {
-                forestMap.generate();
+
+                let updatedTiles = forestMap.generate();
+
                 forestMap = Filters.apply('forestMap', forestMap);
+
+                return updatedTiles;
             });
 
             if (_this.config.storeData) {
@@ -322,11 +326,19 @@ class World {
     tickTimer = function(sleep, iterations) {
         let _this = this,
             step = 0,
+            updatedTiles = new BinaryMatrix(_this.config.worldSize, _this.config.worldSize),
             ite = setInterval(function() {
 
                 for (let i = 0; i < _this.tickHandlers.length; i++) {
-                    _this.tickHandlers[i]();
+                    updatedTiles.combineWith(
+                        _this.tickHandlers[i]()
+                    );
                 }
+
+                // @TODO update map with updated tiles
+
+
+                updatedTiles.setAll(false);
 
                 if (++step === iterations) {
 
@@ -353,22 +365,20 @@ class World {
             humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
             temperatureMap = _this.generateTemperatureMap(altitudeMap),
             biomes = _this.generateBiomes(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
+            mainMap = new Matrix(_this.config.worldSize, _this.config.worldSize),
             ctx = _this.renderCanvas.getContext('2d'),
             image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize);
 
-        altitudeMap.foreach(function(x, y) {
-            fillCanvasPixel(
+        _this.initForestGeneration(biomes);
+
+        mainMap.foreach(function(x, y) {
+            mainMap.setTile(x, y, fillCanvasPixel(
                 image.data,
                 (x + y * _this.config.worldSize) * 4,
                 biomes.getTile(x, y).getHexColor()
-            );
+            ));
         });
 
-        _this.initForestGeneration(biomes);
-
-        _this.tickTimer(50, 100);
-
-        _this.xyCoords = altitudeMap;
         _this.worldImageData = image;
 
         if (this.logs) {
@@ -481,6 +491,7 @@ class World {
         this.drawMiniMap();
         this.drawWorld();
         this.drawRectangles();
+        this.tickTimer(50, 50);
 
         this.logs = false;
     };

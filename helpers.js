@@ -131,7 +131,7 @@ function randBetweenNumbers(float1, float2) {
  * @param {number} chance
  * @return {boolean}
  */
-function flipCoin(chance) {
+function iAmLucky(chance) {
     return chance === 100
         ? true
         : (
@@ -426,7 +426,7 @@ class Matrix {
 
     /**
      * Set all tiles of matrix
-     * @param {Array} values
+     * @param {boolean|number|Array} values
      * @return {Matrix}
      */
     setAll(values) {
@@ -725,7 +725,7 @@ class BinaryMatrix extends NumericMatrix {
      */
     constructor(width, height) {
         super(width, height);
-        this.map(0);
+        this.map(false);
     }
 
     /**
@@ -844,20 +844,15 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Merge with the other binary matrix
+     * Apply binary "OR" between two binary matrix
      * @param {BinaryMatrix} matrix
      */
-    mergeWith(matrix) {
-
-        if (!(matrix instanceof BinaryMatrix)) {
-            return;
+    combineWith(matrix) {
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                this.__values[x][y] |= matrix.__values[x][y];
+            }
         }
-
-        let _this = this;
-
-        _this.foreachFilled(function(x, y) {
-            _this.fill(x, y);
-        });
     }
 
     /**

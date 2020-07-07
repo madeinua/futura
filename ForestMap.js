@@ -174,9 +174,13 @@ class ForestMap extends BinaryMatrix {
         return ((100 - 4 * FA) / K1) * this.config.FOREST_DEAD_CHANCE;
     }
 
+    /**
+     * @return {BinaryMatrix}
+     */
     generate() {
 
-        let _this = this;
+        let _this = this,
+            updatedTiles = new BinaryMatrix(_this.getWidth(), _this.getHeight());
 
         _this.foreachFilled(function(x, y) {
 
@@ -184,7 +188,10 @@ class ForestMap extends BinaryMatrix {
                 _this.biomes.getTile(x, y)
             );
 
-            _this.setTile(x, y, !flipCoin(deadChance));
+            if (iAmLucky(deadChance)) {
+                _this.setTile(x, y, false);
+                updatedTiles.setTile(x, y, true);
+            }
         });
 
         _this.foreachUnfilled(function(x, y) {
@@ -193,7 +200,12 @@ class ForestMap extends BinaryMatrix {
                 _this.biomes.getTile(x, y)
             );
 
-            _this.setTile(x, y, flipCoin(createChance));
+            if (iAmLucky(createChance)) {
+                _this.setTile(x, y, true);
+                updatedTiles.setTile(x, y, true);
+            }
         });
+
+        return updatedTiles;
     }
 }
