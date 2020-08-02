@@ -110,23 +110,23 @@ class ForestMap extends BinaryMatrix {
     getCreateChanceByGround(groundName) {
         switch(groundName) {
             case 'tundra':
-                return 0.3;
+                return this.config.FOREST_TUNDRA_GROWTH;
             case 'tundra-hills':
-                return 0.2;
+                return this.config.FOREST_TUNDRA_HILLS_GROWTH;
             case 'grass':
-                return 0.8;
+                return this.config.FOREST_GRASS_GROWTH;
             case 'grass-hills':
-                return 1;
+                return this.config.FOREST_GRASS_HILLS_GROWTH;
             case 'swamp':
-                return 0.2;
+                return this.config.FOREST_SWAMP_GROWTH;
             case 'rocks':
-                return 0.2;
+                return this.config.FOREST_ROCKS_GROWTH;
             case 'savanna':
-                return 0.3;
+                return this.config.FOREST_SAVANNA_GROWTH;
             case 'savanna-hills':
-                return 0.2;
+                return this.config.FOREST_SAVANNA_HILLS_GROWTH;
             case 'tropic':
-                return 1;
+                return this.config.FOREST_TROPICS_GROWTH;
         }
 
         return 0;
@@ -139,15 +139,20 @@ class ForestMap extends BinaryMatrix {
     getCreateChance(biome) {
 
         let _this = this,
-            K1 = _this.getCreateChanceByGround(biome.getName());
+            GT = _this.getCreateChanceByGround(
+                biome.getName()
+            );
 
-        if (K1 === 0) {
+        if (GT === 0) {
             return 0;
         }
 
-        let FA = _this.sumNeighbors(biome.x, biome.y, 2),
+        let NBR = _this.sumNeighbors(biome.x, biome.y, 2),
             forestType = _this.getForestType(biome),
-            IH, IT, IA;
+            IH, IT, IA,
+            K = _this.config.FOREST_GROWTH_SPEED,
+            BC = _this.config.FOREST_BORN_CHANCE,
+            GC = _this.config.FOREST_GROWTH_CHANCE;
 
         if (forestType === _this.config.FOREST_TEMPERATE) {
             IH = _this.ihTemperateMap.getTile(biome.x, biome.y);
@@ -159,7 +164,17 @@ class ForestMap extends BinaryMatrix {
             IA = _this.iaTropicalMap.getTile(biome.x, biome.y);
         }
 
-        return 2 * (1 + 5 * FA) * IH * IT * IA * K1;
+        /**
+         * K = growth speed coefficient
+         * GT = ground type coefficient
+         * BC = born chance (if no other forest-based tiles around)
+         * GC = growth chance (if there are forest-based tiles around)
+         * NBR = number of neighbours forests (filled tiles)
+         * IH = coefficient of humidity
+         * IT = coefficient of temperature
+         * IA = coefficient of altitude
+         */
+        return K * GT * (BC + GC * NBR) * (IH + IT + IA);
     }
 
     /**
@@ -168,10 +183,20 @@ class ForestMap extends BinaryMatrix {
      */
     getDeadChance(biome) {
 
-        let FA = this.sumNeighbors(biome.x, biome.y, 2),
-            K1 = this.getForestType(biome) === this.config.FOREST_TEMPERATE ? 1 : 3;
+        let NBR = this.sumNeighbors(biome.x, biome.y, 2),
+            DC = this.config.FOREST_DEAD_CHANCE,
+            GC = this.config.FOREST_GROWTH_CHANCE,
+            GT = this.getCreateChanceByGround(
+                biome.getName()
+            );
 
-        return ((100 - 4 * FA) / K1) * this.config.FOREST_DEAD_CHANCE;
+        /**
+         * GC = growth chance (if there are forest-based tiles around)
+         * NBR = number of neighbour forests (forest-filled tiles)
+         * GT = ground type coefficient
+         * DC = dead chance
+         */
+        return (100 + GT - GC * NBR) * DC;
     }
 
     /**

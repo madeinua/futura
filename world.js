@@ -293,7 +293,7 @@ class World {
             forestMap = new ForestMap(biomes, this.config),
             storage = this.config.storeData ? localStorage.getItem('forestMap') : null;
 
-        if (typeof storage !== 'undefined' && storage !== null) {
+        if (false && typeof storage !== 'undefined' && storage !== null) { // @TODO
             forestMap.fromString(storage);
             forestMap = Filters.apply('forestMap', forestMap);
         } else {
@@ -304,9 +304,29 @@ class World {
 
                 let updatedTiles = forestMap.generate();
 
+                // @TODO Draw forest
+
+                let ctx = _this.miniMapCanvas.getContext('2d'),
+                    image = _this.worldImageData,
+                    color = hexToRgb('#FFFF00');
+
+                updatedTiles.foreachFilled(function (x, y) {
+
+                    let point = (x + y * _this.miniMapCanvas.width) * 4;
+
+                    image.data[point] = color[0];
+                    image.data[point + 1] = color[1];
+                    image.data[point + 2] = color[2];
+                    image.data[point + 3] = 255; // Alpha
+
+                });
+
+                ctx.putImageData(image, 0, 0);
+
+
                 forestMap = Filters.apply('forestMap', forestMap);
 
-                return updatedTiles;
+                //return updatedTiles;
             });
 
             if (_this.config.storeData) {
@@ -326,19 +346,23 @@ class World {
     tickTimer = function(sleep, iterations) {
         let _this = this,
             step = 0,
-            updatedTiles = new BinaryMatrix(_this.config.worldSize, _this.config.worldSize),
+            //updatedTiles = new BinaryMatrix(_this.config.worldSize, _this.config.worldSize),
             ite = setInterval(function() {
 
                 for (let i = 0; i < _this.tickHandlers.length; i++) {
-                    updatedTiles.combineWith(
+
+                    /*updatedTiles.combineWith(
                         _this.tickHandlers[i]()
                     );
+                     */
+
+                    _this.tickHandlers[i]();
                 }
 
                 // @TODO update map with updated tiles
 
 
-                updatedTiles.setAll(false);
+                //updatedTiles.setAll(false);
 
                 if (++step === iterations) {
 
@@ -382,7 +406,7 @@ class World {
         _this.worldImageData = image;
 
         if (this.logs) {
-            logTimeEvent('World filled');
+            logTimeEvent('World generated');
         }
     };
 
@@ -491,7 +515,7 @@ class World {
         this.drawMiniMap();
         this.drawWorld();
         this.drawRectangles();
-        this.tickTimer(50, 50);
+        this.tickTimer(50, 200);
 
         this.logs = false;
     };
