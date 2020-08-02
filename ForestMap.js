@@ -169,7 +169,7 @@ class ForestMap extends BinaryMatrix {
          * GT = ground type coefficient
          * BC = born chance (if no other forest-based tiles around)
          * GC = growth chance (if there are forest-based tiles around)
-         * NBR = number of neighbours forests (filled tiles)
+         * NBR = number of neighbors forests (filled tiles)
          * IH = coefficient of humidity
          * IT = coefficient of temperature
          * IA = coefficient of altitude
@@ -183,29 +183,26 @@ class ForestMap extends BinaryMatrix {
      */
     getDeadChance(biome) {
 
-        let NBR = this.sumNeighbors(biome.x, biome.y, 2),
-            DC = this.config.FOREST_DEAD_CHANCE,
-            GC = this.config.FOREST_GROWTH_CHANCE,
-            GT = this.getCreateChanceByGround(
-                biome.getName()
-            );
+        let NBR = this.sumNeighbors(biome.x, biome.y, 2);
+
+        // if no neighbor forest
+        if (NBR === 0 || NBR > 5) {
+            return 0;
+        }
+
+        let DC = this.config.FOREST_DEAD_CHANCE,
+            GC = this.config.FOREST_GROWTH_CHANCE;
 
         /**
          * GC = growth chance (if there are forest-based tiles around)
-         * NBR = number of neighbour forests (forest-filled tiles)
-         * GT = ground type coefficient
          * DC = dead chance
          */
-        return (100 + GT - GC * NBR) * DC;
+        return (100 - GC) * DC;
     }
 
-    /**
-     * @return {BinaryMatrix}
-     */
     generate() {
 
-        let _this = this,
-            updatedTiles = new BinaryMatrix(_this.getWidth(), _this.getHeight());
+        let _this = this;
 
         _this.foreachFilled(function(x, y) {
 
@@ -215,7 +212,6 @@ class ForestMap extends BinaryMatrix {
 
             if (iAmLucky(deadChance)) {
                 _this.setTile(x, y, false);
-                updatedTiles.setTile(x, y, true);
             }
         });
 
@@ -227,10 +223,7 @@ class ForestMap extends BinaryMatrix {
 
             if (iAmLucky(createChance)) {
                 _this.setTile(x, y, true);
-                updatedTiles.setTile(x, y, true);
             }
         });
-
-        return updatedTiles;
     }
 }

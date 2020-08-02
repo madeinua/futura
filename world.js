@@ -302,27 +302,39 @@ class World {
 
             this.tickHandlers.push(function() {
 
-                let updatedTiles = forestMap.generate();
+                forestMap.generate();
 
                 // @TODO Draw forest
 
                 let ctx = _this.miniMapCanvas.getContext('2d'),
-                    image = _this.worldImageData,
-                    color = hexToRgb('#FFFF00');
+                    color = hexToRgb('#FFFF00'),
+                    image;
 
-                updatedTiles.foreachFilled(function (x, y) {
+
+                // @TODO Rework this
+                if (typeof _this.worldImageDataOriginal === 'undefined') {
+
+                    _this.worldImageDataOriginal = new ImageData(
+                        new Uint8ClampedArray(_this.worldImageData.data),
+                        _this.worldImageData.width,
+                        _this.worldImageData.height
+                    );
+                }
+
+                image = new ImageData(
+                        new Uint8ClampedArray(_this.worldImageData.data),
+                        _this.worldImageData.width,
+                        _this.worldImageData.height
+                    );
+
+                forestMap.foreachFilled(function(x, y) {
 
                     let point = (x + y * _this.miniMapCanvas.width) * 4;
 
-                    image.data[point] = color[0];
-                    image.data[point + 1] = color[1];
-                    image.data[point + 2] = color[2];
-                    image.data[point + 3] = 255; // Alpha
-
+                    fillCanvasPixel(image, point, color);
                 });
 
                 ctx.putImageData(image, 0, 0);
-
 
                 forestMap = Filters.apply('forestMap', forestMap);
 
@@ -397,7 +409,7 @@ class World {
 
         mainMap.foreach(function(x, y) {
             mainMap.setTile(x, y, fillCanvasPixel(
-                image.data,
+                image,
                 (x + y * _this.config.worldSize) * 4,
                 biomes.getTile(x, y).getHexColor()
             ));
@@ -515,7 +527,7 @@ class World {
         this.drawMiniMap();
         this.drawWorld();
         this.drawRectangles();
-        this.tickTimer(50, 200);
+        this.tickTimer(50, 50);
 
         this.logs = false;
     };

@@ -30,10 +30,7 @@ function drawColorMap(id, map) {
             let point = (x + y * canvas.width) * 4,
                 color = map.getTile(x, y).getHexColor();
 
-            image.data[point] = color[0];
-            image.data[point + 1] = color[1];
-            image.data[point + 2] = color[2];
-            image.data[point + 3] = 255; // Alpha
+            fillCanvasPixel(image, point, color);
         }
     }
 
@@ -60,10 +57,7 @@ function drawMap(id, map, reverse) {
         let point = (x + y * canvas.width) * 4,
             gray = reverse ? 255 - map.getGrayscale(x, y) : map.getGrayscale(x, y);
 
-        image.data[point] = gray;
-        image.data[point + 1] = gray;
-        image.data[point + 2] = gray;
-        image.data[point + 3] = 255; // Alpha
+        fillCanvasPixel(image, point, [gray, gray, gray]);
     });
 
     ctx.putImageData(image, 0, 0);

@@ -477,7 +477,7 @@ class Matrix {
         }
 
         let _this = this,
-            _getNeighbours = function(x1, y1, deep1) {
+            _getNeighbors = function(x1, y1, deep1) {
 
                 let points;
 
@@ -497,7 +497,7 @@ class Matrix {
 
                 let w = _this.getWidth(),
                     h = _this.getHeight(),
-                    neighbours = [];
+                    neighbors = [];
 
                 for (let i = 0; i < points.length; i++) {
 
@@ -511,25 +511,25 @@ class Matrix {
                         && ny < h
                         && !(nx === x && ny === y)
                     ) {
-                        neighbours.push([nx, ny]);
+                        neighbors.push([nx, ny]);
                     }
                 }
 
                 if (deep1 > 2) {
 
-                    let len = neighbours.length;
+                    let len = neighbors.length;
 
                     for (let j = 0; j < len; j++) {
-                        neighbours = neighbours.concat(
-                            _getNeighbours(neighbours[j][0], neighbours[j][1], deep1 - 2)
+                        neighbors = neighbors.concat(
+                            _getNeighbors(neighbors[j][0], neighbors[j][1], deep1 - 2)
                         );
                     }
                 }
 
-                return neighbours.unique();
+                return neighbors.unique();
             };
 
-        return _getNeighbours(x, y, deep);
+        return _getNeighbors(x, y, deep);
     }
 
     /**
@@ -932,15 +932,15 @@ function createNoiseMap(size, power) {
 }
 
 /**
- * @param {Uint8ClampedArray} data
+ * @param {ImageData} image
  * @param {number} point
  * @param {Array} RGB
  */
-function fillCanvasPixel(data, point, RGB) {
-    data[point] = RGB[0];
-    data[point + 1] = RGB[1];
-    data[point + 2] = RGB[2];
-    data[point + 3] = 255; // Alpha
+function fillCanvasPixel(image, point, RGB) {
+    image.data[point] = RGB[0];
+    image.data[point + 1] = RGB[1];
+    image.data[point + 2] = RGB[2];
+    image.data[point + 3] = 255; // Alpha
 }
 
 /**
