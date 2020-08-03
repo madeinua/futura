@@ -25,6 +25,7 @@ class World {
         this.config = config;
         this.logs = true;
 
+        this.layers = [];
         this.worldCanvas = config.worldCanvas;
         this.worldCanvas.width = this.worldCanvas.offsetWidth;
         this.worldCanvas.height = this.worldCanvas.offsetHeight;
@@ -33,10 +34,6 @@ class World {
 
         this.cameraPosX = config.cameraPosX;
         this.cameraPosY = config.cameraPosY;
-
-        this.renderCanvas = document.createElement('canvas');
-        this.renderCanvas.width = config.worldSize;
-        this.renderCanvas.height = config.worldSize;
 
         if (typeof config.miniMapCanvas !== 'undefined') {
             this.setMiniMap(config);
@@ -70,6 +67,26 @@ class World {
         this.miniMapCanvas.width = config.worldSize;
         this.miniMapCanvas.height = config.worldSize;
     };
+
+    /**
+     * @param {number} level
+     * @return {Layer}
+     */
+    getLayer = function(level) {
+
+        if (typeof this.layers[level] === 'undefined') {
+            this.layers[level] = new Layer(this.config.worldSize, this.config.worldSize);
+        }
+
+        return this.layers[level];
+    };
+
+    /**
+     * @return {number}
+     */
+    getLayersCount = function() {
+        return this.layers.length;
+    }
 
     /**
      * @return {AltitudeMap}
@@ -290,55 +307,33 @@ class World {
     initForestGeneration = function(biomes) {
 
         let _this = this,
-            forestMap = new ForestMap(biomes, this.config),
-            storage = this.config.storeData ? localStorage.getItem('forestMap') : null;
+            forestMap = new ForestMap(biomes, _this.config),
+            storage = _this.config.storeData ? localStorage.getItem('forestMap') : null,
+            forestLayer = _this.getLayer(1),
+            colors = ['#2a6410', '#3c6219', '#3c5626'];
 
-        if (false && typeof storage !== 'undefined' && storage !== null) { // @TODO
+        // @TODO
+        if (false && typeof storage !== 'undefined' && storage !== null) {
             forestMap.fromString(storage);
             forestMap = Filters.apply('forestMap', forestMap);
         } else {
 
             forestMap.init();
 
-            this.tickHandlers.push(function() {
+            _this.tickHandlers.push(function() {
 
                 forestMap.generate();
 
-                // @TODO Draw forest
-
-                let ctx = _this.miniMapCanvas.getContext('2d'),
-                    color = hexToRgb('#FFFF00'),
-                    image;
-
-
-                // @TODO Rework this
-                if (typeof _this.worldImageDataOriginal === 'undefined') {
-
-                    _this.worldImageDataOriginal = new ImageData(
-                        new Uint8ClampedArray(_this.worldImageData.data),
-                        _this.worldImageData.width,
-                        _this.worldImageData.height
+                forestMap.foreach(function(x, y) {
+                    forestLayer.setTile(
+                        x, y,
+                        forestMap.filled(x, y)
+                            ? hexToRgb(colors.randomElement())
+                            : null
                     );
-                }
-
-                image = new ImageData(
-                        new Uint8ClampedArray(_this.worldImageData.data),
-                        _this.worldImageData.width,
-                        _this.worldImageData.height
-                    );
-
-                forestMap.foreachFilled(function(x, y) {
-
-                    let point = (x + y * _this.miniMapCanvas.width) * 4;
-
-                    fillCanvasPixel(image, point, color);
                 });
 
-                ctx.putImageData(image, 0, 0);
-
                 forestMap = Filters.apply('forestMap', forestMap);
-
-                //return updatedTiles;
             });
 
             if (_this.config.storeData) {
@@ -354,27 +349,16 @@ class World {
     /**
      * @param {number} sleep
      * @param {number} iterations
+     * @param {CallableFunction} callback
      */
-    tickTimer = function(sleep, iterations) {
+    tickTimer = function(sleep, iterations, callback) {
         let _this = this,
             step = 0,
-            //updatedTiles = new BinaryMatrix(_this.config.worldSize, _this.config.worldSize),
             ite = setInterval(function() {
 
                 for (let i = 0; i < _this.tickHandlers.length; i++) {
-
-                    /*updatedTiles.combineWith(
-                        _this.tickHandlers[i]()
-                    );
-                     */
-
                     _this.tickHandlers[i]();
                 }
-
-                // @TODO update map with updated tiles
-
-
-                //updatedTiles.setAll(false);
 
                 if (++step === iterations) {
 
@@ -384,6 +368,8 @@ class World {
 
                     clearInterval(ite);
                 }
+
+                callback();
 
             }, sleep);
     };
@@ -401,21 +387,16 @@ class World {
             humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
             temperatureMap = _this.generateTemperatureMap(altitudeMap),
             biomes = _this.generateBiomes(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
-            mainMap = new Matrix(_this.config.worldSize, _this.config.worldSize),
-            ctx = _this.renderCanvas.getContext('2d'),
-            image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize);
+            mainLayer = _this.getLayer(0);
 
-        _this.initForestGeneration(biomes);
-
-        mainMap.foreach(function(x, y) {
-            mainMap.setTile(x, y, fillCanvasPixel(
-                image,
-                (x + y * _this.config.worldSize) * 4,
+        biomes.foreach(function(x, y) {
+            mainLayer.setTile(
+                x, y,
                 biomes.getTile(x, y).getHexColor()
-            ));
+            );
         });
 
-        _this.worldImageData = image;
+        _this.initForestGeneration(biomes);
 
         if (this.logs) {
             logTimeEvent('World generated');
@@ -442,50 +423,34 @@ class World {
 
     drawMiniMap = function() {
 
-        let _this = this;
+        let _this = this,
+            ctx = _this.miniMapCanvas.getContext('2d'),
+            image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize);
 
-        if (_this.miniMapCanvas && _this.worldImageData) {
+        let mainLayer = _this.getLayer(0);
 
-            let ctx = _this.miniMapCanvas.getContext('2d');
-
-            ctx.putImageData(_this.worldImageData, 0, 0);
-
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(
-                _this.cameraPosX,
-                _this.cameraPosY,
-                _this.config.visibleCols,
-                _this.config.visibleCols
+        mainLayer.foreach(function(x, y) {
+            fillCanvasPixel(
+                image,
+                (x + y * _this.config.worldSize) * 4,
+                mainLayer.getTile(x, y)
             );
-        }
-    };
+        });
 
-    drawWorld = function() {
+        ctx.imageSmoothingEnabled = false;
+        ctx.putImageData(image, 0, 0);
 
-        let _this = this;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(
+            this.cameraPosX,
+            this.cameraPosY,
+            this.config.visibleCols,
+            this.config.visibleCols
+        );
 
-        if (_this.worldImageData) {
-
-            let ctx = _this.worldCanvas.getContext('2d');
-
-            ctx.imageSmoothingEnabled = false;
-            ctx.putImageData(_this.worldImageData, 0, 0);
-
-            let imageData = ctx.getImageData(
-                _this.cameraPosX,
-                _this.cameraPosY,
-                _this.config.visibleCols,
-                _this.config.visibleCols
-            );
-
-            let scaledData = scaleImageData(ctx, imageData, _this.cellSize);
-
-            ctx.putImageData(scaledData, 0, 0);
-
-            if (this.logs) {
-                logTimeEvent('World drawn');
-            }
+        if (this.logs) {
+            logTimeEvent('Mini map drawn');
         }
     };
 
@@ -521,20 +486,94 @@ class World {
         }
     };
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @return {boolean}
+     */
+    isTileVisible = function(x, y) {
+        return x >= this.cameraPosX
+            && x <= this.cameraPosX + this.config.visibleCols
+            && y >= this.cameraPosY
+            && y <= this.cameraPosY + this.config.visibleCols;
+    };
+
+    redrawWorld = function() {
+
+        let _this = this,
+            renderCanvas = document.createElement('canvas');
+
+        renderCanvas.width = _this.config.worldSize;
+        renderCanvas.height = _this.config.worldSize;
+
+        let renderCtx = renderCanvas.getContext('2d'),
+            ctx = _this.worldCanvas.getContext('2d'),
+            image = renderCtx.createImageData(_this.config.worldSize, _this.config.worldSize),
+            layer,
+            tile;
+
+        for (let ln = 0; ln < _this.getLayersCount(); ln++) {
+
+            layer = _this.getLayer(ln);
+
+            layer.foreach(function(x, y) {
+
+                if (!_this.isTileVisible(x, y)) {
+                    return;
+                }
+
+                tile = layer.getTile(x, y);
+
+                if (!tile) {
+                    return;
+                }
+
+                fillCanvasPixel(
+                    image,
+                    (x + y * _this.config.worldSize) * 4,
+                    tile
+                );
+            });
+        }
+
+        renderCtx.putImageData(image, 0, 0);
+
+        let imageData = renderCtx.getImageData(
+            _this.cameraPosX,
+            _this.cameraPosY,
+            _this.config.visibleCols,
+            _this.config.visibleCols
+        );
+
+        let scaledData = scaleImageData(ctx, imageData, _this.cellSize);
+
+        ctx.putImageData(scaledData, 0, 0);
+
+        if (_this.logs) {
+            logTimeEvent('World drawn');
+        }
+
+        if (_this.miniMapCanvas) {
+            _this.drawMiniMap();
+        }
+
+        _this.drawRectangles();
+    };
+
     create = function() {
 
-        this.generateWorld();
-        this.drawMiniMap();
-        this.drawWorld();
-        this.drawRectangles();
-        this.tickTimer(50, 50);
+        let _this = this;
 
-        this.logs = false;
+        _this.generateWorld();
+
+        _this.tickTimer(50, 50, function() {
+            _this.update();
+        });
+
+        _this.logs = false;
     };
 
     update = function() {
-        this.drawMiniMap();
-        this.drawWorld();
-        this.drawRectangles();
+        this.redrawWorld();
     };
 }

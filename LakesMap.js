@@ -43,7 +43,7 @@ class LakesMap extends BinaryMatrix {
      * @param {number} startY
      * @return {number}
      */
-    getLakeSizeFromPoint = function (startX, startY) {
+    getLakeSizeFromPoint = function(startX, startY) {
 
         let _this = this;
 
