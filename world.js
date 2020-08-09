@@ -301,6 +301,24 @@ class World {
     };
 
     /**
+     * @param {ForestMap} forestMap
+     */
+    addForestMapToLayer = function (forestMap)
+    {
+        let forestLayer = this.getLayer(1),
+            colors = ['#2a6410', '#3c6219', '#3c5626'];
+
+        forestMap.foreach(function(x, y) {
+            forestLayer.setTile(
+                x, y,
+                forestMap.filled(x, y)
+                    ? hexToRgb(colors.randomElement())
+                    : null
+            );
+        });
+    };
+
+    /**
      * @param {Matrix} biomes
      * @return {Array}
      */
@@ -308,13 +326,11 @@ class World {
 
         let _this = this,
             forestMap = new ForestMap(biomes, _this.config),
-            storage = _this.config.storeData ? localStorage.getItem('forestMap') : null,
-            forestLayer = _this.getLayer(1),
-            colors = ['#2a6410', '#3c6219', '#3c5626'];
+            storage = _this.config.storeData ? localStorage.getItem('forestMap') : null;
 
-        // @TODO
-        if (false && typeof storage !== 'undefined' && storage !== null) {
+        if (typeof storage !== 'undefined' && storage !== null) {
             forestMap.fromString(storage);
+            _this.addForestMapToLayer(forestMap);
             forestMap = Filters.apply('forestMap', forestMap);
         } else {
 
@@ -324,14 +340,7 @@ class World {
 
                 forestMap.generate();
 
-                forestMap.foreach(function(x, y) {
-                    forestLayer.setTile(
-                        x, y,
-                        forestMap.filled(x, y)
-                            ? hexToRgb(colors.randomElement())
-                            : null
-                    );
-                });
+                _this.addForestMapToLayer(forestMap);
 
                 forestMap = Filters.apply('forestMap', forestMap);
             });
@@ -352,6 +361,11 @@ class World {
      * @param {CallableFunction} callback
      */
     tickTimer = function(sleep, iterations, callback) {
+
+        if (this.logs) {
+            logTimeEvent('Start ticks.');
+        }
+
         let _this = this,
             step = 0,
             ite = setInterval(function() {
@@ -364,6 +378,10 @@ class World {
 
                     for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
                         _this.tickFinalHandlers[i]();
+                    }
+
+                    if (_this.logs) {
+                        logTimeEvent('Ticks ended.');
                     }
 
                     clearInterval(ite);
@@ -425,17 +443,29 @@ class World {
 
         let _this = this,
             ctx = _this.miniMapCanvas.getContext('2d'),
-            image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize);
+            image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
+            layer,
+            tile;
 
-        let mainLayer = _this.getLayer(0);
+        for (let ln = 0; ln < _this.getLayersCount(); ln++) {
 
-        mainLayer.foreach(function(x, y) {
-            fillCanvasPixel(
-                image,
-                (x + y * _this.config.worldSize) * 4,
-                mainLayer.getTile(x, y)
-            );
-        });
+            layer = _this.getLayer(ln);
+
+            layer.foreach(function(x, y) {
+
+                tile = layer.getTile(x, y);
+
+                if (!tile) {
+                    return;
+                }
+
+                fillCanvasPixel(
+                    image,
+                    (x + y * _this.config.worldSize) * 4,
+                    tile
+                );
+            });
+        }
 
         ctx.imageSmoothingEnabled = false;
         ctx.putImageData(image, 0, 0);
@@ -448,10 +478,6 @@ class World {
             this.config.visibleCols,
             this.config.visibleCols
         );
-
-        if (this.logs) {
-            logTimeEvent('Mini map drawn');
-        }
     };
 
     drawRectangles = function() {
@@ -479,10 +505,6 @@ class World {
                     ctx.fillText((_this.cameraPosY + y).toString(), x * _this.cellSize + 2, y * _this.cellSize + 21);
                 }
             }
-        }
-
-        if (this.logs) {
-            logTimeEvent('Rectangles added');
         }
     };
 
@@ -549,10 +571,6 @@ class World {
 
         ctx.putImageData(scaledData, 0, 0);
 
-        if (_this.logs) {
-            logTimeEvent('World drawn');
-        }
-
         if (_this.miniMapCanvas) {
             _this.drawMiniMap();
         }
@@ -569,8 +587,6 @@ class World {
         _this.tickTimer(50, 50, function() {
             _this.update();
         });
-
-        _this.logs = false;
     };
 
     update = function() {
