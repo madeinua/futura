@@ -3,12 +3,14 @@ function getConfig() {
     return {
 
         // Global
-        storeData: true,
+        storeData: false,
         worldSize: 300,
         visibleCols: 30,
         worldCanvas: worldCanvas,
         miniMapCanvas: miniMapCanvas,
         showCoordinates: true,
+        tickInterval: 50,
+        ticksCount: 50,
 
         // Altitude
         ALTITUDE_OCTAVES: [12, 20, 80],

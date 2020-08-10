@@ -303,9 +303,9 @@ class World {
     /**
      * @param {ForestMap} forestMap
      */
-    addForestMapToLayer = function (forestMap)
-    {
-        let forestLayer = this.getLayer(1),
+    addForestMapToLayer = function(forestMap) {
+
+        let forestLayer = this.getLayer(LAYER_FOREST),
             colors = ['#2a6410', '#3c6219', '#3c5626'];
 
         forestMap.foreach(function(x, y) {
@@ -356,11 +356,9 @@ class World {
     };
 
     /**
-     * @param {number} sleep
-     * @param {number} iterations
      * @param {CallableFunction} callback
      */
-    tickTimer = function(sleep, iterations, callback) {
+    tickTimer = function(callback) {
 
         if (this.logs) {
             logTimeEvent('Start ticks.');
@@ -374,7 +372,7 @@ class World {
                     _this.tickHandlers[i]();
                 }
 
-                if (++step === iterations) {
+                if (++step === _this.config.ticksCount) {
 
                     for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
                         _this.tickFinalHandlers[i]();
@@ -389,7 +387,7 @@ class World {
 
                 callback();
 
-            }, sleep);
+            }, _this.config.tickInterval);
     };
 
     /**
@@ -405,7 +403,7 @@ class World {
             humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
             temperatureMap = _this.generateTemperatureMap(altitudeMap),
             biomes = _this.generateBiomes(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
-            mainLayer = _this.getLayer(0);
+            mainLayer = _this.getLayer(LAYER_BIOMES);
 
         biomes.foreach(function(x, y) {
             mainLayer.setTile(
@@ -584,7 +582,7 @@ class World {
 
         _this.generateWorld();
 
-        _this.tickTimer(50, 50, function() {
+        _this.tickTimer(function() {
             _this.update();
         });
     };

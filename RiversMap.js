@@ -95,6 +95,7 @@ class RiversMap extends BinaryMatrix {
             }
         }
 
+        _this.addRiverDeltaToRiversMaps(rivers);
         _this.createRiverMapFromRiversPoints(rivers);
 
         return _this;
@@ -165,23 +166,40 @@ class RiversMap extends BinaryMatrix {
     /**
      * Add river delta
      * @param {Array} river
-     * @return {RiversMap}
+     * @return {Array}
      */
     addRiverDeltaToRiverMap = function(river) {
 
         let _this = this,
-            deltaLength = river.length * randBetweenNumbers(0, _this.config.RIVER_DELTA_MAX_LENGTH),
-            notDeltaLength = river.length - deltaLength;
+            ratio = randBetweenNumbers(0.01, _this.config.RIVER_DELTA_MAX_LENGTH),
+            deltaLength = river.length * ratio,
+            notDeltaLength = river.length - deltaLength,
+            delta = [];
 
         for (let p = 0; p < river.length; p++) {
             if (p > notDeltaLength) {
-                _this.foreachNeighbors(river[p][0], river[p][1], 0, function(nx, ny) {
-                    if ([0, 1].randomElement() === 0) {
-                        _this.fill(nx, ny);
+                _this.foreachNeighbors(river[p][0], river[p][1], 1, function(nx, ny) {
+                    if ([0, 1].randomElement() === 0 && !river.includes([nx, ny])) {
+                        delta.push([nx, ny]);
                     }
                 });
             }
         }
+
+        return river.concat(delta);
+    };
+
+    /**
+     * @param {Array} rivers
+     * @return {Array}
+     */
+    addRiverDeltaToRiversMaps = function (rivers) {
+
+        for (let i = 0; i < rivers.length; i++) {
+            rivers[i] = this.addRiverDeltaToRiverMap(rivers[i]);
+        }
+
+        return rivers;
     };
 
     /**
@@ -189,16 +207,10 @@ class RiversMap extends BinaryMatrix {
      * @return {RiversMap}
      */
     createRiverMapFromRiversPoints = function(rivers) {
-
-        let _this = this;
-
         for (let i = 0; i < rivers.length; i++) {
-
             for (let p = 0; p < rivers[i].length; p++) {
-                _this.fill(rivers[i][p][0], rivers[i][p][1]);
+                this.fill(rivers[i][p][0], rivers[i][p][1]);
             }
-
-            _this.addRiverDeltaToRiverMap(rivers[i]);
         }
     };
 }
