@@ -1,5 +1,6 @@
 class RiversMap extends BinaryMatrix {
 
+    riversCount;
     altitudeMap;
     lakesMap;
     config;
@@ -17,6 +18,7 @@ class RiversMap extends BinaryMatrix {
         this.config = config;
         this.altitudeMap = altitudeMap;
         this.lakesMap = lakesMap;
+        this.riversCount = 0;
 
         return this;
     };
@@ -31,7 +33,7 @@ class RiversMap extends BinaryMatrix {
         let riverSources = _this.getRiverSources(_this.altitudeMap),
             rivers = [],
             allRiversPoints = [],
-            riversLimit = Math.floor(fromFraction(_this.config.RIVERS_DENSITY, 1, riverSources.length)),
+            riversLimit = Math.floor(fromFraction(_this.config.RIVERS_DENSITY, 1, _this.config.worldSize)),
             startCloseness = Math.max(_this.config.RIVER_MIN_LENGTH, this.config.RIVER_START_CLOSENESS);
 
         for (let i = 0; i < riverSources.length; i++) {
@@ -85,18 +87,21 @@ class RiversMap extends BinaryMatrix {
             }
 
             if (finished && river.length >= _this.config.RIVER_MIN_LENGTH) {
+
                 rivers.push(river);
                 allRiversPoints = allRiversPoints.concat(river);
                 allRiversPoints.unique();
-            }
 
-            if (rivers.length === riversLimit) {
-                break;
+                if (rivers.length === riversLimit) {
+                    break;
+                }
             }
         }
 
         _this.addRiverDeltaToRiversMaps(rivers);
         _this.createRiverMapFromRiversPoints(rivers);
+
+        this.riversCount = rivers.length;
 
         return _this;
     };
@@ -212,5 +217,12 @@ class RiversMap extends BinaryMatrix {
                 this.fill(rivers[i][p][0], rivers[i][p][1]);
             }
         }
+    };
+
+    /**
+     * @return {number}
+     */
+    getGeneratedRiversCount = function() {
+        return this.riversCount;
     };
 }
