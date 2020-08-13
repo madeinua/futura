@@ -26,6 +26,8 @@ class LakesMap extends BinaryMatrix {
 
         let _this = this;
 
+        // @TODO Lake size should not be larger than X. otherwise make it smaller
+
         _this.altitudeMap.foreach(function(x, y) {
             if (_this.altitudeMap.isWater(
                 _this.altitudeMap.getTile(x, y))
@@ -38,6 +40,19 @@ class LakesMap extends BinaryMatrix {
         return _this;
     };
 
+    polygonArea(coords) {
+
+        let area = 0;
+
+        for (let i = 0; i < coords.length; i++) {
+            let j = (i + 1) % coords.length;
+            area += coords[i][0] * coords[j][1];
+            area -= coords[j][0] * coords[i][1];
+        }
+
+        return area / 2;
+    };
+
     /**
      * @param {number} startX
      * @param {number} startY
@@ -45,37 +60,40 @@ class LakesMap extends BinaryMatrix {
      */
     getLakeSizeFromPoint = function(startX, startY) {
 
-        let _this = this;
-
-        if (!_this.filled(startX, startY)) {
+        if (!this.filled(startX, startY)) {
             return 0;
         }
 
-        let map = new BinaryMatrix(config.worldSize, config.worldSize),
-            activePoints = [],
-            point;
+        let sx,
+            sy,
+            coords = [];
 
-        map.map(0);
-        map.fill(startX, startY);
-        activePoints.push([startX, startY]);
+        for (let d = 0; d < 4; d++) {
 
-        while(activePoints.length) {
+            sx = startX;
+            sy = startY;
 
-            point = activePoints.pop();
+            while(true) {
 
-            _this.altitudeMap.foreachNeighbors(point[0], point[1], 1, function(x, y) {
-
-                let altitude = _this.altitudeMap.getTile(x, y);
-
-                if (_this.altitudeMap.isWater(altitude)) {
-                    if (!map.filled(x, y)) {
-                        map.fill(x, y);
-                        activePoints.push([x, y]);
-                    }
+                if (d === 0) {
+                    sx++;
+                } else if (d === 1) {
+                    sy++;
+                } else if (d === 2) {
+                    sx--;
+                } else if (d === 3) {
+                    sy--;
                 }
-            });
+
+                if (!this.filled(sx, sy)) {
+                    coords.push([sx, sy]);
+                    break;
+                }
+            }
         }
 
-        return map.getFilledTiles().length;
+        return Math.abs(
+            this.polygonArea(coords)
+        );
     };
 }
