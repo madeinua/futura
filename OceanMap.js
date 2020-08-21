@@ -17,19 +17,13 @@ class OceanMap extends BinaryMatrix {
     };
 
     /**
-     * @return {OceanMap}
+     * @param {number} startX
+     * @param {number} startY
      */
-    generateMap = function() {
+    includeAllWatterTilesAround = function(startX, startY) {
 
         let _this = this,
-            startX = 0,
-            startY = 0;
-
-        if (!_this.altitudeMap.isWater(_this.altitudeMap.getTile(startX, startY))) {
-            return _this;
-        }
-
-        let activePoints = [],
+            activePoints = [],
             point;
 
         _this.fill(startX, startY);
@@ -51,6 +45,47 @@ class OceanMap extends BinaryMatrix {
                 }
             });
         }
+    };
+
+    bigLakesToSeas = function() {
+
+        let _this = this,
+            tempMap = new BinaryMatrix(config.worldSize, config.worldSize);
+
+        _this.altitudeMap.foreach(function(x, y) {
+            if (
+                _this.altitudeMap.isWater(_this.altitudeMap.getTile(x, y))
+                && !_this.filled(x, y)
+            ) {
+                tempMap.fill(x, y);
+            }
+        });
+
+        tempMap.foreachFilled(function(x, y) {
+            if (
+                !_this.filled(x, y)
+                && tempMap.getSizeFromPoint(x, y) > config.worldSize
+            ) {
+                _this.includeAllWatterTilesAround(x, y);
+            }
+        });
+    };
+
+    /**
+     * @return {OceanMap}
+     */
+    generateMap = function() {
+
+        let _this = this,
+            startX = 0,
+            startY = 0;
+
+        if (!_this.altitudeMap.isWater(_this.altitudeMap.getTile(startX, startY))) {
+            return _this;
+        }
+
+        _this.includeAllWatterTilesAround(startX, startY);
+        _this.bigLakesToSeas();
 
         return _this;
     };

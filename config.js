@@ -10,10 +10,9 @@ function getConfig() {
         miniMapCanvas: miniMapCanvas,
         showCoordinates: true,
         tickInterval: 50,
-        ticksCount: 50,
+        ticksCount: 1,//50 @TODO
 
         // Altitude
-        ALTITUDE_OCTAVES: [12, 20, 80],
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
         MAX_WATER_LEVEL: 0.3,
 

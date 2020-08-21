@@ -199,7 +199,7 @@ class World {
         riversMap = Filters.apply('riversMap', riversMap);
 
         if (this.logs) {
-            logTimeEvent('Rivers generated. Length: ' + riversMap.getFilledTiles().length);
+            logTimeEvent('Rivers generated. Rivers: ' + riversMap.getGeneratedRiversCount());
         }
 
         return riversMap;

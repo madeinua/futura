@@ -18,12 +18,13 @@ class AltitudeMap extends PointMatrix {
     generateMap = function() {
 
         let _this = this,
+            octaves = [3, 5, 20], // [12, 20, 80]
             maps = [];
 
-        for (let i in this.config.ALTITUDE_OCTAVES) {
+        for (let i in octaves) {
             maps[i] = createNoiseMap(
                 _this.config.worldSize,
-                this.config.ALTITUDE_OCTAVES[i]
+                octaves[i] * (_this.config.worldSize / 75)
             );
         }
 
@@ -64,7 +65,7 @@ class AltitudeMap extends PointMatrix {
         let dx = Math.abs(x - islandSize * 0.5),
             dy = Math.abs(y - islandSize * 0.5),
             distance = Math.sqrt(dx * dx + dy * dy),
-            delta = distance / (islandSize * 0.4),
+            delta = distance / (islandSize * 0.42),
             gradient = delta * delta - 0.2;
 
         return Math.min(altitude, altitude * Math.max(0, 1 - gradient));

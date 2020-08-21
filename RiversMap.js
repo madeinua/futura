@@ -67,7 +67,7 @@ class RiversMap extends BinaryMatrix {
 
                     if (_this.lakesMap.filled(x, y)) {
 
-                        let lakeSize = _this.lakesMap.getLakeSizeFromPoint(x, y);
+                        let lakeSize = _this.getSizeFromPoint(x, y);
 
                         // finish only when the lake size is bigger than the river length
                         if (lakeSize > river.length * config.LAKE_TO_RIVER_RATIO) {

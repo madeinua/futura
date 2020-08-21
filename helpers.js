@@ -460,3 +460,23 @@ function LightenDarkenColor(col, amt) {
 
     return (usePound ? "#" : "") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
 }
+
+/**
+ * @param {Array} coords
+ * @return {number}
+ */
+function getPolygonAreaSize(coords) {
+
+    let area = 0,
+        j;
+
+    for (let i = 0; i < coords.length; i++) {
+
+        j = (i + 1) % coords.length;
+
+        area += coords[i][0] * coords[j][1];
+        area -= coords[j][0] * coords[i][1];
+    }
+
+    return area / 2;
+}

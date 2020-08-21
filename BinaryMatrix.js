@@ -182,4 +182,48 @@ class BinaryMatrix extends NumericMatrix {
     getSize() {
         return round(this.getFilledTiles().length / (this.width * this.height), 2) * 100;
     }
+
+    /**
+     * @param {number} startX
+     * @param {number} startY
+     * @return {number}
+     */
+    getSizeFromPoint = function(startX, startY) {
+
+        if (!this.filled(startX, startY)) {
+            return 0;
+        }
+
+        let sx,
+            sy,
+            coords = [];
+
+        for (let d = 0; d < 4; d++) {
+
+            sx = startX;
+            sy = startY;
+
+            while(true) {
+
+                if (d === 0) {
+                    sx++;
+                } else if (d === 1) {
+                    sy++;
+                } else if (d === 2) {
+                    sx--;
+                } else if (d === 3) {
+                    sy--;
+                }
+
+                if (!this.filled(sx, sy)) {
+                    coords.push([sx, sy]);
+                    break;
+                }
+            }
+        }
+
+        return Math.abs(
+            getPolygonAreaSize(coords)
+        );
+    };
 }
