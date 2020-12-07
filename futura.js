@@ -1,4 +1,5 @@
 let coordinatesField = document.getElementById('coordinates'),
+    worldWrapper = document.getElementById('worldWrapper'),
     worldCanvas = document.getElementById('world'),
     miniMapCanvas = document.getElementById('miniMap'),
     config = getConfig(),

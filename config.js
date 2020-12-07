@@ -3,14 +3,15 @@ function getConfig() {
     return {
 
         // Global
-        storeData: false,
-        worldSize: 300,
+        storeData: true,
+        worldSize: 250,
         visibleCols: 30,
+        worldWrapper: worldWrapper,
         worldCanvas: worldCanvas,
         miniMapCanvas: miniMapCanvas,
         showCoordinates: true,
         tickInterval: 50,
-        ticksCount: 1,//50 @TODO
+        ticksCount: 50,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -70,7 +71,7 @@ function getConfig() {
         FOREST_GRASS_HILLS_GROWTH: 10,
         FOREST_SWAMP_GROWTH: 2,
         FOREST_ROCKS_GROWTH: 2,
-        FOREST_SAVANNA_GROWTH: 3,
+        FOREST_SAVANNA_GROWTH: 5,
         FOREST_SAVANNA_HILLS_GROWTH: 2,
         FOREST_TROPICS_GROWTH: 20,
 

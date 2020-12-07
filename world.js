@@ -26,11 +26,13 @@ class World {
         this.logs = true;
 
         this.layers = [];
-        this.worldCanvas = config.worldCanvas;
-        this.worldCanvas.width = this.worldCanvas.offsetWidth;
-        this.worldCanvas.height = this.worldCanvas.offsetHeight;
 
-        this.cellSize = Math.ceil(this.worldCanvas.width / config.visibleCols);
+        this.cellSize = Math.ceil(config.worldWrapper.offsetWidth / config.visibleCols);
+        this.worldScalledSize = this.cellSize * config.worldSize;
+
+        this.worldCanvas = config.worldCanvas;
+        this.worldCanvas.width = this.worldScalledSize;
+        this.worldCanvas.height = this.worldScalledSize;
 
         this.cameraPosX = config.cameraPosX;
         this.cameraPosY = config.cameraPosY;

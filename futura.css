@@ -4,10 +4,6 @@ body, html {
 }
 
 canvas {
-
-    box-shadow: 0 0 10px #777;
-    margin-bottom: 20px;
-
     image-rendering: optimizeSpeed;
     image-rendering: -moz-crisp-edges;
     image-rendering: -o-crisp-edges;
@@ -27,10 +23,11 @@ canvas {
     width: 250px;
 }
 
-#world {
-    margin: 20px;
+#worldWrapper {
+    box-shadow: 0 0 10px #777;
     width: 700px;
     height: 700px;
+    overflow: scroll;
 }
 
 #miniMap {
