@@ -30,6 +30,7 @@ class World {
         this.cellSize = Math.ceil(config.worldWrapper.offsetWidth / config.visibleCols);
         this.worldScalledSize = this.cellSize * config.worldSize;
 
+        this.worldWrapper = config.worldWrapper;
         this.worldCanvas = config.worldCanvas;
         this.worldCanvas.width = this.worldScalledSize;
         this.worldCanvas.height = this.worldScalledSize;
@@ -423,8 +424,9 @@ class World {
 
     /**
      * @param {number[]} point
+     * @param {boolean} silent
      */
-    moveMapTo = function(point) {
+    moveMapTo = function(point, silent = false) {
 
         let max = this.config.worldSize - this.config.visibleCols;
 
@@ -436,9 +438,12 @@ class World {
 
         this.update();
 
-        Filters.apply('mapMoved', point);
+        if (!silent) {
+            Filters.apply('mapMoved', point);
+        }
     };
 
+    // @TODO: instead of minimap as main map, create new "hidden" map/canvas and use it to generate big map and mini map
     drawMiniMap = function() {
 
         let _this = this,
@@ -484,7 +489,9 @@ class World {
 
         let _this = this,
             ctx = _this.worldCanvas.getContext('2d'),
-            x, y;
+            x, y, lx, ly,
+            worldOffsetLeft = _this.cameraPosX * _this.cellSize,
+            worldOffsetTop = _this.cameraPosY * _this.cellSize;
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
@@ -492,17 +499,15 @@ class World {
         for (x = 0; x < _this.config.visibleCols; x++) {
             for (y = 0; y < _this.config.visibleCols; y++) {
 
-                ctx.strokeRect(
-                    x * _this.cellSize,
-                    y * _this.cellSize,
-                    _this.cellSize,
-                    _this.cellSize
-                );
+                lx = x * _this.cellSize + worldOffsetLeft;
+                ly = y * _this.cellSize + worldOffsetTop;
+
+                ctx.strokeRect(lx, ly, _this.cellSize, _this.cellSize);
 
                 if (_this.config.showCoordinates) {
                     ctx.font = '10px senf';
-                    ctx.fillText((_this.cameraPosX + x).toString(), x * _this.cellSize + 2, y * _this.cellSize + 10);
-                    ctx.fillText((_this.cameraPosY + y).toString(), x * _this.cellSize + 2, y * _this.cellSize + 21);
+                    ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
+                    ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 21);
                 }
             }
         }
@@ -532,7 +537,12 @@ class World {
             ctx = _this.worldCanvas.getContext('2d'),
             image = renderCtx.createImageData(_this.config.worldSize, _this.config.worldSize),
             layer,
-            tile;
+            tile,
+            worldOffsetLeft = this.cameraPosX * _this.cellSize,
+            worldOffsetTop = this.cameraPosY * _this.cellSize;
+
+        this.worldWrapper.scrollLeft = worldOffsetLeft;
+        this.worldWrapper.scrollTop = worldOffsetTop;
 
         for (let ln = 0; ln < _this.getLayersCount(); ln++) {
 
@@ -569,13 +579,13 @@ class World {
 
         let scaledData = scaleImageData(ctx, imageData, _this.cellSize);
 
-        ctx.putImageData(scaledData, 0, 0);
+        ctx.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
+
+        _this.drawRectangles();
 
         if (_this.miniMapCanvas) {
             _this.drawMiniMap();
         }
-
-        _this.drawRectangles();
     };
 
     create = function() {

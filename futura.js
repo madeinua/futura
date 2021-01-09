@@ -177,14 +177,21 @@ coordinatesField.addEventListener("change", function() {
 
 miniMapCanvas.addEventListener("click", function(e) {
 
-    let pos = getPosition(this),
+    let rect = this.getBoundingClientRect(),
         scale = config.worldSize / miniMapCanvas.offsetWidth,
         point = [
-            Math.floor((e.pageX - pos.x) * scale),
-            Math.floor((e.pageY - pos.y) * scale)
+            Math.floor((e.clientX - rect.left) * scale),
+            Math.floor((e.clientY - rect.top) * scale)
         ];
 
     world.moveMapTo(
         centerCameraPoint(point, config.visibleCols)
     );
+});
+
+worldWrapper.addEventListener("scroll", function() {
+    world.moveMapTo([
+        Math.floor(worldWrapper.scrollLeft / world.cellSize),
+        Math.floor(worldWrapper.scrollTop / world.cellSize)
+    ], true);
 });

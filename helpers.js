@@ -278,16 +278,6 @@ function arrayHasPoint(arr, x, y) {
 }
 
 /**
- * Get position of the HTML Element
- * @param {HTMLElement} element
- * @return {{x: number, y: number}}
- */
-function getPosition(element) {
-    let rect = element.getBoundingClientRect();
-    return {x: rect.left, y: rect.top};
-}
-
-/**
  * Create 2D array
  * @param {number} width
  * @param {number} height
