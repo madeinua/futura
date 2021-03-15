@@ -188,10 +188,3 @@ miniMapCanvas.addEventListener("click", function(e) {
         centerCameraPoint(point, config.visibleCols)
     );
 });
-
-worldWrapper.addEventListener("scroll", function() {
-    world.moveMapTo([
-        Math.floor(worldWrapper.scrollLeft / world.cellSize),
-        Math.floor(worldWrapper.scrollTop / world.cellSize)
-    ], true);
-});

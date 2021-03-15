@@ -27,7 +27,7 @@ canvas {
     box-shadow: 0 0 10px #777;
     width: 700px;
     height: 700px;
-    overflow: scroll;
+    overflow: hidden;
 }
 
 #miniMap {

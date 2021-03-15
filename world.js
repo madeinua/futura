@@ -443,7 +443,6 @@ class World {
         }
     };
 
-    // @TODO: instead of minimap as main map, create new "hidden" map/canvas and use it to generate big map and mini map
     drawMiniMap = function() {
 
         let _this = this,
@@ -505,9 +504,9 @@ class World {
                 ctx.strokeRect(lx, ly, _this.cellSize, _this.cellSize);
 
                 if (_this.config.showCoordinates) {
-                    ctx.font = '10px senf';
+                    ctx.font = '7px senf';
                     ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
-                    ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 21);
+                    ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 20);
                 }
             }
         }
