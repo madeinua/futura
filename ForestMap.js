@@ -117,6 +117,8 @@ class ForestMap extends BinaryMatrix {
                 return this.config.FOREST_GRASS_GROWTH;
             case 'grass-hills':
                 return this.config.FOREST_GRASS_HILLS_GROWTH;
+            case 'desert-hills':
+                return this.config.FOREST_DESERT_HILLS_GROWTH;
             case 'swamp':
                 return this.config.FOREST_SWAMP_GROWTH;
             case 'rocks':
@@ -127,6 +129,8 @@ class ForestMap extends BinaryMatrix {
                 return this.config.FOREST_SAVANNA_HILLS_GROWTH;
             case 'tropic':
                 return this.config.FOREST_TROPICS_GROWTH;
+            case 'beach':
+                return this.config.FOREST_BEACH_GROWTH;
         }
 
         return 0;
@@ -134,7 +138,7 @@ class ForestMap extends BinaryMatrix {
 
     /**
      * @param {Biome} biome
-     * @return {number}
+     * @return {number} From 0 to 100
      */
     getCreateChance(biome) {
 
@@ -150,7 +154,6 @@ class ForestMap extends BinaryMatrix {
         let NBR = _this.sumNeighbors(biome.x, biome.y, 2),
             forestType = _this.getForestType(biome),
             IH, IT, IA,
-            K = _this.config.FOREST_GROWTH_SPEED,
             BC = _this.config.FOREST_BORN_CHANCE,
             GC = _this.config.FOREST_GROWTH_CHANCE;
 
@@ -165,7 +168,6 @@ class ForestMap extends BinaryMatrix {
         }
 
         /**
-         * K = growth speed coefficient
          * GT = ground type coefficient
          * BC = born chance (if no other forest-based tiles around)
          * GC = growth chance (if there are forest-based tiles around)
@@ -174,12 +176,12 @@ class ForestMap extends BinaryMatrix {
          * IT = coefficient of temperature
          * IA = coefficient of altitude
          */
-        return K * GT * (BC + GC * NBR) * (IH + IT + IA);
+        return GT * (BC + GC * NBR) * (IH + IT + IA);
     }
 
     /**
      * @param {Biome} biome
-     * @return {number}
+     * @return {number} From 0 to 100
      */
     getDeadChance(biome) {
 
@@ -200,7 +202,10 @@ class ForestMap extends BinaryMatrix {
         return (100 - GC) * DC;
     }
 
-    generate() {
+    /**
+     * @param {number} step
+     */
+    generate(step) {
 
         let _this = this;
 
@@ -209,6 +214,14 @@ class ForestMap extends BinaryMatrix {
             let deadChance = _this.getDeadChance(
                 _this.biomes.getTile(x, y)
             );
+
+            if (deadChance === 0) {
+                return;
+            }
+
+            if (step > _this.config.PRE_GENERATION_STEPS) {
+                deadChance /= _this.config.PRE_GENERATION_MULTIPLY;
+            }
 
             if (iAmLucky(deadChance)) {
                 _this.setTile(x, y, false);
@@ -220,6 +233,14 @@ class ForestMap extends BinaryMatrix {
             let createChance = _this.getCreateChance(
                 _this.biomes.getTile(x, y)
             );
+            
+            if (createChance === 0) {
+                return;
+            }
+
+            if (step > _this.config.PRE_GENERATION_STEPS) {
+                createChance /= _this.config.PRE_GENERATION_MULTIPLY;
+            }
 
             if (iAmLucky(createChance)) {
                 _this.setTile(x, y, true);

@@ -11,7 +11,7 @@ function getConfig() {
         miniMapCanvas: miniMapCanvas,
         showCoordinates: true,
         tickInterval: 50,
-        ticksCount: 50,
+        ticksCount: 100,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -65,19 +65,23 @@ function getConfig() {
         FOREST_BEST_TROPICAL_TEMPERATURE: 0.6,
         FOREST_BEST_TROPICAL_ALTITUDE: 0.3,
 
-        FOREST_TUNDRA_GROWTH: 3,
-        FOREST_TUNDRA_HILLS_GROWTH: 2,
-        FOREST_GRASS_GROWTH: 8,
-        FOREST_GRASS_HILLS_GROWTH: 10,
-        FOREST_SWAMP_GROWTH: 2,
-        FOREST_ROCKS_GROWTH: 2,
-        FOREST_SAVANNA_GROWTH: 5,
-        FOREST_SAVANNA_HILLS_GROWTH: 2,
-        FOREST_TROPICS_GROWTH: 20,
+        FOREST_TUNDRA_GROWTH: 0.12,
+        FOREST_TUNDRA_HILLS_GROWTH: 0.08,
+        FOREST_GRASS_GROWTH: 0.32,
+        FOREST_GRASS_HILLS_GROWTH: 0.4,
+        FOREST_DESERT_HILLS_GROWTH: 0.01,
+        FOREST_SWAMP_GROWTH: 0.08,
+        FOREST_ROCKS_GROWTH: 0.08,
+        FOREST_SAVANNA_GROWTH: 0.2,
+        FOREST_SAVANNA_HILLS_GROWTH: 0.08,
+        FOREST_TROPICS_GROWTH: 0.8,
+        FOREST_BEACH_GROWTH: 0.02,
 
         FOREST_BORN_CHANCE: 0.3,
         FOREST_GROWTH_CHANCE: 14,
-        FOREST_GROWTH_SPEED: 0.04,
-        FOREST_DEAD_CHANCE: 0.5
+        FOREST_DEAD_CHANCE: 0.5,
+
+        PRE_GENERATION_STEPS: 40,
+        PRE_GENERATION_MULTIPLY: 50
     };
 }

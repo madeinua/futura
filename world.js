@@ -339,9 +339,9 @@ class World {
 
             forestMap.init();
 
-            _this.tickHandlers.push(function() {
+            _this.tickHandlers.push(function(step) {
 
-                forestMap.generate();
+                forestMap.generate(step);
 
                 _this.addForestMapToLayer(forestMap);
 
@@ -372,7 +372,7 @@ class World {
             ite = setInterval(function() {
 
                 for (let i = 0; i < _this.tickHandlers.length; i++) {
-                    _this.tickHandlers[i]();
+                    _this.tickHandlers[i](step);
                 }
 
                 if (++step === _this.config.ticksCount) {
