@@ -188,3 +188,12 @@ miniMapCanvas.addEventListener("click", function(e) {
         centerCameraPoint(point, config.visibleCols)
     );
 });
+
+/**
+ * @return {boolean}
+ */
+function pauseTimer() {
+    return world.isTimerPaused()
+        ? world.unpauseTimer()
+        : world.pauseTimer();
+}

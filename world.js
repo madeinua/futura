@@ -308,15 +308,12 @@ class World {
      */
     addForestMapToLayer = function(forestMap) {
 
-        let forestLayer = this.getLayer(LAYER_FOREST),
-            colors = ['#2a6410', '#3c6219', '#3c5626'];
+        let forestLayer = this.getLayer(LAYER_FOREST);
 
         forestMap.foreach(function(x, y) {
             forestLayer.setTile(
                 x, y,
-                forestMap.filled(x, y)
-                    ? hexToRgb(colors.randomElement())
-                    : null
+                forestMap.filled(x, y) ? forestMap.getForestColor(x, y) : null
             );
         });
     };
@@ -328,32 +325,22 @@ class World {
     initForestGeneration = function(biomes) {
 
         let _this = this,
-            forestMap = new ForestMap(biomes, _this.config),
-            storage = _this.config.storeData ? localStorage.getItem('forestMap') : null;
+            forestMap = new ForestMap(biomes, _this.config);
 
-        if (typeof storage !== 'undefined' && storage !== null) {
-            forestMap.fromString(storage);
+        forestMap.init();
+
+        _this.tickHandlers.push(function(step) {
+
+            let multiply = step > _this.config.FOREST_PRE_GENERATION_STEPS
+                ? _this.config.FOREST_PRE_GENERATION_MULTIPLY
+                : 1;
+
+            forestMap.generate(step, multiply);
+
             _this.addForestMapToLayer(forestMap);
+
             forestMap = Filters.apply('forestMap', forestMap);
-        } else {
-
-            forestMap.init();
-
-            _this.tickHandlers.push(function(step) {
-
-                forestMap.generate(step);
-
-                _this.addForestMapToLayer(forestMap);
-
-                forestMap = Filters.apply('forestMap', forestMap);
-            });
-
-            if (_this.config.storeData) {
-                this.tickFinalHandlers.push(function() {
-                    localStorage.setItem('forestMap', forestMap.toString());
-                });
-            }
-        }
+        });
 
         return forestMap;
     };
@@ -363,34 +350,77 @@ class World {
      */
     tickTimer = function(callback) {
 
-        if (this.logs) {
+        let _this = this;
+
+        if (_this.logs) {
             logTimeEvent('Start ticks.');
         }
 
-        let _this = this,
-            step = 0,
-            ite = setInterval(function() {
+        _this.timerStep = 0;
 
-                for (let i = 0; i < _this.tickHandlers.length; i++) {
-                    _this.tickHandlers[i](step);
+        let ite = setInterval(function() {
+
+            if (_this.timerPaused) {
+                return;
+            }
+
+            for (let i = 0; i < _this.tickHandlers.length; i++) {
+                _this.tickHandlers[i](_this.timerStep);
+            }
+
+            if (_this.config.ticksCount > 0 && _this.timerStep === _this.config.ticksCount) {
+
+                for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
+                    _this.tickFinalHandlers[i]();
                 }
 
-                if (++step === _this.config.ticksCount) {
-
-                    for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
-                        _this.tickFinalHandlers[i]();
-                    }
-
-                    if (_this.logs) {
-                        logTimeEvent('Ticks ended.');
-                    }
-
-                    clearInterval(ite);
+                if (_this.logs) {
+                    logTimeEvent('Ticks ended.');
                 }
 
-                callback();
+                clearInterval(ite);
+            }
 
-            }, _this.config.tickInterval);
+            _this.timerStep++;
+
+            callback();
+
+        }, _this.config.tickInterval);
+    };
+
+    /**
+     * @return {boolean}
+     */
+    isTimerPaused = function() {
+        return this.timerPaused;
+    }
+
+    /**
+     * @return {boolean}
+     */
+    pauseTimer = function() {
+
+        if (this.isTimerPaused()) {
+            return false;
+        }
+
+        this.timerPaused = true;
+
+        return true;
+    };
+
+    /**
+     * @return {boolean}
+     */
+    unpauseTimer = function() {
+
+        if (!this.isTimerPaused()) {
+            return false;
+        }
+
+        this.timerPaused = false;
+
+        return true;
     };
 
     /**
