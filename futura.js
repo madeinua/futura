@@ -197,3 +197,7 @@ function pauseTimer() {
         ? world.unpauseTimer()
         : world.pauseTimer();
 }
+
+document.getElementById('pauseTick').addEventListener("click", function() {
+    pauseTimer();
+});

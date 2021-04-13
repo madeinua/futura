@@ -38,6 +38,10 @@ canvas {
     display: block;
 }
 
+#pauseTick {
+    margin: 20px;
+}
+
 body {
     background-color: #eee;
 }
