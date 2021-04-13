@@ -11,7 +11,7 @@ function getConfig() {
         miniMapCanvas: miniMapCanvas,
         showCoordinates: true,
         tickInterval: 50,
-        ticksCount: 100,
+        ticksCount: 50,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -82,6 +82,12 @@ function getConfig() {
         FOREST_DEAD_CHANCE: 0.5,
 
         FOREST_PRE_GENERATION_STEPS: 40,
-        FOREST_PRE_GENERATION_MULTIPLY: 0.001
+        FOREST_PRE_GENERATION_MULTIPLY: 0.001,
+
+        FOREST_COLOR: '#3c5626',
+        FOREST_IMAGES: [
+            'images/forest-1.png',
+            'images/forest-2.png'
+        ]
     };
 }

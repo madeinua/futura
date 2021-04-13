@@ -15,7 +15,15 @@ class ForestMap extends BinaryMatrix {
         this.biomes = biomes;
         this.config = config;
 
-        this.forestColorsCache = [];
+        this.forestColor = hexToRgb(config.FOREST_COLOR);
+        this.forestImages = [];
+        this.forestImagesCache = [];
+
+        for (let i = 0; i < config.FOREST_IMAGES.length; i++) {
+            this.forestImages.push(
+                createImage(config.FOREST_IMAGES[i])
+            );
+        }
     }
 
     init() {
@@ -234,7 +242,7 @@ class ForestMap extends BinaryMatrix {
             let createChance = _this.getCreateChance(
                 _this.biomes.getTile(x, y)
             );
-            
+
             if (createChance === 0) {
                 return;
             }
@@ -250,16 +258,17 @@ class ForestMap extends BinaryMatrix {
     /**
      * @param {number} x
      * @param {number} y
-     * @return {string}
+     * @return {DisplayCell}
      */
-    getForestColor = function(x, y) {
+    getForestDisplayCell = function(x, y) {
 
-        if (typeof this.forestColorsCache[x + ',' + y] === 'undefined') {
-            this.forestColorsCache[x + ',' + y] = hexToRgb(
-                ['#2a6410', '#3c6219', '#3c5626'].randomElement()
+        if (typeof this.forestImagesCache[x + ',' + y] === 'undefined') {
+            this.forestImagesCache[x + ',' + y] = new DisplayCell(
+                this.forestColor,
+                this.forestImages.randomElement()
             );
         }
 
-        return this.forestColorsCache[x + ',' + y];
+        return this.forestImagesCache[x + ',' + y];
     }
 }

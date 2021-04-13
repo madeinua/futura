@@ -55,7 +55,7 @@ let Filters = {
 
 /**
  * Retrieve random element of array
- * @return {string|number}
+ * @return {*}
  */
 Array.prototype.randomElement = function() {
     return this[Math.floor(Math.random() * this.length)];
@@ -469,4 +469,14 @@ function getPolygonAreaSize(coords) {
     }
 
     return area / 2;
+}
+
+/**
+ * @param {string} src
+ * @return {HTMLImageElement}
+ */
+function createImage(src) {
+    let img = new Image();
+    img.src = src;
+    return img;
 }

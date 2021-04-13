@@ -313,7 +313,7 @@ class World {
         forestMap.foreach(function(x, y) {
             forestLayer.setTile(
                 x, y,
-                forestMap.filled(x, y) ? forestMap.getForestColor(x, y) : null
+                forestMap.filled(x, y) ? forestMap.getForestDisplayCell(x, y) : null
             );
         });
     };
@@ -479,7 +479,7 @@ class World {
             ctx = _this.miniMapCanvas.getContext('2d'),
             image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
             layer,
-            tile;
+            displayCell;
 
         for (let ln = 0; ln < _this.getLayersCount(); ln++) {
 
@@ -487,16 +487,16 @@ class World {
 
             layer.foreach(function(x, y) {
 
-                tile = layer.getTile(x, y);
+                displayCell = layer.getTile(x, y);
 
-                if (!tile) {
+                if (displayCell === null) {
                     return;
                 }
 
                 fillCanvasPixel(
                     image,
                     (x + y * _this.config.worldSize) * 4,
-                    tile
+                    displayCell.getColor()
                 );
             });
         }
@@ -565,6 +565,7 @@ class World {
         let renderCtx = renderCanvas.getContext('2d'),
             ctx = _this.worldCanvas.getContext('2d'),
             image = renderCtx.createImageData(_this.config.worldSize, _this.config.worldSize),
+            ctxImages = [],
             layer,
             tile,
             worldOffsetLeft = this.cameraPosX * _this.cellSize,
@@ -585,14 +586,19 @@ class World {
 
                 tile = layer.getTile(x, y);
 
-                if (!tile) {
+                if (tile === null) {
+                    return;
+                }
+
+                if (tile.hasImage()) {
+                    ctxImages.push([x, y, tile.getImage()]);
                     return;
                 }
 
                 fillCanvasPixel(
                     image,
                     (x + y * _this.config.worldSize) * 4,
-                    tile
+                    tile.getColor()
                 );
             });
         }
@@ -610,7 +616,22 @@ class World {
 
         ctx.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
 
-        _this.drawRectangles();
+        for (let i = 0; i < ctxImages.length; i++) {
+
+            if (!_this.isTileVisible(ctxImages[i][0], ctxImages[i][1])) {
+                continue;
+            }
+
+            ctx.drawImage(
+                ctxImages[i][2],
+                ctxImages[i][0] * _this.cellSize,
+                ctxImages[i][1] * _this.cellSize,
+                _this.cellSize,
+                _this.cellSize
+            );
+        }
+
+        //_this.drawRectangles();
 
         if (_this.miniMapCanvas) {
             _this.drawMiniMap();
