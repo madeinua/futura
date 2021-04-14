@@ -158,8 +158,8 @@ class BinaryMatrix extends NumericMatrix {
 
     /**
      * Apply callback to all neighbors of all
-     * @param deep
-     * @param callback
+     * @param {number} deep
+     * @param {function} callback
      * @return {BinaryMatrix}
      */
     foreachAllFilledNeighbors(deep, callback) {

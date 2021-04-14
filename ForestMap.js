@@ -190,6 +190,28 @@ class ForestMap extends BinaryMatrix {
     }
 
     /**
+     * @param {string} biomeName
+     * @param {number} x
+     * @param {number} y
+     * @param {number} radius
+     * @return {boolean}
+     */
+    isBiomeAround(biomeName, x, y, radius) {
+
+        let found = false,
+            _this = this;
+
+        _this.biomes.foreachNeighbors(x, y, radius, function(nx, ny) {
+            if (_this.biomes.getTile(nx, ny).getName() === biomeName) {
+                found = true;
+                return true;
+            }
+        }, true);
+
+        return found;
+    }
+
+    /**
      * @param {Biome} biome
      * @return {number} From 0 to 100
      */
@@ -202,13 +224,9 @@ class ForestMap extends BinaryMatrix {
             return 0;
         }
 
-        let DC = this.config.FOREST_DEAD_CHANCE,
-            GC = this.config.FOREST_GROWTH_CHANCE;
+        let DC = this.config.FOREST_DEAD_CHANCE, // dead chance
+            GC = this.config.FOREST_GROWTH_CHANCE; // growth chance (if there are forest-based tiles around)
 
-        /**
-         * GC = growth chance (if there are forest-based tiles around)
-         * DC = dead chance
-         */
         return (100 - GC) * DC;
     }
 

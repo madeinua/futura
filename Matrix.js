@@ -247,14 +247,17 @@ class Matrix {
      * @param {number} y
      * @param {number} deep
      * @param {function} callback
+     * @param {boolean} stopOnTrue
      * @return {Matrix}
      */
-    foreachNeighbors(x, y, deep, callback) {
+    foreachNeighbors(x, y, deep, callback, stopOnTrue = false) {
 
         let neighbors = this.getNeighbors(x, y, deep);
 
         for (let i = 0; i < neighbors.length; i++) {
-            callback(neighbors[i][0], neighbors[i][1]);
+            if (callback(neighbors[i][0], neighbors[i][1]) && stopOnTrue) {
+                return this;
+            }
         }
 
         return this;

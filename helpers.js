@@ -141,13 +141,16 @@ function randBetweenNumbers(float1, float2) {
  * @return {boolean}
  */
 function iAmLucky(chance) {
-    return chance === 100
-        ? true
-        : (
-            chance === 0
-                ? 0
-                : chance >= randBetweenNumbers(0, 100)
-        );
+
+    if (chance >= 100) {
+        return true;
+    }
+
+    if (chance <= 0) {
+        return false;
+    }
+
+    return chance >= randBetweenNumbers(0, 100);
 }
 
 /**
