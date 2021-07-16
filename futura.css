@@ -45,3 +45,7 @@ canvas {
 body {
     background-color: #eee;
 }
+
+.pad {
+    padding: 20px;
+}

@@ -177,6 +177,12 @@ class ForestMap extends BinaryMatrix {
             IA = _this.iaTropicalMap.getTile(biome.x, biome.y);
         }
 
+        if (biome.getDistanceToWater() > 0) {
+            let inc = Math.pow(biome.getDistanceToWater(), 2);
+            BC += _this.config.FOREST_BORN_NEAR_WATER / inc;
+            GC += _this.config.FOREST_GROWTH_NEAR_WATER / inc;
+        }
+
         /**
          * GT = ground type coefficient
          * BC = born chance (if no other forest-based tiles around)
@@ -186,7 +192,7 @@ class ForestMap extends BinaryMatrix {
          * IT = coefficient of temperature
          * IA = coefficient of altitude
          */
-        return GT * (BC + GC * NBR) * (IH + IT + IA);
+        return Math.min(100, GT * (BC + GC * NBR) * (IH + IT + IA));
     }
 
     /**

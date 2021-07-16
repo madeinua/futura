@@ -631,7 +631,7 @@ class World {
             );
         }
 
-        //_this.drawRectangles();
+        _this.drawRectangles();
 
         if (_this.miniMapCanvas) {
             _this.drawMiniMap();

@@ -201,3 +201,7 @@ function pauseTimer() {
 document.getElementById('pauseTick').addEventListener("click", function() {
     pauseTimer();
 });
+
+world.tickHandlers.push(function(step) {
+    document.getElementById('tickCounter').innerHTML = step;
+});

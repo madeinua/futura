@@ -190,26 +190,36 @@ class Biomes {
      */
     getBiome(x, y) {
 
-        let altitude = this.altitudeMap.getTile(x, y),
-            temperature = this.temperatureMap.getTile(x, y),
-            humidity = this.humidityMap.getTile(x, y);
+        let distanceToRiver = this.riversMap.distanceTo(x, y, 5),
+            distanceToLake = this.lakesMap.distanceTo(x, y, 5);
+
+        let distanceToWater = Math.min(distanceToLake, distanceToRiver);
+
+        distanceToWater = distanceToWater > 100 ? 0 : distanceToWater;
+
+        let args = {
+            altitude: this.altitudeMap.getTile(x, y),
+            temperature: this.temperatureMap.getTile(x, y),
+            humidity: this.humidityMap.getTile(x, y),
+            distanceToWater: distanceToWater
+        };
 
         if (this.riversMap.filled(x, y)) {
-            return new Biome_River(x, y, altitude, temperature, humidity);
+            return new Biome_River(x, y, args);
         }
 
         if (this.lakesMap.filled(x, y)) {
-            return new Biome_Lake(x, y, altitude, temperature, humidity);
+            return new Biome_Lake(x, y, args);
         }
 
         if (this.oceanMap.filled(x, y)) {
-            return this.isCoast(altitude, temperature)
-                ? new Biome_Coast(x, y, altitude, temperature, humidity)
-                : new Biome_Ocean(x, y, altitude, temperature, humidity);
+            return this.isCoast(args.altitude, args.temperature)
+                ? new Biome_Coast(x, y, args)
+                : new Biome_Ocean(x, y, args);
         }
 
-        if (this.isBeach(x, y, altitude, temperature, humidity)) {
-            return new Biome_Beach(x, y, altitude, temperature, humidity);
+        if (this.isBeach(x, y, args.altitude, args.temperature, args.humidity)) {
+            return new Biome_Beach(x, y, args);
         }
 
         for (let i = 0; i < this.biomesConfig.length; i++) {
@@ -217,11 +227,11 @@ class Biomes {
             let cfg = this.biomesConfig[i];
 
             if (
-                this.checkBiomeIndex(cfg.h, humidity)
-                && this.checkBiomeIndex(cfg.t, temperature)
-                && this.checkBiomeIndex(cfg.a, altitude)
+                this.checkBiomeIndex(cfg.h, args.humidity)
+                && this.checkBiomeIndex(cfg.t, args.temperature)
+                && this.checkBiomeIndex(cfg.a, args.altitude)
             ) {
-                return new cfg.class(x, y, altitude, temperature, humidity);
+                return new cfg.class(x, y, args);
             }
         }
 
@@ -236,16 +246,15 @@ class Biome {
     /**
      * @param {number} x
      * @param {number} y
-     * @param {number} altitude
-     * @param {number} temperature
-     * @param {number} humidity
+     * @param {object} args
      */
-    constructor(x, y, altitude, temperature, humidity) {
+    constructor(x, y, args) {
         this.x = x;
         this.y = y;
-        this.altitude = altitude;
-        this.temperature = temperature;
-        this.humidity = humidity;
+        this.altitude = args.altitude;
+        this.temperature = args.temperature;
+        this.humidity = args.humidity;
+        this.distanceToWater = args.distanceToWater;
     }
 
     /**
@@ -291,6 +300,13 @@ class Biome {
      */
     getAltitude() {
         return this.altitude;
+    }
+
+    /**
+     * @return {number}
+     */
+    getDistanceToWater() {
+        return this.distanceToWater;
     }
 }
 
