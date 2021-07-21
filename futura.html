@@ -22,6 +22,10 @@
                         <p><canvas id="miniMap"></canvas><input id="coordinates" type="text" value="0,0" /></p>
                     </div>
                     <div>
+                        <label>Animals map:</label>
+                        <p><canvas id="animalsMapCanvas"></canvas></p>
+                    </div>
+                    <div>
                         <label>Forest map:</label>
                         <p><canvas id="forestMapCanvas"></canvas></p>
                     </div>
@@ -44,6 +48,10 @@
                     <div>
                         <label>Lakes map:</label>
                         <p><canvas id="lakesMapCanvas"></canvas></p>
+                    </div>
+                    <div>
+                        <label>Coast map:</label>
+                        <p><canvas id="coastMapCanvas"></canvas></p>
                     </div>
                     <div>
                         <label>Ocean map:</label>
@@ -71,20 +79,43 @@
 
     <script src='config.js'></script>
     <script src='helpers.js'></script>
-    <script src='Matrix.js'></script>
-    <script src='NumericMatrix.js'></script>
-    <script src='BinaryMatrix.js'></script>
-    <script src='PointMatrix.js'></script>
-    <script src='DisplayCell.js'></script>
-    <script src='Layer.js'></script>
-    <script src='AltitudeMap.js'></script>
-    <script src='OceanMap.js'></script>
-    <script src='LakesMap.js'></script>
-    <script src='RiversMap.js'></script>
-    <script src='HumidityMap.js'></script>
-    <script src='TemperatureMap.js'></script>
-    <script src='ForestMap.js'></script>
-    <script src='Biomes.js'></script>
+    <script src='matrices/Matrix.js'></script>
+    <script src='matrices/NumericMatrix.js'></script>
+    <script src='matrices/BinaryMatrix.js'></script>
+    <script src='matrices/PointMatrix.js'></script>
+    <script src='maps/AltitudeMap.js'></script>
+    <script src='maps/OceanMap.js'></script>
+    <script src='maps/CoastMap.js'></script>
+    <script src='maps/LakesMap.js'></script>
+    <script src='maps/RiversMap.js'></script>
+    <script src='maps/HumidityMap.js'></script>
+    <script src='maps/TemperatureMap.js'></script>
+    <script src='maps/ForestMap.js'></script>
+    <script src='biomes/Biomes.js'></script>
+    <script src='biomes/Biome.js'></script>
+    <script src='biomes/Biome_Beach.js'></script>
+    <script src='biomes/Biome_Coast.js'></script>
+    <script src='biomes/Biome_Desert.js'></script>
+    <script src='biomes/Biome_Desert_Hills.js'></script>
+    <script src='biomes/Biome_Grass.js'></script>
+    <script src='biomes/Biome_Grass_Hills.js'></script>
+    <script src='biomes/Biome_Ice_Rocks.js'></script>
+    <script src='biomes/Biome_Ocean.js'></script>
+    <script src='biomes/Biome_Rocks.js'></script>
+    <script src='biomes/Biome_Savanna.js'></script>
+    <script src='biomes/Biome_Savanna_Hills.js'></script>
+    <script src='biomes/Biome_Swamp.js'></script>
+    <script src='biomes/Biome_Tropic.js'></script>
+    <script src='biomes/Biome_Tundra.js'></script>
+    <script src='biomes/Biome_Tundra_Hills.js'></script>
+    <script src='biomes/Biome_Water.js'></script>
+    <script src='animals/Animal.js'></script>
+    <script src='animals/AnimalGenerator.js'></script>
+    <script src='animals/Fish.js'></script>
+    <script src='animals/FishGenerator.js'></script>
+    <script src='animals/AnimalsOperator.js'></script>
+    <script src='render/DisplayCell.js'></script>
+    <script src='render/Layer.js'></script>
     <script src='world.js'></script>
     <script src='futura.js'></script>
 </body>

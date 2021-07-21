@@ -1,8 +1,15 @@
 class HumidityMap extends PointMatrix {
 
+    /** @var {AltitudeMap} */
     altitudeMap;
+
+    /** @var {RiversMap} */
     riversMap;
+
+    /** @var {LakesMap} */
     lakesMap;
+
+    /** @var {Object} */
     config;
 
     /**

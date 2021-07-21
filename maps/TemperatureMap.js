@@ -1,6 +1,9 @@
 class TemperatureMap extends PointMatrix {
 
+    /** @var {AltitudeMap} */
     altitudeMap;
+
+    /** @var {Object} */
     config;
 
     /**

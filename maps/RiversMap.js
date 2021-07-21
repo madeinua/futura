@@ -1,8 +1,15 @@
 class RiversMap extends BinaryMatrix {
 
+    /** @var {number} */
     riversCount;
+
+    /** @var {AltitudeMap} */
     altitudeMap;
+
+    /** @var {LakesMap} */
     lakesMap;
+
+    /** @var {Object} */
     config;
 
     /**

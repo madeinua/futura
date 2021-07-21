@@ -1,6 +1,9 @@
 class ForestMap extends BinaryMatrix {
 
+    /** @var {Matrix} */
     biomes;
+
+    /** @var {Object} */
     config;
 
     /**
@@ -257,7 +260,7 @@ class ForestMap extends BinaryMatrix {
             deadChance *= multiply;
 
             if (iAmLucky(deadChance)) {
-                _this.setTile(x, y, false);
+                _this.unfill(x, y);
             }
         });
 
@@ -274,7 +277,7 @@ class ForestMap extends BinaryMatrix {
             createChance *= multiply;
 
             if (iAmLucky(createChance)) {
-                _this.setTile(x, y, true);
+                _this.fill(x, y);
             }
         });
     }

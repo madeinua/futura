@@ -1,37 +1,45 @@
 class Biomes {
 
+    /** @var {AltitudeMap} */
+    altitudeMap;
+
+    /** @var {CoastMap} */
+    coastMap;
+
+    /** @var {BinaryMatrix} */
+    freshWaterMap;
+
+    /** @var {TemperatureMap} */
+    temperatureMap;
+
+    /** @var {HumidityMap} */
+    humidityMap;
+
+    /** @var {Object} */
     config;
+
+    /** @var {Object} */
+    biomesConfig;
 
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {OceanMap} oceanMap
-     * @param {RiversMap} riversMap
-     * @param {LakesMap} lakesMap
+     * @param {CoastMap} coastMap
+     * @param {BinaryMatrix} freshWaterMap
      * @param {TemperatureMap} temperatureMap
      * @param {HumidityMap} humidityMap
      * @param {Object} config
      */
-    constructor(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap, config) {
+    constructor(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, config) {
 
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;
-        this.riversMap = riversMap;
-        this.lakesMap = lakesMap;
+        this.coastMap = coastMap;
+        this.freshWaterMap = freshWaterMap;
         this.temperatureMap = temperatureMap;
         this.humidityMap = humidityMap;
         this.config = config;
         this.biomesConfig = this.getBiomesConfiguration();
-    }
-
-    /**
-     * @param {number} altitude
-     * @param {number} temperature
-     * @return {boolean}
-     */
-    isCoast(altitude, temperature) {
-        return altitude > this.config.MAX_OCEAN_LEVEL
-            - (temperature * this.config.COAST_TEMPERATURE_RATIO * 2 - this.config.COAST_TEMPERATURE_RATIO)
-            && altitude <= this.config.MAX_COAST_LEVEL;
     }
 
     /**
@@ -190,11 +198,7 @@ class Biomes {
      */
     getBiome(x, y) {
 
-        let distanceToRiver = this.riversMap.distanceTo(x, y, 5),
-            distanceToLake = this.lakesMap.distanceTo(x, y, 5);
-
-        let distanceToWater = Math.min(distanceToLake, distanceToRiver);
-
+        let distanceToWater = this.freshWaterMap.distanceTo(x, y, 5);
         distanceToWater = distanceToWater > 100 ? 0 : distanceToWater;
 
         let args = {
@@ -204,16 +208,12 @@ class Biomes {
             distanceToWater: distanceToWater
         };
 
-        if (this.riversMap.filled(x, y)) {
-            return new Biome_River(x, y, args);
-        }
-
-        if (this.lakesMap.filled(x, y)) {
-            return new Biome_Lake(x, y, args);
+        if (this.freshWaterMap.filled(x, y)) {
+            return new Biome_Water(x, y, args);
         }
 
         if (this.oceanMap.filled(x, y)) {
-            return this.isCoast(args.altitude, args.temperature)
+            return this.coastMap.isCoast(args.altitude, args.temperature)
                 ? new Biome_Coast(x, y, args)
                 : new Biome_Ocean(x, y, args);
         }
@@ -236,280 +236,5 @@ class Biomes {
         }
 
         return null;
-    }
-}
-
-class Biome {
-
-    static NAME = '';
-
-    /**
-     * @param {number} x
-     * @param {number} y
-     * @param {object} args
-     */
-    constructor(x, y, args) {
-        this.x = x;
-        this.y = y;
-        this.altitude = args.altitude;
-        this.temperature = args.temperature;
-        this.humidity = args.humidity;
-        this.distanceToWater = args.distanceToWater;
-    }
-
-    /**
-     * @return {string}
-     */
-    getName() {
-        return this.constructor.NAME;
-    }
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        throwError('Unknown biome color', 1, true);
-        return '#FFFFFF';
-    }
-
-    /**
-     * @return {Array}
-     */
-    getHexColor() {
-        return hexToRgb(
-            this.getColor()
-        );
-    }
-
-    /**
-     * @return {number}
-     */
-    getHumidity() {
-        return this.humidity;
-    }
-
-    /**
-     * @return {number}
-     */
-    getTemperature() {
-        return this.temperature;
-    }
-
-    /**
-     * @return {number}
-     */
-    getAltitude() {
-        return this.altitude;
-    }
-
-    /**
-     * @return {number}
-     */
-    getDistanceToWater() {
-        return this.distanceToWater;
-    }
-}
-
-class Biome_River extends Biome {
-
-    static NAME = 'river';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#74aece', (this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Lake extends Biome {
-
-    static NAME = 'lake';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#74aece', (this.altitude - 0.5) * 180);
-    }
-}
-
-class Biome_Coast extends Biome {
-
-    static NAME = 'coast';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#003eb2', -(this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Ocean extends Biome {
-
-    static NAME = 'ocean';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return '#003eb2';
-    }
-}
-
-class Biome_Beach extends Biome {
-
-    static NAME = 'beach';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return '#c2b281';
-    }
-}
-
-class Biome_Tundra extends Biome {
-
-    static NAME = 'tundra';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#9c9f73', (this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Tundra_Hills extends Biome {
-
-    static NAME = 'tundra-hills';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#686a54', -(this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Grass extends Biome {
-
-    static NAME = 'grass';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#659c29', (this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Grass_Hills extends Biome {
-
-    static NAME = 'grass-hills';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#778e5d', -(this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Savanna extends Biome {
-
-    static NAME = 'savanna';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#9b9e3f', (this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Savanna_Hills extends Biome {
-
-    static NAME = 'savanna-hills';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#7f7946', -(this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Desert extends Biome {
-
-    static NAME = 'desert';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#e8c57e', (this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Desert_Hills extends Biome {
-
-    static NAME = 'desert-hills';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#c4a37e', -(this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Tropic extends Biome {
-
-    static NAME = 'tropic';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#3c8045', -(this.altitude - 0.5) * 200);
-    }
-}
-
-class Biome_Swamp extends Biome {
-
-    static NAME = 'swamp';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return '#258779';
-    }
-}
-
-class Biome_Rocks extends Biome {
-
-    static NAME = 'rocks';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#726f62', (this.altitude - 0.5) * 250);
-    }
-}
-
-class Biome_Ice_Rocks extends Biome {
-
-    static NAME = 'ice-rocks';
-
-    /**
-     * @return {string}
-     */
-    getColor() {
-        return LightenDarkenColor('#eeeeee', (this.altitude - 0.5) * 500);
     }
 }

@@ -262,4 +262,15 @@ class Matrix {
 
         return this;
     }
+
+    /**
+     * @return {Array}
+     */
+    getRandomTile() {
+
+        let x = Math.floor(Math.random() * this.width),
+            y = Math.floor(Math.random() * this.height);
+
+        return [x, y, this.getTile(x, y)];
+    }
 }

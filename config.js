@@ -10,7 +10,7 @@ function getConfig() {
         worldCanvas: worldCanvas,
         miniMapCanvas: miniMapCanvas,
         showCoordinates: false,
-        tickInterval: 50,
+        tickInterval: 1,
         ticksCount: 40,
 
         // Altitude

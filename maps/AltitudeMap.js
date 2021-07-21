@@ -1,5 +1,6 @@
 class AltitudeMap extends PointMatrix {
 
+    /** @var {Object} */
     config;
 
     /**

@@ -149,6 +149,37 @@ class World {
     };
 
     /**
+     * @param {OceanMap} oceanMap
+     * @param {AltitudeMap} altitudeMap
+     * @param {TemperatureMap} temperatureMap
+     * @return {BinaryMatrix}
+     */
+    getCoastMap = function(oceanMap, altitudeMap, temperatureMap) {
+
+        let coastMap = new CoastMap(oceanMap, altitudeMap, temperatureMap, this.config),
+            storage = this.config.storeData ? localStorage.getItem('coastMap') : null;
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            coastMap.fromString(storage);
+        } else {
+
+            coastMap.generateMap();
+
+            if (this.config.storeData) {
+                localStorage.setItem('coastMap', coastMap.toString());
+            }
+        }
+
+        coastMap = Filters.apply('coastMap', coastMap);
+
+        if (this.logs) {
+            logTimeEvent('Coast map calculated.');
+        }
+
+        return coastMap;
+    }
+
+    /**
      * @param {AltitudeMap} altitudeMap
      * @param {OceanMap} oceanMap
      * @return {LakesMap}
@@ -206,6 +237,21 @@ class World {
         }
 
         return riversMap;
+    };
+
+    /**
+     * @param {LakesMap} lakesMap
+     * @param {RiversMap} riversMap
+     * @return {BinaryMatrix}
+     */
+    getFreshWaterMap = function(lakesMap, riversMap) {
+
+        let freshWaterMap = new BinaryMatrix(config.worldSize, config.worldSize);
+
+        freshWaterMap.combineWith(lakesMap);
+        freshWaterMap.combineWith(riversMap);
+
+        return freshWaterMap;
     };
 
     /**
@@ -271,20 +317,20 @@ class World {
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {OceanMap} oceanMap
-     * @param {RiversMap} riversMap
-     * @param {LakesMap} lakesMap
+     * @param {CoastMap} coastMap
+     * @param {BinaryMatrix} freshWaterMap
      * @param {TemperatureMap} temperatureMap
      * @param {HumidityMap} humidityMap
      * @return {Matrix}
      */
-    generateBiomes = function(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap) {
+    generateBiomes = function(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap) {
 
         let biomes = new Matrix(this.config.worldSize, this.config.worldSize),
             biomesGenerator = new Biomes(
                 altitudeMap,
                 oceanMap,
-                riversMap,
-                lakesMap,
+                coastMap,
+                freshWaterMap,
                 temperatureMap,
                 humidityMap,
                 this.config
@@ -329,6 +375,10 @@ class World {
 
         forestMap.init();
 
+        if (this.logs) {
+            logTimeEvent('Forests initialized.');
+        }
+
         _this.tickHandlers.push(function(step) {
 
             let multiply = step > _this.config.FOREST_PRE_GENERATION_STEPS
@@ -344,6 +394,53 @@ class World {
 
         return forestMap;
     };
+
+    cleanAnimalsLayer = function() {
+        this.getLayer(LAYER_ANIMALS).reset();
+    };
+
+    /**
+     * @param {Animal} animal
+     */
+    addAnimalToLayer = function(animal) {
+        this.getLayer(LAYER_ANIMALS).setTile(animal.x, animal.y, 1);
+    };
+
+    /**
+     * @TODO Rework - see google keep
+     * @param {OceanMap} oceanMap
+     * @param {CoastMap} coastMap
+     * @param {BinaryMatrix} freshWaterMap
+     */
+    initAnimalsGeneration = function(oceanMap, freshWaterMap, coastMap) {
+
+        let _this = this,
+            animal,
+            animalGenerator = new AnimalGenerator(oceanMap, freshWaterMap, coastMap, _this.config),
+            animalsOperator = new AnimalsOperator(),
+            animalsMap = new BinaryMatrix(this.config.worldSize, this.config.worldSize);
+
+        for (let i = 0; i < 100; i++) {
+            animal = animalsOperator.createAnimal(animalGenerator);
+        }
+
+        if (this.logs) {
+            logTimeEvent('Animals initialized.');
+        }
+
+        _this.tickHandlers.push(function() {
+
+            animalsMap.map(false);
+            _this.cleanAnimalsLayer();
+
+            animalsOperator.moveAnimals(function(animal) {
+                _this.addAnimalToLayer(animal);
+                animalsMap.setTile(animal.x, animal.y, 1);
+            });
+
+            Filters.apply('animalsMap', animalsMap);
+        });
+    }
 
     /**
      * @param {CallableFunction} callback
@@ -375,7 +472,7 @@ class World {
                 }
 
                 if (_this.logs) {
-                    logTimeEvent('Ticks ended.');
+                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round(getTimeForEvent() / _this.config.ticksCount) + 'ms');
                 }
 
                 clearInterval(ite);
@@ -430,12 +527,14 @@ class World {
 
         let _this = this,
             altitudeMap = _this.generateAltitudeMap(),
+            temperatureMap = _this.generateTemperatureMap(altitudeMap),
             oceanMap = _this.generateOceanMap(altitudeMap),
+            coastMap = _this.getCoastMap(oceanMap, altitudeMap, temperatureMap),
             lakesMap = _this.generateLakesMap(altitudeMap, oceanMap),
             riversMap = _this.generateRiversMap(altitudeMap, lakesMap),
+            freshWaterMap = _this.getFreshWaterMap(lakesMap, riversMap),
             humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
-            temperatureMap = _this.generateTemperatureMap(altitudeMap),
-            biomes = _this.generateBiomes(altitudeMap, oceanMap, riversMap, lakesMap, temperatureMap, humidityMap),
+            biomes = _this.generateBiomes(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap),
             mainLayer = _this.getLayer(LAYER_BIOMES);
 
         biomes.foreach(function(x, y) {
@@ -446,6 +545,7 @@ class World {
         });
 
         _this.initForestGeneration(biomes);
+        _this.initAnimalsGeneration(oceanMap, freshWaterMap, coastMap);
 
         if (this.logs) {
             logTimeEvent('World generated');

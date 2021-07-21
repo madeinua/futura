@@ -89,6 +89,11 @@ Filters.add('oceanMap', function(map) {
     return map;
 });
 
+Filters.add('coastMap', function(map) {
+    drawMap('coastMapCanvas', map, true);
+    return map;
+});
+
 Filters.add('lakesMap', function(map) {
     drawMap('lakesMapCanvas', map, true);
     return map;
@@ -106,6 +111,11 @@ Filters.add('biomes', function(map) {
 
 Filters.add('forestMap', function(map) {
     drawMap('forestMapCanvas', map, true);
+    return map;
+});
+
+Filters.add('animalsMap', function(map) {
+    drawMap('animalsMapCanvas', map, true);
     return map;
 });
 

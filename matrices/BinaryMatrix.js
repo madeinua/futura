@@ -4,22 +4,23 @@ class BinaryMatrix extends NumericMatrix {
      * Constructor
      * @param {number} width
      * @param {number} height
+     * @param {number} fill
      */
-    constructor(width, height) {
+    constructor(width, height, fill = 0) {
         super(width, height);
-        this.map(false);
+        this.map(fill);
     }
 
     /**
      * Set tile value
      * @param {number} x
      * @param {number} y
-     * @param {boolean} value
+     * @param {number} value
      * @return {BinaryMatrix}
      */
     setTile(x, y, value) {
 
-        this.__values[x][y] = value >= 0.5 ? 1 : 0;
+        this.__values[x][y] = value;
 
         return this;
     };
@@ -47,6 +48,17 @@ class BinaryMatrix extends NumericMatrix {
      */
     fill(x, y) {
         this.setTile(x, y, 1);
+        return this;
+    }
+
+    /**
+     * Remove filling the tile with the value
+     * @param {number} x
+     * @param {number} y
+     * @return {BinaryMatrix}
+     */
+    unfill(x, y) {
+        this.setTile(x, y, 0);
         return this;
     }
 
@@ -116,8 +128,8 @@ class BinaryMatrix extends NumericMatrix {
 
     /**
      * Whether is any filled point around the specified coordinates
-     * @param x
-     * @param y
+     * @param {number} x
+     * @param {number} y
      * @param max Maximum possible value. Bigger = slower performance!
      * @return {boolean}
      */
@@ -138,22 +150,21 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Retrieve all neighbors to the binary matrix
+     * @param {number} x
+     * @param {number} y
      * @param {number} deep
-     * @return {BinaryMatrix}
+     * @return {Array}
      */
-    getAllNeighbors(deep) {
+    getFilledNeighbors(x, y, deep) {
 
-        let map = new BinaryMatrix(this.getWidth(), this.getHeight());
+        let result = [],
+            _this = this;
 
-        this.foreachFilled(function(x, y) {
-            let neighbors = map.getNeighbors(x, y, deep);
-            for (let i = 0; i < neighbors.length; i++) {
-                map.fill(neighbors[i][0], neighbors[i][1]);
-            }
+        _this.foreachNeighbors(x, y, deep, function(nx, ny) {
+            result.push([nx, ny]);
         });
 
-        return map;
+        return result;
     }
 
     /**
@@ -162,7 +173,7 @@ class BinaryMatrix extends NumericMatrix {
      * @param {function} callback
      * @return {BinaryMatrix}
      */
-    foreachAllFilledNeighbors(deep, callback) {
+    foreachFilledNeighbors(deep, callback) {
 
         let _this = this;
 
@@ -226,4 +237,14 @@ class BinaryMatrix extends NumericMatrix {
             getPolygonAreaSize(coords)
         );
     };
+
+    /**
+     * @return {boolean|Array} [x, y] or false
+     */
+    getRandomFilledTile() {
+
+        let filledTiles = this.getFilledTiles();
+        
+        return filledTiles.length ? filledTiles.randomElement() : false;
+    }
 }

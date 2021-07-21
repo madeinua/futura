@@ -361,6 +361,13 @@ function scaleImageData(context, imageData, scale) {
 let timer = Date.now();
 
 /**
+ * @return {number}
+ */
+function getTimeForEvent() {
+    return Math.max(0, (Date.now() - timer));
+}
+
+/**
  * @param {string} event
  */
 function logTimeEvent(event) {

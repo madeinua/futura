@@ -1,5 +1,6 @@
 class OceanMap extends BinaryMatrix {
 
+    /** @var {AltitudeMap} */
     altitudeMap;
 
     /**
@@ -27,6 +28,7 @@ class OceanMap extends BinaryMatrix {
             point;
 
         _this.fill(startX, startY);
+
         activePoints.push([startX, startY]);
 
         while(activePoints.length) {

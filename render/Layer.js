@@ -1,5 +1,6 @@
 const LAYER_BIOMES = 0;
 const LAYER_FOREST = 1;
+const LAYER_ANIMALS = 2;
 
 class Layer extends Matrix {
 
@@ -15,7 +16,7 @@ class Layer extends Matrix {
     /**
      * @param {number} x
      * @param {number} y
-     * @param {null|array|HTMLImageElement} value
+     * @param {null|number|array|HTMLImageElement} value
      * @return {Matrix}
      */
     setTile(x, y, value) {
@@ -25,5 +26,9 @@ class Layer extends Matrix {
         }
 
         return super.setTile(x, y, value);
+    }
+
+    reset() {
+        this.map(null);
     }
 }

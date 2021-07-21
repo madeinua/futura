@@ -1,6 +1,9 @@
 class LakesMap extends BinaryMatrix {
 
+    /** @var {AltitudeMap} */
     altitudeMap;
+
+    /** @var {OceanMap} */
     oceanMap;
 
     /**
