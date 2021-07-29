@@ -16,7 +16,7 @@ class Layer extends Matrix {
     /**
      * @param {number} x
      * @param {number} y
-     * @param {null|number|array|HTMLImageElement} value
+     * @param {null|number|array|DisplayCell|HTMLImageElement} value
      * @return {Matrix}
      */
     setTile(x, y, value) {

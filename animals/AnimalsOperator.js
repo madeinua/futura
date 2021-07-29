@@ -1,42 +1,79 @@
 class AnimalsOperator {
 
+    /** @var {Object} */
+    config;
+
+    /** @var {Array} */
     animals = [];
 
+    /** @var {Array} */
+    animalsGenerators = [];
+
     /**
-     * @param {AnimalGenerator} animalGenerator
-     * @return {Animal}
+     * @param {Object} config
      */
-    createAnimal(animalGenerator) {
-
-        let animal = animalGenerator.create(
-            this.getCollisions()
-        );
-
-        if (animal) {
-            this.animals.push({
-                animal: animal,
-                generator: animalGenerator
-            });
-        }
-
-        return animal;
+    constructor(config) {
+        this.config = config;
     }
 
     /**
+     * @param {Animal} animal
      * @return {Array}
      */
-    getCollisions() {
+    getTilesAvailableToMove(animal) {
+        return getTilesAround(
+            animal.x,
+            animal.y,
+            this.config.worldSize,
+            this.config.worldSize,
+            2
+        );
+    }
 
-        let collisions = [];
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {Animal} animalToExcept
+     * @return {boolean}
+     */
+    isAnimalsAroundPoint = function(x, y, animalToExcept) {
 
-        for (let i = 0; i < this.animals.length; i++) {
-            collisions.push([
-                this.animals[i].animal.x,
-                this.animals[i].animal.y
-            ]);
+        let availableTiles = getTilesAround(x, y, this.config.worldSize, this.config.worldSize, 3);
+
+        for (let j = 0; j < availableTiles.length; j++) {
+            for (let i = 0; i < this.animals.length; i++) {
+                if (
+                    this.animals[i].id !== animalToExcept.id
+                    && this.animals[i].atPos(availableTiles[j])
+                ) {
+                    return true;
+                }
+            }
         }
 
-        return collisions;
+        return false;
+    }
+
+    /**
+     * @param {Animal} animal
+     * @return {boolean|Array}
+     */
+    getNextMove(animal) {
+
+        let availableTiles = this.getTilesAvailableToMove(animal),
+            nextPoint = false;
+
+        while(!nextPoint && availableTiles.length) {
+
+            nextPoint = availableTiles.randomElement();
+
+            if (this.isAnimalsAroundPoint(nextPoint[0], nextPoint[1], animal)) {
+                nextPoint = false;
+                availableTiles.splice(availableTiles.indexOf(nextPoint), 1);
+            }
+        }
+
+        return nextPoint;
     }
 
     /**
@@ -45,25 +82,65 @@ class AnimalsOperator {
     moveAnimals(callback) {
 
         let animal,
-            generator;
+            nextPoint;
 
         for (let i = 0; i < this.animals.length; i++) {
 
-            animal = this.animals[i].animal;
-            generator = this.animals[i].generator;
+            animal = this.animals[i];
 
             if (animal.canMove()) {
 
-                let ma = generator.getMovementsArea(
-                    this.getCollisions()
-                );
+                nextPoint = this.getNextMove(animal);
 
-                if (!animal.move(ma)) {
-                    continue;
+                if (nextPoint !== false) {
+                    animal.moveToTile(nextPoint);
                 }
             }
 
             callback(animal);
         }
+    }
+
+    /**
+     * @param {AnimalGenerator} generator
+     * @return {boolean}
+     */
+    isAnimalsGeneratorRegistered(generator) {
+
+        for (let i = 0; i < this.animalsGenerators.length; i++) {
+            if (this.animalsGenerators[i].getName() === generator.getName()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param {AnimalGenerator} generator
+     */
+    registerAnimalsGenerator(generator) {
+        if (!this.isAnimalsGeneratorRegistered(generator)) {
+            this.animalsGenerators.push(generator);
+            console.log('Generator ' + generator.getName() + ' registered'); // @TODO: remove this
+        }
+    }
+
+    maybeCreateAnimals() {
+
+        if (this.animals.length > this.config.ANIMALS_LIMIT) {
+            return;
+        }
+
+        for (let i = 0; i < this.animalsGenerators.length; i++) {
+
+            let animals = this.animalsGenerators[i].maybeCreateAnimals();
+
+            for (let j = 0; j < animals.length; j++) {
+                this.animals.push(animals[j]);
+            }
+        }
+        
+        console.log(this.animals); // @TODO: remove this
     }
 }

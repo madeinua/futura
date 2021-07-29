@@ -180,65 +180,7 @@ class Matrix {
      * @return {Array}
      */
     getNeighbors(x, y, deep) {
-
-        if (deep === 0) {
-            return [];
-        }
-
-        let _this = this,
-            _getNeighbors = function(x1, y1, deep1) {
-
-                let points;
-
-                if (deep1 % 2 === 0) {
-                    points = [
-                        [-1, -1], [-1, 0], [-1, 1],
-                        [0, -1], [0, 1],
-                        [1, -1], [1, 0], [1, 1]
-                    ];
-                } else {
-                    points = [
-                        [-1, 0],
-                        [0, -1], [0, 1],
-                        [1, 0]
-                    ];
-                }
-
-                let w = _this.getWidth(),
-                    h = _this.getHeight(),
-                    neighbors = [];
-
-                for (let i = 0; i < points.length; i++) {
-
-                    let nx = x1 + points[i][0];
-                    let ny = y1 + points[i][1];
-
-                    if (
-                        nx >= 0
-                        && nx < w
-                        && ny >= 0
-                        && ny < h
-                        && !(nx === x && ny === y)
-                    ) {
-                        neighbors.push([nx, ny]);
-                    }
-                }
-
-                if (deep1 > 2) {
-
-                    let len = neighbors.length;
-
-                    for (let j = 0; j < len; j++) {
-                        neighbors = neighbors.concat(
-                            _getNeighbors(neighbors[j][0], neighbors[j][1], deep1 - 2)
-                        );
-                    }
-                }
-
-                return neighbors.unique();
-            };
-
-        return _getNeighbors(x, y, deep);
+        return getTilesAround(x, y, this.getWidth(), this.getHeight(), deep);
     }
 
     /**

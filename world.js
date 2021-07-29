@@ -403,7 +403,7 @@ class World {
      * @param {Animal} animal
      */
     addAnimalToLayer = function(animal) {
-        this.getLayer(LAYER_ANIMALS).setTile(animal.x, animal.y, 1);
+        this.getLayer(LAYER_ANIMALS).setTile(animal.x, animal.y, hexToRgb(this.config.ANIMAL_COLOR));
     };
 
     /**
@@ -415,14 +415,12 @@ class World {
     initAnimalsGeneration = function(oceanMap, freshWaterMap, coastMap) {
 
         let _this = this,
-            animal,
-            animalGenerator = new AnimalGenerator(oceanMap, freshWaterMap, coastMap, _this.config),
-            animalsOperator = new AnimalsOperator(),
+            animalsOperator = new AnimalsOperator(_this.config),
             animalsMap = new BinaryMatrix(this.config.worldSize, this.config.worldSize);
 
-        for (let i = 0; i < 100; i++) {
-            animal = animalsOperator.createAnimal(animalGenerator);
-        }
+        animalsOperator.registerAnimalsGenerator(
+            new AnimalGenerator(oceanMap, freshWaterMap, coastMap, _this.config)
+        );
 
         if (this.logs) {
             logTimeEvent('Animals initialized.');
@@ -432,6 +430,8 @@ class World {
 
             animalsMap.map(false);
             _this.cleanAnimalsLayer();
+
+            animalsOperator.maybeCreateAnimals();
 
             animalsOperator.moveAnimals(function(animal) {
                 _this.addAnimalToLayer(animal);

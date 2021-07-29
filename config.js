@@ -9,9 +9,9 @@ function getConfig() {
         worldWrapper: worldWrapper,
         worldCanvas: worldCanvas,
         miniMapCanvas: miniMapCanvas,
-        showCoordinates: false,
-        tickInterval: 1,
-        ticksCount: 40,
+        showCoordinates: true,
+        tickInterval: 500,
+        ticksCount: 20,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -91,6 +91,9 @@ function getConfig() {
         FOREST_IMAGES: [
             'images/forest-1.png',
             'images/forest-2.png'
-        ]
+        ],
+
+        ANIMALS_LIMIT: 100,
+        ANIMAL_COLOR: '#f7ff00'
     };
 }

@@ -13,7 +13,7 @@ class AnimalGenerator {
     coastMap;
 
     /** @var {BinaryMatrix} */
-    movementsArea;
+    creationArea;
 
     /**
      * @param {OceanMap} oceanMap
@@ -30,14 +30,55 @@ class AnimalGenerator {
     }
 
     /**
-     * @param {Array} collisions
+     * @return {string}
+     */
+    getName() {
+        return AnimalGenerator.constructor.name;
+    }
+
+    /**
+     * @return {number} [0 - 100]
+     */
+    getCreateChance() {
+        return 100;
+    }
+
+    /**
+     * @return {number}
+     */
+    getCreateIntensity() {
+        return 1;
+    }
+
+    /**
+     * @return {BinaryMatrix}
+     */
+    generateCreationArea() {
+        return new BinaryMatrix(this.config.worldSize, this.config.worldSize, 1);
+    }
+
+    /**
+     * @return {BinaryMatrix}
+     */
+    getCreationArea() {
+
+        if (typeof this.creationArea === 'undefined') {
+            this.creationArea = this.generateCreationArea();
+        }
+
+        return this.creationArea;
+    }
+
+    /**
      * @return {boolean|Animal}
      */
-    create(collisions) {
+    maybeCreateAnimal() {
 
-        let ma = this.getMovementsArea(collisions);
+        if (!iAmLucky(this.getCreateChance())) {
+            return false;
+        }
 
-        let tile = ma.getRandomFilledTile();
+        let tile = this.getCreationArea().getRandomFilledTile();
 
         if (!tile) {
             throwError('Can not create animal', 1, true);
@@ -48,27 +89,22 @@ class AnimalGenerator {
     }
 
     /**
-     * @return {BinaryMatrix}
+     * @return {Animal[]}
      */
-    createMovementsArea() {
-        return new BinaryMatrix(this.config.worldSize, this.config.worldSize, 1);
-    }
+    maybeCreateAnimals() {
 
-    /**
-     * @return {BinaryMatrix}
-     */
-    getMovementsArea(collisions) {
+        let animals = [],
+            animal;
 
-        if (typeof this.movementsArea === 'undefined') {
-            this.movementsArea = this.createMovementsArea();
+        for (let i = 0; i < this.getCreateIntensity(); i++) {
+
+            animal = this.maybeCreateAnimal();
+
+            if (animal) {
+                animals.push(animal);
+            }
         }
 
-        let result = this.movementsArea;
-
-        for (let i = 0; i < collisions.length; i++) {
-            result.unfill(collisions[i][0], collisions[i][1]);
-        }
-
-        return result;
+        return animals;
     }
 }

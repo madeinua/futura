@@ -1,10 +1,15 @@
 class Animal {
 
+    static NAME = 'Animal';
+
     /** @var {number} */
     x;
 
     /** @var {number} */
     y;
+
+    /** @var {string} */
+    id;
 
     /**
      * @param {number} x
@@ -13,38 +18,29 @@ class Animal {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.id = this.constructor.NAME + '-' + x + '-' + y;
     }
 
     /**
      * @return {boolean}
      */
     canMove() {
-        return iAmLucky(50);
+        return true;
     }
 
     /**
-     * @param {BinaryMatrix} movementsArea
-     * @return {Array}
+     * @param {Array} xy
      */
-    getNextMove(movementsArea) {
-
-        let availableTiles = movementsArea.getFilledNeighbors(this.x, this.y, 1);
-        availableTiles.push([this.x, this.y]);
-
-        return availableTiles.randomElement();
-    }
-
-    /**
-     * @param {BinaryMatrix} movementsArea
-     * @return {boolean}
-     */
-    move(movementsArea) {
-
-        let xy = this.getNextMove(movementsArea);
-
+    moveToTile(xy) {
         this.x = xy[0];
         this.y = xy[1];
+    }
 
-        return true;
+    /**
+     * @param {Array} xy
+     * @return {boolean}
+     */
+    atPos(xy) {
+        return xy[0] === this.x && xy[1] === this.y;
     }
 }

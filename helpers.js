@@ -77,12 +77,119 @@ Array.prototype.shuffle = function() {
 };
 
 /**
+ * @param {Array} array
+ * @return {Array}
+ */
+Array.prototype.intersect = function(array) {
+    return this.filter(value => array.includes(value));
+};
+
+/**
+ * @param {Array} array
+ * @return {Array}
+ */
+Array.prototype.diff = function(array) {
+    return this.filter(value => !array.includes(value));
+};
+
+/**
+ * @param {Array} xy
+ * @return {boolean}
+ */
+Array.prototype.includesTile = function(xy) {
+    return this.some(e => ((e[0] === xy[0]) && (e[1] === xy[1])));
+};
+
+/**
+ * @param {Array} array
+ * @return {Array}
+ */
+Array.prototype.intersectTiles = function(array) {
+    return this.filter(value => array.includesTile(value));
+};
+
+/**
+ * @param {Array} array
+ * @return {Array}
+ */
+Array.prototype.diffTiles = function(array) {
+    return this.filter(value => !array.includesTile(value));
+};
+
+/**
  * @param {number} value
  * @param {number} precision
  * @return {number}
  */
 function round(value, precision) {
     return parseFloat(value.toFixed(precision));
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} maxWidth
+ * @param {number} maxHeight
+ * @param {number} deep
+ * @return {Array}
+ */
+function getTilesAround(x, y, maxWidth, maxHeight, deep) {
+
+    if (deep === 0) {
+        return [];
+    }
+
+    let _getTilesAround = function(x1, y1, maxWidth, maxHeight, deep1) {
+
+        let points;
+
+        if (deep1 % 2 === 0) {
+            points = [
+                [-1, -1], [-1, 0], [-1, 1],
+                [0, -1], [0, 1],
+                [1, -1], [1, 0], [1, 1]
+            ];
+        } else {
+            points = [
+                [-1, 0],
+                [0, -1], [0, 1],
+                [1, 0]
+            ];
+        }
+
+        let neighbors = [];
+
+        for (let i = 0; i < points.length; i++) {
+
+            let nx = x1 + points[i][0];
+            let ny = y1 + points[i][1];
+
+            if (
+                nx >= 0
+                && nx < maxWidth
+                && ny >= 0
+                && ny < maxHeight
+                && !(nx === x && ny === y)
+            ) {
+                neighbors.push([nx, ny]);
+            }
+        }
+
+        if (deep1 > 2) {
+
+            let len = neighbors.length;
+
+            for (let j = 0; j < len; j++) {
+                neighbors = neighbors.concat(
+                    _getTilesAround(neighbors[j][0], neighbors[j][1], maxWidth, maxHeight, deep1 - 2)
+                );
+            }
+        }
+
+        return neighbors.unique();
+    };
+
+    return _getTilesAround(x, y, maxWidth, maxHeight, deep);
 }
 
 /**
