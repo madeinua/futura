@@ -1,18 +1,10 @@
 class AltitudeMap extends PointMatrix {
 
-    /** @var {Object} */
-    config;
-
     /**
-     * @param {Object} config
      * @return {AltitudeMap}
      */
-    constructor(config) {
-
+    constructor() {
         super(config.worldSize, config.worldSize);
-
-        this.config = config;
-
         return this;
     }
 
@@ -24,8 +16,8 @@ class AltitudeMap extends PointMatrix {
 
         for (let i in octaves) {
             maps[i] = createNoiseMap(
-                _this.config.worldSize,
-                octaves[i] * (_this.config.worldSize / 75)
+                config.worldSize,
+                octaves[i] * (config.worldSize / 75)
             );
         }
 
@@ -44,10 +36,10 @@ class AltitudeMap extends PointMatrix {
             val /= size;
 
             // stretch map
-            val = Math.min(1, Math.pow(val, _this.config.WORLD_MAP_OCEAN_LEVEL + 1));
+            val = Math.min(1, Math.pow(val, config.WORLD_MAP_OCEAN_LEVEL + 1));
 
             // make island
-            val = _this.makeIsland(x, y, _this.config.worldSize, val);
+            val = _this.makeIsland(x, y, config.worldSize, val);
 
             return val;
         });
@@ -77,7 +69,7 @@ class AltitudeMap extends PointMatrix {
      * @return {boolean}
      */
     isGround = function(level) {
-        return level > this.config.MAX_WATER_LEVEL;
+        return level > config.MAX_WATER_LEVEL;
     };
 
     /**
@@ -85,6 +77,6 @@ class AltitudeMap extends PointMatrix {
      * @return {boolean}
      */
     isWater = function(level) {
-        return this.config.MAX_WATER_LEVEL >= level;
+        return config.MAX_WATER_LEVEL >= level;
     };
 }

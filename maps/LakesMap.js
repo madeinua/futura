@@ -9,10 +9,9 @@ class LakesMap extends BinaryMatrix {
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {OceanMap} oceanMap
-     * @param {Object} config
      * @return {LakesMap}
      */
-    constructor(altitudeMap, oceanMap, config) {
+    constructor(altitudeMap, oceanMap) {
 
         super(config.worldSize, config.worldSize);
 

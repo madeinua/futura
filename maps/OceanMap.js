@@ -5,15 +5,11 @@ class OceanMap extends BinaryMatrix {
 
     /**
      * @param {AltitudeMap} altitudeMap
-     * @param {Object} config
      * @return {OceanMap}
      */
-    constructor(altitudeMap, config) {
-
+    constructor(altitudeMap) {
         super(config.worldSize, config.worldSize);
-
         this.altitudeMap = altitudeMap;
-
         return this;
     };
 

@@ -22,8 +22,7 @@ class World {
             );
         }
 
-        this.config = config;
-        this.logs = true;
+        this.logs = config.logs;
 
         this.layers = [];
 
@@ -48,7 +47,7 @@ class World {
         if (config.storeData) {
 
             let worldSize = localStorage.getItem('worldSize'),
-                actualSize = this.config.worldSize + 'x' + this.config.worldSize;
+                actualSize = config.worldSize + 'x' + config.worldSize;
 
             if (actualSize !== worldSize) {
                 localStorage.clear();
@@ -78,7 +77,7 @@ class World {
     getLayer = function(level) {
 
         if (typeof this.layers[level] === 'undefined') {
-            this.layers[level] = new Layer(this.config.worldSize, this.config.worldSize);
+            this.layers[level] = new Layer(config.worldSize, config.worldSize);
         }
 
         return this.layers[level];
@@ -96,8 +95,8 @@ class World {
      */
     generateAltitudeMap = function() {
 
-        let altitudeMap = new AltitudeMap(this.config),
-            storage = this.config.storeData ? localStorage.getItem('altitudeMap') : null;
+        let altitudeMap = new AltitudeMap(),
+            storage = config.storeData ? localStorage.getItem('altitudeMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             altitudeMap.fromString(storage);
@@ -105,7 +104,7 @@ class World {
 
             altitudeMap.generateMap();
 
-            if (this.config.storeData) {
+            if (config.storeData) {
                 localStorage.setItem('altitudeMap', altitudeMap.toString());
             }
         }
@@ -125,8 +124,8 @@ class World {
      */
     generateOceanMap = function(altitudeMap) {
 
-        let oceanMap = new OceanMap(altitudeMap, this.config),
-            storage = this.config.storeData ? localStorage.getItem('oceanMap') : null;
+        let oceanMap = new OceanMap(altitudeMap),
+            storage = config.storeData ? localStorage.getItem('oceanMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             oceanMap.fromString(storage);
@@ -134,7 +133,7 @@ class World {
 
             oceanMap.generateMap();
 
-            if (this.config.storeData) {
+            if (config.storeData) {
                 localStorage.setItem('oceanMap', oceanMap.toString());
             }
         }
@@ -156,8 +155,8 @@ class World {
      */
     getCoastMap = function(oceanMap, altitudeMap, temperatureMap) {
 
-        let coastMap = new CoastMap(oceanMap, altitudeMap, temperatureMap, this.config),
-            storage = this.config.storeData ? localStorage.getItem('coastMap') : null;
+        let coastMap = new CoastMap(oceanMap, altitudeMap, temperatureMap),
+            storage = config.storeData ? localStorage.getItem('coastMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             coastMap.fromString(storage);
@@ -165,7 +164,7 @@ class World {
 
             coastMap.generateMap();
 
-            if (this.config.storeData) {
+            if (config.storeData) {
                 localStorage.setItem('coastMap', coastMap.toString());
             }
         }
@@ -186,8 +185,8 @@ class World {
      */
     generateLakesMap = function(altitudeMap, oceanMap) {
 
-        let lakesMap = new LakesMap(altitudeMap, oceanMap, this.config),
-            storage = this.config.storeData ? localStorage.getItem('lakesMap') : null;
+        let lakesMap = new LakesMap(altitudeMap, oceanMap),
+            storage = config.storeData ? localStorage.getItem('lakesMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             lakesMap.fromString(storage);
@@ -195,7 +194,7 @@ class World {
 
             lakesMap.generateMap();
 
-            if (this.config.storeData) {
+            if (config.storeData) {
                 localStorage.setItem('lakesMap', lakesMap.toString());
             }
         }
@@ -216,8 +215,8 @@ class World {
      */
     generateRiversMap = function(altitudeMap, lakesMap) {
 
-        let riversMap = new RiversMap(altitudeMap, lakesMap, this.config),
-            storage = this.config.storeData ? localStorage.getItem('riversMap') : null;
+        let riversMap = new RiversMap(altitudeMap, lakesMap),
+            storage = config.storeData ? localStorage.getItem('riversMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             riversMap.fromString(storage);
@@ -225,7 +224,7 @@ class World {
 
             riversMap.generateMap();
 
-            if (this.config.storeData) {
+            if (config.storeData) {
                 localStorage.setItem('riversMap', riversMap.toString());
             }
         }
@@ -262,8 +261,8 @@ class World {
      */
     generateHumidityMap = function(altitudeMap, riversMap, lakesMap) {
 
-        let humidityMap = new HumidityMap(altitudeMap, riversMap, lakesMap, this.config),
-            storage = this.config.storeData ? localStorage.getItem('humidityMap') : null;
+        let humidityMap = new HumidityMap(altitudeMap, riversMap, lakesMap),
+            storage = config.storeData ? localStorage.getItem('humidityMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             humidityMap.fromString(storage);
@@ -271,7 +270,7 @@ class World {
 
             humidityMap.generateMap();
 
-            if (this.config.storeData) {
+            if (config.storeData) {
                 localStorage.setItem('humidityMap', humidityMap.toString());
             }
         }
@@ -291,8 +290,8 @@ class World {
      */
     generateTemperatureMap = function(altitudeMap) {
 
-        let temperatureMap = new TemperatureMap(altitudeMap, this.config),
-            storage = this.config.storeData ? localStorage.getItem('temperatureMap') : null;
+        let temperatureMap = new TemperatureMap(altitudeMap),
+            storage = config.storeData ? localStorage.getItem('temperatureMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             temperatureMap.fromString(storage);
@@ -300,7 +299,7 @@ class World {
 
             temperatureMap.generateMap();
 
-            if (this.config.storeData) {
+            if (config.storeData) {
                 localStorage.setItem('temperatureMap', temperatureMap.toString());
             }
         }
@@ -313,134 +312,6 @@ class World {
 
         return temperatureMap;
     };
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @param {OceanMap} oceanMap
-     * @param {CoastMap} coastMap
-     * @param {BinaryMatrix} freshWaterMap
-     * @param {TemperatureMap} temperatureMap
-     * @param {HumidityMap} humidityMap
-     * @return {Matrix}
-     */
-    generateBiomes = function(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap) {
-
-        let biomes = new Matrix(this.config.worldSize, this.config.worldSize),
-            biomesGenerator = new Biomes(
-                altitudeMap,
-                oceanMap,
-                coastMap,
-                freshWaterMap,
-                temperatureMap,
-                humidityMap,
-                this.config
-            );
-
-        altitudeMap.foreach(function(x, y) {
-            biomes.setTile(x, y, biomesGenerator.getBiome(x, y));
-        });
-
-        if (this.logs) {
-            logTimeEvent('Biomes calculated');
-        }
-
-        biomes = Filters.apply('biomes', biomes);
-
-        return biomes;
-    };
-
-    /**
-     * @param {ForestMap} forestMap
-     */
-    addForestMapToLayer = function(forestMap) {
-
-        let forestLayer = this.getLayer(LAYER_FOREST);
-
-        forestMap.foreach(function(x, y) {
-            forestLayer.setTile(
-                x, y,
-                forestMap.filled(x, y) ? forestMap.getForestDisplayCell(x, y) : null
-            );
-        });
-    };
-
-    /**
-     * @param {Matrix} biomes
-     * @return {Array}
-     */
-    initForestGeneration = function(biomes) {
-
-        let _this = this,
-            forestMap = new ForestMap(biomes, _this.config);
-
-        forestMap.init();
-
-        if (this.logs) {
-            logTimeEvent('Forests initialized.');
-        }
-
-        _this.tickHandlers.push(function(step) {
-
-            let multiply = step > _this.config.FOREST_PRE_GENERATION_STEPS
-                ? _this.config.FOREST_PRE_GENERATION_MULTIPLY
-                : 1;
-
-            forestMap.generate(step, multiply);
-
-            _this.addForestMapToLayer(forestMap);
-
-            forestMap = Filters.apply('forestMap', forestMap);
-        });
-
-        return forestMap;
-    };
-
-    cleanAnimalsLayer = function() {
-        this.getLayer(LAYER_ANIMALS).reset();
-    };
-
-    /**
-     * @param {Animal} animal
-     */
-    addAnimalToLayer = function(animal) {
-        this.getLayer(LAYER_ANIMALS).setTile(animal.x, animal.y, hexToRgb(this.config.ANIMAL_COLOR));
-    };
-
-    /**
-     * @TODO Rework - see google keep
-     * @param {OceanMap} oceanMap
-     * @param {CoastMap} coastMap
-     * @param {BinaryMatrix} freshWaterMap
-     */
-    initAnimalsGeneration = function(oceanMap, freshWaterMap, coastMap) {
-
-        let _this = this,
-            animalsOperator = new AnimalsOperator(_this.config),
-            animalsMap = new BinaryMatrix(this.config.worldSize, this.config.worldSize);
-
-        animalsOperator.registerAnimalsGenerator(
-            new AnimalGenerator(oceanMap, freshWaterMap, coastMap, _this.config)
-        );
-
-        if (this.logs) {
-            logTimeEvent('Animals initialized.');
-        }
-
-        _this.tickHandlers.push(function() {
-
-            animalsMap.map(false);
-            _this.cleanAnimalsLayer();
-
-            animalsOperator.maybeCreateAnimals();
-
-            animalsOperator.moveAnimals(function(animal) {
-                _this.addAnimalToLayer(animal);
-                animalsMap.setTile(animal.x, animal.y, 1);
-            });
-
-            Filters.apply('animalsMap', animalsMap);
-        });
-    }
 
     /**
      * @param {CallableFunction} callback
@@ -465,14 +336,14 @@ class World {
                 _this.tickHandlers[i](_this.timerStep);
             }
 
-            if (_this.config.ticksCount > 0 && _this.timerStep === _this.config.ticksCount) {
+            if (config.ticksCount > 0 && _this.timerStep === config.ticksCount) {
 
                 for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
                     _this.tickFinalHandlers[i]();
                 }
 
                 if (_this.logs) {
-                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round(getTimeForEvent() / _this.config.ticksCount) + 'ms');
+                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round(getTimeForEvent() / config.ticksCount) + 'ms');
                 }
 
                 clearInterval(ite);
@@ -482,7 +353,7 @@ class World {
 
             callback();
 
-        }, _this.config.tickInterval);
+        }, config.tickInterval);
     };
 
     /**
@@ -534,18 +405,33 @@ class World {
             riversMap = _this.generateRiversMap(altitudeMap, lakesMap),
             freshWaterMap = _this.getFreshWaterMap(lakesMap, riversMap),
             humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
-            biomes = _this.generateBiomes(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap),
-            mainLayer = _this.getLayer(LAYER_BIOMES);
+            biomesOperator = new BiomesOperator(),
+            forestsOperator = new ForestsOperator(),
+            animalsOperator = new AnimalsOperator();
 
-        biomes.foreach(function(x, y) {
-            mainLayer.setTile(
-                x, y,
-                biomes.getTile(x, y).getHexColor()
-            );
-        });
+        biomesOperator.initBiomesGeneration(
+            altitudeMap,
+            oceanMap,
+            coastMap,
+            freshWaterMap,
+            temperatureMap,
+            humidityMap,
+            this.getLayer(LAYER_BIOMES)
+        );
 
-        _this.initForestGeneration(biomes);
-        _this.initAnimalsGeneration(oceanMap, freshWaterMap, coastMap);
+        forestsOperator.initForestGeneration(
+            biomesOperator.getBiomes(),
+            this.tickHandlers,
+            this.getLayer(LAYER_FOREST)
+        );
+
+        animalsOperator.initAnimalsGeneration(
+            oceanMap,
+            freshWaterMap,
+            coastMap,
+            this.tickHandlers,
+            this.getLayer(LAYER_ANIMALS)
+        );
 
         if (this.logs) {
             logTimeEvent('World generated');
@@ -558,7 +444,7 @@ class World {
      */
     moveMapTo = function(point, silent = false) {
 
-        let max = this.config.worldSize - this.config.visibleCols;
+        let max = config.worldSize - config.visibleCols;
 
         point[0] = Math.max(0, Math.min(point[0], max));
         point[1] = Math.max(0, Math.min(point[1], max));
@@ -577,7 +463,7 @@ class World {
 
         let _this = this,
             ctx = _this.miniMapCanvas.getContext('2d'),
-            image = ctx.createImageData(_this.config.worldSize, _this.config.worldSize),
+            image = ctx.createImageData(config.worldSize, config.worldSize),
             layer,
             displayCell;
 
@@ -595,7 +481,7 @@ class World {
 
                 fillCanvasPixel(
                     image,
-                    (x + y * _this.config.worldSize) * 4,
+                    (x + y * config.worldSize) * 4,
                     displayCell.getColor()
                 );
             });
@@ -609,8 +495,8 @@ class World {
         ctx.strokeRect(
             this.cameraPosX,
             this.cameraPosY,
-            this.config.visibleCols,
-            this.config.visibleCols
+            config.visibleCols,
+            config.visibleCols
         );
     };
 
@@ -625,15 +511,15 @@ class World {
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
 
-        for (x = 0; x < _this.config.visibleCols; x++) {
-            for (y = 0; y < _this.config.visibleCols; y++) {
+        for (x = 0; x < config.visibleCols; x++) {
+            for (y = 0; y < config.visibleCols; y++) {
 
                 lx = x * _this.cellSize + worldOffsetLeft;
                 ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.strokeRect(lx, ly, _this.cellSize, _this.cellSize);
 
-                if (_this.config.showCoordinates) {
+                if (config.showCoordinates) {
                     ctx.font = '7px senf';
                     ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
                     ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 20);
@@ -649,9 +535,9 @@ class World {
      */
     isTileVisible = function(x, y) {
         return x >= this.cameraPosX
-            && x <= this.cameraPosX + this.config.visibleCols
+            && x <= this.cameraPosX + config.visibleCols
             && y >= this.cameraPosY
-            && y <= this.cameraPosY + this.config.visibleCols;
+            && y <= this.cameraPosY + config.visibleCols;
     };
 
     redrawWorld = function() {
@@ -659,12 +545,12 @@ class World {
         let _this = this,
             renderCanvas = document.createElement('canvas');
 
-        renderCanvas.width = _this.config.worldSize;
-        renderCanvas.height = _this.config.worldSize;
+        renderCanvas.width = config.worldSize;
+        renderCanvas.height = config.worldSize;
 
         let renderCtx = renderCanvas.getContext('2d'),
             ctx = _this.worldCanvas.getContext('2d'),
-            image = renderCtx.createImageData(_this.config.worldSize, _this.config.worldSize),
+            image = renderCtx.createImageData(config.worldSize, config.worldSize),
             ctxImages = [],
             layer,
             tile,
@@ -697,7 +583,7 @@ class World {
 
                 fillCanvasPixel(
                     image,
-                    (x + y * _this.config.worldSize) * 4,
+                    (x + y * config.worldSize) * 4,
                     tile.getColor()
                 );
             });
@@ -708,8 +594,8 @@ class World {
         let imageData = renderCtx.getImageData(
             _this.cameraPosX,
             _this.cameraPosY,
-            _this.config.visibleCols,
-            _this.config.visibleCols
+            config.visibleCols,
+            config.visibleCols
         );
 
         let scaledData = scaleImageData(ctx, imageData, _this.cellSize);

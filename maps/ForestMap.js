@@ -3,20 +3,15 @@ class ForestMap extends BinaryMatrix {
     /** @var {Matrix} */
     biomes;
 
-    /** @var {Object} */
-    config;
-
     /**
      * @param {Matrix} biomes
-     * @param {Object} config
      * @return {ForestMap}
      */
-    constructor(biomes, config) {
+    constructor(biomes) {
 
         super(config.worldSize, config.worldSize);
 
         this.biomes = biomes;
-        this.config = config;
 
         this.forestColor = hexToRgb(config.FOREST_COLOR);
         this.forestImages = [];
@@ -31,13 +26,13 @@ class ForestMap extends BinaryMatrix {
 
     init() {
 
-        this.ihTemperateMap = this.createIdealHumidityMap(this.config.FOREST_BEST_TEMPERATE_HUMIDITY);
-        this.itTemperateMap = this.createIdealTemperatureMap(this.config.FOREST_BEST_TEMPERATE_TEMPERATURE);
-        this.iaTemperateMap = this.createIdealAltitudeMap(this.config.FOREST_BEST_TEMPERATE_ALTITUDE);
+        this.ihTemperateMap = this.createIdealHumidityMap(config.FOREST_BEST_TEMPERATE_HUMIDITY);
+        this.itTemperateMap = this.createIdealTemperatureMap(config.FOREST_BEST_TEMPERATE_TEMPERATURE);
+        this.iaTemperateMap = this.createIdealAltitudeMap(config.FOREST_BEST_TEMPERATE_ALTITUDE);
 
-        this.ihTropicalMap = this.createIdealHumidityMap(this.config.FOREST_BEST_TROPICAL_HUMIDITY);
-        this.itTropicalMap = this.createIdealTemperatureMap(this.config.FOREST_BEST_TROPICAL_TEMPERATURE);
-        this.iaTropicalMap = this.createIdealAltitudeMap(this.config.FOREST_BEST_TROPICAL_ALTITUDE);
+        this.ihTropicalMap = this.createIdealHumidityMap(config.FOREST_BEST_TROPICAL_HUMIDITY);
+        this.itTropicalMap = this.createIdealTemperatureMap(config.FOREST_BEST_TROPICAL_TEMPERATURE);
+        this.iaTropicalMap = this.createIdealAltitudeMap(config.FOREST_BEST_TROPICAL_ALTITUDE);
     }
 
     /**
@@ -113,7 +108,7 @@ class ForestMap extends BinaryMatrix {
     getForestType(biome) {
         return ['savanna', 'savanna-hills', 'tropic'].includes(
             biome.getName()
-        ) ? this.config.FOREST_TEMPERATE : this.config.FOREST_TROPICAL;
+        ) ? config.FOREST_TEMPERATE : config.FOREST_TROPICAL;
     }
 
     /**
@@ -123,27 +118,27 @@ class ForestMap extends BinaryMatrix {
     getCreateChanceByGround(groundName) {
         switch(groundName) {
             case 'tundra':
-                return this.config.FOREST_TUNDRA_GROWTH;
+                return config.FOREST_TUNDRA_GROWTH;
             case 'tundra-hills':
-                return this.config.FOREST_TUNDRA_HILLS_GROWTH;
+                return config.FOREST_TUNDRA_HILLS_GROWTH;
             case 'grass':
-                return this.config.FOREST_GRASS_GROWTH;
+                return config.FOREST_GRASS_GROWTH;
             case 'grass-hills':
-                return this.config.FOREST_GRASS_HILLS_GROWTH;
+                return config.FOREST_GRASS_HILLS_GROWTH;
             case 'desert-hills':
-                return this.config.FOREST_DESERT_HILLS_GROWTH;
+                return config.FOREST_DESERT_HILLS_GROWTH;
             case 'swamp':
-                return this.config.FOREST_SWAMP_GROWTH;
+                return config.FOREST_SWAMP_GROWTH;
             case 'rocks':
-                return this.config.FOREST_ROCKS_GROWTH;
+                return config.FOREST_ROCKS_GROWTH;
             case 'savanna':
-                return this.config.FOREST_SAVANNA_GROWTH;
+                return config.FOREST_SAVANNA_GROWTH;
             case 'savanna-hills':
-                return this.config.FOREST_SAVANNA_HILLS_GROWTH;
+                return config.FOREST_SAVANNA_HILLS_GROWTH;
             case 'tropic':
-                return this.config.FOREST_TROPICS_GROWTH;
+                return config.FOREST_TROPICS_GROWTH;
             case 'beach':
-                return this.config.FOREST_BEACH_GROWTH;
+                return config.FOREST_BEACH_GROWTH;
         }
 
         return 0;
@@ -167,14 +162,14 @@ class ForestMap extends BinaryMatrix {
         let NBR = _this.sumNeighbors(biome.x, biome.y, 2),
             forestType = _this.getForestType(biome),
             IH, IT, IA,
-            BC = _this.config.FOREST_BORN_CHANCE,
-            GC = _this.config.FOREST_GROWTH_CHANCE;
+            BC = config.FOREST_BORN_CHANCE,
+            GC = config.FOREST_GROWTH_CHANCE;
 
-        if (forestType === _this.config.FOREST_TEMPERATE) {
+        if (forestType === config.FOREST_TEMPERATE) {
             IH = _this.ihTemperateMap.getTile(biome.x, biome.y);
             IT = _this.itTemperateMap.getTile(biome.x, biome.y);
             IA = _this.iaTemperateMap.getTile(biome.x, biome.y);
-        } else if (forestType === _this.config.FOREST_TROPICAL) {
+        } else if (forestType === config.FOREST_TROPICAL) {
             IH = _this.ihTropicalMap.getTile(biome.x, biome.y);
             IT = _this.itTropicalMap.getTile(biome.x, biome.y);
             IA = _this.iaTropicalMap.getTile(biome.x, biome.y);
@@ -182,8 +177,8 @@ class ForestMap extends BinaryMatrix {
 
         if (biome.getDistanceToWater() > 0) {
             let inc = Math.pow(biome.getDistanceToWater(), 2);
-            BC += _this.config.FOREST_BORN_NEAR_WATER / inc;
-            GC += _this.config.FOREST_GROWTH_NEAR_WATER / inc;
+            BC += config.FOREST_BORN_NEAR_WATER / inc;
+            GC += config.FOREST_GROWTH_NEAR_WATER / inc;
         }
 
         /**
@@ -233,8 +228,8 @@ class ForestMap extends BinaryMatrix {
             return 0;
         }
 
-        let DC = this.config.FOREST_DEAD_CHANCE, // dead chance
-            GC = this.config.FOREST_GROWTH_CHANCE; // growth chance (if there are forest-based tiles around)
+        let DC = config.FOREST_DEAD_CHANCE, // dead chance
+            GC = config.FOREST_GROWTH_CHANCE; // growth chance (if there are forest-based tiles around)
 
         return (100 - GC) * DC;
     }

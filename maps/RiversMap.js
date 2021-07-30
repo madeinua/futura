@@ -9,20 +9,15 @@ class RiversMap extends BinaryMatrix {
     /** @var {LakesMap} */
     lakesMap;
 
-    /** @var {Object} */
-    config;
-
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {LakesMap} lakesMap
-     * @param {Object} config
      * @return {RiversMap}
      */
-    constructor(altitudeMap, lakesMap, config) {
+    constructor(altitudeMap, lakesMap) {
 
         super(config.worldSize, config.worldSize);
 
-        this.config = config;
         this.altitudeMap = altitudeMap;
         this.lakesMap = lakesMap;
         this.riversCount = 0;
@@ -40,8 +35,8 @@ class RiversMap extends BinaryMatrix {
         let riverSources = _this.getRiverSources(_this.altitudeMap),
             rivers = [],
             allRiversPoints = [],
-            riversLimit = Math.floor(fromFraction(_this.config.RIVERS_DENSITY, 1, _this.config.worldSize)),
-            startCloseness = Math.max(_this.config.RIVER_MIN_LENGTH, this.config.RIVER_START_CLOSENESS);
+            riversLimit = Math.floor(fromFraction(config.RIVERS_DENSITY, 1, config.worldSize)),
+            startCloseness = Math.max(config.RIVER_MIN_LENGTH, config.RIVER_START_CLOSENESS);
 
         for (let i = 0; i < riverSources.length; i++) {
 
@@ -57,7 +52,7 @@ class RiversMap extends BinaryMatrix {
             river.push(riverSources[i]);
 
             // max river length = worldSize
-            for (let j = 0; j < _this.config.worldSize; j++) {
+            for (let j = 0; j < config.worldSize; j++) {
 
                 let nextRiverPoint = _this.getRiverDirection(river, _this.altitudeMap);
 
@@ -93,7 +88,7 @@ class RiversMap extends BinaryMatrix {
                 }
             }
 
-            if (finished && river.length >= _this.config.RIVER_MIN_LENGTH) {
+            if (finished && river.length >= config.RIVER_MIN_LENGTH) {
 
                 rivers.push(river);
                 allRiversPoints = allRiversPoints.concat(river);
@@ -128,8 +123,8 @@ class RiversMap extends BinaryMatrix {
 
             if (
                 altitudeMap.isGround(altitude)
-                && altitude >= _this.config.RIVER_SOURCE_MIN_ALTITUDE
-                && _this.config.RIVER_SOURCE_MAX_ALTITUDE >= altitude
+                && altitude >= config.RIVER_SOURCE_MIN_ALTITUDE
+                && config.RIVER_SOURCE_MAX_ALTITUDE >= altitude
             ) {
                 spawns.push([x, y]);
             }
@@ -183,7 +178,7 @@ class RiversMap extends BinaryMatrix {
     addRiverDeltaToRiverMap = function(river) {
 
         let _this = this,
-            ratio = randBetweenNumbers(0.01, _this.config.RIVER_DELTA_MAX_LENGTH),
+            ratio = randBetweenNumbers(0.01, config.RIVER_DELTA_MAX_LENGTH),
             deltaLength = river.length * ratio,
             notDeltaLength = river.length - deltaLength,
             delta = [];

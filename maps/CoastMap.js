@@ -1,8 +1,5 @@
 class CoastMap extends BinaryMatrix {
 
-    /** @var {Object} */
-    config;
-
     /** @var {OceanMap} */
     oceanMap;
 
@@ -16,17 +13,15 @@ class CoastMap extends BinaryMatrix {
      * @param {OceanMap} oceanMap
      * @param {AltitudeMap} altitudeMap
      * @param {TemperatureMap} temperatureMap
-     * @param {Object} config
      * @return {CoastMap}
      */
-    constructor(oceanMap, altitudeMap, temperatureMap, config) {
+    constructor(oceanMap, altitudeMap, temperatureMap) {
 
         super(config.worldSize, config.worldSize);
 
         this.oceanMap = oceanMap;
         this.altitudeMap = altitudeMap;
         this.temperatureMap = temperatureMap;
-        this.config = config;
 
         return this;
     };
@@ -37,9 +32,9 @@ class CoastMap extends BinaryMatrix {
      * @return {boolean}
      */
     isCoast(altitude, temperature) {
-        return altitude > this.config.MAX_OCEAN_LEVEL
-            - (temperature * this.config.COAST_TEMPERATURE_RATIO * 2 - this.config.COAST_TEMPERATURE_RATIO)
-            && altitude <= this.config.MAX_COAST_LEVEL;
+        return altitude > config.MAX_OCEAN_LEVEL
+            - (temperature * config.COAST_TEMPERATURE_RATIO * 2 - config.COAST_TEMPERATURE_RATIO)
+            && altitude <= config.MAX_COAST_LEVEL;
     }
 
     /**

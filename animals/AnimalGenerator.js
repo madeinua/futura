@@ -1,7 +1,6 @@
 class AnimalGenerator {
 
-    /** @var {Object} */
-    config;
+    static NAME = 'Animal';
 
     /** @var {OceanMap} */
     oceanMap;
@@ -19,21 +18,19 @@ class AnimalGenerator {
      * @param {OceanMap} oceanMap
      * @param {BinaryMatrix} freshWaterMap
      * @param {CoastMap} coastMap
-     * @param {Object} config
      */
-    constructor(oceanMap, freshWaterMap, coastMap, config) {
+    constructor(oceanMap, freshWaterMap, coastMap) {
 
         this.oceanMap = oceanMap;
         this.freshWaterMap = freshWaterMap;
         this.coastMap = coastMap;
-        this.config = config;
     }
 
     /**
      * @return {string}
      */
     getName() {
-        return AnimalGenerator.constructor.name;
+        return this.constructor.NAME;
     }
 
     /**
@@ -54,7 +51,7 @@ class AnimalGenerator {
      * @return {BinaryMatrix}
      */
     generateCreationArea() {
-        return new BinaryMatrix(this.config.worldSize, this.config.worldSize, 1);
+        return new BinaryMatrix(config.worldSize, config.worldSize, 1);
     }
 
     /**

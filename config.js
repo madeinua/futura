@@ -3,6 +3,7 @@ function getConfig() {
     return {
 
         // Global
+        logs: true,
         storeData: true,
         worldSize: 250,
         visibleCols: 30,

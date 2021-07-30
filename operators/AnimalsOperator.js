@@ -1,8 +1,5 @@
 class AnimalsOperator {
 
-    /** @var {Object} */
-    config;
-
     /** @var {Array} */
     animals = [];
 
@@ -10,10 +7,55 @@ class AnimalsOperator {
     animalsGenerators = [];
 
     /**
-     * @param {Object} config
+     * @param {Layer} animalsLayer
      */
-    constructor(config) {
-        this.config = config;
+    cleanAnimalsLayer = function(animalsLayer) {
+        animalsLayer.reset();
+    };
+
+    /**
+     * @param {Layer} animalsLayer
+     * @param {Animal} animal
+     */
+    addAnimalToLayer = function(animalsLayer, animal) {
+        animalsLayer.setTile(animal.x, animal.y, hexToRgb(config.ANIMAL_COLOR));
+    };
+
+    /**
+     * @param {OceanMap} oceanMap
+     * @param {CoastMap} coastMap
+     * @param {BinaryMatrix} freshWaterMap
+     * @param {Array} tickHandlers
+     * @param {Layer} animalsLayer
+     */
+    initAnimalsGeneration = function(oceanMap, freshWaterMap, coastMap, tickHandlers, animalsLayer) {
+
+        let _this = this,
+            animalsOperator = new AnimalsOperator(config),
+            animalsMap = new BinaryMatrix(config.worldSize, config.worldSize);
+
+        animalsOperator.registerAnimalsGenerator(
+            new AnimalGenerator(oceanMap, freshWaterMap, coastMap, config)
+        );
+
+        if (config.logs) {
+            logTimeEvent('Animals initialized.');
+        }
+
+        tickHandlers.push(function() {
+
+            animalsMap.map(false);
+            _this.cleanAnimalsLayer(animalsLayer);
+
+            animalsOperator.maybeCreateAnimals();
+
+            animalsOperator.moveAnimals(function(animal) {
+                _this.addAnimalToLayer(animalsLayer, animal);
+                animalsMap.setTile(animal.x, animal.y, 1);
+            });
+
+            Filters.apply('animalsMap', animalsMap);
+        });
     }
 
     /**
@@ -24,8 +66,8 @@ class AnimalsOperator {
         return getTilesAround(
             animal.x,
             animal.y,
-            this.config.worldSize,
-            this.config.worldSize,
+            config.worldSize,
+            config.worldSize,
             2
         );
     }
@@ -38,7 +80,7 @@ class AnimalsOperator {
      */
     isAnimalsAroundPoint = function(x, y, animalToExcept) {
 
-        let availableTiles = getTilesAround(x, y, this.config.worldSize, this.config.worldSize, 3);
+        let availableTiles = getTilesAround(x, y, config.worldSize, config.worldSize, 3);
 
         for (let j = 0; j < availableTiles.length; j++) {
             for (let i = 0; i < this.animals.length; i++) {
@@ -121,14 +163,18 @@ class AnimalsOperator {
      */
     registerAnimalsGenerator(generator) {
         if (!this.isAnimalsGeneratorRegistered(generator)) {
+
             this.animalsGenerators.push(generator);
-            console.log('Generator ' + generator.getName() + ' registered'); // @TODO: remove this
+
+            if (config.logs) {
+                console.log('Generator "' + generator.getName() + '" registered');
+            }
         }
     }
 
     maybeCreateAnimals() {
 
-        if (this.animals.length > this.config.ANIMALS_LIMIT) {
+        if (this.animals.length > config.ANIMALS_LIMIT) {
             return;
         }
 
@@ -140,7 +186,5 @@ class AnimalsOperator {
                 this.animals.push(animals[j]);
             }
         }
-        
-        console.log(this.animals); // @TODO: remove this
     }
 }

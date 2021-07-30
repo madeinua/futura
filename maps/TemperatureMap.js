@@ -3,21 +3,13 @@ class TemperatureMap extends PointMatrix {
     /** @var {AltitudeMap} */
     altitudeMap;
 
-    /** @var {Object} */
-    config;
-
     /**
      * @param {AltitudeMap} altitudeMap
-     * @param {Object} config
      * @return {TemperatureMap}
      */
-    constructor(altitudeMap, config) {
-
+    constructor(altitudeMap) {
         super(config.worldSize, config.worldSize);
-
         this.altitudeMap = altitudeMap;
-        this.config = config;
-
         return this;
     };
 
@@ -38,8 +30,8 @@ class TemperatureMap extends PointMatrix {
         let _this = this,
             gradient = [];
 
-        for (let i = 0; i < this.config.worldSize; i++) {
-            gradient[i] = i / this.config.worldSize;
+        for (let i = 0; i < config.worldSize; i++) {
+            gradient[i] = i / config.worldSize;
         }
 
         _this.foreach(function(x, y) {
@@ -50,7 +42,7 @@ class TemperatureMap extends PointMatrix {
     considerAltitude = function() {
 
         let _this = this,
-            revFactor = fromFraction(_this.config.ALTITUDE_TEMPERATURE_FACTOR, 5, 1);
+            revFactor = fromFraction(config.ALTITUDE_TEMPERATURE_FACTOR, 5, 1);
 
         _this.foreach(function(x, y) {
             _this.addToTile(x, y, _this.altitudeMap.getTile(x, y) / revFactor);
