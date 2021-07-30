@@ -10,7 +10,7 @@ function getConfig() {
         worldWrapper: worldWrapper,
         worldCanvas: worldCanvas,
         miniMapCanvas: miniMapCanvas,
-        showCoordinates: true,
+        showCoordinates: false,
         tickInterval: 500,
         ticksCount: 20,
 

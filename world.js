@@ -91,229 +91,6 @@ class World {
     }
 
     /**
-     * @return {AltitudeMap}
-     */
-    generateAltitudeMap = function() {
-
-        let altitudeMap = new AltitudeMap(),
-            storage = config.storeData ? localStorage.getItem('altitudeMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            altitudeMap.fromString(storage);
-        } else {
-
-            altitudeMap.generateMap();
-
-            if (config.storeData) {
-                localStorage.setItem('altitudeMap', altitudeMap.toString());
-            }
-        }
-
-        altitudeMap = Filters.apply('altitudeMap', altitudeMap);
-
-        if (this.logs) {
-            logTimeEvent('Altitude map generated. Min: ' + altitudeMap.getMin() + ' Max: ' + altitudeMap.getMax() + ' Avg: ' + altitudeMap.getAvgValue());
-        }
-
-        return altitudeMap;
-    };
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @return {OceanMap}
-     */
-    generateOceanMap = function(altitudeMap) {
-
-        let oceanMap = new OceanMap(altitudeMap),
-            storage = config.storeData ? localStorage.getItem('oceanMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            oceanMap.fromString(storage);
-        } else {
-
-            oceanMap.generateMap();
-
-            if (config.storeData) {
-                localStorage.setItem('oceanMap', oceanMap.toString());
-            }
-        }
-
-        oceanMap = Filters.apply('oceanMap', oceanMap);
-
-        if (this.logs) {
-            logTimeEvent('Ocean map calculated. Size: ' + oceanMap.getSize() + '%');
-        }
-
-        return oceanMap;
-    };
-
-    /**
-     * @param {OceanMap} oceanMap
-     * @param {AltitudeMap} altitudeMap
-     * @param {TemperatureMap} temperatureMap
-     * @return {BinaryMatrix}
-     */
-    getCoastMap = function(oceanMap, altitudeMap, temperatureMap) {
-
-        let coastMap = new CoastMap(oceanMap, altitudeMap, temperatureMap),
-            storage = config.storeData ? localStorage.getItem('coastMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            coastMap.fromString(storage);
-        } else {
-
-            coastMap.generateMap();
-
-            if (config.storeData) {
-                localStorage.setItem('coastMap', coastMap.toString());
-            }
-        }
-
-        coastMap = Filters.apply('coastMap', coastMap);
-
-        if (this.logs) {
-            logTimeEvent('Coast map calculated.');
-        }
-
-        return coastMap;
-    }
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @param {OceanMap} oceanMap
-     * @return {LakesMap}
-     */
-    generateLakesMap = function(altitudeMap, oceanMap) {
-
-        let lakesMap = new LakesMap(altitudeMap, oceanMap),
-            storage = config.storeData ? localStorage.getItem('lakesMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            lakesMap.fromString(storage);
-        } else {
-
-            lakesMap.generateMap();
-
-            if (config.storeData) {
-                localStorage.setItem('lakesMap', lakesMap.toString());
-            }
-        }
-
-        lakesMap = Filters.apply('lakesMap', lakesMap);
-
-        if (this.logs) {
-            logTimeEvent('Lakes map calculated. Size: ' + lakesMap.getSize() + '%');
-        }
-
-        return lakesMap;
-    };
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @param {LakesMap} lakesMap
-     * @return {RiversMap}
-     */
-    generateRiversMap = function(altitudeMap, lakesMap) {
-
-        let riversMap = new RiversMap(altitudeMap, lakesMap),
-            storage = config.storeData ? localStorage.getItem('riversMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            riversMap.fromString(storage);
-        } else {
-
-            riversMap.generateMap();
-
-            if (config.storeData) {
-                localStorage.setItem('riversMap', riversMap.toString());
-            }
-        }
-
-        riversMap = Filters.apply('riversMap', riversMap);
-
-        if (this.logs) {
-            logTimeEvent('Rivers generated. Rivers: ' + riversMap.getGeneratedRiversCount());
-        }
-
-        return riversMap;
-    };
-
-    /**
-     * @param {LakesMap} lakesMap
-     * @param {RiversMap} riversMap
-     * @return {BinaryMatrix}
-     */
-    getFreshWaterMap = function(lakesMap, riversMap) {
-
-        let freshWaterMap = new BinaryMatrix(config.worldSize, config.worldSize);
-
-        freshWaterMap.combineWith(lakesMap);
-        freshWaterMap.combineWith(riversMap);
-
-        return freshWaterMap;
-    };
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @param {RiversMap} riversMap
-     * @param {LakesMap} lakesMap
-     * @return {HumidityMap}
-     */
-    generateHumidityMap = function(altitudeMap, riversMap, lakesMap) {
-
-        let humidityMap = new HumidityMap(altitudeMap, riversMap, lakesMap),
-            storage = config.storeData ? localStorage.getItem('humidityMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            humidityMap.fromString(storage);
-        } else {
-
-            humidityMap.generateMap();
-
-            if (config.storeData) {
-                localStorage.setItem('humidityMap', humidityMap.toString());
-            }
-        }
-
-        humidityMap = Filters.apply('humidityMap', humidityMap);
-
-        if (this.logs) {
-            logTimeEvent('Humidity map created. Min: ' + humidityMap.getMin() + ' Max: ' + humidityMap.getMax() + ' Avg: ' + humidityMap.getAvgValue());
-        }
-
-        return humidityMap;
-    };
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @return {TemperatureMap}
-     */
-    generateTemperatureMap = function(altitudeMap) {
-
-        let temperatureMap = new TemperatureMap(altitudeMap),
-            storage = config.storeData ? localStorage.getItem('temperatureMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            temperatureMap.fromString(storage);
-        } else {
-
-            temperatureMap.generateMap();
-
-            if (config.storeData) {
-                localStorage.setItem('temperatureMap', temperatureMap.toString());
-            }
-        }
-
-        temperatureMap = Filters.apply('temperatureMap', temperatureMap);
-
-        if (this.logs) {
-            logTimeEvent('Temperature map created. Min: ' + temperatureMap.getMin() + ' Max: ' + temperatureMap.getMax() + ' Avg.: ' + temperatureMap.getAvgValue());
-        }
-
-        return temperatureMap;
-    };
-
-    /**
      * @param {CallableFunction} callback
      */
     tickTimer = function(callback) {
@@ -396,18 +173,21 @@ class World {
      */
     generateWorld = function() {
 
-        let _this = this,
-            altitudeMap = _this.generateAltitudeMap(),
-            temperatureMap = _this.generateTemperatureMap(altitudeMap),
-            oceanMap = _this.generateOceanMap(altitudeMap),
-            coastMap = _this.getCoastMap(oceanMap, altitudeMap, temperatureMap),
-            lakesMap = _this.generateLakesMap(altitudeMap, oceanMap),
-            riversMap = _this.generateRiversMap(altitudeMap, lakesMap),
-            freshWaterMap = _this.getFreshWaterMap(lakesMap, riversMap),
-            humidityMap = _this.generateHumidityMap(altitudeMap, riversMap, lakesMap),
+        let surfaceOperator = new SurfaceOperator(),
+            weatherOperator = new WeatherOperator(),
+            waterOperator = new WaterOperator(),
+            humidityOperator = new HumidityOperator(),
             biomesOperator = new BiomesOperator(),
             forestsOperator = new ForestsOperator(),
-            animalsOperator = new AnimalsOperator();
+            animalsOperator = new AnimalsOperator(),
+            altitudeMap = surfaceOperator.generateAltitudeMap(),
+            temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap),
+            oceanMap = waterOperator.generateOceanMap(altitudeMap),
+            coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap),
+            lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap),
+            riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap),
+            freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap),
+            humidity = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
 
         biomesOperator.initBiomesGeneration(
             altitudeMap,
@@ -415,7 +195,7 @@ class World {
             coastMap,
             freshWaterMap,
             temperatureMap,
-            humidityMap,
+            humidity,
             this.getLayer(LAYER_BIOMES)
         );
 
