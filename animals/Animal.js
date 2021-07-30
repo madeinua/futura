@@ -11,6 +11,9 @@ class Animal {
     /** @var {string} */
     id;
 
+    /** @var {number} */
+    age;
+
     /**
      * @param {number} x
      * @param {number} y
@@ -19,6 +22,7 @@ class Animal {
         this.x = x;
         this.y = y;
         this.id = this.constructor.NAME + '-' + x + '-' + y;
+        this.age = 0;
     }
 
     /**
@@ -42,5 +46,12 @@ class Animal {
      */
     atPos(xy) {
         return xy[0] === this.x && xy[1] === this.y;
+    }
+
+    /**
+     * @return {number}
+     */
+    getLifespan() {
+        return 15;
     }
 }

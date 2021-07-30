@@ -23,8 +23,7 @@ class BiomesOperator {
                 coastMap,
                 freshWaterMap,
                 temperatureMap,
-                humidityMap,
-                config
+                humidityMap
             );
 
         altitudeMap.foreach(function(x, y) {

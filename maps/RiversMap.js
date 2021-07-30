@@ -114,8 +114,7 @@ class RiversMap extends BinaryMatrix {
      */
     getRiverSources = function(altitudeMap) {
 
-        let _this = this,
-            spawns = [];
+        let spawns = [];
 
         altitudeMap.foreach(function(x, y) {
 

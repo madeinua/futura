@@ -9,7 +9,7 @@ class ForestsOperator {
     initForestGeneration = function(biomes, tickHandlers, forestLayer) {
 
         let _this = this,
-            forestMap = new ForestMap(biomes, config);
+            forestMap = new ForestMap(biomes);
 
         forestMap.init();
 

@@ -22,8 +22,6 @@ class World {
             );
         }
 
-        this.logs = config.logs;
-
         this.layers = [];
 
         this.cellSize = Math.ceil(config.worldWrapper.offsetWidth / config.visibleCols);
@@ -56,7 +54,7 @@ class World {
             localStorage.setItem('worldSize', actualSize);
         }
 
-        if (this.logs) {
+        if (config.logs) {
             logTimeEvent('Initialized');
         }
     }
@@ -95,15 +93,16 @@ class World {
      */
     tickTimer = function(callback) {
 
-        let _this = this;
+        let _this = this,
+            timerStart = Date.now();
 
-        if (_this.logs) {
+        if (config.logs) {
             logTimeEvent('Start ticks.');
         }
 
         _this.timerStep = 0;
 
-        let ite = setInterval(function() {
+        let timerInterval = setInterval(function() {
 
             if (_this.timerPaused) {
                 return;
@@ -119,18 +118,18 @@ class World {
                     _this.tickFinalHandlers[i]();
                 }
 
-                if (_this.logs) {
-                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round(getTimeForEvent() / config.ticksCount) + 'ms');
+                if (config.logs) {
+                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round((Date.now() - timerStart) / config.ticksCount) + 'ms');
                 }
 
-                clearInterval(ite);
+                clearInterval(timerInterval);
             }
 
             _this.timerStep++;
 
             callback();
 
-        }, config.tickInterval);
+        }, config.minTickInterval);
     };
 
     /**
@@ -213,7 +212,7 @@ class World {
             this.getLayer(LAYER_ANIMALS)
         );
 
-        if (this.logs) {
+        if (config.logs) {
             logTimeEvent('World generated');
         }
     };

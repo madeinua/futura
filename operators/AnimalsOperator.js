@@ -31,11 +31,11 @@ class AnimalsOperator {
     initAnimalsGeneration = function(oceanMap, freshWaterMap, coastMap, tickHandlers, animalsLayer) {
 
         let _this = this,
-            animalsOperator = new AnimalsOperator(config),
+            animalsOperator = new AnimalsOperator(),
             animalsMap = new BinaryMatrix(config.worldSize, config.worldSize);
 
         animalsOperator.registerAnimalsGenerator(
-            new AnimalGenerator(oceanMap, freshWaterMap, coastMap, config)
+            new AnimalGenerator(oceanMap, freshWaterMap, coastMap)
         );
 
         if (config.logs) {
@@ -47,6 +47,8 @@ class AnimalsOperator {
             animalsMap.map(false);
             _this.cleanAnimalsLayer(animalsLayer);
 
+            animalsOperator.touchAnimals();
+            animalsOperator.maybeKillAnimals();
             animalsOperator.maybeCreateAnimals();
 
             animalsOperator.moveAnimals(function(animal) {
@@ -185,6 +187,29 @@ class AnimalsOperator {
             for (let j = 0; j < animals.length; j++) {
                 this.animals.push(animals[j]);
             }
+        }
+    }
+
+    /**
+     * @param {number} age
+     * @param {number} lifespan
+     * @return {boolean}
+     */
+    canDie(age, lifespan) {
+        return age > (lifespan + 10) || (age > (lifespan - 10) && iAmLucky(5));
+    }
+
+    maybeKillAnimals() {
+        for (let i = 0; i < this.animals.length; i++) {
+            if (this.canDie(this.animals[i].age,this.animals[i].getLifespan())) {
+                this.animals.splice(i, 1);
+            }
+        }
+    }
+
+    touchAnimals() {
+        for (let i = 0; i < this.animals.length; i++) {
+            ++ this.animals[i].age;
         }
     }
 }
