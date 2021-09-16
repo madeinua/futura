@@ -17,7 +17,7 @@ class NumericMatrix extends Matrix {
 
     /**
      * @param {string} string
-     * @return {NumericMatrix}
+     * @return {this}
      */
     fromString = function(string) {
         return this.setAll(
@@ -30,9 +30,10 @@ class NumericMatrix extends Matrix {
      * @param {number} x
      * @param {number} y
      * @param {number} value
+     * @return {this}
      */
     addToTile(x, y, value) {
-        this.setTile(x, y, this.getTile(x, y) + value);
+        return this.setTile(x, y, this.getTile(x, y) + value);
     }
 
     /**
@@ -79,7 +80,7 @@ class NumericMatrix extends Matrix {
      * @param {number} y
      * @param {number} deep
      * @param {number} value
-     * @return {NumericMatrix}
+     * @return {this}
      */
     addToNeighborTiles(x, y, deep, value) {
 
@@ -115,7 +116,7 @@ class NumericMatrix extends Matrix {
      * Scale matrix to fit min/max ranges
      * @param {number} min
      * @param {number} max
-     * @return {NumericMatrix}
+     * @return {this}
      */
     setRange(min, max) {
 

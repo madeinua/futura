@@ -6,6 +6,6 @@ class Biome_Swamp extends Biome {
      * @return {string}
      */
     getColor() {
-        return '#258779';
+        return '#20a894';
     }
 }

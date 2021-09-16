@@ -2,127 +2,140 @@
 <html lang="en-US">
 <head>
     <title>Futura</title>
-    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="libs/bootstrap.min.css">
-    <link href="futura.css" type="text/css" rel="stylesheet" media="all" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link href="futura.css" type="text/css" rel="stylesheet" media="all"/>
     <script src="libs/jquery.slim.min.js"></script>
-    <script src="libs/popper.min.js"></script>
-    <script src="libs/bootstrap.min.js"></script>
     <script src="libs/perlin.js"></script>
 </head>
 <body>
 
-    <div class="content">
-        <div class="row">
-            <div class="col-lg-3">
-                <div class="left-bar">
-                    <div>
-                        <label>Mini map:</label>
-                        <p><canvas id="miniMap"></canvas><input id="coordinates" type="text" value="0,0" /></p>
-                    </div>
-                    <div>
-                        <label>Animals map:</label>
-                        <p><canvas id="animalsMapCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Forest map:</label>
-                        <p><canvas id="forestMapCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Biomes:</label>
-                        <p><canvas id="biomesCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Temperature map:</label>
-                        <p><canvas id="temperatureMapCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Humidity map:</label>
-                        <p><canvas id="humidityMapCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Rivers map:</label>
-                        <p><canvas id="riversMapCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Lakes map:</label>
-                        <p><canvas id="lakesMapCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Coast map:</label>
-                        <p><canvas id="coastMapCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Ocean map:</label>
-                        <p><canvas id="oceanMapCanvas"></canvas></p>
-                    </div>
-                    <div>
-                        <label>Altitude map:</label>
-                        <p><canvas id="altitudeMapCanvas"></canvas></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div id="worldWrapper">
-                    <canvas id="world"></canvas>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="pad">
-                    <label>Tick: <span id="tickCounter"></span></label>
-                </div>
-                <button id="pauseTick">Pause</button>
-            </div>
+<div class="content">
+    <div class="left-bar">
+        <div>
+            <label>Tick: <span id="tickCounter"></span></label>
+            <button id="pauseTick">Pause</button>
+        </div>
+        <div>
+            <label>Animals map:</label>
+            <p>
+                <canvas id="animalsMapCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Forest map:</label>
+            <p>
+                <canvas id="forestMapCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Biomes:</label>
+            <p>
+                <canvas id="biomesCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Temperature map:</label>
+            <p>
+                <canvas id="temperatureMapCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Humidity map:</label>
+            <p>
+                <canvas id="humidityMapCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Rivers map:</label>
+            <p>
+                <canvas id="riversMapCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Lakes map:</label>
+            <p>
+                <canvas id="lakesMapCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Coast map:</label>
+            <p>
+                <canvas id="coastMapCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Ocean map:</label>
+            <p>
+                <canvas id="oceanMapCanvas"></canvas>
+            </p>
+        </div>
+        <div>
+            <label>Altitude map:</label>
+            <p>
+                <canvas id="altitudeMapCanvas"></canvas>
+            </p>
         </div>
     </div>
+    <div class="central-panel">
+        <div class="coordinatesWrapper">
+            <label for="coordinates">X,Y: <input id="coordinates" type="text" value="0,0"/></label>
+        </div>
+        <canvas id="mainMap"></canvas>
+    </div>
+    <div class="right-bar">
+        <div id="scrollingMapWrapper">
+            <canvas id="scrollingMap"></canvas>
+        </div>
+    </div>
+</div>
 
-    <script src='config.js'></script>
-    <script src='helpers.js'></script>
-    <script src='matrices/Matrix.js'></script>
-    <script src='matrices/NumericMatrix.js'></script>
-    <script src='matrices/BinaryMatrix.js'></script>
-    <script src='matrices/PointMatrix.js'></script>
-    <script src='maps/AltitudeMap.js'></script>
-    <script src='maps/OceanMap.js'></script>
-    <script src='maps/CoastMap.js'></script>
-    <script src='maps/LakesMap.js'></script>
-    <script src='maps/RiversMap.js'></script>
-    <script src='maps/HumidityMap.js'></script>
-    <script src='maps/TemperatureMap.js'></script>
-    <script src='maps/ForestMap.js'></script>
-    <script src='biomes/Biomes.js'></script>
-    <script src='biomes/Biome.js'></script>
-    <script src='biomes/Biome_Beach.js'></script>
-    <script src='biomes/Biome_Coast.js'></script>
-    <script src='biomes/Biome_Desert.js'></script>
-    <script src='biomes/Biome_Desert_Hills.js'></script>
-    <script src='biomes/Biome_Grass.js'></script>
-    <script src='biomes/Biome_Grass_Hills.js'></script>
-    <script src='biomes/Biome_Ice_Rocks.js'></script>
-    <script src='biomes/Biome_Ocean.js'></script>
-    <script src='biomes/Biome_Rocks.js'></script>
-    <script src='biomes/Biome_Savanna.js'></script>
-    <script src='biomes/Biome_Savanna_Hills.js'></script>
-    <script src='biomes/Biome_Swamp.js'></script>
-    <script src='biomes/Biome_Tropic.js'></script>
-    <script src='biomes/Biome_Tundra.js'></script>
-    <script src='biomes/Biome_Tundra_Hills.js'></script>
-    <script src='biomes/Biome_Water.js'></script>
-    <script src='animals/Animal.js'></script>
-    <script src='animals/AnimalGenerator.js'></script>
-    <script src='animals/Fish.js'></script>
-    <script src='animals/FishGenerator.js'></script>
-    <script src='operators/SurfaceOperator.js'></script>
-    <script src='operators/WeatherOperator.js'></script>
-    <script src='operators/WaterOperator.js'></script>
-    <script src='operators/HumidityOperator.js'></script>
-    <script src='operators/BiomesOperator.js'></script>
-    <script src='operators/ForestsOperator.js'></script>
-    <script src='operators/AnimalsOperator.js'></script>
-    <script src='render/DisplayCell.js'></script>
-    <script src='render/Layer.js'></script>
-    <script src='world.js'></script>
-    <script src='futura.js'></script>
+<script src='config.js'></script>
+<script src='helpers.js'></script>
+<script src='matrices/Matrix.js'></script>
+<script src='matrices/NumericMatrix.js'></script>
+<script src='matrices/BinaryMatrix.js'></script>
+<script src='matrices/PointMatrix.js'></script>
+<script src='maps/AltitudeMap.js'></script>
+<script src='maps/OceanMap.js'></script>
+<script src='maps/CoastMap.js'></script>
+<script src='maps/LakesMap.js'></script>
+<script src='maps/RiversMap.js'></script>
+<script src='maps/HumidityMap.js'></script>
+<script src='maps/TemperatureMap.js'></script>
+<script src='maps/ForestMap.js'></script>
+<script src='biomes/Biomes.js'></script>
+<script src='biomes/Biome.js'></script>
+<script src='biomes/Biome_Beach.js'></script>
+<script src='biomes/Biome_Coast.js'></script>
+<script src='biomes/Biome_Desert.js'></script>
+<script src='biomes/Biome_Desert_Hills.js'></script>
+<script src='biomes/Biome_Grass.js'></script>
+<script src='biomes/Biome_Grass_Hills.js'></script>
+<script src='biomes/Biome_Ice_Rocks.js'></script>
+<script src='biomes/Biome_Ocean.js'></script>
+<script src='biomes/Biome_Rocks.js'></script>
+<script src='biomes/Biome_Savanna.js'></script>
+<script src='biomes/Biome_Savanna_Hills.js'></script>
+<script src='biomes/Biome_Swamp.js'></script>
+<script src='biomes/Biome_Tropic.js'></script>
+<script src='biomes/Biome_Tundra.js'></script>
+<script src='biomes/Biome_Tundra_Hills.js'></script>
+<script src='biomes/Biome_Water.js'></script>
+<script src='animals/Animal.js'></script>
+<script src='animals/AnimalGenerator.js'></script>
+<script src='animals/Fish.js'></script>
+<script src='animals/FishGenerator.js'></script>
+<script src='operators/SurfaceOperator.js'></script>
+<script src='operators/WeatherOperator.js'></script>
+<script src='operators/WaterOperator.js'></script>
+<script src='operators/HumidityOperator.js'></script>
+<script src='operators/BiomesOperator.js'></script>
+<script src='operators/ForestsOperator.js'></script>
+<script src='operators/AnimalsOperator.js'></script>
+<script src='render/DisplayCell.js'></script>
+<script src='render/Layer.js'></script>
+<script src='world.js'></script>
+<script src='futura.js'></script>
 </body>
 </html>

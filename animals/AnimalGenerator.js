@@ -1,7 +1,5 @@
 class AnimalGenerator {
 
-    static NAME = 'Animal';
-
     /** @var {OceanMap} */
     oceanMap;
 
@@ -20,7 +18,6 @@ class AnimalGenerator {
      * @param {CoastMap} coastMap
      */
     constructor(oceanMap, freshWaterMap, coastMap) {
-
         this.oceanMap = oceanMap;
         this.freshWaterMap = freshWaterMap;
         this.coastMap = coastMap;
@@ -30,7 +27,14 @@ class AnimalGenerator {
      * @return {string}
      */
     getName() {
-        return this.constructor.NAME;
+        return Animal.NAME;
+    }
+
+    /**
+     * @returns {Animal}
+     */
+    getAnimalClass() {
+        return Animal;
     }
 
     /**
@@ -82,7 +86,7 @@ class AnimalGenerator {
             return false;
         }
 
-        return new Animal(tile[0], tile[1]);
+        return new (this.getAnimalClass())(tile[0], tile[1]);
     }
 
     /**

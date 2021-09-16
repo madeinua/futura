@@ -1,4 +1,23 @@
 class FishGenerator extends AnimalGenerator {
 
-    static NAME = 'Fish';
+    /**
+     * @return {string}
+     */
+    getName() {
+        return Fish.NAME;
+    }
+
+    /**
+     * @returns {Animal}
+     */
+    getAnimalClass() {
+        return Fish;
+    }
+
+    /**
+     * @return {BinaryMatrix}
+     */
+    generateCreationArea() {
+        return this.freshWaterMap.clone().combineWith(this.coastMap);
+    }
 }

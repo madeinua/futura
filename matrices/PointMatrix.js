@@ -1,7 +1,7 @@
 class PointMatrix extends NumericMatrix {
 
     /**
-     * @return {PointMatrix}
+     * @return {this}
      */
     normalize() {
         this.setRange(0, 1);

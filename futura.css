@@ -12,30 +12,47 @@ canvas {
 }
 
 .left-bar {
-    overflow: scroll;
-    width: 300px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    width: 268px;
     height: 650px;
     background-color: #fff;
-    padding: 20px;
+    padding: 5px;
+    float: left;
+}
+
+.central-panel {
+    float: left;
+    padding: 5px 20px;
+}
+
+.right-bar {
+    float: left;
+    padding: 5px;
 }
 
 .left-bar canvas {
     width: 250px;
 }
 
-#worldWrapper {
+#scrollingMapWrapper {
     box-shadow: 0 0 10px #777;
-    width: 700px;
-    height: 700px;
+    width: 900px;
+    height: 640px;
     overflow: hidden;
 }
 
-#miniMap {
+#mainMap {
     cursor: crosshair;
 }
 
+.coordinatesWrapper {
+    padding: 0 0 5px;
+}
+
 #coordinates {
-    display: block;
+    display: inline-block;
+    width: 66px;
 }
 
 #pauseTick {
@@ -46,6 +63,21 @@ body {
     background-color: #eee;
 }
 
-.pad {
-    padding: 20px;
+button {
+    border-width: 0;
+    border-radius: 7px;
+    background-color: #efefef;
+    padding: 3px 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #e0dfdf;
+}
+
+#tickCounter {
+    color: #00b5dc;
+    font-weight: 600;
+    min-width: 50px;
+    display: inline-block;
 }

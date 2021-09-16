@@ -1,7 +1,7 @@
 let coordinatesField = document.getElementById('coordinates'),
-    worldWrapper = document.getElementById('worldWrapper'),
-    worldCanvas = document.getElementById('world'),
-    miniMapCanvas = document.getElementById('miniMap'),
+    scrollingMapWrapper = document.getElementById('scrollingMapWrapper'),
+    scrollingMapCanvas = document.getElementById('scrollingMap'),
+    mainMapCanvas = document.getElementById('mainMap'),
     config = getConfig(),
     cameraPos = getCenteredCameraPosition(config.visibleCols);
 
@@ -185,10 +185,10 @@ coordinatesField.addEventListener("change", function() {
     );
 });
 
-miniMapCanvas.addEventListener("click", function(e) {
+mainMapCanvas.addEventListener("click", function(e) {
 
     let rect = this.getBoundingClientRect(),
-        scale = config.worldSize / miniMapCanvas.offsetWidth,
+        scale = config.worldSize / mainMapCanvas.offsetWidth,
         point = [
             Math.floor((e.clientX - rect.left) * scale),
             Math.floor((e.clientY - rect.top) * scale)

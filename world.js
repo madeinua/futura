@@ -2,8 +2,12 @@ class World {
 
     constructor(config) {
 
-        if (typeof config.worldCanvas === 'undefined') {
-            console.error('World Canvas not defined');
+        if (typeof config.scrollingMapCanvas === 'undefined') {
+            console.error('Scrolling map canvas not defined');
+        }
+
+        if (typeof config.mainMapCanvas === 'undefined') {
+            console.error('Main map canvas not defined');
         }
 
         if (typeof config.storeData === 'undefined') {
@@ -24,20 +28,18 @@ class World {
 
         this.layers = [];
 
-        this.cellSize = Math.ceil(config.worldWrapper.offsetWidth / config.visibleCols);
+        this.cellSize = Math.ceil(config.scrollingMapWrapper.offsetWidth / config.visibleCols);
         this.worldScalledSize = this.cellSize * config.worldSize;
 
-        this.worldWrapper = config.worldWrapper;
-        this.worldCanvas = config.worldCanvas;
-        this.worldCanvas.width = this.worldScalledSize;
-        this.worldCanvas.height = this.worldScalledSize;
+        this.scrollingMapWrapper = config.scrollingMapWrapper;
+        this.scrollingMapCanvas = config.scrollingMapCanvas;
+        this.scrollingMapCanvas.width = this.worldScalledSize;
+        this.scrollingMapCanvas.height = this.worldScalledSize;
 
         this.cameraPosX = config.cameraPosX;
         this.cameraPosY = config.cameraPosY;
 
-        if (typeof config.miniMapCanvas !== 'undefined') {
-            this.setMiniMap(config);
-        }
+        this.setMainMap(config);
 
         this.tickHandlers = [];
         this.tickFinalHandlers = [];
@@ -62,10 +64,10 @@ class World {
     /**
      * @param {Object} config
      */
-    setMiniMap = function(config) {
-        this.miniMapCanvas = config.miniMapCanvas;
-        this.miniMapCanvas.width = config.worldSize;
-        this.miniMapCanvas.height = config.worldSize;
+    setMainMap = function(config) {
+        this.mainMapCanvas = config.mainMapCanvas;
+        this.mainMapCanvas.width = config.worldSize * config.mainMapScale;
+        this.mainMapCanvas.height = config.worldSize * config.mainMapScale;
     };
 
     /**
@@ -93,6 +95,11 @@ class World {
      */
     tickTimer = function(callback) {
 
+        if (config.ticksCount === 0) {
+            callback();
+            return;
+        }
+
         let _this = this,
             timerStart = Date.now();
 
@@ -112,7 +119,7 @@ class World {
                 _this.tickHandlers[i](_this.timerStep);
             }
 
-            if (config.ticksCount > 0 && _this.timerStep === config.ticksCount) {
+            if (_this.timerStep === config.ticksCount) {
 
                 for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
                     _this.tickFinalHandlers[i]();
@@ -238,18 +245,19 @@ class World {
         }
     };
 
-    drawMiniMap = function() {
+    drawMainMap = function() {
 
         let _this = this,
-            ctx = _this.miniMapCanvas.getContext('2d'),
-            image = ctx.createImageData(config.worldSize, config.worldSize),
+            ctx = _this.mainMapCanvas.getContext('2d'),
             layer,
-            displayCell;
+            displayCell,
+            image = ctx.createImageData(config.worldSize, config.worldSize),
+            mainMapSize = config.worldSize * config.mainMapScale,
+            cameraPosX = this.cameraPosX,
+            cameraPosY = this.cameraPosY;
 
         for (let ln = 0; ln < _this.getLayersCount(); ln++) {
-
             layer = _this.getLayer(ln);
-
             layer.foreach(function(x, y) {
 
                 displayCell = layer.getTile(x, y);
@@ -266,23 +274,29 @@ class World {
             });
         }
 
-        ctx.imageSmoothingEnabled = false;
-        ctx.putImageData(image, 0, 0);
+        createImageBitmap(image).then(function(render) {
 
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(
-            this.cameraPosX,
-            this.cameraPosY,
-            config.visibleCols,
-            config.visibleCols
-        );
+            ctx.imageSmoothingEnabled = false;
+
+            ctx.drawImage(render, 0, 0, mainMapSize, mainMapSize);
+
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+                cameraPosX * config.mainMapScale,
+                cameraPosY * config.mainMapScale,
+                config.visibleCols * config.mainMapScale,
+                config.visibleCols * config.mainMapScale
+            );
+
+            return ctx;
+        });
     };
 
     drawRectangles = function() {
 
         let _this = this,
-            ctx = _this.worldCanvas.getContext('2d'),
+            ctx = _this.scrollingMapCanvas.getContext('2d'),
             x, y, lx, ly,
             worldOffsetLeft = _this.cameraPosX * _this.cellSize,
             worldOffsetTop = _this.cameraPosY * _this.cellSize;
@@ -328,7 +342,7 @@ class World {
         renderCanvas.height = config.worldSize;
 
         let renderCtx = renderCanvas.getContext('2d'),
-            ctx = _this.worldCanvas.getContext('2d'),
+            ctx = _this.scrollingMapCanvas.getContext('2d'),
             image = renderCtx.createImageData(config.worldSize, config.worldSize),
             ctxImages = [],
             layer,
@@ -336,8 +350,8 @@ class World {
             worldOffsetLeft = this.cameraPosX * _this.cellSize,
             worldOffsetTop = this.cameraPosY * _this.cellSize;
 
-        this.worldWrapper.scrollLeft = worldOffsetLeft;
-        this.worldWrapper.scrollTop = worldOffsetTop;
+        this.scrollingMapWrapper.scrollLeft = worldOffsetLeft;
+        this.scrollingMapWrapper.scrollTop = worldOffsetTop;
 
         for (let ln = 0; ln < _this.getLayersCount(); ln++) {
 
@@ -397,10 +411,7 @@ class World {
         }
 
         _this.drawRectangles();
-
-        if (_this.miniMapCanvas) {
-            _this.drawMiniMap();
-        }
+        _this.drawMainMap();
     };
 
     create = function() {

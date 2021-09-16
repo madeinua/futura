@@ -18,6 +18,13 @@ class Matrix {
     }
 
     /**
+     * @returns {this}
+     */
+    clone() {
+        return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+    }
+
+    /**
      * Get all tiles of matrix
      * @return {Array}
      */
@@ -49,7 +56,7 @@ class Matrix {
      * @param {number} x
      * @param {number} y
      * @param {*} value
-     * @return {Matrix}
+     * @return {this}
      */
     setTile(x, y, value) {
 
@@ -106,7 +113,7 @@ class Matrix {
     /**
      * Applies the callback to the elements of the Matrix and accepts return value as the Matrix tile value
      * @param {*|function} value
-     * @return {Matrix}
+     * @return {this}
      */
     map(value) {
 
@@ -136,7 +143,7 @@ class Matrix {
     /**
      * Set all tiles of matrix
      * @param {boolean|number|Array} values
-     * @return {Matrix}
+     * @return {this}
      */
     setAll(values) {
 
@@ -190,7 +197,7 @@ class Matrix {
      * @param {number} deep
      * @param {function} callback
      * @param {boolean} stopOnTrue
-     * @return {Matrix}
+     * @return {this}
      */
     foreachNeighbors(x, y, deep, callback, stopOnTrue = false) {
 

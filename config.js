@@ -7,12 +7,13 @@ function getConfig() {
         storeData: true,
         worldSize: 250,
         visibleCols: 30,
-        worldWrapper: worldWrapper,
-        worldCanvas: worldCanvas,
-        miniMapCanvas: miniMapCanvas,
+        scrollingMapWrapper: scrollingMapWrapper,
+        scrollingMapCanvas: scrollingMapCanvas,
+        mainMapCanvas: mainMapCanvas,
+        mainMapScale: 2.5,
         showCoordinates: false,
         minTickInterval: 1,
-        ticksCount: 20,
+        ticksCount: 200,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -71,7 +72,7 @@ function getConfig() {
         FOREST_GRASS_GROWTH: 0.30,
         FOREST_GRASS_HILLS_GROWTH: 0.35,
         FOREST_DESERT_HILLS_GROWTH: 0.01,
-        FOREST_SWAMP_GROWTH: 0.08,
+        FOREST_SWAMP_GROWTH: 0.2,
         FOREST_ROCKS_GROWTH: 0.08,
         FOREST_SAVANNA_GROWTH: 0.25,
         FOREST_SAVANNA_HILLS_GROWTH: 0.08,

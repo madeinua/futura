@@ -16,7 +16,7 @@ class BinaryMatrix extends NumericMatrix {
      * @param {number} x
      * @param {number} y
      * @param {number} value
-     * @return {BinaryMatrix}
+     * @return {this}
      */
     setTile(x, y, value) {
 
@@ -44,7 +44,7 @@ class BinaryMatrix extends NumericMatrix {
      * Fill the tile with the value
      * @param {number} x
      * @param {number} y
-     * @return {BinaryMatrix}
+     * @return {this}
      */
     fill(x, y) {
         this.setTile(x, y, 1);
@@ -55,7 +55,7 @@ class BinaryMatrix extends NumericMatrix {
      * Remove filling the tile with the value
      * @param {number} x
      * @param {number} y
-     * @return {BinaryMatrix}
+     * @return {this}
      */
     unfill(x, y) {
         this.setTile(x, y, 0);
@@ -140,13 +140,17 @@ class BinaryMatrix extends NumericMatrix {
     /**
      * Apply binary "OR" between two binary matrix
      * @param {BinaryMatrix} matrix
+     * @return {this}
      */
     combineWith(matrix) {
+
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 this.__values[x][y] |= matrix.__values[x][y];
             }
         }
+
+        return this;
     }
 
     /**
@@ -171,7 +175,7 @@ class BinaryMatrix extends NumericMatrix {
      * Apply callback to all neighbors of all
      * @param {number} deep
      * @param {function} callback
-     * @return {BinaryMatrix}
+     * @return {this}
      */
     foreachFilledNeighbors(deep, callback) {
 

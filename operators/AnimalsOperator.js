@@ -22,6 +22,16 @@ class AnimalsOperator {
     };
 
     /**
+     * @returns {AnimalGenerator[]}
+     */
+    getAvailableGenerators = function() {
+        return [
+            //AnimalGenerator,
+            FishGenerator
+        ];
+    };
+
+    /**
      * @param {OceanMap} oceanMap
      * @param {CoastMap} coastMap
      * @param {BinaryMatrix} freshWaterMap
@@ -32,11 +42,14 @@ class AnimalsOperator {
 
         let _this = this,
             animalsOperator = new AnimalsOperator(),
-            animalsMap = new BinaryMatrix(config.worldSize, config.worldSize);
+            animalsMap = new BinaryMatrix(config.worldSize, config.worldSize),
+            animalGenerators = this.getAvailableGenerators();
 
-        animalsOperator.registerAnimalsGenerator(
-            new AnimalGenerator(oceanMap, freshWaterMap, coastMap)
-        );
+        for (let i = 0; i < animalGenerators.length; i++) {
+            animalsOperator.registerAnimalsGenerator(
+                new animalGenerators[i](oceanMap, freshWaterMap, coastMap)
+            );
+        }
 
         if (config.logs) {
             logTimeEvent('Animals initialized.');
@@ -65,13 +78,31 @@ class AnimalsOperator {
      * @return {Array}
      */
     getTilesAvailableToMove(animal) {
-        return getTilesAround(
-            animal.x,
-            animal.y,
-            config.worldSize,
-            config.worldSize,
-            2
-        );
+
+        let g = this.getAnimalGeneratorByAnimal(animal);
+
+        //@TODO
+        if (g === null) {
+            throwError('asd');
+            return [];
+        }
+
+        let creationArea = this.getAnimalGeneratorByAnimal(animal).getCreationArea(),
+            tilesAround = getTilesAround(
+                animal.x,
+                animal.y,
+                config.worldSize,
+                config.worldSize,
+                2
+            );
+
+        for (let i = 0; i < tilesAround.length; i++) {
+            if (!creationArea.filled(tilesAround[i][0], tilesAround[i][1])) {
+                tilesAround.splice(i, 1);
+            }
+        }
+
+        return tilesAround;
     }
 
     /**
@@ -88,7 +119,8 @@ class AnimalsOperator {
             for (let i = 0; i < this.animals.length; i++) {
                 if (
                     this.animals[i].id !== animalToExcept.id
-                    && this.animals[i].atPos(availableTiles[j])
+                    && this.animals[i].x === availableTiles[j][0]
+                    && this.animals[i].y === availableTiles[j][1]
                 ) {
                     return true;
                 }
@@ -96,53 +128,6 @@ class AnimalsOperator {
         }
 
         return false;
-    }
-
-    /**
-     * @param {Animal} animal
-     * @return {boolean|Array}
-     */
-    getNextMove(animal) {
-
-        let availableTiles = this.getTilesAvailableToMove(animal),
-            nextPoint = false;
-
-        while(!nextPoint && availableTiles.length) {
-
-            nextPoint = availableTiles.randomElement();
-
-            if (this.isAnimalsAroundPoint(nextPoint[0], nextPoint[1], animal)) {
-                nextPoint = false;
-                availableTiles.splice(availableTiles.indexOf(nextPoint), 1);
-            }
-        }
-
-        return nextPoint;
-    }
-
-    /**
-     * @param callback
-     */
-    moveAnimals(callback) {
-
-        let animal,
-            nextPoint;
-
-        for (let i = 0; i < this.animals.length; i++) {
-
-            animal = this.animals[i];
-
-            if (animal.canMove()) {
-
-                nextPoint = this.getNextMove(animal);
-
-                if (nextPoint !== false) {
-                    animal.moveToTile(nextPoint);
-                }
-            }
-
-            callback(animal);
-        }
     }
 
     /**
@@ -191,6 +176,21 @@ class AnimalsOperator {
     }
 
     /**
+     * @param {Animal} animal
+     * @returns {null|AnimalGenerator}
+     */
+    getAnimalGeneratorByAnimal(animal) {
+
+        for (let i = 0; i < this.animalsGenerators.length; i++) {
+            if (this.animalsGenerators[i].getName() === animal.getName()) {
+                return this.animalsGenerators[i];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param {number} age
      * @param {number} lifespan
      * @return {boolean}
@@ -201,7 +201,7 @@ class AnimalsOperator {
 
     maybeKillAnimals() {
         for (let i = 0; i < this.animals.length; i++) {
-            if (this.canDie(this.animals[i].age,this.animals[i].getLifespan())) {
+            if (this.canDie(this.animals[i].age, this.animals[i].getLifespan())) {
                 this.animals.splice(i, 1);
             }
         }
@@ -209,7 +209,55 @@ class AnimalsOperator {
 
     touchAnimals() {
         for (let i = 0; i < this.animals.length; i++) {
-            ++ this.animals[i].age;
+            ++this.animals[i].age;
+        }
+    }
+
+    /**
+     * @param {Animal} animal
+     * @return {boolean|Array}
+     */
+    getNextMove(animal) {
+
+        let availableTiles = this.getTilesAvailableToMove(animal),
+            nextPoint = false;
+
+        while(!nextPoint && availableTiles.length) {
+
+            nextPoint = availableTiles.randomElement();
+
+            if (this.isAnimalsAroundPoint(nextPoint[0], nextPoint[1], animal)) {
+                nextPoint = false;
+                availableTiles.splice(availableTiles.indexOf(nextPoint), 1);
+            }
+        }
+
+        return nextPoint;
+    }
+
+    /**
+     * @param callback
+     */
+    moveAnimals(callback) {
+
+        let animal,
+            nextPoint;
+
+        for (let i = 0; i < this.animals.length; i++) {
+
+            animal = this.animals[i];
+
+            if (animal.canMove()) {
+
+                nextPoint = this.getNextMove(animal);
+
+                if (nextPoint !== false) {
+                    animal.x = nextPoint[0];
+                    animal.y = nextPoint[1];
+                }
+            }
+
+            callback(animal);
         }
     }
 }
