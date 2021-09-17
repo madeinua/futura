@@ -1,53 +1,48 @@
 class World {
 
-    constructor(config) {
+    constructor(config, scrollingMapWrapper, scrollingMapCanvas, mainMapCanvas) {
 
-        if (typeof config.scrollingMapCanvas === 'undefined') {
-            console.error('Scrolling map canvas not defined');
-        }
+        let cameraPos = getCenteredCameraPosition(config.VISIBLE_COLS);
 
-        if (typeof config.mainMapCanvas === 'undefined') {
-            console.error('Main map canvas not defined');
-        }
-
-        if (typeof config.storeData === 'undefined') {
-            config.storeData = true;
-        }
+        config.cameraPosX = cameraPos[0];
+        config.cameraPosY = cameraPos[1];
 
         if (typeof config.cameraPosX === 'undefined') {
             config.cameraPosX = Math.ceil(
-                config.worldSize / 2 - config.visibleCols / 2
+                config.WORLD_SIZE / 2 - config.VISIBLE_COLS / 2
             );
         }
 
         if (typeof config.cameraPosY === 'undefined') {
             config.cameraPosY = Math.ceil(
-                config.worldSize / 2 - config.visibleCols / 2
+                config.WORLD_SIZE / 2 - config.VISIBLE_COLS / 2
             );
         }
 
         this.layers = [];
 
-        this.cellSize = Math.ceil(config.scrollingMapWrapper.offsetWidth / config.visibleCols);
-        this.worldScalledSize = this.cellSize * config.worldSize;
+        this.cellSize = Math.ceil(scrollingMapWrapper.offsetWidth / config.VISIBLE_COLS);
+        this.worldScalledSize = this.cellSize * config.WORLD_SIZE;
 
-        this.scrollingMapWrapper = config.scrollingMapWrapper;
-        this.scrollingMapCanvas = config.scrollingMapCanvas;
+        this.scrollingMapWrapper = scrollingMapWrapper;
+        this.scrollingMapCanvas = scrollingMapCanvas;
         this.scrollingMapCanvas.width = this.worldScalledSize;
         this.scrollingMapCanvas.height = this.worldScalledSize;
 
         this.cameraPosX = config.cameraPosX;
         this.cameraPosY = config.cameraPosY;
 
-        this.setMainMap(config);
+        this.mainMapCanvas = mainMapCanvas;
+        this.mainMapCanvas.width = config.WORLD_SIZE * config.MAIN_MAP_SCALE;
+        this.mainMapCanvas.height = config.WORLD_SIZE * config.MAIN_MAP_SCALE;
 
         this.tickHandlers = [];
         this.tickFinalHandlers = [];
 
-        if (config.storeData) {
+        if (config.STORE_DATA) {
 
             let worldSize = localStorage.getItem('worldSize'),
-                actualSize = config.worldSize + 'x' + config.worldSize;
+                actualSize = config.WORLD_SIZE + 'x' + config.WORLD_SIZE;
 
             if (actualSize !== worldSize) {
                 localStorage.clear();
@@ -56,19 +51,10 @@ class World {
             localStorage.setItem('worldSize', actualSize);
         }
 
-        if (config.logs) {
+        if (config.LOGS) {
             logTimeEvent('Initialized');
         }
     }
-
-    /**
-     * @param {Object} config
-     */
-    setMainMap = function(config) {
-        this.mainMapCanvas = config.mainMapCanvas;
-        this.mainMapCanvas.width = config.worldSize * config.mainMapScale;
-        this.mainMapCanvas.height = config.worldSize * config.mainMapScale;
-    };
 
     /**
      * @param {number} level
@@ -77,7 +63,7 @@ class World {
     getLayer = function(level) {
 
         if (typeof this.layers[level] === 'undefined') {
-            this.layers[level] = new Layer(config.worldSize, config.worldSize);
+            this.layers[level] = new Layer(config.WORLD_SIZE, config.WORLD_SIZE);
         }
 
         return this.layers[level];
@@ -95,21 +81,24 @@ class World {
      */
     tickTimer = function(callback) {
 
-        if (config.ticksCount === 0) {
+        if (!config.TICKS_ENABLED || config.TICKS_LIMIT === 0) {
             callback();
             return;
         }
 
         let _this = this,
-            timerStart = Date.now();
+            timerStart = Date.now(),
+            minTickInterval = config.TICKS_MIN_INTERVAL / config.TICKS_BOOST,
+            boosted = false,
+            timerInterval;
 
-        if (config.logs) {
+        if (config.LOGS) {
             logTimeEvent('Start ticks.');
         }
 
         _this.timerStep = 0;
 
-        let timerInterval = setInterval(function() {
+        let tickerFn = function() {
 
             if (_this.timerPaused) {
                 return;
@@ -119,14 +108,14 @@ class World {
                 _this.tickHandlers[i](_this.timerStep);
             }
 
-            if (_this.timerStep === config.ticksCount) {
+            if (_this.timerStep === config.TICKS_LIMIT) {
 
                 for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
                     _this.tickFinalHandlers[i]();
                 }
 
-                if (config.logs) {
-                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round((Date.now() - timerStart) / config.ticksCount) + 'ms');
+                if (config.LOGS) {
+                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round((Date.now() - timerStart) / config.TICKS_LIMIT) + 'ms');
                 }
 
                 clearInterval(timerInterval);
@@ -136,7 +125,15 @@ class World {
 
             callback();
 
-        }, config.minTickInterval);
+            if (!boosted && _this.timerStep > config.TICKS_BOOST_STEPS) {
+                clearInterval(timerInterval);
+                minTickInterval *= config.TICKS_BOOST;
+                timerInterval = setInterval(tickerFn, minTickInterval);
+                boosted = true;
+            }
+        };
+
+        timerInterval = setInterval(tickerFn, minTickInterval);
     };
 
     /**
@@ -219,7 +216,7 @@ class World {
             this.getLayer(LAYER_ANIMALS)
         );
 
-        if (config.logs) {
+        if (config.LOGS) {
             logTimeEvent('World generated');
         }
     };
@@ -230,7 +227,7 @@ class World {
      */
     moveMapTo = function(point, silent = false) {
 
-        let max = config.worldSize - config.visibleCols;
+        let max = config.WORLD_SIZE - config.VISIBLE_COLS;
 
         point[0] = Math.max(0, Math.min(point[0], max));
         point[1] = Math.max(0, Math.min(point[1], max));
@@ -251,8 +248,8 @@ class World {
             ctx = _this.mainMapCanvas.getContext('2d'),
             layer,
             displayCell,
-            image = ctx.createImageData(config.worldSize, config.worldSize),
-            mainMapSize = config.worldSize * config.mainMapScale,
+            image = ctx.createImageData(config.WORLD_SIZE, config.WORLD_SIZE),
+            mainMapSize = config.WORLD_SIZE * config.MAIN_MAP_SCALE,
             cameraPosX = this.cameraPosX,
             cameraPosY = this.cameraPosY;
 
@@ -268,7 +265,7 @@ class World {
 
                 fillCanvasPixel(
                     image,
-                    (x + y * config.worldSize) * 4,
+                    (x + y * config.WORLD_SIZE) * 4,
                     displayCell.getColor()
                 );
             });
@@ -283,10 +280,10 @@ class World {
             ctx.strokeStyle = '#FFFFFF';
             ctx.lineWidth = 2;
             ctx.strokeRect(
-                cameraPosX * config.mainMapScale,
-                cameraPosY * config.mainMapScale,
-                config.visibleCols * config.mainMapScale,
-                config.visibleCols * config.mainMapScale
+                cameraPosX * config.MAIN_MAP_SCALE,
+                cameraPosY * config.MAIN_MAP_SCALE,
+                config.VISIBLE_COLS * config.MAIN_MAP_SCALE,
+                config.VISIBLE_COLS * config.MAIN_MAP_SCALE
             );
 
             return ctx;
@@ -304,15 +301,15 @@ class World {
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
 
-        for (x = 0; x < config.visibleCols; x++) {
-            for (y = 0; y < config.visibleCols; y++) {
+        for (x = 0; x < config.VISIBLE_COLS; x++) {
+            for (y = 0; y < config.VISIBLE_COLS; y++) {
 
                 lx = x * _this.cellSize + worldOffsetLeft;
                 ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.strokeRect(lx, ly, _this.cellSize, _this.cellSize);
 
-                if (config.showCoordinates) {
+                if (config.SHOW_COORDINATES) {
                     ctx.font = '7px senf';
                     ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
                     ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 20);
@@ -328,9 +325,9 @@ class World {
      */
     isTileVisible = function(x, y) {
         return x >= this.cameraPosX
-            && x <= this.cameraPosX + config.visibleCols
+            && x <= this.cameraPosX + config.VISIBLE_COLS
             && y >= this.cameraPosY
-            && y <= this.cameraPosY + config.visibleCols;
+            && y <= this.cameraPosY + config.VISIBLE_COLS;
     };
 
     redrawWorld = function() {
@@ -338,12 +335,12 @@ class World {
         let _this = this,
             renderCanvas = document.createElement('canvas');
 
-        renderCanvas.width = config.worldSize;
-        renderCanvas.height = config.worldSize;
+        renderCanvas.width = config.WORLD_SIZE;
+        renderCanvas.height = config.WORLD_SIZE;
 
         let renderCtx = renderCanvas.getContext('2d'),
             ctx = _this.scrollingMapCanvas.getContext('2d'),
-            image = renderCtx.createImageData(config.worldSize, config.worldSize),
+            image = renderCtx.createImageData(config.WORLD_SIZE, config.WORLD_SIZE),
             ctxImages = [],
             layer,
             tile,
@@ -376,7 +373,7 @@ class World {
 
                 fillCanvasPixel(
                     image,
-                    (x + y * config.worldSize) * 4,
+                    (x + y * config.WORLD_SIZE) * 4,
                     tile.getColor()
                 );
             });
@@ -387,8 +384,8 @@ class World {
         let imageData = renderCtx.getImageData(
             _this.cameraPosX,
             _this.cameraPosY,
-            config.visibleCols,
-            config.visibleCols
+            config.VISIBLE_COLS,
+            config.VISIBLE_COLS
         );
 
         let scaledData = scaleImageData(ctx, imageData, _this.cellSize);

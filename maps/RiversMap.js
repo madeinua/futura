@@ -16,7 +16,7 @@ class RiversMap extends BinaryMatrix {
      */
     constructor(altitudeMap, lakesMap) {
 
-        super(config.worldSize, config.worldSize);
+        super(config.WORLD_SIZE, config.WORLD_SIZE);
 
         this.altitudeMap = altitudeMap;
         this.lakesMap = lakesMap;
@@ -35,7 +35,7 @@ class RiversMap extends BinaryMatrix {
         let riverSources = _this.getRiverSources(_this.altitudeMap),
             rivers = [],
             allRiversPoints = [],
-            riversLimit = Math.floor(fromFraction(config.RIVERS_DENSITY, 1, config.worldSize)),
+            riversLimit = Math.floor(fromFraction(config.RIVERS_DENSITY, 1, config.WORLD_SIZE)),
             startCloseness = Math.max(config.RIVER_MIN_LENGTH, config.RIVER_START_CLOSENESS);
 
         for (let i = 0; i < riverSources.length; i++) {
@@ -52,7 +52,7 @@ class RiversMap extends BinaryMatrix {
             river.push(riverSources[i]);
 
             // max river length = worldSize
-            for (let j = 0; j < config.worldSize; j++) {
+            for (let j = 0; j < config.WORLD_SIZE; j++) {
 
                 let nextRiverPoint = _this.getRiverDirection(river, _this.altitudeMap);
 

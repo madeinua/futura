@@ -1,14 +1,12 @@
 let coordinatesField = document.getElementById('coordinates'),
-    scrollingMapWrapper = document.getElementById('scrollingMapWrapper'),
-    scrollingMapCanvas = document.getElementById('scrollingMap'),
     mainMapCanvas = document.getElementById('mainMap'),
     config = getConfig(),
-    cameraPos = getCenteredCameraPosition(config.visibleCols);
-
-config.cameraPosX = cameraPos[0];
-config.cameraPosY = cameraPos[1];
-
-let world = new World(config);
+    world = new World(
+        config,
+        document.getElementById('scrollingMapWrapper'),
+        document.getElementById('scrollingMap'),
+        mainMapCanvas
+    );
 
 /**
  * @param {string} id
@@ -65,7 +63,7 @@ function drawMap(id, map, reverse) {
 }
 
 Filters.add('mapMoved', function(point) {
-    point = centeredCameraPointToXY(point, config.visibleCols);
+    point = centeredCameraPointToXY(point, config.VISIBLE_COLS);
     coordinatesField.value = point[0] + ',' + point[1];
 });
 
@@ -181,21 +179,21 @@ function centeredCameraPointToXY(point, size) {
 
 coordinatesField.addEventListener("change", function() {
     world.moveMapTo(
-        getCenteredCameraPosition(config.visibleCols)
+        getCenteredCameraPosition(config.VISIBLE_COLS)
     );
 });
 
 mainMapCanvas.addEventListener("click", function(e) {
 
     let rect = this.getBoundingClientRect(),
-        scale = config.worldSize / mainMapCanvas.offsetWidth,
+        scale = config.WORLD_SIZE / mainMapCanvas.offsetWidth,
         point = [
             Math.floor((e.clientX - rect.left) * scale),
             Math.floor((e.clientY - rect.top) * scale)
         ];
 
     world.moveMapTo(
-        centerCameraPoint(point, config.visibleCols)
+        centerCameraPoint(point, config.VISIBLE_COLS)
     );
 });
 

@@ -17,7 +17,7 @@ class CoastMap extends BinaryMatrix {
      */
     constructor(oceanMap, altitudeMap, temperatureMap) {
 
-        super(config.worldSize, config.worldSize);
+        super(config.WORLD_SIZE, config.WORLD_SIZE);
 
         this.oceanMap = oceanMap;
         this.altitudeMap = altitudeMap;

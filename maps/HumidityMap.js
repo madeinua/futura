@@ -17,7 +17,7 @@ class HumidityMap extends PointMatrix {
      */
     constructor(altitudeMap, riversMap, lakesMap) {
 
-        super(config.worldSize, config.worldSize);
+        super(config.WORLD_SIZE, config.WORLD_SIZE);
 
         this.altitudeMap = altitudeMap;
         this.riversMap = riversMap;
@@ -44,7 +44,7 @@ class HumidityMap extends PointMatrix {
 
     generateNoiseMap() {
         this.setAll(
-            createNoiseMap(config.worldSize, 150).getAll()
+            createNoiseMap(config.WORLD_SIZE, 150).getAll()
         );
     };
 

@@ -13,17 +13,16 @@ class ForestsOperator {
 
         forestMap.init();
 
-        if (_this.logs) {
+        if (_this.LOGS) {
             logTimeEvent('Forests initialized.');
         }
 
         tickHandlers.push(function(step) {
 
-            let multiply = step > _this.FOREST_PRE_GENERATION_STEPS
-                ? _this.FOREST_PRE_GENERATION_MULTIPLY
-                : 1;
-
-            forestMap.generate(step, multiply);
+            forestMap.generate(
+                step,
+                step > config.FOREST_BOOST_STEPS ? config.FOREST_BOOST : 1
+            );
 
             _this.addForestMapToLayer(forestLayer, forestMap);
 

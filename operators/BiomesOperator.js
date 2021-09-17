@@ -14,7 +14,7 @@ class BiomesOperator {
      */
     initBiomesGeneration = function(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, biomesLayer) {
 
-        this.biomes = new Matrix(config.worldSize, config.worldSize);
+        this.biomes = new Matrix(config.WORLD_SIZE, config.WORLD_SIZE);
 
         let _this = this,
             biomesGenerator = new Biomes(
@@ -30,7 +30,7 @@ class BiomesOperator {
             _this.biomes.setTile(x, y, biomesGenerator.getBiome(x, y));
         });
 
-        if (config.logs) {
+        if (config.LOGS) {
             logTimeEvent('Biomes calculated');
         }
 

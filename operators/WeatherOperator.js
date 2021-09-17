@@ -7,7 +7,7 @@ class WeatherOperator {
     generateTemperatureMap = function(altitudeMap) {
 
         let temperatureMap = new TemperatureMap(altitudeMap),
-            storage = config.storeData ? localStorage.getItem('temperatureMap') : null;
+            storage = config.STORE_DATA ? localStorage.getItem('temperatureMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             temperatureMap.fromString(storage);
@@ -15,14 +15,14 @@ class WeatherOperator {
 
             temperatureMap.generateMap();
 
-            if (config.storeData) {
+            if (config.STORE_DATA) {
                 localStorage.setItem('temperatureMap', temperatureMap.toString());
             }
         }
 
         temperatureMap = Filters.apply('temperatureMap', temperatureMap);
 
-        if (config.logs) {
+        if (config.LOGS) {
             logTimeEvent('Temperature map created. Min: ' + temperatureMap.getMin() + ' Max: ' + temperatureMap.getMax() + ' Avg.: ' + temperatureMap.getAvgValue());
         }
 

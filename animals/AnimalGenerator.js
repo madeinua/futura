@@ -55,7 +55,7 @@ class AnimalGenerator {
      * @return {BinaryMatrix}
      */
     generateCreationArea() {
-        return new BinaryMatrix(config.worldSize, config.worldSize, 1);
+        return new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE, 1);
     }
 
     /**

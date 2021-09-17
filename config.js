@@ -1,19 +1,26 @@
+/**
+ * @returns {Object}
+ */
 function getConfig() {
 
     return {
 
         // Global
-        logs: true,
-        storeData: true,
-        worldSize: 250,
-        visibleCols: 30,
-        scrollingMapWrapper: scrollingMapWrapper,
-        scrollingMapCanvas: scrollingMapCanvas,
-        mainMapCanvas: mainMapCanvas,
-        mainMapScale: 2.5,
-        showCoordinates: false,
-        minTickInterval: 1,
-        ticksCount: 200,
+        LOGS: true,
+        STORE_DATA: true,
+
+        // Maps
+        WORLD_SIZE: 250,
+        VISIBLE_COLS: 30,
+        MAIN_MAP_SCALE: 2.5,
+        SHOW_COORDINATES: false,
+
+        // Ticks
+        TICKS_ENABLED: true,
+        TICKS_MIN_INTERVAL: 500,
+        TICKS_LIMIT: 100,
+        TICKS_BOOST: 5,
+        TICKS_BOOST_STEPS: 40,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -86,8 +93,8 @@ function getConfig() {
         FOREST_BORN_NEAR_WATER: 5, // 1-20
         FOREST_GROWTH_NEAR_WATER: 15, // 1-20
 
-        FOREST_PRE_GENERATION_STEPS: 40,
-        FOREST_PRE_GENERATION_MULTIPLY: 0.001,
+        FOREST_BOOST: 0.0001,
+        FOREST_BOOST_STEPS: 40,
 
         FOREST_COLOR: '#3c5626',
         FOREST_IMAGES: [

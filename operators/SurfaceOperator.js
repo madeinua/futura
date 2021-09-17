@@ -6,7 +6,7 @@ class SurfaceOperator {
     generateAltitudeMap = function() {
 
         let altitudeMap = new AltitudeMap(),
-            storage = config.storeData ? localStorage.getItem('altitudeMap') : null;
+            storage = config.STORE_DATA ? localStorage.getItem('altitudeMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
             altitudeMap.fromString(storage);
@@ -14,14 +14,14 @@ class SurfaceOperator {
 
             altitudeMap.generateMap();
 
-            if (config.storeData) {
+            if (config.STORE_DATA) {
                 localStorage.setItem('altitudeMap', altitudeMap.toString());
             }
         }
 
         altitudeMap = Filters.apply('altitudeMap', altitudeMap);
 
-        if (config.logs) {
+        if (config.LOGS) {
             logTimeEvent('Altitude map generated. Min: ' + altitudeMap.getMin() + ' Max: ' + altitudeMap.getMax() + ' Avg: ' + altitudeMap.getAvgValue());
         }
 

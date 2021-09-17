@@ -42,7 +42,7 @@ class AnimalsOperator {
 
         let _this = this,
             animalsOperator = new AnimalsOperator(),
-            animalsMap = new BinaryMatrix(config.worldSize, config.worldSize),
+            animalsMap = new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE),
             animalGenerators = this.getAvailableGenerators();
 
         for (let i = 0; i < animalGenerators.length; i++) {
@@ -51,7 +51,7 @@ class AnimalsOperator {
             );
         }
 
-        if (config.logs) {
+        if (config.LOGS) {
             logTimeEvent('Animals initialized.');
         }
 
@@ -81,9 +81,7 @@ class AnimalsOperator {
 
         let g = this.getAnimalGeneratorByAnimal(animal);
 
-        //@TODO
         if (g === null) {
-            throwError('asd');
             return [];
         }
 
@@ -91,8 +89,8 @@ class AnimalsOperator {
             tilesAround = getTilesAround(
                 animal.x,
                 animal.y,
-                config.worldSize,
-                config.worldSize,
+                config.WORLD_SIZE,
+                config.WORLD_SIZE,
                 2
             );
 
@@ -113,7 +111,7 @@ class AnimalsOperator {
      */
     isAnimalsAroundPoint = function(x, y, animalToExcept) {
 
-        let availableTiles = getTilesAround(x, y, config.worldSize, config.worldSize, 3);
+        let availableTiles = getTilesAround(x, y, config.WORLD_SIZE, config.WORLD_SIZE, 3);
 
         for (let j = 0; j < availableTiles.length; j++) {
             for (let i = 0; i < this.animals.length; i++) {
@@ -153,7 +151,7 @@ class AnimalsOperator {
 
             this.animalsGenerators.push(generator);
 
-            if (config.logs) {
+            if (config.LOGS) {
                 console.log('Generator "' + generator.getName() + '" registered');
             }
         }

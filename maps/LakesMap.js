@@ -13,7 +13,7 @@ class LakesMap extends BinaryMatrix {
      */
     constructor(altitudeMap, oceanMap) {
 
-        super(config.worldSize, config.worldSize);
+        super(config.WORLD_SIZE, config.WORLD_SIZE);
 
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;

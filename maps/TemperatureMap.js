@@ -8,7 +8,7 @@ class TemperatureMap extends PointMatrix {
      * @return {TemperatureMap}
      */
     constructor(altitudeMap) {
-        super(config.worldSize, config.worldSize);
+        super(config.WORLD_SIZE, config.WORLD_SIZE);
         this.altitudeMap = altitudeMap;
         return this;
     };
@@ -30,8 +30,8 @@ class TemperatureMap extends PointMatrix {
         let _this = this,
             gradient = [];
 
-        for (let i = 0; i < config.worldSize; i++) {
-            gradient[i] = i / config.worldSize;
+        for (let i = 0; i < config.WORLD_SIZE; i++) {
+            gradient[i] = i / config.WORLD_SIZE;
         }
 
         _this.foreach(function(x, y) {

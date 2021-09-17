@@ -9,7 +9,7 @@ class ForestMap extends BinaryMatrix {
      */
     constructor(biomes) {
 
-        super(config.worldSize, config.worldSize);
+        super(config.WORLD_SIZE, config.WORLD_SIZE);
 
         this.biomes = biomes;
 

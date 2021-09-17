@@ -4,7 +4,7 @@ class AltitudeMap extends PointMatrix {
      * @return {AltitudeMap}
      */
     constructor() {
-        super(config.worldSize, config.worldSize);
+        super(config.WORLD_SIZE, config.WORLD_SIZE);
         return this;
     }
 
@@ -16,8 +16,8 @@ class AltitudeMap extends PointMatrix {
 
         for (let i in octaves) {
             maps[i] = createNoiseMap(
-                config.worldSize,
-                octaves[i] * (config.worldSize / 75)
+                config.WORLD_SIZE,
+                octaves[i] * (config.WORLD_SIZE / 75)
             );
         }
 
@@ -39,7 +39,7 @@ class AltitudeMap extends PointMatrix {
             val = Math.min(1, Math.pow(val, config.WORLD_MAP_OCEAN_LEVEL + 1));
 
             // make island
-            val = _this.makeIsland(x, y, config.worldSize, val);
+            val = _this.makeIsland(x, y, config.WORLD_SIZE, val);
 
             return val;
         });
