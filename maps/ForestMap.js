@@ -125,6 +125,8 @@ class ForestMap extends BinaryMatrix {
                 return config.FOREST_GRASS_GROWTH;
             case 'grass-hills':
                 return config.FOREST_GRASS_HILLS_GROWTH;
+            case 'desert':
+                return config.FOREST_DESERT_GROWTH;
             case 'desert-hills':
                 return config.FOREST_DESERT_HILLS_GROWTH;
             case 'swamp':
@@ -159,7 +161,7 @@ class ForestMap extends BinaryMatrix {
             return 0;
         }
 
-        let NBR = _this.sumNeighbors(biome.x, biome.y, 2),
+        let NBR = _this.sumNeighbors(biome.x, biome.y),
             forestType = _this.getForestType(biome),
             IH, IT, IA,
             BC = config.FOREST_BORN_CHANCE,
@@ -205,7 +207,7 @@ class ForestMap extends BinaryMatrix {
         let found = false,
             _this = this;
 
-        _this.biomes.foreachNeighbors(x, y, radius, function(nx, ny) {
+        _this.biomes.foreachAroundRadius(x, y, radius, function(nx, ny) {
             if (_this.biomes.getTile(nx, ny).getName() === biomeName) {
                 found = true;
                 return true;
@@ -221,7 +223,7 @@ class ForestMap extends BinaryMatrix {
      */
     getDeadChance(biome) {
 
-        let NBR = this.sumNeighbors(biome.x, biome.y, 2);
+        let NBR = this.sumNeighbors(biome.x, biome.y);
 
         // if no neighbor forest
         if (NBR === 0 || NBR > 5) {

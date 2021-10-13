@@ -156,15 +156,14 @@ class BinaryMatrix extends NumericMatrix {
     /**
      * @param {number} x
      * @param {number} y
-     * @param {number} deep
      * @return {Array}
      */
-    getFilledNeighbors(x, y, deep) {
+    getFilledNeighbors(x, y) {
 
         let result = [],
             _this = this;
 
-        _this.foreachNeighbors(x, y, deep, function(nx, ny) {
+        _this.foreachNeighbors(x, y, function(nx, ny) {
             result.push([nx, ny]);
         });
 
@@ -173,16 +172,15 @@ class BinaryMatrix extends NumericMatrix {
 
     /**
      * Apply callback to all neighbors of all
-     * @param {number} deep
      * @param {function} callback
      * @return {this}
      */
-    foreachFilledNeighbors(deep, callback) {
+    foreachFilledNeighbors(callback) {
 
         let _this = this;
 
         _this.foreachFilled(function(x, y) {
-            _this.foreachNeighbors(x, y, deep, function(nx, ny) {
+            _this.foreachNeighbors(x, y, function(nx, ny) {
                 callback(nx, ny);
             });
         });

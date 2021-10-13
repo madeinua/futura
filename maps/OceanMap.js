@@ -31,7 +31,7 @@ class OceanMap extends BinaryMatrix {
 
             point = activePoints.pop();
 
-            _this.altitudeMap.foreachNeighbors(point[0], point[1], 1, function(x, y) {
+            _this.altitudeMap.foreachAroundRadius(point[0], point[1], 1, function(x, y) {
 
                 let altitude = _this.altitudeMap.getTile(x, y);
 

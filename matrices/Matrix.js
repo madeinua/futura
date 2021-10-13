@@ -176,32 +176,61 @@ class Matrix {
     }
 
     /**
-     * Retrieve tile neighbors
-     * deep:
-     * 1/3/5/.. exclude corners
-     * 2/4/6/.. include corners
+     * Retrieve tile neighbors around the tile
      *
      * @param {number} x
      * @param {number} y
-     * @param {number} deep
      * @return {Array}
      */
-    getNeighbors(x, y, deep) {
-        return getTilesAround(x, y, this.getWidth(), this.getHeight(), deep);
+    getNeighbors(x, y) {
+        return getRectangleAround(x, y, this.getWidth(), this.getHeight());
     }
 
     /**
      * Apply callback to all neighbors
      * @param {number} x
      * @param {number} y
-     * @param {number} deep
      * @param {function} callback
      * @param {boolean} stopOnTrue
      * @return {this}
      */
-    foreachNeighbors(x, y, deep, callback, stopOnTrue = false) {
+    foreachNeighbors(x, y, callback, stopOnTrue = false) {
 
-        let neighbors = this.getNeighbors(x, y, deep);
+        let neighbors = this.getNeighbors(x, y);
+
+        for (let i = 0; i < neighbors.length; i++) {
+            if (callback(neighbors[i][0], neighbors[i][1]) && stopOnTrue) {
+                return this;
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Retrieve tiles around a specified tile in a specified radius
+     *
+     * @param {number} x
+     * @param {number} y
+     * @param {number} radius
+     * @return {Array}
+     */
+    getAroundRadius(x, y, radius) {
+        return getAroundRadius(x, y, this.getWidth(), this.getHeight(), radius);
+    }
+
+    /**
+     * Apply callback to all neighbors
+     * @param {number} x
+     * @param {number} y
+     * @param {number} radius
+     * @param {function} callback
+     * @param {boolean} stopOnTrue
+     * @return {this}
+     */
+    foreachAroundRadius(x, y, radius, callback, stopOnTrue = false) {
+
+        let neighbors = this.getAroundRadius(x, y, radius);
 
         for (let i = 0; i < neighbors.length; i++) {
             if (callback(neighbors[i][0], neighbors[i][1]) && stopOnTrue) {

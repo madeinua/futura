@@ -86,12 +86,11 @@ class AnimalsOperator {
         }
 
         let creationArea = this.getAnimalGeneratorByAnimal(animal).getCreationArea(),
-            tilesAround = getTilesAround(
+            tilesAround = getRectangleAround(
                 animal.x,
                 animal.y,
                 config.WORLD_SIZE,
-                config.WORLD_SIZE,
-                2
+                config.WORLD_SIZE
             );
 
         for (let i = 0; i < tilesAround.length; i++) {
@@ -111,7 +110,7 @@ class AnimalsOperator {
      */
     isAnimalsAroundPoint = function(x, y, animalToExcept) {
 
-        let availableTiles = getTilesAround(x, y, config.WORLD_SIZE, config.WORLD_SIZE, 3);
+        let availableTiles = getAroundRadius(x, y, config.WORLD_SIZE, config.WORLD_SIZE, 2);
 
         for (let j = 0; j < availableTiles.length; j++) {
             for (let i = 0; i < this.animals.length; i++) {

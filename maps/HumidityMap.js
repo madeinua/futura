@@ -67,7 +67,7 @@ class HumidityMap extends PointMatrix {
 
             _this.addToTile(x, y, 0.2);
 
-            _this.foreachNeighbors(x, y, 5, function(nx, ny) {
+            _this.foreachAroundRadius(x, y, 5, function(nx, ny) {
                 if (!_this.riversMap.filled(nx, ny)) {
                     _this.addToTile(nx, ny, 0.02);
                 }
@@ -81,7 +81,7 @@ class HumidityMap extends PointMatrix {
 
         // lakes increase humidity
         _this.lakesMap.foreachFilled(function(x, y) {
-            _this.foreachNeighbors(x, y, 5, function (nx, ny) {
+            _this.foreachAroundRadius(x, y, 5, function (nx, ny) {
                 _this.addToTile(nx, ny, 0.015);
             });
         });

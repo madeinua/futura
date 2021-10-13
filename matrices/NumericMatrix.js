@@ -59,15 +59,14 @@ class NumericMatrix extends Matrix {
      * Count sum of all neighbors
      * @param {number} x
      * @param {number} y
-     * @param {number} deep
      * @return {number}
      */
-    sumNeighbors(x, y, deep) {
+    sumNeighbors(x, y) {
 
         let sum = 0,
             _this = this;
 
-        _this.foreachNeighbors(x, y, deep, function(nx, ny) {
+        _this.foreachNeighbors(x, y, function(nx, ny) {
             sum += _this.getTile(nx, ny);
         });
 
@@ -78,15 +77,14 @@ class NumericMatrix extends Matrix {
      * Add value to all neighbors of the point [x, y]
      * @param {number} x
      * @param {number} y
-     * @param {number} deep
      * @param {number} value
      * @return {this}
      */
-    addToNeighborTiles(x, y, deep, value) {
+    addToNeighborTiles(x, y, value) {
 
         let _this = this;
 
-        _this.foreachNeighbors(x, y, deep, function(nx, ny) {
+        _this.foreachNeighbors(x, y, function(nx, ny) {
             _this.addToTile(nx, ny, value);
         });
 

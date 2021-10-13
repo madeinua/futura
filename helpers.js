@@ -130,66 +130,64 @@ function round(value, precision) {
  * @param {number} y
  * @param {number} maxWidth
  * @param {number} maxHeight
- * @param {number} deep
+ * @param {number} radius
  * @return {Array}
  */
-function getTilesAround(x, y, maxWidth, maxHeight, deep) {
+function getAroundRadius(x, y, maxWidth, maxHeight, radius) {
 
-    if (deep === 0) {
-        return [];
+    let result = [],
+        minX = Math.max(0, x - radius),
+        minY = Math.max(0, y - radius),
+        maxX = Math.min(maxWidth - 1, x + radius),
+        maxY = Math.min(maxHeight - 1, y + radius),
+        maxRadius = radius + 1,
+        nx, ny;
+
+    for (nx = minX; nx <= maxX; nx++) {
+        for (ny = minY; ny <= maxY; ny++) {
+            if (
+                !(nx === x && ny === y)
+                && (
+                    (x > nx ? x - nx : nx - x)
+                    +
+                    (y > ny ? y - ny : ny - y)
+                    <
+                    maxRadius
+                )
+            ) {
+                result.push([nx, ny]);
+            }
+        }
     }
 
-    let _getTilesAround = function(x1, y1, maxWidth, maxHeight, deep1) {
+    return result;
+}
 
-        let points;
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} maxWidth
+ * @param {number} maxHeight
+ * @returns {Array}
+ */
+function getRectangleAround(x, y, maxWidth, maxHeight) {
 
-        if (deep1 % 2 === 0) {
-            points = [
-                [-1, -1], [-1, 0], [-1, 1],
-                [0, -1], [0, 1],
-                [1, -1], [1, 0], [1, 1]
-            ];
-        } else {
-            points = [
-                [-1, 0],
-                [0, -1], [0, 1],
-                [1, 0]
-            ];
-        }
+    let result = [],
+        minX = Math.max(0, x - 1),
+        minY = Math.max(0, y - 1),
+        maxX = Math.min(maxWidth - 1, x + 1),
+        maxY = Math.min(maxHeight - 1, y + 1),
+        nx, ny;
 
-        let neighbors = [];
-
-        for (let i = 0; i < points.length; i++) {
-
-            let nx = x1 + points[i][0];
-            let ny = y1 + points[i][1];
-
-            if (
-                nx >= 0
-                && nx < maxWidth
-                && ny >= 0
-                && ny < maxHeight
-                && !(nx === x && ny === y)
-            ) {
-                neighbors.push([nx, ny]);
+    for (nx = minX; nx <= maxX; nx++) {
+        for (ny = minY; ny <= maxY; ny++) {
+            if (!(nx === x && ny === y)) {
+                result.push([nx, ny]);
             }
         }
+    }
 
-        if (deep1 > 2) {
-
-            let len = neighbors.length;
-
-            for (let j = 0; j < len; j++) {
-                neighbors = neighbors.concat(
-                    _getTilesAround(neighbors[j][0], neighbors[j][1], maxWidth, maxHeight, deep1 - 2)
-                );
-            }
-        }
-
-        return neighbors.unique();
-    };
-
-    return _getTilesAround(x, y, maxWidth, maxHeight, deep);
+    return result;
 }
 
 /**

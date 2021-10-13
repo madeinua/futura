@@ -144,7 +144,7 @@ class RiversMap extends BinaryMatrix {
             cx = currentPoint[0],
             cy = currentPoint[1],
             currentAltitude = altitudeMap.getTile(cx, cy),
-            neighbors = altitudeMap.getNeighbors(cx, cy, 2).shuffle(),
+            neighbors = altitudeMap.getNeighbors(cx, cy).shuffle(),
             lowerPoint = [];
 
         for (let i = 0; i < neighbors.length; i++) {
@@ -184,7 +184,7 @@ class RiversMap extends BinaryMatrix {
 
         for (let p = 0; p < river.length; p++) {
             if (p > notDeltaLength) {
-                _this.foreachNeighbors(river[p][0], river[p][1], 1, function(nx, ny) {
+                _this.foreachAroundRadius(river[p][0], river[p][1], 1, function(nx, ny) {
                     if ([0, 1].randomElement() === 0 && !river.includes([nx, ny])) {
                         delta.push([nx, ny]);
                     }
