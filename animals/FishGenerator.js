@@ -17,7 +17,7 @@ class FishGenerator extends AnimalGenerator {
     /**
      * @return {BinaryMatrix}
      */
-    generateCreationArea() {
+    generateHabitat() {
         return this.freshWaterMap.clone().combineWith(this.coastMap);
     }
 }

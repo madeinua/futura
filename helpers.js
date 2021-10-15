@@ -508,29 +508,6 @@ function hexToRgb(hex) {
 }
 
 /**
- * Split [0-100] range into equal parts "distances"
- * @param {number} number
- * @param {number} start
- * @param {number} end
- * @return {[number]}
- */
-function getEqualDistances(number, start, end) {
-
-    let lines = [];
-
-    if (number === 1) {
-        lines = [(end - start) / 2];
-    } else {
-        let parts = (end - start) / (number - 1);
-        for (let i = 0; i < number; i++) {
-            lines.push(start + Math.floor(parts * i));
-        }
-    }
-
-    return lines;
-}
-
-/**
  * Make a Hex color darken/brighten
  *
  * @param {string} col

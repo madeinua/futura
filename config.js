@@ -13,7 +13,7 @@ function getConfig() {
         WORLD_SIZE: 250,
         VISIBLE_COLS: 30,
         MAIN_MAP_SCALE: 2.5,
-        SHOW_COORDINATES: false,
+        SHOW_COORDINATES: true,
 
         // Ticks
         TICKS_ENABLED: true,
@@ -78,8 +78,8 @@ function getConfig() {
         FOREST_TUNDRA_HILLS_GROWTH: 0.08,
         FOREST_GRASS_GROWTH: 0.30,
         FOREST_GRASS_HILLS_GROWTH: 0.35,
-        FOREST_DESERT_GROWTH: 0.15,
-        FOREST_DESERT_HILLS_GROWTH: 0.2,
+        FOREST_DESERT_GROWTH: 0.05,
+        FOREST_DESERT_HILLS_GROWTH: 0.15,
         FOREST_SWAMP_GROWTH: 0.2,
         FOREST_ROCKS_GROWTH: 0.08,
         FOREST_SAVANNA_GROWTH: 0.25,

@@ -10,7 +10,7 @@ class AnimalGenerator {
     coastMap;
 
     /** @var {BinaryMatrix} */
-    creationArea;
+    habitat;
 
     /**
      * @param {OceanMap} oceanMap
@@ -54,20 +54,20 @@ class AnimalGenerator {
     /**
      * @return {BinaryMatrix}
      */
-    generateCreationArea() {
+    generateHabitat() {
         return new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE, 1);
     }
 
     /**
      * @return {BinaryMatrix}
      */
-    getCreationArea() {
+    getHabitat() {
 
-        if (typeof this.creationArea === 'undefined') {
-            this.creationArea = this.generateCreationArea();
+        if (typeof this.habitat === 'undefined') {
+            this.habitat = this.generateHabitat();
         }
 
-        return this.creationArea;
+        return this.habitat;
     }
 
     /**
@@ -79,7 +79,7 @@ class AnimalGenerator {
             return false;
         }
 
-        let tile = this.getCreationArea().getRandomFilledTile();
+        let tile = this.getHabitat().getRandomFilledTile();
 
         if (!tile) {
             throwError('Can not create animal', 1, true);

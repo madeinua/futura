@@ -79,13 +79,8 @@ class AnimalsOperator {
      */
     getTilesAvailableToMove(animal) {
 
-        let g = this.getAnimalGeneratorByAnimal(animal);
-
-        if (g === null) {
-            return [];
-        }
-
-        let creationArea = this.getAnimalGeneratorByAnimal(animal).getCreationArea(),
+        let result = [],
+            habitat = this.getAnimalGeneratorByAnimal(animal).getHabitat(),
             tilesAround = getRectangleAround(
                 animal.x,
                 animal.y,
@@ -94,12 +89,12 @@ class AnimalsOperator {
             );
 
         for (let i = 0; i < tilesAround.length; i++) {
-            if (!creationArea.filled(tilesAround[i][0], tilesAround[i][1])) {
-                tilesAround.splice(i, 1);
+            if (habitat.filled(tilesAround[i][0], tilesAround[i][1])) {
+                result.push(tilesAround[i]);
             }
         }
 
-        return tilesAround;
+        return result;
     }
 
     /**
