@@ -180,9 +180,6 @@ class World {
             weatherOperator = new WeatherOperator(),
             waterOperator = new WaterOperator(),
             humidityOperator = new HumidityOperator(),
-            biomesOperator = new BiomesOperator(),
-            forestsOperator = new ForestsOperator(),
-            animalsOperator = new AnimalsOperator(),
             altitudeMap = surfaceOperator.generateAltitudeMap(),
             temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap),
             oceanMap = waterOperator.generateOceanMap(altitudeMap),
@@ -192,7 +189,7 @@ class World {
             freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap),
             humidity = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
 
-        biomesOperator.initBiomesGeneration(
+        let biomesOperator = new BiomesOperator(
             altitudeMap,
             oceanMap,
             coastMap,
@@ -202,13 +199,13 @@ class World {
             this.getLayer(LAYER_BIOMES)
         );
 
-        forestsOperator.initForestGeneration(
+        new ForestsOperator(
             biomesOperator.getBiomes(),
             this.tickHandlers,
             this.getLayer(LAYER_FOREST)
         );
 
-        animalsOperator.initAnimalsGeneration(
+        new AnimalsOperator(
             oceanMap,
             freshWaterMap,
             coastMap,

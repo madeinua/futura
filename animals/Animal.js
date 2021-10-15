@@ -45,4 +45,18 @@ class Animal {
     getLifespan() {
         return 15;
     }
+
+    /**
+     * @returns {null|string}
+     */
+    getImage() {
+        return null;
+    }
+
+    /**
+     * @returns {string}
+     */
+    getColor() {
+        return config.ANIMAL_COLOR;
+    }
 }

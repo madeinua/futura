@@ -7,46 +7,22 @@ class AnimalsOperator {
     animalsGenerators = [];
 
     /**
-     * @param {Layer} animalsLayer
-     */
-    cleanAnimalsLayer = function(animalsLayer) {
-        animalsLayer.reset();
-    };
-
-    /**
-     * @param {Layer} animalsLayer
-     * @param {Animal} animal
-     */
-    addAnimalToLayer = function(animalsLayer, animal) {
-        animalsLayer.setTile(animal.x, animal.y, hexToRgb(config.ANIMAL_COLOR));
-    };
-
-    /**
-     * @returns {AnimalGenerator[]}
-     */
-    getAvailableGenerators = function() {
-        return [
-            //AnimalGenerator,
-            FishGenerator
-        ];
-    };
-
-    /**
      * @param {OceanMap} oceanMap
      * @param {CoastMap} coastMap
      * @param {BinaryMatrix} freshWaterMap
      * @param {Array} tickHandlers
      * @param {Layer} animalsLayer
      */
-    initAnimalsGeneration = function(oceanMap, freshWaterMap, coastMap, tickHandlers, animalsLayer) {
+    constructor(oceanMap, freshWaterMap, coastMap, tickHandlers, animalsLayer) {
+
+        this.animalImagesCache = [];
 
         let _this = this,
-            animalsOperator = new AnimalsOperator(),
-            animalsMap = new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE),
+            animalsMap = new AnimalsMap(),
             animalGenerators = this.getAvailableGenerators();
 
         for (let i = 0; i < animalGenerators.length; i++) {
-            animalsOperator.registerAnimalsGenerator(
+            _this.registerAnimalsGenerator(
                 new animalGenerators[i](oceanMap, freshWaterMap, coastMap)
             );
         }
@@ -60,11 +36,11 @@ class AnimalsOperator {
             animalsMap.map(false);
             _this.cleanAnimalsLayer(animalsLayer);
 
-            animalsOperator.touchAnimals();
-            animalsOperator.maybeKillAnimals();
-            animalsOperator.maybeCreateAnimals();
+            _this.touchAnimals();
+            _this.maybeKillAnimals();
+            _this.maybeCreateAnimals();
 
-            animalsOperator.moveAnimals(function(animal) {
+            _this.moveAnimals(function(animal) {
                 _this.addAnimalToLayer(animalsLayer, animal);
                 animalsMap.setTile(animal.x, animal.y, 1);
             });
@@ -72,6 +48,35 @@ class AnimalsOperator {
             Filters.apply('animalsMap', animalsMap);
         });
     }
+
+    /**
+     * @param {Layer} animalsLayer
+     */
+    cleanAnimalsLayer = function(animalsLayer) {
+        animalsLayer.reset();
+    };
+
+    /**
+     * @param {Layer} animalsLayer
+     * @param {Animal} animal
+     */
+    addAnimalToLayer = function(animalsLayer, animal) {
+        animalsLayer.setTile(
+            animal.x,
+            animal.y,
+            this.getDisplayCell(animal)
+        );
+    };
+
+    /**
+     * @returns {AnimalGenerator[]}
+     */
+    getAvailableGenerators = function() {
+        return [
+            //AnimalGenerator,
+            FishGenerator
+        ];
+    };
 
     /**
      * @param {Animal} animal
@@ -251,5 +256,21 @@ class AnimalsOperator {
 
             callback(animal);
         }
+    }
+
+    /**
+     * @param {Animal} animal
+     * @return {DisplayCell}
+     */
+    getDisplayCell = function(animal) {
+
+        if (typeof this.animalImagesCache[animal.getName()] === 'undefined') {
+            this.animalImagesCache[animal.getName()] = new DisplayCell(
+                hexToRgb(animal.getColor()),
+                createImage(animal.getImage())
+            );
+        }
+
+        return this.animalImagesCache[animal.getName()];
     }
 }

@@ -12,7 +12,7 @@ class BiomesOperator {
      * @param {HumidityMap} humidityMap
      * @param {Layer} biomesLayer
      */
-    initBiomesGeneration = function(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, biomesLayer) {
+    constructor(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, biomesLayer) {
 
         this.biomes = new Matrix(config.WORLD_SIZE, config.WORLD_SIZE);
 

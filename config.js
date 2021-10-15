@@ -13,7 +13,7 @@ function getConfig() {
         WORLD_SIZE: 250,
         VISIBLE_COLS: 30,
         MAIN_MAP_SCALE: 2.5,
-        SHOW_COORDINATES: true,
+        SHOW_COORDINATES: false,
 
         // Ticks
         TICKS_ENABLED: true,
@@ -104,6 +104,8 @@ function getConfig() {
         ],
 
         ANIMALS_LIMIT: 100,
-        ANIMAL_COLOR: '#f7ff00'
+        ANIMAL_COLOR: '#f7ff00',
+
+        FISH_IMAGE: 'images/fish-1.png'
     };
 }

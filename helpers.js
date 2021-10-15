@@ -564,11 +564,17 @@ function getPolygonAreaSize(coords) {
 }
 
 /**
- * @param {string} src
- * @return {HTMLImageElement}
+ * @param {null|string} src
+ * @return {null|HTMLImageElement}
  */
 function createImage(src) {
+
+    if (src === null) {
+        return null;
+    }
+
     let img = new Image();
     img.src = src;
+
     return img;
 }
