@@ -40,10 +40,11 @@ class Animal {
     }
 
     /**
-     * @return {number}
+     * 0 -> 100
+     * @returns {number}
      */
-    getLifespan() {
-        return 15;
+    getMoveChance() {
+        return 20;
     }
 
     /**

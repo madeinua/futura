@@ -41,7 +41,7 @@ class AnimalGenerator {
      * @return {number} [0 - 100]
      */
     getCreateChance() {
-        return 100;
+        return 50;
     }
 
     /**

@@ -188,17 +188,15 @@ class AnimalsOperator {
     }
 
     /**
-     * @param {number} age
-     * @param {number} lifespan
      * @return {boolean}
      */
-    canDie(age, lifespan) {
-        return age > (lifespan + 10) || (age > (lifespan - 10) && iAmLucky(5));
+    canDie() {
+        return iAmLucky(1);
     }
 
     maybeKillAnimals() {
         for (let i = 0; i < this.animals.length; i++) {
-            if (this.canDie(this.animals[i].age, this.animals[i].getLifespan())) {
+            if (this.canDie()) {
                 this.animals.splice(i, 1);
             }
         }
@@ -215,6 +213,10 @@ class AnimalsOperator {
      * @return {boolean|Array}
      */
     getNextMove(animal) {
+
+        if (!iAmLucky(animal.getMoveChance())) {
+            return false;
+        }
 
         let availableTiles = this.getTilesAvailableToMove(animal),
             nextPoint = false;
