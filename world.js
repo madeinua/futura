@@ -19,6 +19,10 @@ class World {
             );
         }
 
+        if (!config.RANDOM_WORLD) {
+            Math.seedrandom(config.SEED);
+        }
+
         this.layers = [];
 
         this.cellSize = Math.ceil(scrollingMapWrapper.offsetWidth / config.VISIBLE_COLS);

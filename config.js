@@ -7,7 +7,9 @@ function getConfig() {
 
         // Global
         LOGS: true,
-        STORE_DATA: true,
+        STORE_DATA: false,
+        RANDOM_WORLD: false,
+        SEED: 12345,
 
         // Maps
         WORLD_SIZE: 250,
