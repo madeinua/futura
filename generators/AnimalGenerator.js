@@ -46,7 +46,7 @@ class AnimalGenerator {
      * @return {number}
      */
     getCreateIntensity() {
-        return 50;
+        return 100;
     }
 
     /**
@@ -102,17 +102,30 @@ class AnimalGenerator {
      */
     getRespawnPoints() {
         return this.respawnPoints;
+        //return JSON.parse(JSON.stringify(this.respawnPoints)); // @TODO WTF is this?
     }
 
     /**
-     * @param {Array} excludeTiles
+     * @param {Array} anotherAnimalsPositions
      * @return {boolean|Animal}
      */
-    createAnimal(excludeTiles) {
+    createAnimal(anotherAnimalsPositions) {
 
-        let tile = this.getRespawnPoints()
-            .diffTiles(excludeTiles)
-            .randomElement();
+        let respawnPoints = this.getRespawnPoints();
+
+        console.log(respawnPoints); // @TODO: remove this
+
+        for (let i = 0; i < respawnPoints.length; i++) {
+            if (anotherAnimalsPositions.getClosestDistanceTo(respawnPoints[i][0], respawnPoints[i][1]) < 3) { // @TODO this probably doesn't work
+                respawnPoints.removeElementByIndex(i);
+            }
+        }
+
+        if (!respawnPoints.length) {
+            return false;
+        }
+
+        let tile = respawnPoints.randomElement();
 
         if (!tile) {
             throwError('Can not create animal', 1, true);

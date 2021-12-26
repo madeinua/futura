@@ -108,7 +108,7 @@ function getConfig() {
         ANIMAL_RESPAWN_POINTS: 5,
         ANIMAL_COLOR: '#f7ff00',
 
-        FISH_RESPAWN_POINTS: 20,
+        FISH_RESPAWN_POINTS: 40,
         FISH_IMAGE: 'images/fish-1.png'
     };
 }

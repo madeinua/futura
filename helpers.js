@@ -72,6 +72,26 @@ Array.prototype.randomElement = function() {
 };
 
 /**
+ * Remove/delete an element from the array by the index
+ * @param index
+ * @returns {Array}
+ */
+Array.prototype.removeElementByIndex = function(index) {
+    return this.filter(function(e) {
+        return e.value !== index;
+    });
+};
+
+/**
+ * Remove/delete an element from the array by the value
+ * @param value
+ * @returns {Array}
+ */
+Array.prototype.removeElementByValue = function(value) {
+    return this.splice(this.indexOf(value), 1);
+};
+
+/**
  * Shuffles array
  * @return {Array}
  */
