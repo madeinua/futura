@@ -102,7 +102,6 @@ class AnimalGenerator {
      */
     getRespawnPoints() {
         return this.respawnPoints;
-        //return JSON.parse(JSON.stringify(this.respawnPoints)); // @TODO WTF is this?
     }
 
     /**
@@ -112,8 +111,6 @@ class AnimalGenerator {
     createAnimal(anotherAnimalsPositions) {
 
         let respawnPoints = this.getRespawnPoints();
-
-        console.log(respawnPoints); // @TODO: remove this
 
         for (let i = 0; i < respawnPoints.length; i++) {
             if (anotherAnimalsPositions.getClosestDistanceTo(respawnPoints[i][0], respawnPoints[i][1]) < 3) { // @TODO this probably doesn't work

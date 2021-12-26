@@ -159,6 +159,7 @@ class AnimalsOperator {
     }
 
     maybeCreateAnimals() {
+
         for (let i = 0; i < this.animalsGenerators.length; i++) {
 
             if (!iAmLucky(this.animalsGenerators[i].getCreateIntensity())) {
@@ -235,8 +236,8 @@ class AnimalsOperator {
             nextPoint = availableTiles.randomElement();
 
             if (this.isAnimalsAroundPoint(nextPoint, animal)) {
+                availableTiles.removeElementByValue(nextPoint);
                 nextPoint = false;
-                availableTiles.splice(availableTiles.indexOf(nextPoint), 1);
             }
         }
 
