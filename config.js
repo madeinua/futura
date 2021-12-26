@@ -105,9 +105,10 @@ function getConfig() {
             'images/forest-2.png'
         ],
 
-        ANIMALS_LIMIT: 100,
+        ANIMAL_RESPAWN_POINTS: 5,
         ANIMAL_COLOR: '#f7ff00',
 
+        FISH_RESPAWN_POINTS: 20,
         FISH_IMAGE: 'images/fish-1.png'
     };
 }

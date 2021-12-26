@@ -53,6 +53,16 @@ let Filters = {
     }
 };
 
+let tick = 0;
+
+/**
+ * Always return unique autoincrement value
+ * @returns {number}
+ */
+function getTick() {
+    return ++tick;
+}
+
 /**
  * Retrieve random element of array
  * @return {*}

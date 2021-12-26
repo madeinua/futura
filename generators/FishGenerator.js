@@ -20,4 +20,11 @@ class FishGenerator extends AnimalGenerator {
     generateHabitat() {
         return this.freshWaterMap.clone().combineWith(this.coastMap);
     }
+
+    /**
+     * @returns {number}
+     */
+    getRespawnPointsLimit() {
+        return config.FISH_RESPAWN_POINTS;
+    }
 }

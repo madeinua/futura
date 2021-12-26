@@ -12,6 +12,9 @@ class AnimalGenerator {
     /** @var {BinaryMatrix} */
     habitat;
 
+    /** @var {Array} */
+    respawnPoints;
+
     /**
      * @param {OceanMap} oceanMap
      * @param {BinaryMatrix} freshWaterMap
@@ -21,6 +24,8 @@ class AnimalGenerator {
         this.oceanMap = oceanMap;
         this.freshWaterMap = freshWaterMap;
         this.coastMap = coastMap;
+        this.habitat = this.generateHabitat();
+        this.respawnPoints = this.generateRespawnPoints();
     }
 
     /**
@@ -38,17 +43,10 @@ class AnimalGenerator {
     }
 
     /**
-     * @return {number} [0 - 100]
-     */
-    getCreateChance() {
-        return 50;
-    }
-
-    /**
      * @return {number}
      */
     getCreateIntensity() {
-        return 1;
+        return 50;
     }
 
     /**
@@ -62,24 +60,59 @@ class AnimalGenerator {
      * @return {BinaryMatrix}
      */
     getHabitat() {
-
-        if (typeof this.habitat === 'undefined') {
-            this.habitat = this.generateHabitat();
-        }
-
         return this.habitat;
     }
 
     /**
-     * @return {boolean|Animal}
+     * @returns {number}
      */
-    maybeCreateAnimal() {
+    getRespawnPointsLimit() {
+        return config.ANIMAL_RESPAWN_POINTS;
+    }
 
-        if (!iAmLucky(this.getCreateChance())) {
-            return false;
+    /**
+     * @returns {Array}
+     */
+    generateRespawnPoints() {
+
+        let tiles = [],
+            tile;
+
+        for (let i = 0; i < this.getRespawnPointsLimit(); i++) {
+            for (let j = 0; j < 3; j++) {
+
+                tile = this.getHabitat().getRandomFilledTile();
+
+                if (!tiles.includesTile(tile)) {
+                    tiles.push(tile);
+                    break;
+                }
+            }
         }
 
-        let tile = this.getHabitat().getRandomFilledTile();
+        if (!tiles.length) {
+            throwError('Can not create respawn points', 1, true);
+        }
+
+        return tiles;
+    }
+
+    /**
+     * @returns {Array}
+     */
+    getRespawnPoints() {
+        return this.respawnPoints;
+    }
+
+    /**
+     * @param {Array} excludeTiles
+     * @return {boolean|Animal}
+     */
+    createAnimal(excludeTiles) {
+
+        let tile = this.getRespawnPoints()
+            .diffTiles(excludeTiles)
+            .randomElement();
 
         if (!tile) {
             throwError('Can not create animal', 1, true);
@@ -87,25 +120,5 @@ class AnimalGenerator {
         }
 
         return new (this.getAnimalClass())(tile[0], tile[1]);
-    }
-
-    /**
-     * @return {Animal[]}
-     */
-    maybeCreateAnimals() {
-
-        let animals = [],
-            animal;
-
-        for (let i = 0; i < this.getCreateIntensity(); i++) {
-
-            animal = this.maybeCreateAnimal();
-
-            if (animal) {
-                animals.push(animal);
-            }
-        }
-
-        return animals;
     }
 }

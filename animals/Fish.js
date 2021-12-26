@@ -8,4 +8,11 @@ class Fish extends Animal {
     getImage() {
         return config.FISH_IMAGE;
     }
+
+    /**
+     * @returns {number}
+     */
+    getMoveChance() {
+        return 50;
+    }
 }

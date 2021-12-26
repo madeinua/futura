@@ -1,9 +1,12 @@
 class AnimalsOperator {
 
-    /** @var {Array} */
+    /** @var {Animal[]} */
     animals = [];
 
     /** @var {Array} */
+    animalsPositions = [];
+
+    /** @var {AnimalGenerator[]} */
     animalsGenerators = [];
 
     /**
@@ -103,14 +106,13 @@ class AnimalsOperator {
     }
 
     /**
-     * @param {number} x
-     * @param {number} y
+     * @param {Array} tile
      * @param {Animal} animalToExcept
      * @return {boolean}
      */
-    isAnimalsAroundPoint = function(x, y, animalToExcept) {
+    isAnimalsAroundPoint = function(tile, animalToExcept) {
 
-        let availableTiles = getAroundRadius(x, y, config.WORLD_SIZE, config.WORLD_SIZE, 2);
+        let availableTiles = getAroundRadius(tile[0], tile[1], config.WORLD_SIZE, config.WORLD_SIZE, 2);
 
         for (let j = 0; j < availableTiles.length; j++) {
             for (let i = 0; i < this.animals.length; i++) {
@@ -157,17 +159,18 @@ class AnimalsOperator {
     }
 
     maybeCreateAnimals() {
-
-        if (this.animals.length > config.ANIMALS_LIMIT) {
-            return;
-        }
-
         for (let i = 0; i < this.animalsGenerators.length; i++) {
 
-            let animals = this.animalsGenerators[i].maybeCreateAnimals();
+            if (!iAmLucky(this.animalsGenerators[i].getCreateIntensity())) {
+                continue;
+            }
 
-            for (let j = 0; j < animals.length; j++) {
-                this.animals.push(animals[j]);
+            let animal = this.animalsGenerators[i].createAnimal(
+                this.animalsPositions
+            );
+
+            if (animal) {
+                this.animals.push(animal);
             }
         }
     }
@@ -218,14 +221,20 @@ class AnimalsOperator {
             return false;
         }
 
-        let availableTiles = this.getTilesAvailableToMove(animal),
+        let prevPoint = animal.getPrevPosition(),
             nextPoint = false;
+
+        if (prevPoint && iAmLucky(50)) {
+            return prevPoint;
+        }
+
+        let availableTiles = this.getTilesAvailableToMove(animal);
 
         while(!nextPoint && availableTiles.length) {
 
             nextPoint = availableTiles.randomElement();
 
-            if (this.isAnimalsAroundPoint(nextPoint[0], nextPoint[1], animal)) {
+            if (this.isAnimalsAroundPoint(nextPoint, animal)) {
                 nextPoint = false;
                 availableTiles.splice(availableTiles.indexOf(nextPoint), 1);
             }
@@ -242,6 +251,8 @@ class AnimalsOperator {
         let animal,
             nextPoint;
 
+        this.animalsPositions = [];
+
         for (let i = 0; i < this.animals.length; i++) {
 
             animal = this.animals[i];
@@ -251,12 +262,15 @@ class AnimalsOperator {
                 nextPoint = this.getNextMove(animal);
 
                 if (nextPoint !== false) {
-                    animal.x = nextPoint[0];
-                    animal.y = nextPoint[1];
+                    animal.moveTo(nextPoint[0], nextPoint[1]);
                 }
             }
 
             callback(animal);
+
+            this.animalsPositions.push(
+                animal.getPosition()
+            );
         }
     }
 
