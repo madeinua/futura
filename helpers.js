@@ -77,8 +77,8 @@ Array.prototype.randomElement = function() {
  * @returns {Array}
  */
 Array.prototype.removeElementByIndex = function(index) {
-    return this.filter(function(e) {
-        return e.value !== index;
+    return this.filter((e, i) => {
+        return i !== index;
     });
 };
 
@@ -88,7 +88,9 @@ Array.prototype.removeElementByIndex = function(index) {
  * @returns {Array}
  */
 Array.prototype.removeElementByValue = function(value) {
-    return this.splice(this.indexOf(value), 1);
+    return this.filter((e) => {
+        return e !== value;
+    });
 };
 
 /**
@@ -349,7 +351,7 @@ function fractionToRGB(value) {
  * @return {number}
  */
 function distance(x1, y1, x2, y2) {
-    return Math.floor(Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2)));
+    return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 }
 
 /**

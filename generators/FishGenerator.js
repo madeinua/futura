@@ -15,6 +15,13 @@ class FishGenerator extends AnimalGenerator {
     }
 
     /**
+     * @return {number}
+     */
+    getCreateIntensity() {
+        return config.FISH_CREATE_INTENSITY;
+    }
+
+    /**
      * @return {BinaryMatrix}
      */
     generateHabitat() {

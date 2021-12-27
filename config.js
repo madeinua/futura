@@ -15,7 +15,7 @@ function getConfig() {
         WORLD_SIZE: 250,
         VISIBLE_COLS: 30,
         MAIN_MAP_SCALE: 2.5,
-        SHOW_COORDINATES: false,
+        SHOW_COORDINATES: true,
 
         // Ticks
         TICKS_ENABLED: true,
@@ -106,9 +106,15 @@ function getConfig() {
         ],
 
         ANIMAL_RESPAWN_POINTS: 5,
+        ANIMAL_CREATE_INTENSITY: 100,
+        ANIMAL_MOVE_CHANCE: 100,
+        ANIMAL_LIFESPAN: 50,
         ANIMAL_COLOR: '#f7ff00',
 
-        FISH_RESPAWN_POINTS: 40,
+        FISH_RESPAWN_POINTS: 1,
+        FISH_CREATE_INTENSITY: 30,
+        FISH_MOVE_CHANCE: 100,
+        FISH_LIFESPAN: 10,
         FISH_IMAGE: 'images/fish-1.png'
     };
 }

@@ -46,7 +46,7 @@ class AnimalGenerator {
      * @return {number}
      */
     getCreateIntensity() {
-        return 100;
+        return config.ANIMAL_CREATE_INTENSITY;
     }
 
     /**
@@ -113,8 +113,8 @@ class AnimalGenerator {
         let respawnPoints = this.getRespawnPoints();
 
         for (let i = 0; i < respawnPoints.length; i++) {
-            if (anotherAnimalsPositions.getClosestDistanceTo(respawnPoints[i][0], respawnPoints[i][1]) < 3) { // @TODO this probably doesn't work
-                respawnPoints.removeElementByIndex(i);
+            if (anotherAnimalsPositions.getClosestDistanceTo(respawnPoints[i][0], respawnPoints[i][1]) < 3) {
+                respawnPoints = respawnPoints.removeElementByIndex(i);
             }
         }
 

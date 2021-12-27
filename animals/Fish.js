@@ -13,6 +13,13 @@ class Fish extends Animal {
      * @returns {number}
      */
     getMoveChance() {
-        return 50;
+        return config.FISH_MOVE_CHANCE;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getAverageLifespan() {
+        return config.FISH_LIFESPAN;
     }
 }

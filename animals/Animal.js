@@ -27,6 +27,8 @@ class Animal {
         this.y = y;
         this.age = 0;
         this.history = [];
+        
+        console.log(this.id + ' created in ' + x + ', ' + y); // @TODO: remove this
     }
 
     /**
@@ -34,6 +36,13 @@ class Animal {
      */
     getName() {
         return this.constructor.NAME;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getAverageLifespan() {
+        return config.ANIMAL_LIFESPAN;
     }
 
     /**
@@ -48,7 +57,7 @@ class Animal {
      * @returns {number}
      */
     getMoveChance() {
-        return 100;
+        return config.ANIMAL_MOVE_CHANCE;
     }
 
     /**
@@ -77,10 +86,6 @@ class Animal {
         }
 
         this.history.push([this.x, this.y]);
-
-        if (this.history.length > 5) {
-            this.history.shift();
-        }
 
         this.x = x;
         this.y = y;

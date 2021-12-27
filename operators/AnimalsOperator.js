@@ -35,7 +35,7 @@ class AnimalsOperator {
         }
 
         tickHandlers.push(function() {
-
+            
             animalsMap.map(false);
             _this.cleanAnimalsLayer(animalsLayer);
 
@@ -192,16 +192,27 @@ class AnimalsOperator {
     }
 
     /**
+     * @param {Animal} animal
      * @return {boolean}
      */
-    canDie() {
-        return iAmLucky(1);
+    canDie(animal) {
+        return iAmLucky(
+            animal.age / animal.getAverageLifespan()
+        );
     }
 
+    /**
+     * @param {Animal} animal
+     */
+    killAnimal(animal) {
+        console.log(animal.id + ' died'); // @TODO: remove this
+        this.animals = this.animals.removeElementByValue(animal);
+    }
+    
     maybeKillAnimals() {
         for (let i = 0; i < this.animals.length; i++) {
-            if (this.canDie()) {
-                this.animals.splice(i, 1);
+            if (this.canDie(this.animals[i])) {
+                this.killAnimal(this.animals[i]);
             }
         }
     }
@@ -222,21 +233,15 @@ class AnimalsOperator {
             return false;
         }
 
-        let prevPoint = animal.getPrevPosition(),
-            nextPoint = false;
-
-        if (prevPoint && iAmLucky(50)) {
-            return prevPoint;
-        }
-
-        let availableTiles = this.getTilesAvailableToMove(animal);
+        let nextPoint = false,
+            availableTiles = this.getTilesAvailableToMove(animal);
 
         while(!nextPoint && availableTiles.length) {
 
             nextPoint = availableTiles.randomElement();
 
             if (this.isAnimalsAroundPoint(nextPoint, animal)) {
-                availableTiles.removeElementByValue(nextPoint);
+                availableTiles = availableTiles.removeElementByValue(nextPoint);
                 nextPoint = false;
             }
         }
