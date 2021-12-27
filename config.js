@@ -108,13 +108,15 @@ function getConfig() {
         ANIMAL_RESPAWN_POINTS: 5,
         ANIMAL_CREATE_INTENSITY: 100,
         ANIMAL_MOVE_CHANCE: 100,
-        ANIMAL_LIFESPAN: 50,
+        ANIMAL_MIN_LIFESPAN: 50,
+        ANIMAL_MAX_LIFESPAN: 100,
         ANIMAL_COLOR: '#f7ff00',
 
-        FISH_RESPAWN_POINTS: 1,
-        FISH_CREATE_INTENSITY: 30,
+        FISH_RESPAWN_POINTS: 30,
+        FISH_CREATE_INTENSITY: 50,
         FISH_MOVE_CHANCE: 100,
-        FISH_LIFESPAN: 10,
+        FISH_MIN_LIFESPAN: 10,
+        FISH_MAX_LIFESPAN: 30,
         FISH_IMAGE: 'images/fish-1.png'
     };
 }

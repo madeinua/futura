@@ -112,9 +112,24 @@ Filters.add('forestMap', function(map) {
     return map;
 });
 
-Filters.add('animalsMap', function(map) {
-    drawMap('animalsMapCanvas', map, true);
-    return map;
+Filters.add('animalsTick', function(animals) {
+
+    let text = 'Total: ' + animals.length,
+        groups = {};
+
+    for (let i = 0; i < animals.length; i++) {
+        if (typeof groups[animals[i].getName()] === 'undefined') {
+            groups[animals[i].getName()] = 0;
+        }
+        
+        groups[animals[i].getName()]++;
+    }
+    
+    for (let i in groups) {
+        text += '<br />' + i + ': ' + groups[i];
+    }
+
+    document.getElementById('animalsList').innerHTML = text;
 });
 
 world.create();

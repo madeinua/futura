@@ -41,8 +41,15 @@ class Animal {
     /**
      * @returns {number}
      */
-    getAverageLifespan() {
-        return config.ANIMAL_LIFESPAN;
+    getMinLifespan() {
+        return config.ANIMAL_MIN_LIFESPAN;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getMaxLifespan() {
+        return config.ANIMAL_MAX_LIFESPAN;
     }
 
     /**

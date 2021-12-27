@@ -21,7 +21,6 @@ class AnimalsOperator {
         this.animalImagesCache = [];
 
         let _this = this,
-            animalsMap = new AnimalsMap(),
             animalGenerators = this.getAvailableGenerators();
 
         for (let i = 0; i < animalGenerators.length; i++) {
@@ -35,8 +34,7 @@ class AnimalsOperator {
         }
 
         tickHandlers.push(function() {
-            
-            animalsMap.map(false);
+
             _this.cleanAnimalsLayer(animalsLayer);
 
             _this.touchAnimals();
@@ -45,10 +43,9 @@ class AnimalsOperator {
 
             _this.moveAnimals(function(animal) {
                 _this.addAnimalToLayer(animalsLayer, animal);
-                animalsMap.setTile(animal.x, animal.y, 1);
             });
 
-            Filters.apply('animalsMap', animalsMap);
+            Filters.apply('animalsTick', _this.animals);
         });
     }
 
@@ -196,19 +193,20 @@ class AnimalsOperator {
      * @return {boolean}
      */
     canDie(animal) {
-        return iAmLucky(
-            animal.age / animal.getAverageLifespan()
-        );
+        return animal.age >= animal.getMinLifespan()
+            && iAmLucky(
+                changeRange(animal.age, animal.getMinLifespan(), animal.getMaxLifespan(), 0, 100)
+            );
     }
 
     /**
      * @param {Animal} animal
      */
     killAnimal(animal) {
-        console.log(animal.id + ' died'); // @TODO: remove this
+        console.log(animal.id + ' died in age ' + animal.age + ' years'); // @TODO: remove this
         this.animals = this.animals.removeElementByValue(animal);
     }
-    
+
     maybeKillAnimals() {
         for (let i = 0; i < this.animals.length; i++) {
             if (this.canDie(this.animals[i])) {

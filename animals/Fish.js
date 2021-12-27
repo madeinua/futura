@@ -19,7 +19,14 @@ class Fish extends Animal {
     /**
      * @returns {number}
      */
-    getAverageLifespan() {
-        return config.FISH_LIFESPAN;
+    getMinLifespan() {
+        return config.FISH_MIN_LIFESPAN;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getMaxLifespan() {
+        return config.FISH_MAX_LIFESPAN;
     }
 }
