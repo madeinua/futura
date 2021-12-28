@@ -12,9 +12,6 @@ class ForestMap extends BinaryMatrix {
         super(config.WORLD_SIZE, config.WORLD_SIZE);
 
         this.biomes = biomes;
-    }
-
-    init() {
 
         this.ihTemperateMap = this.createIdealHumidityMap(config.FOREST_BEST_TEMPERATE_HUMIDITY);
         this.itTemperateMap = this.createIdealTemperatureMap(config.FOREST_BEST_TEMPERATE_TEMPERATURE);

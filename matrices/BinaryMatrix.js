@@ -63,6 +63,23 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
+     * Check if matrix has filled tiles
+     * @returns {boolean}
+     */
+    hasFilled() {
+
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                if (this.filled(x, y)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Check if the tile is filled
      * @param {number} x
      * @param {number} y
@@ -154,6 +171,38 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
+     * Unfill tiles which are filled in the specified matrix
+     * @param {BinaryMatrix} matrix
+     * @returns {BinaryMatrix}
+     */
+    diff(matrix) {
+
+        let _this = this;
+
+        matrix.foreachFilled(function(x, y) {
+            _this.unfill(x, y);
+        });
+
+        return this;
+    }
+
+    /**
+     * Unfill tiles which are filled in the specified array of tiles
+     * @param {Array} tiles
+     * @returns {BinaryMatrix}
+     */
+    diffTiles(tiles) {
+
+        for (let i = 0; i < tiles.length; i++) {
+            if (this.filled(tiles[i][0], tiles[i][1])) {
+                this.unfill(tiles[i][0], tiles[i][1]);
+            }
+        }
+        
+        return this;
+    }
+
+    /**
      * @param {number} x
      * @param {number} y
      * @return {Array}
@@ -239,14 +288,4 @@ class BinaryMatrix extends NumericMatrix {
             getPolygonAreaSize(coords)
         );
     };
-
-    /**
-     * @return {boolean|Array} [x, y] or false
-     */
-    getRandomFilledTile() {
-
-        let filledTiles = this.getFilledTiles();
-        
-        return filledTiles.length ? filledTiles.randomElement() : false;
-    }
 }

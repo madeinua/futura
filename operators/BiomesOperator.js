@@ -3,6 +3,9 @@ class BiomesOperator {
     /** @var {Matrix} */
     biomes;
 
+    /** @var {Biomes} */
+    biomesGenerator;
+
     /**
      * @param {AltitudeMap} altitudeMap
      * @param {OceanMap} oceanMap
@@ -16,18 +19,19 @@ class BiomesOperator {
 
         this.biomes = new Matrix(config.WORLD_SIZE, config.WORLD_SIZE);
 
-        let _this = this,
-            biomesGenerator = new Biomes(
-                altitudeMap,
-                oceanMap,
-                coastMap,
-                freshWaterMap,
-                temperatureMap,
-                humidityMap
-            );
+        let _this = this;
+
+        _this.biomesGenerator = new Biomes(
+            altitudeMap,
+            oceanMap,
+            coastMap,
+            freshWaterMap,
+            temperatureMap,
+            humidityMap
+        );
 
         altitudeMap.foreach(function(x, y) {
-            _this.biomes.setTile(x, y, biomesGenerator.getBiome(x, y));
+            _this.biomes.setTile(x, y, _this.biomesGenerator.getBiome(x, y));
         });
 
         if (config.LOGS) {
@@ -59,5 +63,14 @@ class BiomesOperator {
      */
     getBiomes() {
         return this.biomes;
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {Biome}
+     */
+    getBiome(x, y) {
+        return this.biomesGenerator.getBiome(x, y);
     }
 }

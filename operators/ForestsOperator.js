@@ -1,16 +1,23 @@
 class ForestsOperator {
 
+    /** @var {ForestMap} */
+    forestMap;
+
+    /** @var {BiomesOperator} */
+    biomesOperator;
+
     /**
-     * @param {Matrix} biomes
+     * @param {BiomesOperator} biomesOperator
      * @param {Array} tickHandlers
      * @param {Layer} forestLayer
-     * @return {Array}
+     * @return {ForestsOperator}
      */
-    constructor(biomes, tickHandlers, forestLayer) {
+    constructor(biomesOperator, tickHandlers, forestLayer) {
 
         let _this = this,
-            forestMap = new ForestMap(biomes),
             forestGenerator = new ForestGenerator();
+
+        _this.biomesOperator = biomesOperator;
 
         _this.forestColor = hexToRgb(config.FOREST_COLOR);
         _this.forestImages = [];
@@ -22,24 +29,37 @@ class ForestsOperator {
             );
         }
 
-        forestMap.init();
+        _this.forestPalmImage = createImage(config.FOREST_PALM_IMAGE);
+
+        _this.forestMap = new ForestMap(
+            biomesOperator.getBiomes()
+        );
 
         tickHandlers.push(function(step) {
 
             forestGenerator.generate(
-                forestMap,
+                _this.forestMap,
                 step,
                 step > config.FOREST_BOOST_STEPS ? config.FOREST_BOOST : 1
             );
 
-            _this.addForestMapToLayer(forestLayer, forestMap);
+            _this.addForestMapToLayer(forestLayer, _this.forestMap);
 
-            forestMap = Filters.apply('forestMap', forestMap);
+            _this.forestMap = Filters.apply('forestMap', _this.forestMap);
         });
 
         if (config.LOGS) {
             logTimeEvent('Forests initialized.');
         }
+
+        return _this;
+    }
+
+    /**
+     * @returns {ForestMap}
+     */
+    getForestMap() {
+        return this.forestMap;
     }
 
     /**
@@ -66,9 +86,14 @@ class ForestsOperator {
     getDisplayCell = function(x, y) {
 
         if (typeof this.forestImagesCache[x + ',' + y] === 'undefined') {
+
+            let isPalm = [Biome_Desert.NAME, Biome_Desert_Hills.NAME, Biome_Tropic.NAME].includes(
+                this.biomesOperator.getBiome(x, y).getName()
+            );
+
             this.forestImagesCache[x + ',' + y] = new DisplayCell(
                 this.forestColor,
-                this.forestImages.randomElement()
+                isPalm ? this.forestPalmImage : this.forestImages.randomElement()
             );
         }
 

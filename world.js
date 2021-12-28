@@ -203,18 +203,20 @@ class World {
             this.getLayer(LAYER_BIOMES)
         );
 
-        new ForestsOperator(
-            biomesOperator.getBiomes(),
+        let forestOperator = new ForestsOperator(
+            biomesOperator,
             this.tickHandlers,
             this.getLayer(LAYER_FOREST)
         );
 
         new AnimalsOperator(
-            oceanMap,
-            freshWaterMap,
-            coastMap,
             this.tickHandlers,
-            this.getLayer(LAYER_ANIMALS)
+            this.getLayer(LAYER_ANIMALS),
+            {
+                freshWaterMap: freshWaterMap,
+                coastMap: coastMap,
+                forestMap: forestOperator.getForestMap()
+            }
         );
 
         if (config.LOGS) {

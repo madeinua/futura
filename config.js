@@ -15,7 +15,7 @@ function getConfig() {
         WORLD_SIZE: 250,
         VISIBLE_COLS: 30,
         MAIN_MAP_SCALE: 2.5,
-        SHOW_COORDINATES: true,
+        SHOW_COORDINATES: false,
 
         // Ticks
         TICKS_ENABLED: true,
@@ -47,7 +47,7 @@ function getConfig() {
         ALTITUDE_TEMPERATURE_FACTOR: 0.5,
         MIN_TEMPERATURE: 0,
         NORMAL_TEMPERATURE: 0.3,
-        HIGH_TEMPERATURE: 0.6,
+        HIGH_TEMPERATURE: 0.75,
         MAX_TEMPERATURE: 1,
 
         // Biomes
@@ -104,6 +104,7 @@ function getConfig() {
             'images/forest-1.png',
             'images/forest-2.png'
         ],
+        FOREST_PALM_IMAGE: 'images/palm-1.png',
 
         ANIMAL_RESPAWN_POINTS: 5,
         ANIMAL_CREATE_INTENSITY: 100,
@@ -113,10 +114,22 @@ function getConfig() {
         ANIMAL_COLOR: '#f7ff00',
 
         FISH_RESPAWN_POINTS: 30,
-        FISH_CREATE_INTENSITY: 50,
+        FISH_CREATE_INTENSITY: 75,
         FISH_MOVE_CHANCE: 100,
-        FISH_MIN_LIFESPAN: 10,
+        FISH_MIN_LIFESPAN: 15,
         FISH_MAX_LIFESPAN: 30,
-        FISH_IMAGE: 'images/fish-1.png'
+        FISH_IMAGE: 'images/fish-1.png',
+
+        DEER_RESPAWN_POINTS: 10,
+        DEER_CREATE_INTENSITY: 50,
+        DEER_MOVE_CHANCE: 75,
+        DEER_MIN_LIFESPAN: 20,
+        DEER_MAX_LIFESPAN: 40,
+        DEER_IMAGE: 'images/deer-1.png'
     };
+    /**
+     * @TODO's
+     * 1. deers only where are no palms
+     * 2. cows only where a specific grass
+     */
 }
