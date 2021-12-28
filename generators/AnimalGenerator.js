@@ -1,31 +1,23 @@
 class AnimalGenerator {
 
-    /** @var {OceanMap} */
-    oceanMap;
-
-    /** @var {BinaryMatrix} */
-    freshWaterMap;
-
-    /** @var {CoastMap} */
-    coastMap;
+    /** @var {Object} */
+    maps;
 
     /** @var {BinaryMatrix} */
     habitat;
 
     /** @var {Array} */
-    respawnPoints;
+    respawnPoints = [];
 
     /**
-     * @param {OceanMap} oceanMap
-     * @param {BinaryMatrix} freshWaterMap
-     * @param {CoastMap} coastMap
+     * @param {Object} maps
      */
-    constructor(oceanMap, freshWaterMap, coastMap) {
-        this.oceanMap = oceanMap;
-        this.freshWaterMap = freshWaterMap;
-        this.coastMap = coastMap;
-        this.habitat = this.generateHabitat();
-        this.respawnPoints = this.generateRespawnPoints();
+    constructor(maps) {
+
+        this.maps = maps;
+
+        this.generateHabitat()
+            .generateRespawnPoints();
     }
 
     /**
@@ -50,10 +42,13 @@ class AnimalGenerator {
     }
 
     /**
-     * @return {BinaryMatrix}
+     * @returns {AnimalGenerator}
      */
     generateHabitat() {
-        return new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE, 1);
+
+        this.habitat = new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE, 1);
+
+        return this;
     }
 
     /**
@@ -64,6 +59,15 @@ class AnimalGenerator {
     }
 
     /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {boolean}
+     */
+    isTileInHabitat(x, y) {
+        return this.getHabitat().filled(x, y);
+    }
+
+    /**
      * @returns {number}
      */
     getRespawnPointsLimit() {
@@ -71,30 +75,39 @@ class AnimalGenerator {
     }
 
     /**
-     * @returns {Array}
+     * @returns {boolean}
+     */
+    createRespawnPoint() {
+
+        let habitat = this.getHabitat()
+            .clone()
+            .diffTiles(this.getRespawnPoints());
+
+        if (!habitat.hasFilled()) {
+            return false;
+        }
+
+        this.respawnPoints.push(
+            habitat.getFilledTiles().randomElement()
+        );
+
+        return true;
+    }
+
+    /**
+     * @returns {AnimalGenerator}
      */
     generateRespawnPoints() {
 
-        let tiles = [],
-            tile;
-
         for (let i = 0; i < this.getRespawnPointsLimit(); i++) {
-            for (let j = 0; j < 3; j++) {
-
-                tile = this.getHabitat().getRandomFilledTile();
-
-                if (!tiles.includesTile(tile)) {
-                    tiles.push(tile);
-                    break;
-                }
-            }
+            this.createRespawnPoint();
         }
 
-        if (!tiles.length) {
-            throwError('Can not create respawn points', 1, true);
+        if (!this.getRespawnPoints().length) {
+            throwError('Can not create respawn points for ' + this.getName(), 1, true);
         }
 
-        return tiles;
+        return this;
     }
 
     /**
@@ -102,6 +115,24 @@ class AnimalGenerator {
      */
     getRespawnPoints() {
         return this.respawnPoints;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    checkRespawns() {
+
+        let missedRespawnPoints = this.getRespawnPointsLimit() - this.getRespawnPoints().length;
+
+        if (missedRespawnPoints < 1) {
+            return true;
+        }
+
+        for (let i = 0; i < missedRespawnPoints; i++) {
+            this.createRespawnPoint();
+        }
+
+        return false;
     }
 
     /**

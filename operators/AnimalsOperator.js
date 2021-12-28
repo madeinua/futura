@@ -10,13 +10,11 @@ class AnimalsOperator {
     animalsGenerators = [];
 
     /**
-     * @param {OceanMap} oceanMap
-     * @param {CoastMap} coastMap
-     * @param {BinaryMatrix} freshWaterMap
      * @param {Array} tickHandlers
      * @param {Layer} animalsLayer
+     * @param {Object} maps
      */
-    constructor(oceanMap, freshWaterMap, coastMap, tickHandlers, animalsLayer) {
+    constructor(tickHandlers, animalsLayer, maps) {
 
         this.animalImagesCache = [];
 
@@ -25,7 +23,7 @@ class AnimalsOperator {
 
         for (let i = 0; i < animalGenerators.length; i++) {
             _this.registerAnimalsGenerator(
-                new animalGenerators[i](oceanMap, freshWaterMap, coastMap)
+                new animalGenerators[i](maps)
             );
         }
 
@@ -36,14 +34,10 @@ class AnimalsOperator {
         tickHandlers.push(function() {
 
             _this.cleanAnimalsLayer(animalsLayer);
-
             _this.touchAnimals();
             _this.maybeKillAnimals();
             _this.maybeCreateAnimals();
-
-            _this.moveAnimals(function(animal) {
-                _this.addAnimalToLayer(animalsLayer, animal);
-            });
+            _this.moveAnimals(animalsLayer);
 
             Filters.apply('animalsTick', _this.animals);
         });
@@ -74,7 +68,8 @@ class AnimalsOperator {
     getAvailableGenerators = function() {
         return [
             //AnimalGenerator,
-            FishGenerator
+            FishGenerator,
+            DeerGenerator
         ];
     };
 
@@ -163,6 +158,10 @@ class AnimalsOperator {
                 continue;
             }
 
+            if (!this.animalsGenerators[i].checkRespawns()) {
+                continue;
+            }
+
             let animal = this.animalsGenerators[i].createAnimal(
                 this.animalsPositions
             );
@@ -248,9 +247,9 @@ class AnimalsOperator {
     }
 
     /**
-     * @param callback
+     * @parma {Layer} animalsLayer
      */
-    moveAnimals(callback) {
+    moveAnimals(animalsLayer) {
 
         let animal,
             nextPoint;
@@ -261,16 +260,21 @@ class AnimalsOperator {
 
             animal = this.animals[i];
 
-            if (animal.canMove()) {
+            nextPoint = this.getNextMove(animal);
 
-                nextPoint = this.getNextMove(animal);
+            if (nextPoint !== false) {
+                animal.moveTo(nextPoint[0], nextPoint[1]);
+                this.addAnimalToLayer(animalsLayer, animal);
+            } else {
 
-                if (nextPoint !== false) {
-                    animal.moveTo(nextPoint[0], nextPoint[1]);
+                let generator = this.getAnimalGeneratorByAnimal(animal);
+
+                if (generator.isTileInHabitat(animal.x, animal.y)) {
+                    this.addAnimalToLayer(animalsLayer, animal);
+                } else { // if animal can't move & it's not in habitat - it must be killed
+                    this.killAnimal(animal);
                 }
             }
-
-            callback(animal);
 
             this.animalsPositions.push(
                 animal.getPosition()

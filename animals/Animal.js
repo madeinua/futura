@@ -53,13 +53,6 @@ class Animal {
     }
 
     /**
-     * @return {boolean}
-     */
-    canMove() {
-        return true;
-    }
-
-    /**
      * 0 -> 100
      * @returns {number}
      */
