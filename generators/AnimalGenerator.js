@@ -95,11 +95,21 @@ class AnimalGenerator {
     }
 
     /**
+     * @returns {number}
+     */
+    getAllowedRespawnPoints() {
+        return Math.max(
+           this.getRespawnPointsLimit(),
+           this.objects.timer.getTick()
+        );
+    }
+
+    /**
      * @returns {AnimalGenerator}
      */
     generateRespawnPoints() {
 
-        for (let i = 0; i < this.getRespawnPointsLimit(); i++) {
+        for (let i = 0; i < this.getAllowedRespawnPoints(); i++) {
             this.createRespawnPoint();
         }
 
@@ -122,7 +132,7 @@ class AnimalGenerator {
      */
     checkRespawns() {
 
-        let missedRespawnPoints = this.getRespawnPointsLimit() - this.getRespawnPoints().length;
+        let missedRespawnPoints = Math.max(0, this.getAllowedRespawnPoints() - this.getRespawnPoints().length);
 
         if (missedRespawnPoints < 1) {
             return true;

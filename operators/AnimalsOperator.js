@@ -10,16 +10,18 @@ class AnimalsOperator {
     animalsGenerators = [];
 
     /**
-     * @param {Array} tickHandlers
+     * @param {Timer} timer
      * @param {Layer} animalsLayer
      * @param {Object} objects
      */
-    constructor(tickHandlers, animalsLayer, objects) {
+    constructor(timer, animalsLayer, objects) {
 
         this.animalImagesCache = [];
 
         let _this = this,
             animalGenerators = this.getAvailableGenerators();
+
+        objects.timer = timer;
 
         for (let i = 0; i < animalGenerators.length; i++) {
             _this.registerAnimalsGenerator(
@@ -31,7 +33,7 @@ class AnimalsOperator {
             logTimeEvent('Animals initialized.');
         }
 
-        tickHandlers.push(function() {
+        timer.addTickHandler(function() {
 
             _this.cleanAnimalsLayer(animalsLayer);
             _this.touchAnimals();
@@ -203,7 +205,13 @@ class AnimalsOperator {
      * @param {Animal} animal
      */
     killAnimal(animal) {
-        console.log(animal.id + ' died in age ' + animal.age + ' years'); // @TODO: remove this
+
+        if (animal.age === 0) {
+            throwError(animal.id + ' died in age ' + animal.age, 10, true);
+        } else {
+            console.log(animal.id + ' died in age ' + animal.age + ' years'); // @TODO: remove this
+        }
+
         this.animals = this.animals.removeElementByValue(animal);
     }
 

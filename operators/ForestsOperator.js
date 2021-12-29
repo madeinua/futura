@@ -8,11 +8,11 @@ class ForestsOperator {
 
     /**
      * @param {BiomesOperator} biomesOperator
-     * @param {Array} tickHandlers
+     * @param {Timer} timer
      * @param {Layer} forestLayer
      * @return {ForestsOperator}
      */
-    constructor(biomesOperator, tickHandlers, forestLayer) {
+    constructor(biomesOperator, timer, forestLayer) {
 
         let _this = this,
             forestGenerator = new ForestGenerator();
@@ -35,7 +35,7 @@ class ForestsOperator {
             biomesOperator.getBiomes()
         );
 
-        tickHandlers.push(function(step) {
+        timer.addTickHandler(function(step) {
 
             forestGenerator.generate(
                 _this.forestMap,

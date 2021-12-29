@@ -23,8 +23,6 @@ class World {
             Math.seedrandom(config.SEED);
         }
 
-        this.layers = [];
-
         this.cellSize = Math.ceil(scrollingMapWrapper.offsetWidth / config.VISIBLE_COLS);
         this.worldScalledSize = this.cellSize * config.WORLD_SIZE;
 
@@ -40,8 +38,8 @@ class World {
         this.mainMapCanvas.width = config.WORLD_SIZE * config.MAIN_MAP_SCALE;
         this.mainMapCanvas.height = config.WORLD_SIZE * config.MAIN_MAP_SCALE;
 
-        this.tickHandlers = [];
-        this.tickFinalHandlers = [];
+        this.timer = new Timer();
+        this.layers = new Layers();
 
         if (config.STORE_DATA) {
 
@@ -59,121 +57,6 @@ class World {
             logTimeEvent('Initialized');
         }
     }
-
-    /**
-     * @param {number} level
-     * @return {Layer}
-     */
-    getLayer = function(level) {
-
-        if (typeof this.layers[level] === 'undefined') {
-            this.layers[level] = new Layer();
-        }
-
-        return this.layers[level];
-    };
-
-    /**
-     * @return {number}
-     */
-    getLayersCount = function() {
-        return this.layers.length;
-    }
-
-    /**
-     * @param {CallableFunction} callback
-     */
-    tickTimer = function(callback) {
-
-        if (!config.TICKS_ENABLED || config.TICKS_LIMIT === 0) {
-            callback();
-            return;
-        }
-
-        let _this = this,
-            timerStart = Date.now(),
-            minTickInterval = config.TICKS_MIN_INTERVAL / config.TICKS_BOOST,
-            boosted = false,
-            timerInterval;
-
-        if (config.LOGS) {
-            logTimeEvent('Start ticks.');
-        }
-
-        _this.timerStep = 0;
-
-        let tickerFn = function() {
-
-            if (_this.timerPaused) {
-                return;
-            }
-
-            for (let i = 0; i < _this.tickHandlers.length; i++) {
-                _this.tickHandlers[i](_this.timerStep);
-            }
-
-            if (_this.timerStep === config.TICKS_LIMIT) {
-
-                for (let i = 0; i < _this.tickFinalHandlers.length; i++) {
-                    _this.tickFinalHandlers[i]();
-                }
-
-                if (config.LOGS) {
-                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round((Date.now() - timerStart) / config.TICKS_LIMIT) + 'ms');
-                }
-
-                clearInterval(timerInterval);
-            }
-
-            _this.timerStep++;
-
-            callback();
-
-            if (!boosted && _this.timerStep > config.TICKS_BOOST_STEPS) {
-                clearInterval(timerInterval);
-                minTickInterval *= config.TICKS_BOOST;
-                timerInterval = setInterval(tickerFn, minTickInterval);
-                boosted = true;
-            }
-        };
-
-        timerInterval = setInterval(tickerFn, minTickInterval);
-    };
-
-    /**
-     * @return {boolean}
-     */
-    isTimerPaused = function() {
-        return this.timerPaused;
-    }
-
-    /**
-     * @return {boolean}
-     */
-    pauseTimer = function() {
-
-        if (this.isTimerPaused()) {
-            return false;
-        }
-
-        this.timerPaused = true;
-
-        return true;
-    };
-
-    /**
-     * @return {boolean}
-     */
-    unpauseTimer = function() {
-
-        if (!this.isTimerPaused()) {
-            return false;
-        }
-
-        this.timerPaused = false;
-
-        return true;
-    };
 
     /**
      * @return {ImageData}
@@ -200,18 +83,18 @@ class World {
             freshWaterMap,
             temperatureMap,
             humidity,
-            this.getLayer(LAYER_BIOMES)
+            this.layers.getLayer(LAYER_BIOMES)
         );
 
         let forestOperator = new ForestsOperator(
             biomesOperator,
-            this.tickHandlers,
-            this.getLayer(LAYER_FOREST)
+            this.timer,
+            this.layers.getLayer(LAYER_FOREST)
         );
 
         new AnimalsOperator(
-            this.tickHandlers,
-            this.getLayer(LAYER_ANIMALS),
+            this.timer,
+            this.layers.getLayer(LAYER_ANIMALS),
             {
                 freshWaterMap: freshWaterMap,
                 coastMap: coastMap,
@@ -257,8 +140,8 @@ class World {
             cameraPosX = this.cameraPosX,
             cameraPosY = this.cameraPosY;
 
-        for (let ln = 0; ln < _this.getLayersCount(); ln++) {
-            layer = _this.getLayer(ln);
+        for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
+            layer = _this.layers.getLayer(ln);
             layer.foreach(function(x, y) {
 
                 displayCell = layer.getTile(x, y);
@@ -354,9 +237,9 @@ class World {
         this.scrollingMapWrapper.scrollLeft = worldOffsetLeft;
         this.scrollingMapWrapper.scrollTop = worldOffsetTop;
 
-        for (let ln = 0; ln < _this.getLayersCount(); ln++) {
+        for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
 
-            layer = _this.getLayer(ln);
+            layer = _this.layers.getLayer(ln);
 
             layer.foreach(function(x, y) {
 
@@ -421,7 +304,7 @@ class World {
 
         _this.generateWorld();
 
-        _this.tickTimer(function() {
+        _this.timer.tickTimer(function() {
             _this.update();
         });
     };

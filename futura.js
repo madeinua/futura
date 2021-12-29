@@ -216,15 +216,15 @@ mainMapCanvas.addEventListener("click", function(e) {
  * @return {boolean}
  */
 function pauseTimer() {
-    return world.isTimerPaused()
-        ? world.unpauseTimer()
-        : world.pauseTimer();
+    return world.timer.isTimerPaused()
+        ? world.timer.unpauseTimer()
+        : world.timer.pauseTimer();
 }
 
 document.getElementById('pauseTick').addEventListener("click", function() {
     pauseTimer();
 });
 
-world.tickHandlers.push(function(step) {
+world.timer.addTickHandler(function(step) {
     document.getElementById('tickCounter').innerHTML = step;
 });

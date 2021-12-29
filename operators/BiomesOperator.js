@@ -287,13 +287,13 @@ class BiomesOperator {
      * @param {string} biomeName
      * @returns {BinaryMatrix}
      */
-    getSurfaceByBiome(biomeName) {
+    getSurfaceByBiomeName(biomeName) {
 
         let biomes = this.biomes,
             surface = new BinaryMatrix(1);
 
         this.altitudeMap.foreach(function(x, y) {
-            if (biomes.getTile(x, y).getName() !== biomeName) {
+            if (biomes.getTile(x, y).getName() === biomeName) {
                 surface.fill(x, y);
             }
         });
