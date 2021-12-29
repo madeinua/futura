@@ -1,13 +1,5 @@
 class AltitudeMap extends PointMatrix {
 
-    /**
-     * @return {AltitudeMap}
-     */
-    constructor() {
-        super(config.WORLD_SIZE, config.WORLD_SIZE);
-        return this;
-    }
-
     generateMap = function() {
 
         let _this = this,

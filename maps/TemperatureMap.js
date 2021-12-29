@@ -8,9 +8,9 @@ class TemperatureMap extends PointMatrix {
      * @return {TemperatureMap}
      */
     constructor(altitudeMap) {
-        super(config.WORLD_SIZE, config.WORLD_SIZE);
+        super();
+
         this.altitudeMap = altitudeMap;
-        return this;
     };
 
     /**

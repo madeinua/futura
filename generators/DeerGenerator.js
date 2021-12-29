@@ -26,7 +26,7 @@ class DeerGenerator extends AnimalGenerator {
      */
     generateHabitat() {
 
-        this.habitat = this.maps.forestMap;
+        this.habitat = this.objects.forestOperator.getForestMap();
 
         return this;
     }

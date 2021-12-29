@@ -6,15 +6,21 @@
  */
 class Matrix {
 
+    /** @var {number} */
+    width;
+
+    /** @var {number} */
+    height;
+
     /**
      * Constructor
-     * @param {number} width
-     * @param {number} height
+     * @param {number=} width
+     * @param {number=} height
      */
     constructor(width, height) {
-        this.width = width;
-        this.height = height;
-        this.__values = create2DArray(width, height, null);
+        this.width = typeof width === 'undefined' ? config.WORLD_SIZE : width;
+        this.height = typeof height === 'undefined' ? config.WORLD_SIZE : height;
+        this.__values = create2DArray(this.width, this.height, null);
     }
 
     /**

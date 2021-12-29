@@ -16,14 +16,11 @@ class HumidityMap extends PointMatrix {
      * @return {HumidityMap}
      */
     constructor(altitudeMap, riversMap, lakesMap) {
-
-        super(config.WORLD_SIZE, config.WORLD_SIZE);
+        super();
 
         this.altitudeMap = altitudeMap;
         this.riversMap = riversMap;
         this.lakesMap = lakesMap;
-
-        return this;
     };
 
     /**

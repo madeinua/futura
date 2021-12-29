@@ -12,9 +12,9 @@ class AnimalsOperator {
     /**
      * @param {Array} tickHandlers
      * @param {Layer} animalsLayer
-     * @param {Object} maps
+     * @param {Object} objects
      */
-    constructor(tickHandlers, animalsLayer, maps) {
+    constructor(tickHandlers, animalsLayer, objects) {
 
         this.animalImagesCache = [];
 
@@ -23,7 +23,7 @@ class AnimalsOperator {
 
         for (let i = 0; i < animalGenerators.length; i++) {
             _this.registerAnimalsGenerator(
-                new animalGenerators[i](maps)
+                new animalGenerators[i](objects)
             );
         }
 
@@ -69,7 +69,8 @@ class AnimalsOperator {
         return [
             //AnimalGenerator,
             FishGenerator,
-            DeerGenerator
+            DeerGenerator,
+            CowGenerator
         ];
     };
 

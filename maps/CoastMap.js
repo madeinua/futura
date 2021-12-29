@@ -16,14 +16,11 @@ class CoastMap extends BinaryMatrix {
      * @return {CoastMap}
      */
     constructor(oceanMap, altitudeMap, temperatureMap) {
-
-        super(config.WORLD_SIZE, config.WORLD_SIZE);
+        super();
 
         this.oceanMap = oceanMap;
         this.altitudeMap = altitudeMap;
         this.temperatureMap = temperatureMap;
-
-        return this;
     };
 
     /**

@@ -2,12 +2,14 @@ class BinaryMatrix extends NumericMatrix {
 
     /**
      * Constructor
-     * @param {number} width
-     * @param {number} height
-     * @param {number} fill
+     * @param {number=} fill
+     * @param {number=} width
+     * @param {number=} height
      */
-    constructor(width, height, fill = 0) {
+    constructor(fill, width, height) {
         super(width, height);
+
+        fill = typeof fill === 'undefined' ? 0 : fill;
         this.map(fill);
     }
 
@@ -198,7 +200,7 @@ class BinaryMatrix extends NumericMatrix {
                 this.unfill(tiles[i][0], tiles[i][1]);
             }
         }
-        
+
         return this;
     }
 

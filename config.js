@@ -121,15 +121,18 @@ function getConfig() {
         FISH_IMAGE: 'images/fish-1.png',
 
         DEER_RESPAWN_POINTS: 10,
-        DEER_CREATE_INTENSITY: 50,
+        DEER_CREATE_INTENSITY: 75,
         DEER_MOVE_CHANCE: 75,
-        DEER_MIN_LIFESPAN: 20,
-        DEER_MAX_LIFESPAN: 40,
-        DEER_IMAGE: 'images/deer-1.png'
+        DEER_MIN_LIFESPAN: 15,
+        DEER_MAX_LIFESPAN: 30,
+        DEER_IMAGE: 'images/deer-1.png',
+
+
+        COW_RESPAWN_POINTS: 10,
+        COW_CREATE_INTENSITY: 50,
+        COW_MOVE_CHANCE: 25,
+        COW_MIN_LIFESPAN: 25,
+        COW_MAX_LIFESPAN: 50,
+        COW_IMAGE: 'images/cow-1.png',
     };
-    /**
-     * @TODO's
-     * 1. deers only where are no palms
-     * 2. cows only where a specific grass
-     */
 }

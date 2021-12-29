@@ -67,7 +67,7 @@ class World {
     getLayer = function(level) {
 
         if (typeof this.layers[level] === 'undefined') {
-            this.layers[level] = new Layer(config.WORLD_SIZE, config.WORLD_SIZE);
+            this.layers[level] = new Layer();
         }
 
         return this.layers[level];
@@ -215,7 +215,8 @@ class World {
             {
                 freshWaterMap: freshWaterMap,
                 coastMap: coastMap,
-                forestMap: forestOperator.getForestMap()
+                forestOperator: forestOperator,
+                biomesOperator: biomesOperator
             }
         );
 

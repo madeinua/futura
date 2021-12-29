@@ -127,7 +127,7 @@ class WaterOperator {
      */
     getFreshWaterMap = function(lakesMap, riversMap) {
 
-        let freshWaterMap = new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE);
+        let freshWaterMap = new BinaryMatrix();
 
         freshWaterMap.combineWith(lakesMap);
         freshWaterMap.combineWith(riversMap);

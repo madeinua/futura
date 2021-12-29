@@ -15,14 +15,11 @@ class RiversMap extends BinaryMatrix {
      * @return {RiversMap}
      */
     constructor(altitudeMap, lakesMap) {
-
-        super(config.WORLD_SIZE, config.WORLD_SIZE);
+        super();
 
         this.altitudeMap = altitudeMap;
         this.lakesMap = lakesMap;
         this.riversCount = 0;
-
-        return this;
     };
 
     /**

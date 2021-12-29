@@ -8,9 +8,9 @@ class OceanMap extends BinaryMatrix {
      * @return {OceanMap}
      */
     constructor(altitudeMap) {
-        super(config.WORLD_SIZE, config.WORLD_SIZE);
+        super();
+
         this.altitudeMap = altitudeMap;
-        return this;
     };
 
     /**
@@ -48,7 +48,7 @@ class OceanMap extends BinaryMatrix {
     bigLakesToSeas = function() {
 
         let _this = this,
-            tempMap = new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE);
+            tempMap = new BinaryMatrix();
 
         _this.altitudeMap.foreach(function(x, y) {
             if (

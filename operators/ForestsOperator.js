@@ -51,8 +51,6 @@ class ForestsOperator {
         if (config.LOGS) {
             logTimeEvent('Forests initialized.');
         }
-
-        return _this;
     }
 
     /**

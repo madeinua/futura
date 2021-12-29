@@ -1,7 +1,7 @@
 class AnimalGenerator {
 
     /** @var {Object} */
-    maps;
+    objects;
 
     /** @var {BinaryMatrix} */
     habitat;
@@ -10,11 +10,11 @@ class AnimalGenerator {
     respawnPoints = [];
 
     /**
-     * @param {Object} maps
+     * @param {Object} objects
      */
-    constructor(maps) {
+    constructor(objects) {
 
-        this.maps = maps;
+        this.objects = objects;
 
         this.generateHabitat()
             .generateRespawnPoints();
@@ -46,7 +46,7 @@ class AnimalGenerator {
      */
     generateHabitat() {
 
-        this.habitat = new BinaryMatrix(config.WORLD_SIZE, config.WORLD_SIZE, 1);
+        this.habitat = new BinaryMatrix(1);
 
         return this;
     }

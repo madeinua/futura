@@ -27,9 +27,9 @@ class FishGenerator extends AnimalGenerator {
     generateHabitat() {
 
         /** @var {BinaryMatrix} freshWaterMap */
-        let freshWaterMap = this.maps.freshWaterMap;
+        let freshWaterMap = this.objects.freshWaterMap;
 
-        this.habitat = freshWaterMap.clone().combineWith(this.maps.coastMap);
+        this.habitat = freshWaterMap.clone().combineWith(this.objects.coastMap);
 
         return this;
     }
