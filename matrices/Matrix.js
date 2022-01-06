@@ -12,6 +12,9 @@ class Matrix {
     /** @var {number} */
     height;
 
+    /** @var {Array} */
+    __values;
+
     /**
      * Constructor
      * @param {number=} width
@@ -24,25 +27,18 @@ class Matrix {
     }
 
     /**
-     * @returns {this}
-     */
-    clone() {
-        return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
-    }
-
-    /**
      * Get all tiles of matrix
      * @return {Array}
      */
-    getAll() {
+    getValues() {
         return this.__values;
     }
 
     /**
-     * Retrieve all values of the matrix
+     * Retrieve all tiles of the matrix as a list
      * @return {Array}
      */
-    values() {
+    getList() {
 
         let values = [];
 

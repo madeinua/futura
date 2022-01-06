@@ -449,13 +449,13 @@ function createNoiseMap(size, power) {
 /**
  * @param {ImageData} image
  * @param {number} point
- * @param {Array} RGB
+ * @param {Array} RGBa
  */
-function fillCanvasPixel(image, point, RGB) {
-    image.data[point] = RGB[0];
-    image.data[point + 1] = RGB[1];
-    image.data[point + 2] = RGB[2];
-    image.data[point + 3] = 255; // Alpha
+function fillCanvasPixel(image, point, RGBa) {
+    image.data[point] = RGBa[0];
+    image.data[point + 1] = RGBa[1];
+    image.data[point + 2] = RGBa[2];
+    image.data[point + 3] = typeof RGBa[3] === 'undefined' ? 255 : RGBa[3];
 }
 
 /**

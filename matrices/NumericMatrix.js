@@ -11,7 +11,7 @@ class NumericMatrix extends Matrix {
      */
     toString = function() {
         return JSON.stringify(
-            this.getAll()
+            this.__values
         );
     };
 
@@ -42,7 +42,7 @@ class NumericMatrix extends Matrix {
      * @return {boolean}
      */
     equals(matrix) {
-        return this.getAll().toString() === matrix.getAll().toString();
+        return this.__values.toString() === matrix.__values.toString();
     }
 
     /**
@@ -119,7 +119,7 @@ class NumericMatrix extends Matrix {
     setRange(min, max) {
 
         let _this = this,
-            values = _this.values(),
+            values = _this.getList(),
             currMin = Math.min(...values),
             currMax = Math.max(...values);
 
@@ -157,6 +157,6 @@ class NumericMatrix extends Matrix {
      * @return {number}
      */
     getAvgValue() {
-        return round(this.values().reduce((a, b) => a + b, 0) / (this.width * this.height), 2);
+        return round(this.getList().reduce((a, b) => a + b, 0) / (this.width * this.height), 2);
     }
 }

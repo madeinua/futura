@@ -11,10 +11,11 @@ class AnimalsOperator {
 
     /**
      * @param {Timer} timer
+     * @param {Layer} habitatLayer
      * @param {Layer} animalsLayer
      * @param {Object} objects
      */
-    constructor(timer, animalsLayer, objects) {
+    constructor(timer, habitatLayer, animalsLayer, objects) {
 
         this.animalImagesCache = [];
 
@@ -35,7 +36,11 @@ class AnimalsOperator {
 
         timer.addTickHandler(function() {
 
-            _this.cleanAnimalsLayer(animalsLayer);
+            habitatLayer.reset();
+            _this.generateHabitats();
+            _this.showHabitatsOnLayer(habitatLayer, Fish);
+
+            animalsLayer.reset();
             _this.touchAnimals();
             _this.maybeKillAnimals();
             _this.maybeCreateAnimals();
@@ -45,12 +50,11 @@ class AnimalsOperator {
         });
     }
 
-    /**
-     * @param {Layer} animalsLayer
-     */
-    cleanAnimalsLayer = function(animalsLayer) {
-        animalsLayer.reset();
-    };
+    generateHabitats() {
+        for (let i = 0; i < this.animalsGenerators.length; i++) {
+            this.animalsGenerators[i].generateHabitat();
+        }
+    }
 
     /**
      * @param {Layer} animalsLayer
@@ -161,9 +165,7 @@ class AnimalsOperator {
                 continue;
             }
 
-            if (!this.animalsGenerators[i].checkRespawns()) {
-                continue;
-            }
+            this.animalsGenerators[i].checkRespawns();
 
             let animal = this.animalsGenerators[i].createAnimal(
                 this.animalsPositions
@@ -207,9 +209,7 @@ class AnimalsOperator {
     killAnimal(animal) {
 
         if (animal.age === 0) {
-            throwError(animal.id + ' died in age ' + animal.age, 10, true);
-        } else {
-            console.log(animal.id + ' died in age ' + animal.age + ' years'); // @TODO: remove this
+            throwError(animal.id + ' died in age ' + animal.age + ' in ' + animal.x + ', ' + animal.y, 10, true);
         }
 
         this.animals = this.animals.removeElementByValue(animal);
@@ -219,6 +219,20 @@ class AnimalsOperator {
         for (let i = 0; i < this.animals.length; i++) {
             if (this.canDie(this.animals[i])) {
                 this.killAnimal(this.animals[i]);
+            }
+        }
+    }
+
+    /**
+     * @param {Layer} habitatLayer
+     * @param {Animal} animal
+     */
+    showHabitatsOnLayer(habitatLayer, animal) {
+        for (let i = 0; i < this.animalsGenerators.length; i++) {
+            if (this.animalsGenerators[i].getName() === animal.NAME) {
+                this.animalsGenerators[i].getHabitat().foreachFilled(function(x, y) {
+                    habitatLayer.setTile(x, y, [100, 100, 200, 255]);
+                });
             }
         }
     }

@@ -94,6 +94,7 @@ class World {
 
         new AnimalsOperator(
             this.timer,
+            this.layers.getLayer(LAYER_HABITAT),
             this.layers.getLayer(LAYER_ANIMALS),
             {
                 freshWaterMap: freshWaterMap,

@@ -26,10 +26,13 @@ class FishGenerator extends AnimalGenerator {
      */
     generateHabitat() {
 
-        /** @var {BinaryMatrix} freshWaterMap */
-        let freshWaterMap = this.objects.freshWaterMap;
+        if (typeof this.habitat === 'undefined') {
 
-        this.habitat = freshWaterMap.clone().combineWith(this.objects.coastMap);
+            /** @var {BinaryMatrix} freshWaterMap */
+            let freshWaterMap = this.objects.freshWaterMap;
+
+            this.habitat = freshWaterMap.clone().combineWith(this.objects.coastMap);
+        }
 
         return this;
     }

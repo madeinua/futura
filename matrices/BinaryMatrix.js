@@ -14,18 +14,16 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Set tile value
-     * @param {number} x
-     * @param {number} y
-     * @param {number} value
-     * @return {this}
+     * @returns {this}
      */
-    setTile(x, y, value) {
+    clone() {
 
-        this.__values[x][y] = value;
+        let matrix = new BinaryMatrix(0, this.width, this.height);
 
-        return this;
-    };
+        matrix.__values = JSON.parse(JSON.stringify(this.__values));
+
+        return matrix;
+    }
 
     /**
      * Retrieve all tiles that are filled
@@ -185,7 +183,7 @@ class BinaryMatrix extends NumericMatrix {
             _this.unfill(x, y);
         });
 
-        return this;
+        return _this;
     }
 
     /**

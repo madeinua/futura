@@ -41,7 +41,7 @@ class HumidityMap extends PointMatrix {
 
     generateNoiseMap() {
         this.setAll(
-            createNoiseMap(config.WORLD_SIZE, 150).getAll()
+            createNoiseMap(config.WORLD_SIZE, 150).getValues()
         );
     };
 

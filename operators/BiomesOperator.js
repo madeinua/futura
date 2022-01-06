@@ -290,7 +290,7 @@ class BiomesOperator {
     getSurfaceByBiomeName(biomeName) {
 
         let biomes = this.biomes,
-            surface = new BinaryMatrix(1);
+            surface = new BinaryMatrix();
 
         this.altitudeMap.foreach(function(x, y) {
             if (biomes.getTile(x, y).getName() === biomeName) {

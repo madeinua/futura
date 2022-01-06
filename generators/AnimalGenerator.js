@@ -13,11 +13,7 @@ class AnimalGenerator {
      * @param {Object} objects
      */
     constructor(objects) {
-
         this.objects = objects;
-
-        this.generateHabitat()
-            .generateRespawnPoints();
     }
 
     /**
@@ -46,7 +42,9 @@ class AnimalGenerator {
      */
     generateHabitat() {
 
-        this.habitat = new BinaryMatrix(1);
+        if (typeof this.habitat === 'undefined') {
+            this.habitat = new BinaryMatrix(1);
+        }
 
         return this;
     }
@@ -79,9 +77,11 @@ class AnimalGenerator {
      */
     createRespawnPoint() {
 
-        let habitat = this.getHabitat()
-            .clone()
-            .diffTiles(this.getRespawnPoints());
+        let habitat = this.getHabitat().clone();
+
+        habitat.diffTiles(
+            this.getRespawnPoints()
+        );
 
         if (!habitat.hasFilled()) {
             return false;
@@ -99,25 +99,9 @@ class AnimalGenerator {
      */
     getAllowedRespawnPoints() {
         return Math.max(
-           this.getRespawnPointsLimit(),
-           this.objects.timer.getTick()
+            this.getRespawnPointsLimit(),
+            this.objects.timer.getTick()
         );
-    }
-
-    /**
-     * @returns {AnimalGenerator}
-     */
-    generateRespawnPoints() {
-
-        for (let i = 0; i < this.getAllowedRespawnPoints(); i++) {
-            this.createRespawnPoint();
-        }
-
-        if (!this.getRespawnPoints().length) {
-            throwError('Can not create respawn points for ' + this.getName(), 1, true);
-        }
-
-        return this;
     }
 
     /**
@@ -134,15 +118,9 @@ class AnimalGenerator {
 
         let missedRespawnPoints = Math.max(0, this.getAllowedRespawnPoints() - this.getRespawnPoints().length);
 
-        if (missedRespawnPoints < 1) {
-            return true;
-        }
-
         for (let i = 0; i < missedRespawnPoints; i++) {
             this.createRespawnPoint();
         }
-
-        return false;
     }
 
     /**
