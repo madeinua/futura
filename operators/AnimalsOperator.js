@@ -38,7 +38,7 @@ class AnimalsOperator {
 
             habitatLayer.reset();
             _this.generateHabitats();
-            _this.showHabitatsOnLayer(habitatLayer, Fish);
+            //_this.showHabitatsOnLayer(habitatLayer, Fish);
 
             animalsLayer.reset();
             _this.touchAnimals();

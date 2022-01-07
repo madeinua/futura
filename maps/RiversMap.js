@@ -27,9 +27,48 @@ class RiversMap extends BinaryMatrix {
      */
     generateMap = function() {
 
-        let _this = this;
+        let riverSources = this.getRiverSources(this.altitudeMap),
+            rivers = this.generateRiversTiles(riverSources);
 
-        let riverSources = _this.getRiverSources(_this.altitudeMap),
+        //rivers = _this.addRiverDeltaToRiversMaps(rivers);
+
+        this.createRiverMapFromRiversPoints(rivers);
+
+        this.riversCount = rivers.length;
+
+        return this;
+    };
+
+    /**
+     * @param {AltitudeMap} altitudeMap
+     * @return {Array}
+     */
+    getRiverSources = function(altitudeMap) {
+
+        let spawns = [];
+
+        altitudeMap.foreach(function(x, y) {
+
+            let altitude = altitudeMap.getTile(x, y);
+
+            if (
+                altitudeMap.isGround(altitude)
+                && altitude >= config.RIVER_SOURCE_MIN_ALTITUDE
+                && config.RIVER_SOURCE_MAX_ALTITUDE >= altitude
+            ) {
+                spawns.push([x, y]);
+            }
+        });
+
+        return spawns.shuffle();
+    };
+
+    /**
+     * @returns {Array}
+     */
+    generateRiversTiles = function(riverSources) {
+
+        let _this = this,
             rivers = [],
             allRiversPoints = [],
             riversLimit = Math.floor(fromFraction(config.RIVERS_DENSITY, 1, config.WORLD_SIZE)),
@@ -66,7 +105,7 @@ class RiversMap extends BinaryMatrix {
 
                     if (_this.lakesMap.filled(x, y)) {
 
-                        let lakeSize = _this.getSizeFromPoint(x, y);
+                        let lakeSize = _this.lakesMap.getSizeFromPoint(x, y);
 
                         // finish only when the lake size is bigger than the river length
                         if (lakeSize > river.length * config.LAKE_TO_RIVER_RATIO) {
@@ -97,36 +136,7 @@ class RiversMap extends BinaryMatrix {
             }
         }
 
-        _this.addRiverDeltaToRiversMaps(rivers);
-        _this.createRiverMapFromRiversPoints(rivers);
-
-        this.riversCount = rivers.length;
-
-        return _this;
-    };
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @return {Array}
-     */
-    getRiverSources = function(altitudeMap) {
-
-        let spawns = [];
-
-        altitudeMap.foreach(function(x, y) {
-
-            let altitude = altitudeMap.getTile(x, y);
-
-            if (
-                altitudeMap.isGround(altitude)
-                && altitude >= config.RIVER_SOURCE_MIN_ALTITUDE
-                && config.RIVER_SOURCE_MAX_ALTITUDE >= altitude
-            ) {
-                spawns.push([x, y]);
-            }
-        });
-
-        return spawns.shuffle();
+        return rivers;
     };
 
     /**
@@ -196,7 +206,7 @@ class RiversMap extends BinaryMatrix {
      * @param {Array} rivers
      * @return {Array}
      */
-    addRiverDeltaToRiversMaps = function (rivers) {
+    addRiverDeltaToRiversMaps = function(rivers) {
 
         for (let i = 0; i < rivers.length; i++) {
             rivers[i] = this.addRiverDeltaToRiverMap(rivers[i]);
