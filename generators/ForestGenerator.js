@@ -2,10 +2,10 @@ class ForestGenerator {
 
     /**
      * @param {ForestMap} forestMap
+     * @param {HumidityMap} humidityMap
      * @param {number} step
-     * @param {number} multiply
      */
-    generate(forestMap, step, multiply = 1) {
+    generate(forestMap, humidityMap, step) {
 
         let _this = this;
 
@@ -17,8 +17,6 @@ class ForestGenerator {
                 return;
             }
 
-            deadChance *= multiply;
-
             if (iAmLucky(deadChance)) {
                 forestMap.unfill(x, y);
             }
@@ -26,13 +24,17 @@ class ForestGenerator {
 
         forestMap.foreachUnfilled(function(x, y) {
 
-            let createChance = _this.getCreateChance(forestMap, x, y);
+            let createChance = _this.getCreateChance(
+                forestMap,
+                humidityMap.getTile(x, y),
+                x,
+                y,
+                config.TICKS_BOOST_STEPS > step ? config.FOREST_BOOST : 1
+            );
 
             if (createChance === 0) {
                 return;
             }
-
-            createChance *= multiply;
 
             if (iAmLucky(createChance)) {
                 forestMap.fill(x, y);
@@ -42,11 +44,17 @@ class ForestGenerator {
 
     /**
      * @param {ForestMap} forestMap
+     * @param {number} humidity
      * @param {number} x
      * @param {number} y
+     * @param {number} boost
      * @return {number} From 0 to 100
      */
-    getCreateChance(forestMap, x, y) {
+    getCreateChance(forestMap, humidity, x, y, boost) {
+
+        if (humidity === 0) {
+            return 0;
+        }
 
         let _this = this,
             biome = forestMap.biomes.getTile(x, y),
@@ -58,26 +66,14 @@ class ForestGenerator {
             return 0;
         }
 
-        let NBR = forestMap.sumNeighbors(biome.x, biome.y),
-            forestType = _this.getForestType(biome),
-            IH, IT, IA,
+        let NBR = forestMap.sumNeighbors(x, y),
             BC = config.FOREST_BORN_CHANCE,
-            GC = config.FOREST_GROWTH_CHANCE;
+            dtw = biome.getDistanceToWater();
 
-        if (forestType === config.FOREST_TEMPERATE) {
-            IH = forestMap.ihTemperateMap.getTile(biome.x, biome.y);
-            IT = forestMap.itTemperateMap.getTile(biome.x, biome.y);
-            IA = forestMap.iaTemperateMap.getTile(biome.x, biome.y);
-        } else if (forestType === config.FOREST_TROPICAL) {
-            IH = forestMap.ihTropicalMap.getTile(biome.x, biome.y);
-            IT = forestMap.itTropicalMap.getTile(biome.x, biome.y);
-            IA = forestMap.iaTropicalMap.getTile(biome.x, biome.y);
-        }
-
-        if (biome.getDistanceToWater() > 0) {
-            let inc = Math.pow(biome.getDistanceToWater(), 2);
-            BC += config.FOREST_BORN_NEAR_WATER / inc;
-            GC += config.FOREST_GROWTH_NEAR_WATER / inc;
+        if (dtw >= 0 && dtw <= 1) {
+            BC *= 10;
+        } else if (dtw > 1 && dtw <= 2) {
+            BC *= 5;
         }
 
         /**
@@ -85,21 +81,8 @@ class ForestGenerator {
          * BC = born chance (if no other forest-based tiles around)
          * GC = growth chance (if there are forest-based tiles around)
          * NBR = number of neighbors forests (filled tiles)
-         * IH = coefficient of humidity
-         * IT = coefficient of temperature
-         * IA = coefficient of altitude
          */
-        return Math.min(100, GT * (BC + GC * NBR) * (IH + IT + IA));
-    }
-
-    /**
-     * @param {Biome} biome
-     * @return {number}
-     */
-    getForestType(biome) {
-        return ['savanna', 'savanna-hills', 'tropic'].includes(
-            biome.getName()
-        ) ? config.FOREST_TEMPERATE : config.FOREST_TROPICAL;
+        return Math.min(100, GT * humidity * (BC + NBR / 10) * config.FOREST_GROWTH_SPEED * boost);
     }
 
     /**

@@ -27,8 +27,6 @@ class Animal {
         this.y = y;
         this.age = 0;
         this.history = [];
-        
-        console.log(this.id + ' created in ' + x + ', ' + y); // @TODO: remove this
     }
 
     /**

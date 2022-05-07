@@ -39,8 +39,8 @@ class ForestsOperator {
 
             forestGenerator.generate(
                 _this.forestMap,
-                step,
-                step > config.FOREST_BOOST_STEPS ? config.FOREST_BOOST : 1
+                biomesOperator.humidityMap,
+                step
             );
 
             _this.addForestMapToLayer(forestLayer, _this.forestMap);

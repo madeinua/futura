@@ -39,15 +39,17 @@ function getConfig() {
 
         // Humidity
         MIN_HUMIDITY: 0,
-        NORMAL_HUMIDITY: 0.3,
-        HIGH_HUMIDITY: 0.6,
+        LOW_HUMIDITY: 0.2,
+        NORMAL_HUMIDITY: 0.5,
+        HIGH_HUMIDITY: 0.8,
         MAX_HUMIDITY: 1,
 
         // Temperature
         ALTITUDE_TEMPERATURE_FACTOR: 0.5,
         MIN_TEMPERATURE: 0,
-        NORMAL_TEMPERATURE: 0.3,
-        HIGH_TEMPERATURE: 0.75,
+        LOW_TEMPERATURE: 0.2,
+        NORMAL_TEMPERATURE: 0.5,
+        HIGH_TEMPERATURE: 0.8,
         MAX_TEMPERATURE: 1,
 
         // Biomes
@@ -64,40 +66,138 @@ function getConfig() {
 
         MAX_BEACH_DISTANCE_FROM_OCEAN: 5,
 
+        /**
+         * @internal
+         * @return {[]}
+         */
+        biomesConfig: function() {
+
+            let biomesConfig = [];
+
+            biomesConfig.push({
+                class: Biome_Tundra,
+                h: [config.MIN_HUMIDITY, config.MAX_HUMIDITY],
+                t: [config.MIN_TEMPERATURE, config.LOW_TEMPERATURE],
+                a: [0, config.MAX_LOWLAND_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Swamp,
+                h: [config.HIGH_HUMIDITY, config.MAX_HUMIDITY],
+                t: [config.MIN_TEMPERATURE, config.NORMAL_TEMPERATURE],
+                a: [0, config.MAX_LOWLAND_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Grass,
+                h: [config.LOW_HUMIDITY, config.MAX_HUMIDITY],
+                t: [config.LOW_TEMPERATURE, config.HIGH_TEMPERATURE],
+                a: [0, config.MAX_LOWLAND_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Savanna,
+                h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
+                t: [config.NORMAL_TEMPERATURE, config.HIGH_TEMPERATURE],
+                a: [0, config.MAX_LOWLAND_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Savanna,
+                h: [config.MIN_HUMIDITY, config.LOW_HUMIDITY],
+                t: [config.LOW_TEMPERATURE, config.NORMAL_TEMPERATURE],
+                a: [0, config.MAX_LOWLAND_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Tropic,
+                h: [config.NORMAL_HUMIDITY, config.MAX_HUMIDITY],
+                t: [config.HIGH_TEMPERATURE, config.MAX_TEMPERATURE],
+                a: [0, config.MAX_LOWLAND_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Desert,
+                h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
+                t: [config.HIGH_TEMPERATURE, config.MAX_TEMPERATURE],
+                a: [0, config.MAX_LOWLAND_LEVEL]
+            });
+
+            ///
+
+            biomesConfig.push({
+                class: Biome_Tundra_Hills,
+                h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
+                t: [config.MIN_TEMPERATURE, config.NORMAL_TEMPERATURE],
+                a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Tundra_Hills,
+                h: [config.NORMAL_HUMIDITY, config.MAX_HUMIDITY],
+                t: [config.MIN_TEMPERATURE, config.LOW_TEMPERATURE],
+                a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Grass_Hills,
+                h: [config.NORMAL_HUMIDITY, config.MAX_HUMIDITY],
+                t: [config.LOW_TEMPERATURE, config.MAX_TEMPERATURE],
+                a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Savanna_Hills,
+                h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
+                t: [config.NORMAL_TEMPERATURE, config.HIGH_TEMPERATURE],
+                a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Desert_Hills,
+                h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
+                t: [config.HIGH_TEMPERATURE, config.MAX_TEMPERATURE],
+                a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
+            });
+
+            ///
+
+            biomesConfig.push({
+                class: Biome_Ice_Rocks,
+                h: [config.MIN_HUMIDITY, config.MAX_HUMIDITY],
+                t: [config.MIN_TEMPERATURE, config.NORMAL_TEMPERATURE],
+                a: [config.MAX_HILLS_LEVEL, config.MAX_MOUNTAINS_LEVEL]
+            });
+
+            biomesConfig.push({
+                class: Biome_Rocks,
+                h: [config.MIN_HUMIDITY, config.MAX_HUMIDITY],
+                t: [config.NORMAL_TEMPERATURE, config.MAX_TEMPERATURE],
+                a: [config.MAX_HILLS_LEVEL, config.MAX_MOUNTAINS_LEVEL]
+            });
+
+            return biomesConfig;
+        },
+
         // Forests
-        FOREST_TROPICAL: 1,
-        FOREST_TEMPERATE: 2,
-
-        FOREST_BEST_TEMPERATE_HUMIDITY: 0.4,
-        FOREST_BEST_TEMPERATE_TEMPERATURE: 0.4,
-        FOREST_BEST_TEMPERATE_ALTITUDE: 0.4,
-
-        FOREST_BEST_TROPICAL_HUMIDITY: 0.6,
-        FOREST_BEST_TROPICAL_TEMPERATURE: 0.6,
-        FOREST_BEST_TROPICAL_ALTITUDE: 0.3,
-
         FOREST_TUNDRA_GROWTH: 0.12,
         FOREST_TUNDRA_HILLS_GROWTH: 0.08,
-        FOREST_GRASS_GROWTH: 0.30,
-        FOREST_GRASS_HILLS_GROWTH: 0.35,
+        FOREST_GRASS_GROWTH: 0.2,
+        FOREST_GRASS_HILLS_GROWTH: 0.5,
         FOREST_DESERT_GROWTH: 0.05,
         FOREST_DESERT_HILLS_GROWTH: 0.15,
         FOREST_SWAMP_GROWTH: 0.2,
         FOREST_ROCKS_GROWTH: 0.08,
         FOREST_SAVANNA_GROWTH: 0.25,
-        FOREST_SAVANNA_HILLS_GROWTH: 0.08,
-        FOREST_TROPICS_GROWTH: 0.55,
+        FOREST_SAVANNA_HILLS_GROWTH: 0.4,
+        FOREST_TROPICS_GROWTH: 0.6,
         FOREST_BEACH_GROWTH: 0,
 
-        FOREST_BORN_CHANCE: 0.4, // 0-1
-        FOREST_GROWTH_CHANCE: 12, // 1-20
+        FOREST_BORN_CHANCE: 0.01, // 0-1
         FOREST_DEAD_CHANCE: 0.5, // 0-1
 
-        FOREST_BORN_NEAR_WATER: 5, // 1-20
-        FOREST_GROWTH_NEAR_WATER: 15, // 1-20
-
-        FOREST_BOOST: 0.0001,
-        FOREST_BOOST_STEPS: 40,
+        FOREST_GROWTH_SPEED: 5,
+        FOREST_BOOST: 20,
 
         FOREST_COLOR: '#3c5626',
         FOREST_IMAGES: [
@@ -106,6 +206,7 @@ function getConfig() {
         ],
         FOREST_PALM_IMAGE: 'images/palm-1.png',
 
+        // Animals
         ANIMAL_RESPAWN_POINTS: 5,
         ANIMAL_CREATE_INTENSITY: 100,
         ANIMAL_MOVE_CHANCE: 100,
