@@ -97,7 +97,7 @@ class BiomesOperator {
     _getBiome(x, y) {
 
         let distanceToWater = this.freshWaterMap.distanceTo(x, y, 5);
-        distanceToWater = distanceToWater > 100 ? 0 : distanceToWater;
+        distanceToWater = distanceToWater > 100 ? 100 : distanceToWater;
 
         let args = {
             altitude: this.altitudeMap.getTile(x, y),

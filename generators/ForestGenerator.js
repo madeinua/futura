@@ -43,49 +43,6 @@ class ForestGenerator {
     }
 
     /**
-     * @param {ForestMap} forestMap
-     * @param {number} humidity
-     * @param {number} x
-     * @param {number} y
-     * @param {number} boost
-     * @return {number} From 0 to 100
-     */
-    getCreateChance(forestMap, humidity, x, y, boost) {
-
-        if (humidity === 0) {
-            return 0;
-        }
-
-        let _this = this,
-            biome = forestMap.biomes.getTile(x, y),
-            GT = _this.getCreateChanceByGround(
-                biome.getName()
-            );
-
-        if (GT === 0) {
-            return 0;
-        }
-
-        let NBR = forestMap.sumNeighbors(x, y),
-            BC = config.FOREST_BORN_CHANCE,
-            dtw = biome.getDistanceToWater();
-
-        if (dtw >= 0 && dtw <= 1) {
-            BC *= 10;
-        } else if (dtw > 1 && dtw <= 2) {
-            BC *= 5;
-        }
-
-        /**
-         * GT = ground type coefficient
-         * BC = born chance (if no other forest-based tiles around)
-         * GC = growth chance (if there are forest-based tiles around)
-         * NBR = number of neighbors forests (filled tiles)
-         */
-        return Math.min(100, GT * humidity * (BC + NBR / 10) * config.FOREST_GROWTH_SPEED * boost);
-    }
-
-    /**
      * @param {string} groundName
      * @return {number}
      */
@@ -122,6 +79,37 @@ class ForestGenerator {
 
     /**
      * @param {ForestMap} forestMap
+     * @param {number} humidity
+     * @param {number} x
+     * @param {number} y
+     * @param {number} boost
+     * @return {number} From 0 to 100
+     */
+    getCreateChance(forestMap, humidity, x, y, boost) {
+
+        if (humidity === 0) {
+            return 0;
+        }
+
+        let _this = this,
+            biome = forestMap.biomes.getTile(x, y),
+            groundType = _this.getCreateChanceByGround(
+                biome.getName()
+            );
+
+        if (groundType === 0) {
+            return 0;
+        }
+
+        let neighbors = (forestMap.getFilledNeighbors(x, y).length * config.FOREST_NEIGHBORS_MULT + 1),
+            bornChance = config.FOREST_BORN_CHANCE,
+            water = Math.max(1, config.FOREST_WATTER_MULT / biome.getDistanceToWater());
+
+        return bornChance * groundType * humidity * water * neighbors * boost;
+    }
+
+    /**
+     * @param {ForestMap} forestMap
      * @param {number} x
      * @param {number} y
      * @return {number} From 0 to 100
@@ -135,9 +123,6 @@ class ForestGenerator {
             return 0;
         }
 
-        let DC = config.FOREST_DEAD_CHANCE, // dead chance
-            GC = config.FOREST_GROWTH_CHANCE; // growth chance (if there are forest-based tiles around)
-
-        return (100 - GC) * DC;
+        return 100 * config.FOREST_DEAD_CHANCE;
     }
 }

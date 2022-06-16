@@ -109,12 +109,13 @@ Filters.add('biomes', function(map) {
 
 Filters.add('forestMap', function(map) {
     drawMap('forestMapCanvas', map, true);
+    document.getElementById('forestCounter').innerHTML = map.count();
     return map;
 });
 
 Filters.add('animalsTick', function(animals) {
 
-    let text = 'Total: ' + animals.length,
+    let text = '',
         groups = {};
 
     for (let i = 0; i < animals.length; i++) {
@@ -126,10 +127,11 @@ Filters.add('animalsTick', function(animals) {
     }
     
     for (let i in groups) {
-        text += '<br />' + i + ': ' + groups[i];
+        text += i + ': ' + groups[i] + '<br />';
     }
 
     document.getElementById('animalsList').innerHTML = text;
+    document.getElementById('animalsCounter').innerHTML = animals.length;
 });
 
 world.create();

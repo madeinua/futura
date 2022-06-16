@@ -2,9 +2,9 @@ class BinaryMatrix extends NumericMatrix {
 
     /**
      * Constructor
-     * @param {number=} fill
-     * @param {number=} width
-     * @param {number=} height
+     * @param {number} fill
+     * @param {number} width
+     * @param {number} height
      */
     constructor(fill, width, height) {
         super(width, height);
@@ -60,6 +60,16 @@ class BinaryMatrix extends NumericMatrix {
     unfill(x, y) {
         this.setTile(x, y, 0);
         return this;
+    }
+
+    /**
+     * Count the number of filled tiles
+     * @returns {number}
+     */
+    count() {
+        return this.__values.reduce(
+            (r, a) => r + a.reduce((pv, cv) => pv + cv, 0), 0
+        );
     }
 
     /**
@@ -213,28 +223,12 @@ class BinaryMatrix extends NumericMatrix {
             _this = this;
 
         _this.foreachNeighbors(x, y, function(nx, ny) {
-            result.push([nx, ny]);
+            if (_this.filled(nx, ny)) {
+                result.push([nx, ny]);
+            }
         });
 
         return result;
-    }
-
-    /**
-     * Apply callback to all neighbors of all
-     * @param {function} callback
-     * @return {this}
-     */
-    foreachFilledNeighbors(callback) {
-
-        let _this = this;
-
-        _this.foreachFilled(function(x, y) {
-            _this.foreachNeighbors(x, y, function(nx, ny) {
-                callback(nx, ny);
-            });
-        });
-
-        return _this;
     }
 
     /**

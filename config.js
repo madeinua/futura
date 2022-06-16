@@ -180,25 +180,24 @@ function getConfig() {
         },
 
         // Forests
-        FOREST_TUNDRA_GROWTH: 0.12,
-        FOREST_TUNDRA_HILLS_GROWTH: 0.08,
-        FOREST_GRASS_GROWTH: 0.2,
-        FOREST_GRASS_HILLS_GROWTH: 0.5,
-        FOREST_DESERT_GROWTH: 0.05,
-        FOREST_DESERT_HILLS_GROWTH: 0.15,
-        FOREST_SWAMP_GROWTH: 0.2,
-        FOREST_ROCKS_GROWTH: 0.08,
-        FOREST_SAVANNA_GROWTH: 0.25,
-        FOREST_SAVANNA_HILLS_GROWTH: 0.4,
-        FOREST_TROPICS_GROWTH: 0.6,
+        FOREST_TUNDRA_GROWTH: 1.2,
+        FOREST_TUNDRA_HILLS_GROWTH: 0.8,
+        FOREST_GRASS_GROWTH: 2,
+        FOREST_GRASS_HILLS_GROWTH: 5,
+        FOREST_DESERT_GROWTH: 0.5,
+        FOREST_DESERT_HILLS_GROWTH: 1.5,
+        FOREST_SWAMP_GROWTH: 2,
+        FOREST_ROCKS_GROWTH: 0.8,
+        FOREST_SAVANNA_GROWTH: 2.5,
+        FOREST_SAVANNA_HILLS_GROWTH: 4,
+        FOREST_TROPICS_GROWTH: 6,
         FOREST_BEACH_GROWTH: 0,
 
-        FOREST_BORN_CHANCE: 0.01, // 0-1
-        FOREST_DEAD_CHANCE: 0.5, // 0-1
-
-        FOREST_GROWTH_SPEED: 5,
-        FOREST_BOOST: 20,
-
+        FOREST_BORN_CHANCE: 0.0014,
+        FOREST_NEIGHBORS_MULT: 1.2, // always multiplied by 9 in the formula. means 1 = 9. 2 = 18..
+        FOREST_WATTER_MULT: 15,
+        FOREST_DEAD_CHANCE: 0.00005,
+        FOREST_BOOST: 80,
         FOREST_COLOR: '#3c5626',
         FOREST_IMAGES: [
             'images/forest-1.png',

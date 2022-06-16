@@ -17,8 +17,8 @@ class Matrix {
 
     /**
      * Constructor
-     * @param {number=} width
-     * @param {number=} height
+     * @param {number} width
+     * @param {number} height
      */
     constructor(width, height) {
         this.width = typeof width === 'undefined' ? config.WORLD_SIZE : width;
