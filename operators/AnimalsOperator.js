@@ -37,7 +37,7 @@ class AnimalsOperator {
         timer.addTickHandler(function() {
 
             habitatLayer.reset();
-            _this.generateHabitats();
+            _this.updateHabitats();
             //_this.showHabitatsOnLayer(habitatLayer, Fish);
 
             animalsLayer.reset();
@@ -50,9 +50,9 @@ class AnimalsOperator {
         });
     }
 
-    generateHabitats() {
+    updateHabitats() {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
-            this.animalsGenerators[i].generateHabitat();
+            this.animalsGenerators[i].updateHabitat();
         }
     }
 

@@ -15,7 +15,7 @@ function getConfig() {
         WORLD_SIZE: 250,
         VISIBLE_COLS: 30,
         MAIN_MAP_SCALE: 2.5,
-        SHOW_COORDINATES: false,
+        SHOW_COORDINATES: true,
 
         // Ticks
         TICKS_ENABLED: true,
@@ -206,29 +206,25 @@ function getConfig() {
         FOREST_PALM_IMAGE: 'images/palm-1.png',
 
         // Animals
-        ANIMAL_RESPAWN_POINTS: 5,
+        ANIMAL_RESPAWN_AREA: 20, // of available tiles per 1 animal
         ANIMAL_CREATE_INTENSITY: 100,
         ANIMAL_MOVE_CHANCE: 100,
         ANIMAL_MIN_LIFESPAN: 50,
         ANIMAL_MAX_LIFESPAN: 100,
         ANIMAL_COLOR: '#f7ff00',
 
-        FISH_RESPAWN_POINTS: 30,
         FISH_CREATE_INTENSITY: 75,
         FISH_MOVE_CHANCE: 100,
         FISH_MIN_LIFESPAN: 15,
         FISH_MAX_LIFESPAN: 30,
         FISH_IMAGE: 'images/fish-1.png',
 
-        DEER_RESPAWN_POINTS: 10,
         DEER_CREATE_INTENSITY: 75,
         DEER_MOVE_CHANCE: 75,
         DEER_MIN_LIFESPAN: 15,
         DEER_MAX_LIFESPAN: 30,
         DEER_IMAGE: 'images/deer-1.png',
 
-
-        COW_RESPAWN_POINTS: 10,
         COW_CREATE_INTENSITY: 50,
         COW_MOVE_CHANCE: 25,
         COW_MIN_LIFESPAN: 25,

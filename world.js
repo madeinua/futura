@@ -86,7 +86,7 @@ class World {
             this.layers.getLayer(LAYER_BIOMES)
         );
 
-        let forestOperator = new ForestsOperator(
+        let forestsOperator = new ForestsOperator(
             biomesOperator,
             this.timer,
             this.layers.getLayer(LAYER_FOREST)
@@ -99,7 +99,7 @@ class World {
             {
                 freshWaterMap: freshWaterMap,
                 coastMap: coastMap,
-                forestOperator: forestOperator,
+                forestsOperator: forestsOperator,
                 biomesOperator: biomesOperator
             }
         );

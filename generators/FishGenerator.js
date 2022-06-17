@@ -24,7 +24,7 @@ class FishGenerator extends AnimalGenerator {
     /**
      * @returns {FishGenerator}
      */
-    generateHabitat() {
+    updateHabitat() {
 
         if (typeof this.habitat === 'undefined') {
 
@@ -35,12 +35,5 @@ class FishGenerator extends AnimalGenerator {
         }
 
         return this;
-    }
-
-    /**
-     * @returns {number}
-     */
-    getRespawnPointsLimit() {
-        return config.FISH_RESPAWN_POINTS;
     }
 }

@@ -24,19 +24,22 @@ class DeerGenerator extends AnimalGenerator {
     /**
      * @returns {DeerGenerator}
      */
-    generateHabitat() {
+    updateHabitat() {
 
-        if (typeof this.habitat === 'undefined') {
-            this.habitat = this.objects.forestOperator.getForestMap();
-        }
+        let _this = this;
 
-        return this;
-    }
+        /** @var {ForestsOperator} */
+        let forestsOperator = _this.objects.forestsOperator;
 
-    /**
-     * @returns {number}
-     */
-    getRespawnPointsLimit() {
-        return config.DEER_RESPAWN_POINTS;
+        _this.habitat = forestsOperator.getForestMap().clone();
+
+        // Remove palms
+        _this.habitat.foreachFilled(function(x, y) {
+            if (forestsOperator.isPalm(x, y)) {
+                _this.habitat.unfill(x, y);
+            }
+        });
+
+        return _this;
     }
 }

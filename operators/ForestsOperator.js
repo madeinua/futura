@@ -54,6 +54,19 @@ class ForestsOperator {
     }
 
     /**
+     * Whether the tile is a palm or a normal forest
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {boolean}
+     */
+    isPalm = function(x, y) {
+        return [Biome_Desert.NAME, Biome_Desert_Hills.NAME, Biome_Tropic.NAME].includes(
+            this.biomesOperator.getBiome(x, y).getName()
+        );
+    }
+
+    /**
      * @returns {ForestMap}
      */
     getForestMap() {
@@ -74,7 +87,7 @@ class ForestsOperator {
                 forestMap.filled(x, y) ? _this.getDisplayCell(x, y) : null
             );
         });
-    };
+    }
 
     /**
      * @param {number} x
@@ -84,14 +97,11 @@ class ForestsOperator {
     getDisplayCell = function(x, y) {
 
         if (typeof this.forestImagesCache[x + ',' + y] === 'undefined') {
-
-            let isPalm = [Biome_Desert.NAME, Biome_Desert_Hills.NAME, Biome_Tropic.NAME].includes(
-                this.biomesOperator.getBiome(x, y).getName()
-            );
-
             this.forestImagesCache[x + ',' + y] = new DisplayCell(
                 this.forestColor,
-                isPalm ? this.forestPalmImage : this.forestImages.randomElement()
+                this.isPalm(x, y)
+                    ? this.forestPalmImage
+                    : this.forestImages.randomElement()
             );
         }
 

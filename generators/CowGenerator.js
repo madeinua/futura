@@ -1,7 +1,7 @@
 class CowGenerator extends AnimalGenerator {
 
     /** @var {BinaryMatrix} */
-    grassMatrix;
+    grassMap;
 
     /**
      * @return {string}
@@ -27,25 +27,18 @@ class CowGenerator extends AnimalGenerator {
     /**
      * @returns {CowGenerator}
      */
-    generateHabitat() {
+    updateHabitat() {
 
-        if (typeof this.grassMatrix === 'undefined') {
-            this.grassMatrix = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.NAME);
+        if (typeof this.grassMap === 'undefined') {
+            this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.NAME);
         }
 
-        this.habitat = this.grassMatrix.clone();
+        this.habitat = this.grassMap.clone();
 
         this.habitat.diff(
-            this.objects.forestOperator.getForestMap()
+            this.objects.forestsOperator.getForestMap()
         );
 
         return this;
-    }
-
-    /**
-     * @returns {number}
-     */
-    getRespawnPointsLimit() {
-        return config.COW_RESPAWN_POINTS;
     }
 }

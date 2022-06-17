@@ -109,7 +109,7 @@ Filters.add('biomes', function(map) {
 
 Filters.add('forestMap', function(map) {
     drawMap('forestMapCanvas', map, true);
-    document.getElementById('forestCounter').innerHTML = map.count();
+    document.getElementById('forestCounter').innerHTML = map.countFilled();
     return map;
 });
 

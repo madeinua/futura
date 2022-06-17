@@ -66,7 +66,7 @@ class BinaryMatrix extends NumericMatrix {
      * Count the number of filled tiles
      * @returns {number}
      */
-    count() {
+    countFilled() {
         return this.__values.reduce(
             (r, a) => r + a.reduce((pv, cv) => pv + cv, 0), 0
         );

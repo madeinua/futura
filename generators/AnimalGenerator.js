@@ -40,7 +40,7 @@ class AnimalGenerator {
     /**
      * @returns {AnimalGenerator}
      */
-    generateHabitat() {
+    updateHabitat() {
 
         if (typeof this.habitat === 'undefined') {
             this.habitat = new BinaryMatrix(1);
@@ -69,7 +69,9 @@ class AnimalGenerator {
      * @returns {number}
      */
     getRespawnPointsLimit() {
-        return config.ANIMAL_RESPAWN_POINTS;
+        return Math.floor(
+            this.getHabitat().countFilled() / config.ANIMAL_RESPAWN_AREA
+        );
     }
 
     /**
@@ -98,7 +100,7 @@ class AnimalGenerator {
      * @returns {number}
      */
     getAllowedRespawnPoints() {
-        return Math.max(
+        return Math.min(
             this.getRespawnPointsLimit(),
             this.objects.timer.getTick()
         );
@@ -133,6 +135,12 @@ class AnimalGenerator {
 
         for (let i = 0; i < respawnPoints.length; i++) {
             if (anotherAnimalsPositions.getClosestDistanceTo(respawnPoints[i][0], respawnPoints[i][1]) < 3) {
+                respawnPoints = respawnPoints.removeElementByIndex(i);
+            }
+        }
+
+        for (let i = 0; i < respawnPoints.length; i++) {
+            if (!this.isTileInHabitat(respawnPoints[i][0], respawnPoints[i][1])) {
                 respawnPoints = respawnPoints.removeElementByIndex(i);
             }
         }
