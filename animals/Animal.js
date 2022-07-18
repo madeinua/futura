@@ -11,9 +11,6 @@ class Animal {
     /** @var {string} */
     id;
 
-    /** @var {number} */
-    age;
-
     /** @var {Array} */
     history;
 
@@ -25,7 +22,6 @@ class Animal {
         this.id = this.getName() + '-' + getTick();
         this.x = x;
         this.y = y;
-        this.age = 0;
         this.history = [];
     }
 

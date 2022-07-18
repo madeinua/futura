@@ -42,7 +42,6 @@ class AnimalsOperator {
 
             animalsLayer.reset();
             _this.touchAnimals();
-            _this.maybeKillAnimals();
             _this.maybeCreateAnimals();
             _this.moveAnimals(animalsLayer);
 
@@ -194,33 +193,9 @@ class AnimalsOperator {
 
     /**
      * @param {Animal} animal
-     * @return {boolean}
-     */
-    canDie(animal) {
-        return animal.age >= animal.getMinLifespan()
-            && iAmLucky(
-                changeRange(animal.age, animal.getMinLifespan(), animal.getMaxLifespan(), 0, 100)
-            );
-    }
-
-    /**
-     * @param {Animal} animal
      */
     killAnimal(animal) {
-
-        if (animal.age === 0) {
-            throwError(animal.id + ' died in age ' + animal.age + ' in ' + animal.x + ', ' + animal.y, 10, true);
-        }
-
         this.animals = this.animals.removeElementByValue(animal);
-    }
-
-    maybeKillAnimals() {
-        for (let i = 0; i < this.animals.length; i++) {
-            if (this.canDie(this.animals[i])) {
-                this.killAnimal(this.animals[i]);
-            }
-        }
     }
 
     /**
