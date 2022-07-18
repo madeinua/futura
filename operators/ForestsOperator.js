@@ -15,7 +15,7 @@ class ForestsOperator {
     constructor(biomesOperator, timer, forestLayer) {
 
         let _this = this,
-            forestGenerator = new ForestGenerator();
+            forestGenerator = new ForestGenerator(biomesOperator);
 
         _this.biomesOperator = biomesOperator;
 
@@ -37,11 +37,7 @@ class ForestsOperator {
 
         timer.addTickHandler(function(step) {
 
-            forestGenerator.generate(
-                _this.forestMap,
-                biomesOperator.humidityMap,
-                step
-            );
+            forestGenerator.generate(_this.forestMap, step);
 
             _this.addForestMapToLayer(forestLayer, _this.forestMap);
 

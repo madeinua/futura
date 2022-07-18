@@ -15,14 +15,14 @@ function getConfig() {
         WORLD_SIZE: 250,
         VISIBLE_COLS: 30,
         MAIN_MAP_SCALE: 2.5,
-        SHOW_COORDINATES: true,
+        SHOW_COORDINATES: false,
 
         // Ticks
         TICKS_ENABLED: true,
         TICKS_MIN_INTERVAL: 500,
         TICKS_LIMIT: 100,
         TICKS_BOOST: 5,
-        TICKS_BOOST_STEPS: 40,
+        TICKS_BOOST_STEPS: 90,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -180,24 +180,29 @@ function getConfig() {
         },
 
         // Forests
-        FOREST_TUNDRA_GROWTH: 1.2,
-        FOREST_TUNDRA_HILLS_GROWTH: 0.8,
-        FOREST_GRASS_GROWTH: 2,
-        FOREST_GRASS_HILLS_GROWTH: 5,
-        FOREST_DESERT_GROWTH: 0.5,
-        FOREST_DESERT_HILLS_GROWTH: 1.5,
-        FOREST_SWAMP_GROWTH: 2,
-        FOREST_ROCKS_GROWTH: 0.8,
-        FOREST_SAVANNA_GROWTH: 2.5,
-        FOREST_SAVANNA_HILLS_GROWTH: 4,
-        FOREST_TROPICS_GROWTH: 6,
-        FOREST_BEACH_GROWTH: 0,
-
-        FOREST_BORN_CHANCE: 0.0014,
-        FOREST_NEIGHBORS_MULT: 1.2, // always multiplied by 9 in the formula. means 1 = 9. 2 = 18..
-        FOREST_WATTER_MULT: 15,
-        FOREST_DEAD_CHANCE: 0.00005,
-        FOREST_BOOST: 80,
+        FOREST_LIMIT: 30, // %, compared to the possible tiles
+        FOREST_BORN_STARTING_BOOST: 100,
+        FOREST_BORN_CHANCE: 0.00025, // %
+        FOREST_GROWTH_CHANCE: 0.05, // %
+        FOREST_DIE_CHANCE: 0.001, // %
+        FOREST_GROUNDS_MULTS: {
+            'tundra': 1.2,
+            'tundra-hills': 0.8,
+            'grass': 2,
+            'grass-hills': 5,
+            'desert': 0.5,
+            'desert-hills': 1.5,
+            'swamp': 2,
+            'rocks': 0.8,
+            'savanna': 2.5,
+            'savanna-hills': 4,
+            'tropic': 6
+        },
+        FOREST_CREATE_MULTS: { // Must be 100 in the total
+            WATTER: 35,
+            HUMIDITY: 35,
+            GROUND: 30
+        },
         FOREST_COLOR: '#3c5626',
         FOREST_IMAGES: [
             'images/forest-1.png',

@@ -1,5 +1,8 @@
 class AltitudeMap extends PointMatrix {
 
+    waterSize = 0;
+    landSize = 0;
+
     generateMap = function() {
 
         let _this = this,
@@ -34,6 +37,12 @@ class AltitudeMap extends PointMatrix {
             val = _this.makeIsland(x, y, config.WORLD_SIZE, val);
 
             return val;
+        });
+
+        _this.foreach(function(x, y) {
+            _this.isWater(_this.getTile(x, y))
+                ? _this.waterSize++
+                : _this.landSize++;
         });
     };
 
@@ -71,4 +80,18 @@ class AltitudeMap extends PointMatrix {
     isWater = function(level) {
         return config.MAX_WATER_LEVEL >= level;
     };
+
+    /**
+     * @returns {number}
+     */
+    getWaterTilesCount = function() {
+        return this.landSize;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getLandTilesCount = function() {
+        return this.landSize;
+    }
 }

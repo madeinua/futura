@@ -41,6 +41,21 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
+     * Retrieve all tiles that are not filled
+     * @return {Array}
+     */
+    getUnfilledTiles() {
+
+        let arr = [];
+
+        this.foreachUnfilled(function(x, y) {
+            arr.push([x, y]);
+        });
+
+        return arr;
+    }
+
+    /**
      * Fill the tile with the value
      * @param {number} x
      * @param {number} y

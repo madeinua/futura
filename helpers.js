@@ -225,7 +225,7 @@ function getRectangleAround(x, y, maxWidth, maxHeight) {
 /**
  * Create normal randomization (more chance to get 0.5 rather than 0 or 1)
  * @see https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
- * @return {number}
+ * @return {number} [0-1]
  */
 function normalRandom() {
 
