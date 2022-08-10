@@ -18,13 +18,6 @@ class CowGenerator extends AnimalGenerator {
     }
 
     /**
-     * @return {number}
-     */
-    getCreateIntensity() {
-        return config.COW_CREATE_INTENSITY;
-    }
-
-    /**
      * @returns {CowGenerator}
      */
     updateHabitat() {
@@ -33,11 +26,13 @@ class CowGenerator extends AnimalGenerator {
             this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.NAME);
         }
 
-        this.habitat = this.grassMap.clone();
+        let habitat = this.grassMap.clone();
 
-        this.habitat.diff(
+        habitat.diff(
             this.objects.forestsOperator.getForestMap()
         );
+
+        this.setHabitat(habitat);
 
         return this;
     }

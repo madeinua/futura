@@ -521,6 +521,10 @@ let hexStorage = [];
  */
 function hexToRgb(hex) {
 
+    if (typeof hex === 'undefined') {
+        return [0, 0, 0];
+    }
+
     if (typeof hexStorage[hex] === "undefined") {
 
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")

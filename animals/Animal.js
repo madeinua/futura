@@ -33,17 +33,10 @@ class Animal {
     }
 
     /**
-     * @returns {number}
+     * @returns {*}
      */
-    getMinLifespan() {
-        return config.ANIMAL_MIN_LIFESPAN;
-    }
-
-    /**
-     * @returns {number}
-     */
-    getMaxLifespan() {
-        return config.ANIMAL_MAX_LIFESPAN;
+    getSettings() {
+        return config.ANIMALS[this.getName()];
     }
 
     /**
@@ -51,21 +44,21 @@ class Animal {
      * @returns {number}
      */
     getMoveChance() {
-        return config.ANIMAL_MOVE_CHANCE;
+        return this.getSettings().moveChance;
     }
 
     /**
      * @returns {null|string}
      */
     getImage() {
-        return null;
+        return this.getSettings().image;
     }
 
     /**
-     * @returns {string}
+     * @returns {null|string}
      */
     getColor() {
-        return config.ANIMAL_COLOR;
+        return this.getSettings().color;
     }
 
     /**

@@ -15,13 +15,6 @@ class FishGenerator extends AnimalGenerator {
     }
 
     /**
-     * @return {number}
-     */
-    getCreateIntensity() {
-        return config.FISH_CREATE_INTENSITY;
-    }
-
-    /**
      * @returns {FishGenerator}
      */
     updateHabitat() {
@@ -31,7 +24,9 @@ class FishGenerator extends AnimalGenerator {
             /** @var {BinaryMatrix} freshWaterMap */
             let freshWaterMap = this.objects.freshWaterMap;
 
-            this.habitat = freshWaterMap.clone().combineWith(this.objects.coastMap);
+            this.setHabitat(
+                freshWaterMap.clone().combineWith(this.objects.coastMap)
+            );
         }
 
         return this;

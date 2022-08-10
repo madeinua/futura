@@ -20,9 +20,9 @@ function getConfig() {
         // Ticks
         TICKS_ENABLED: true,
         TICKS_MIN_INTERVAL: 500,
-        TICKS_LIMIT: 100,
+        TICKS_LIMIT: 500,
         TICKS_BOOST: 5,
-        TICKS_BOOST_STEPS: 90,
+        TICKS_BOOST_STEPS: 50,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -211,29 +211,35 @@ function getConfig() {
         FOREST_PALM_IMAGE: 'images/palm-1.png',
 
         // Animals
-        ANIMAL_RESPAWN_AREA: 20, // of available tiles per 1 animal
-        ANIMAL_CREATE_INTENSITY: 100,
-        ANIMAL_MOVE_CHANCE: 100,
-        ANIMAL_MIN_LIFESPAN: 50,
-        ANIMAL_MAX_LIFESPAN: 100,
-        ANIMAL_COLOR: '#f7ff00',
-
-        FISH_CREATE_INTENSITY: 75,
-        FISH_MOVE_CHANCE: 100,
-        FISH_MIN_LIFESPAN: 15,
-        FISH_MAX_LIFESPAN: 30,
-        FISH_IMAGE: 'images/fish-1.png',
-
-        DEER_CREATE_INTENSITY: 75,
-        DEER_MOVE_CHANCE: 75,
-        DEER_MIN_LIFESPAN: 15,
-        DEER_MAX_LIFESPAN: 30,
-        DEER_IMAGE: 'images/deer-1.png',
-
-        COW_CREATE_INTENSITY: 50,
-        COW_MOVE_CHANCE: 25,
-        COW_MIN_LIFESPAN: 25,
-        COW_MAX_LIFESPAN: 50,
-        COW_IMAGE: 'images/cow-1.png',
+        ANIMALS: {
+            'Animal': { // defaults
+                intensity: 100,
+                moveChance: 100,
+                rarity: 0.01, // % of all tiles
+                color: '#000000',
+                image: null
+            },
+            'Fish': {
+                intensity: 75,
+                moveChance: 50,
+                rarity: 0.01,
+                color: '#4fd0ff',
+                image: 'images/fish-1.png'
+            },
+            'Deer': {
+                intensity: 75,
+                moveChance: 30,
+                rarity: 0.01,
+                color: '#ffc800',
+                image: 'images/deer-1.png'
+            },
+            'Cow': {
+                intensity: 50,
+                moveChance: 10,
+                rarity: 0.01,
+                color: '#ffffff',
+                image: 'images/cow-1.png'
+            }
+        }
     };
 }

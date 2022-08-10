@@ -6,6 +6,9 @@ class AnimalsOperator {
     /** @var {Array} */
     animalsPositions = [];
 
+    /** @var {Array} */
+    animalsTypesCounter = {};
+
     /** @var {AnimalGenerator[]} */
     animalsGenerators = [];
 
@@ -41,7 +44,7 @@ class AnimalsOperator {
             //_this.showHabitatsOnLayer(habitatLayer, Fish);
 
             animalsLayer.reset();
-            _this.touchAnimals();
+
             _this.maybeCreateAnimals();
             _this.moveAnimals(animalsLayer);
 
@@ -156,22 +159,56 @@ class AnimalsOperator {
         }
     }
 
+    /**
+     * @param {string} name
+     */
+    incAnimalsCount(name) {
+        this.animalsTypesCounter[name]++;
+    }
+
+    /**
+     * @param {string} name
+     */
+    decAnimalsCount(name) {
+        this.animalsTypesCounter[name]--;
+    }
+
+    /**
+     * @param {string} name
+     * @returns {number}
+     */
+    getAnimalsCountByName(name) {
+
+        if (typeof this.animalsTypesCounter[name] === 'undefined') {
+            this.animalsTypesCounter[name] = 0;
+        }
+
+        return this.animalsTypesCounter[name];
+    }
+
     maybeCreateAnimals() {
 
         for (let i = 0; i < this.animalsGenerators.length; i++) {
+            let generator = this.animalsGenerators[i],
+                animalsCount = this.getAnimalsCountByName(generator.getName());
 
-            if (!iAmLucky(this.animalsGenerators[i].getCreateIntensity())) {
+            if (animalsCount > generator.getMaxAnimals()) {
                 continue;
             }
 
-            this.animalsGenerators[i].checkRespawns();
+            if (!iAmLucky(generator.getCreateIntensity())) {
+                continue;
+            }
 
-            let animal = this.animalsGenerators[i].createAnimal(
+            generator.checkRespawns(animalsCount);
+
+            let animal = generator.createAnimal(
                 this.animalsPositions
             );
 
             if (animal) {
                 this.animals.push(animal);
+                this.incAnimalsCount(animal.getName());
             }
         }
     }
@@ -196,6 +233,7 @@ class AnimalsOperator {
      */
     killAnimal(animal) {
         this.animals = this.animals.removeElementByValue(animal);
+        this.decAnimalsCount(animal.getName());
     }
 
     /**
@@ -209,12 +247,6 @@ class AnimalsOperator {
                     habitatLayer.setTile(x, y, [100, 100, 200, 255]);
                 });
             }
-        }
-    }
-
-    touchAnimals() {
-        for (let i = 0; i < this.animals.length; i++) {
-            ++this.animals[i].age;
         }
     }
 

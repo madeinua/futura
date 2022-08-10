@@ -9,6 +9,9 @@ class AnimalGenerator {
     /** @var {Array} */
     respawnPoints = [];
 
+    /** @var {number} */
+    maxAnimals = -1;
+
     /**
      * @param {Object} objects
      */
@@ -31,10 +34,24 @@ class AnimalGenerator {
     }
 
     /**
+     * @returns {*}
+     */
+    getSettings() {
+        return config.ANIMALS[this.getName()];
+    }
+
+    /**
      * @return {number}
      */
     getCreateIntensity() {
-        return config.ANIMAL_CREATE_INTENSITY;
+        return this.getSettings().intensity;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getRarity() {
+        return this.getSettings().rarity;
     }
 
     /**
@@ -43,10 +60,18 @@ class AnimalGenerator {
     updateHabitat() {
 
         if (typeof this.habitat === 'undefined') {
-            this.habitat = new BinaryMatrix(1);
+            this.setHabitat(new BinaryMatrix(1));
         }
 
         return this;
+    }
+
+    /**
+     * @param {BinaryMatrix} habitat
+     */
+    setHabitat(habitat) {
+        this.habitat = habitat;
+        this.maxAnimals = -1;
     }
 
     /**
@@ -63,15 +88,6 @@ class AnimalGenerator {
      */
     isTileInHabitat(x, y) {
         return this.getHabitat().filled(x, y);
-    }
-
-    /**
-     * @returns {number}
-     */
-    getRespawnPointsLimit() {
-        return Math.floor(
-            this.getHabitat().countFilled() / config.ANIMAL_RESPAWN_AREA
-        );
     }
 
     /**
@@ -97,16 +113,6 @@ class AnimalGenerator {
     }
 
     /**
-     * @returns {number}
-     */
-    getAllowedRespawnPoints() {
-        return Math.min(
-            this.getRespawnPointsLimit(),
-            this.objects.timer.getTick()
-        );
-    }
-
-    /**
      * @returns {Array}
      */
     getRespawnPoints() {
@@ -116,13 +122,22 @@ class AnimalGenerator {
     /**
      * @returns {boolean}
      */
-    checkRespawns() {
-
-        let missedRespawnPoints = Math.max(0, this.getAllowedRespawnPoints() - this.getRespawnPoints().length);
-
-        for (let i = 0; i < missedRespawnPoints; i++) {
+    checkRespawns(animalsCount) {
+        for (let i = 0; i < Math.ceil(animalsCount / 3) + 1; i++) { // @TODO 3 - bigger value = less respawn points
             this.createRespawnPoint();
         }
+    }
+
+    /**
+     * @returns {number}
+     */
+    getMaxAnimals() {
+
+        if (this.maxAnimals === -1) {
+            this.maxAnimals = this.getHabitat().countFilled() * this.getRarity();
+        }
+
+        return this.maxAnimals;
     }
 
     /**
