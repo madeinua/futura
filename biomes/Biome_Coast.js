@@ -6,6 +6,6 @@ class Biome_Coast extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#003eb2', (this.altitude - 0.2) * 800);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Coast, (this.altitude - 0.2) * 800);
     }
 }

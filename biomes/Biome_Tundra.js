@@ -6,6 +6,6 @@ class Biome_Tundra extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#9c9f73', (this.altitude - 0.5) * 200);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Tundra, (this.altitude - 0.5) * 200);
     }
 }

@@ -154,7 +154,7 @@ class BiomesOperator {
         _this.biomes.foreach(function(x, y) {
             biomesLayer.setTile(
                 x, y,
-                _this.biomes.getTile(x, y).getHexColor()
+                _this.biomes.getTile(x, y).getImage()
             );
         });
     }

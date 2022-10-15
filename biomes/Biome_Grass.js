@@ -6,6 +6,6 @@ class Biome_Grass extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#659c29', (this.altitude - 0.5) * 200);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Grass, (this.altitude - 0.5) * 200);
     }
 }

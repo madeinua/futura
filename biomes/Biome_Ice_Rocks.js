@@ -6,6 +6,6 @@ class Biome_Ice_Rocks extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#eeeeee', (this.altitude - 0.5) * 500);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Ice_Rocks, (this.altitude - 0.5) * 500);
     }
 }

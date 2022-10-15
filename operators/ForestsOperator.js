@@ -18,7 +18,6 @@ class ForestsOperator {
             forestGenerator = new ForestGenerator(biomesOperator);
 
         _this.biomesOperator = biomesOperator;
-
         _this.forestColor = hexToRgb(config.FOREST_COLOR);
         _this.forestImages = [];
         _this.forestImagesCache = [];
@@ -30,17 +29,13 @@ class ForestsOperator {
         }
 
         _this.forestPalmImage = createImage(config.FOREST_PALM_IMAGE);
-
         _this.forestMap = new ForestMap(
             biomesOperator.getBiomes()
         );
 
         timer.addTickHandler(function(step) {
-
             forestGenerator.generate(_this.forestMap, step);
-
             _this.addForestMapToLayer(forestLayer, _this.forestMap);
-
             _this.forestMap = Filters.apply('forestMap', _this.forestMap);
         });
 
@@ -78,6 +73,7 @@ class ForestsOperator {
         let _this = this;
 
         forestMap.foreach(function(x, y) {
+
             forestLayer.setTile(
                 x, y,
                 forestMap.filled(x, y) ? _this.getDisplayCell(x, y) : null

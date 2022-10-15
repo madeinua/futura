@@ -9,7 +9,7 @@ class SurfaceOperator {
             storage = config.STORE_DATA ? localStorage.getItem('altitudeMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {
-            altitudeMap.fromString(storage);
+            altitudeMap.loadMap(storage);
         } else {
 
             altitudeMap.generateMap();

@@ -6,6 +6,6 @@ class Biome_Savanna_Hills extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#7f7946', -(this.altitude - 0.5) * 200);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Savanna_Hills, -(this.altitude - 0.5) * 200);
     }
 }

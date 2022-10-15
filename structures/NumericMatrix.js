@@ -17,10 +17,9 @@ class NumericMatrix extends Matrix {
 
     /**
      * @param {string} string
-     * @return {this}
      */
     fromString = function(string) {
-        return this.setAll(
+        this.setAll(
             JSON.parse(string)
         );
     };

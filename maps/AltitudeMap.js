@@ -39,12 +39,27 @@ class AltitudeMap extends PointMatrix {
             return val;
         });
 
+        this.initVariables();
+    };
+
+    /**
+     * @param {String} str
+     */
+    loadMap = function(str) {
+        this.fromString(str);
+        this.initVariables();
+    }
+
+    initVariables()
+    {
+        let _this = this;
+
         _this.foreach(function(x, y) {
             _this.isWater(_this.getTile(x, y))
                 ? _this.waterSize++
                 : _this.landSize++;
         });
-    };
+    }
 
     /**
      * @param {number} x

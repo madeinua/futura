@@ -28,15 +28,23 @@ class Biome {
      */
     getColor() {
         throwError('Unknown biome color', 1, true);
-        return '#FFFFFF';
+        return '#ffffff';
     }
 
     /**
      * @return {Array}
      */
     getHexColor() {
-        return hexToRgb(
-            this.getColor()
+        return hexToRgb(this.getColor());
+    }
+
+    /**
+     * @returns {DisplayCell}
+     */
+    getImage() {
+        return new DisplayCell(
+            this.getHexColor(),
+            null
         );
     }
 

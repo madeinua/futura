@@ -6,6 +6,6 @@ class Biome_Tropic extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#3c8045', -(this.altitude - 0.5) * 200);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Tropic, -(this.altitude - 0.5) * 200);
     }
 }

@@ -6,6 +6,6 @@ class Biome_Ocean extends Biome {
      * @return {string}
      */
     getColor() {
-        return '#003eb2';
+        return config.BIOME_COLORS.Biome_Ocean;
     }
 }

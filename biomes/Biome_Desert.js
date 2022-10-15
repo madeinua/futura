@@ -6,6 +6,6 @@ class Biome_Desert extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#e8c57e', (this.altitude - 0.5) * 200);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Desert, (this.altitude - 0.5) * 200);
     }
 }

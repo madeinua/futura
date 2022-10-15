@@ -6,6 +6,6 @@ class Biome_Water extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#74aece', (this.altitude - 0.5) * 250);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Water, (this.altitude - 0.5) * 250);
     }
 }

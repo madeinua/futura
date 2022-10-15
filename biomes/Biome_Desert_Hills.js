@@ -6,6 +6,6 @@ class Biome_Desert_Hills extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor('#c4a37e', -(this.altitude - 0.5) * 200);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Desert_Hills, -(this.altitude - 0.5) * 200);
     }
 }

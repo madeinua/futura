@@ -7,7 +7,7 @@ function getConfig() {
 
         // Global
         LOGS: true,
-        STORE_DATA: false,
+        STORE_DATA: true,
         RANDOM_WORLD: false,
         SEED: 12345,
 
@@ -57,14 +57,12 @@ function getConfig() {
         MAX_COAST_LEVEL: 0.3,
         MAX_BEACH_LEVEL: 0.32,
         MAX_LOWLAND_LEVEL: 0.5,
-        MAX_HILLS_LEVEL: 0.75,
+        MAX_HILLS_LEVEL: 0.7,
         MAX_MOUNTAINS_LEVEL: 1,
 
         COAST_TEMPERATURE_RATIO: 0.05,
         BEACH_TEMPERATURE_RATIO: -0.02,
         BEACH_HUMIDITY_RATIO: 0.01,
-
-        MAX_BEACH_DISTANCE_FROM_OCEAN: 5,
 
         /**
          * @internal
@@ -178,6 +176,27 @@ function getConfig() {
 
             return biomesConfig;
         },
+
+        BIOME_COLORS: {
+            Biome_Beach: '#c2b281',
+            Biome_Coast: '#003eb2',
+            Biome_Desert: '#e8c57e',
+            Biome_Desert_Hills: '#c4a37e',
+            Biome_Grass: '#659c29',
+            Biome_Grass_Hills: '#778e5d',
+            Biome_Ice_Rocks: '#eeeeee',
+            Biome_Ocean: '#003eb2',
+            Biome_Rocks: '#52563d',
+            Biome_Savanna: '#9b9e3f',
+            Biome_Savanna_Hills: '#7f7946',
+            Biome_Swamp: '#20a894',
+            Biome_Tropic: '#3c8045',
+            Biome_Tundra: '#9c9f73',
+            Biome_Tundra_Hills: '#686a54',
+            Biome_Water: '#74aece'
+        },
+
+        BIOME_ROCKS_IMAGE: 'images/mountains-1.png',
 
         // Forests
         FOREST_LIMIT: 30, // %, compared to the possible tiles
