@@ -3,10 +3,12 @@ class DisplayCell {
     /**
      * @param {array} color
      * @param {null|HTMLImageElement} image
+     * @param {boolean} withBackground
      */
-    constructor(color, image) {
+    constructor(color, image, withBackground) {
         this.color = color;
         this.image = typeof image === 'undefined' ? null : image;
+        this.withBg = withBackground;
     }
 
     /**
@@ -28,5 +30,12 @@ class DisplayCell {
      */
     hasImage() {
         return this.image instanceof HTMLImageElement;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    drawBackground() {
+        return this.withBg || !this.hasImage();
     }
 }

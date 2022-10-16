@@ -41,10 +41,11 @@ class Biome {
     /**
      * @returns {DisplayCell}
      */
-    getImage() {
+    getDisplayCell() {
         return new DisplayCell(
             this.getHexColor(),
-            null
+            null,
+            false
         );
     }
 

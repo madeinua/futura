@@ -36,6 +36,17 @@ class NumericMatrix extends Matrix {
     }
 
     /**
+     * Subtract value from a current tile value
+     * @param {number} x
+     * @param {number} y
+     * @param {number} value
+     * @return {this}
+     */
+    subtractFromTile(x, y, value) {
+        return this.setTile(x, y, this.getTile(x, y) - value);
+    }
+
+    /**
      * Compare current matrix to the other one
      * @param {NumericMatrix} matrix
      * @return {boolean}

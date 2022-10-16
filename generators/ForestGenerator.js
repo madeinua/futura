@@ -9,12 +9,16 @@ class ForestGenerator {
     /** @var {object} */
     groundCreateMults = {};
 
+    unallowedCells = [];
+
     /**
      * @param {BiomesOperator} biomesOperator
      */
     constructor(biomesOperator) {
-        this.biomesOperator = biomesOperator;
-        this.maxForestTiles = Math.ceil(biomesOperator.altitudeMap.getLandTilesCount() * config.FOREST_LIMIT / 100);
+        let _this = this;
+
+        _this.biomesOperator = biomesOperator;
+        _this.maxForestTiles = Math.ceil(biomesOperator.altitudeMap.getLandTilesCount() * config.FOREST_LIMIT / 100);
 
         let maxGroundMult = 0;
 
@@ -23,8 +27,14 @@ class ForestGenerator {
         }
 
         for (let i in config.FOREST_GROUNDS_MULTS) {
-            this.groundCreateMults[i] = changeRange(config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, config.FOREST_CREATE_MULTS.GROUND);
+            _this.groundCreateMults[i] = changeRange(config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, config.FOREST_CREATE_MULTS.GROUND);
         }
+
+        biomesOperator.altitudeMap.foreach(function(x, y) {
+            if (biomesOperator.altitudeMap.getTile(x, y) > config.MAX_HILLS_LEVEL) {
+                _this.unallowedCells.push([x, y]);
+            }
+        });
     }
 
     /**
@@ -137,7 +147,7 @@ class ForestGenerator {
      */
     getCreateChance(forestMap, humidity, x, y, speed) {
 
-        if (humidity === 0) {
+        if (humidity === 0 || this.unallowedCells.includesTile([x, y])) {
             return 0;
         }
 

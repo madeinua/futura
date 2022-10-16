@@ -40,12 +40,14 @@ class TemperatureMap extends PointMatrix {
     };
 
     considerAltitude = function() {
-
         let _this = this,
-            revFactor = fromFraction(config.ALTITUDE_TEMPERATURE_FACTOR, 5, 1);
+            minLevel = config.MAX_COAST_LEVEL,
+            altitude;
 
         _this.foreach(function(x, y) {
-            _this.addToTile(x, y, _this.altitudeMap.getTile(x, y) / revFactor);
+            altitude = _this.altitudeMap.getTile(x, y);
+            altitude = altitude >= minLevel ? (altitude - minLevel) * (altitude - minLevel) : 0;
+            _this.subtractFromTile(x, y, altitude);
         });
     };
 }

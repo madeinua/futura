@@ -123,12 +123,11 @@ class BiomesOperator {
         let matchedBiomes = [];
 
         for (let i = 0; i < this.biomesConfig.length; i++) {
-
             let cfg = this.biomesConfig[i]
 
             if (
-                this.checkBiomeIndex(cfg.h, args.humidity)
-                && this.checkBiomeIndex(cfg.t, args.temperature)
+                this.checkBiomeIndex(cfg.h, fromFraction(args.humidity, config.MIN_HUMIDITY, config.MAX_HUMIDITY))
+                && this.checkBiomeIndex(cfg.t, fromFraction(args.temperature, config.MIN_TEMPERATURE, config.MAX_TEMPERATURE))
                 && this.checkBiomeIndex(cfg.a, args.altitude)
             ) {
                 matchedBiomes.push(cfg.class);
@@ -136,7 +135,8 @@ class BiomesOperator {
         }
 
         if (!matchedBiomes.length) {
-            throwError('No biome matched for ' + x + ', ' + y, 1, true);
+            throwError('No biome matched for ' + x + ', ' + y, 2, true);
+            throwError(args, 2, true);
         }
 
         return matchedBiomes.length
@@ -148,13 +148,12 @@ class BiomesOperator {
      * @param {Layer} biomesLayer
      */
     addBiomesToLayer = function(biomesLayer) {
-
         let _this = this;
 
         _this.biomes.foreach(function(x, y) {
             biomesLayer.setTile(
                 x, y,
-                _this.biomes.getTile(x, y).getImage()
+                _this.biomes.getTile(x, y).getDisplayCell()
             );
         });
     }

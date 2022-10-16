@@ -23,7 +23,7 @@ class Layer extends Matrix {
     setTile(x, y, value) {
 
         if (value !== null && !(value instanceof DisplayCell)) {
-            value = new DisplayCell(value, null);
+            value = new DisplayCell(value, null, false);
         }
 
         return super.setTile(x, y, value);

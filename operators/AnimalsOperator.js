@@ -321,7 +321,8 @@ class AnimalsOperator {
         if (typeof this.animalImagesCache[animal.getName()] === 'undefined') {
             this.animalImagesCache[animal.getName()] = new DisplayCell(
                 hexToRgb(animal.getColor()),
-                createImage(animal.getImage())
+                createImage(animal.getImage()),
+                false
             );
         }
 

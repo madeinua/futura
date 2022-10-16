@@ -6,16 +6,17 @@ class Biome_Rocks extends Biome {
      * @return {string}
      */
     getColor() {
-        return LightenDarkenColor(config.BIOME_COLORS.Biome_Rocks, (this.altitude - 0.5) * 250);
+        return LightenDarkenColor(config.BIOME_COLORS.Biome_Rocks, -(this.altitude - 0.5) * 200)
     }
 
     /**
      * @returns {DisplayCell}
      */
-    getImage() {
+    getDisplayCell() {
         return new DisplayCell(
             this.getHexColor(),
-            createImage(config.BIOME_ROCKS_IMAGE)
+            createImage(config.BIOME_IMAGES.Biome_Rocks),
+            true
         );
     }
 }

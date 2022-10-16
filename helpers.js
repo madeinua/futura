@@ -302,6 +302,17 @@ function fromFraction(value, min, max) {
 }
 
 /**
+ * Convert range [min-max] to [0-1]
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @return {number}
+ */
+function toFraction(value, min, max) {
+    return (value - min) / (max - min);
+}
+
+/**
  * Convert middle-best value to highest-best value:
  * E.g. if the value 0.5 is the best option in between the range [0-1]
  * then the function will return 1 for 0.5 and 0 for 0/1.

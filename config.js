@@ -7,7 +7,7 @@ function getConfig() {
 
         // Global
         LOGS: true,
-        STORE_DATA: true,
+        STORE_DATA: false,
         RANDOM_WORLD: false,
         SEED: 12345,
 
@@ -15,6 +15,7 @@ function getConfig() {
         WORLD_SIZE: 250,
         VISIBLE_COLS: 30,
         MAIN_MAP_SCALE: 2.5,
+        SHOW_RECTANGLES: false,
         SHOW_COORDINATES: false,
 
         // Ticks
@@ -39,20 +40,22 @@ function getConfig() {
 
         // Humidity
         MIN_HUMIDITY: 0,
-        LOW_HUMIDITY: 0.2,
-        NORMAL_HUMIDITY: 0.5,
-        HIGH_HUMIDITY: 0.8,
-        MAX_HUMIDITY: 1,
+        LOW_HUMIDITY: 25,
+        NORMAL_HUMIDITY: 50,
+        HIGH_HUMIDITY: 75,
+        MAX_HUMIDITY: 100,
 
         // Temperature
-        ALTITUDE_TEMPERATURE_FACTOR: 0.5,
+        SHOW_TEMPERATURES: false,
         MIN_TEMPERATURE: 0,
-        LOW_TEMPERATURE: 0.2,
-        NORMAL_TEMPERATURE: 0.5,
-        HIGH_TEMPERATURE: 0.8,
-        MAX_TEMPERATURE: 1,
+        LOW_TEMPERATURE: 14,
+        NORMAL_TEMPERATURE: 21,
+        HIGH_TEMPERATURE: 28,
+        MAX_TEMPERATURE: 45,
 
         // Biomes
+        SHOW_BIOMES_INFO: false,
+        MIN_LEVEL: 0,
         MAX_OCEAN_LEVEL: 0.25,
         MAX_COAST_LEVEL: 0.3,
         MAX_BEACH_LEVEL: 0.32,
@@ -63,6 +66,7 @@ function getConfig() {
         COAST_TEMPERATURE_RATIO: 0.05,
         BEACH_TEMPERATURE_RATIO: -0.02,
         BEACH_HUMIDITY_RATIO: 0.01,
+        MAX_BEACH_DISTANCE_FROM_OCEAN: 3,
 
         /**
          * @internal
@@ -76,70 +80,61 @@ function getConfig() {
                 class: Biome_Tundra,
                 h: [config.MIN_HUMIDITY, config.MAX_HUMIDITY],
                 t: [config.MIN_TEMPERATURE, config.LOW_TEMPERATURE],
-                a: [0, config.MAX_LOWLAND_LEVEL]
+                a: [config.MIN_LEVEL, config.MAX_LOWLAND_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Swamp,
                 h: [config.HIGH_HUMIDITY, config.MAX_HUMIDITY],
                 t: [config.MIN_TEMPERATURE, config.NORMAL_TEMPERATURE],
-                a: [0, config.MAX_LOWLAND_LEVEL]
+                a: [config.MIN_LEVEL, config.MAX_LOWLAND_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Grass,
                 h: [config.LOW_HUMIDITY, config.MAX_HUMIDITY],
                 t: [config.LOW_TEMPERATURE, config.HIGH_TEMPERATURE],
-                a: [0, config.MAX_LOWLAND_LEVEL]
+                a: [config.MIN_LEVEL, config.MAX_LOWLAND_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Savanna,
                 h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
                 t: [config.NORMAL_TEMPERATURE, config.HIGH_TEMPERATURE],
-                a: [0, config.MAX_LOWLAND_LEVEL]
+                a: [config.MIN_LEVEL, config.MAX_LOWLAND_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Savanna,
                 h: [config.MIN_HUMIDITY, config.LOW_HUMIDITY],
                 t: [config.LOW_TEMPERATURE, config.NORMAL_TEMPERATURE],
-                a: [0, config.MAX_LOWLAND_LEVEL]
+                a: [config.MIN_LEVEL, config.MAX_LOWLAND_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Tropic,
                 h: [config.NORMAL_HUMIDITY, config.MAX_HUMIDITY],
                 t: [config.HIGH_TEMPERATURE, config.MAX_TEMPERATURE],
-                a: [0, config.MAX_LOWLAND_LEVEL]
+                a: [config.MIN_LEVEL, config.MAX_LOWLAND_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Desert,
                 h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
                 t: [config.HIGH_TEMPERATURE, config.MAX_TEMPERATURE],
-                a: [0, config.MAX_LOWLAND_LEVEL]
-            });
-
-            ///
-
-            biomesConfig.push({
-                class: Biome_Tundra_Hills,
-                h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
-                t: [config.MIN_TEMPERATURE, config.NORMAL_TEMPERATURE],
-                a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
+                a: [config.MIN_LEVEL, config.MAX_LOWLAND_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Tundra_Hills,
-                h: [config.NORMAL_HUMIDITY, config.MAX_HUMIDITY],
+                h: [config.MIN_HUMIDITY, config.MAX_HUMIDITY],
                 t: [config.MIN_TEMPERATURE, config.LOW_TEMPERATURE],
                 a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Grass_Hills,
-                h: [config.NORMAL_HUMIDITY, config.MAX_HUMIDITY],
+                h: [config.LOW_HUMIDITY, config.MAX_HUMIDITY],
                 t: [config.LOW_TEMPERATURE, config.MAX_TEMPERATURE],
                 a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
             });
@@ -152,25 +147,30 @@ function getConfig() {
             });
 
             biomesConfig.push({
+                class: Biome_Savanna_Hills,
+                h: [config.MIN_HUMIDITY, config.LOW_HUMIDITY],
+                t: [config.LOW_TEMPERATURE, config.NORMAL_TEMPERATURE],
+                a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
+            });
+
+            biomesConfig.push({
                 class: Biome_Desert_Hills,
                 h: [config.MIN_HUMIDITY, config.NORMAL_HUMIDITY],
                 t: [config.HIGH_TEMPERATURE, config.MAX_TEMPERATURE],
                 a: [config.MAX_LOWLAND_LEVEL, config.MAX_HILLS_LEVEL]
             });
 
-            ///
-
             biomesConfig.push({
                 class: Biome_Ice_Rocks,
                 h: [config.MIN_HUMIDITY, config.MAX_HUMIDITY],
-                t: [config.MIN_TEMPERATURE, config.NORMAL_TEMPERATURE],
+                t: [config.MIN_TEMPERATURE, config.LOW_TEMPERATURE],
                 a: [config.MAX_HILLS_LEVEL, config.MAX_MOUNTAINS_LEVEL]
             });
 
             biomesConfig.push({
                 class: Biome_Rocks,
                 h: [config.MIN_HUMIDITY, config.MAX_HUMIDITY],
-                t: [config.NORMAL_TEMPERATURE, config.MAX_TEMPERATURE],
+                t: [config.LOW_TEMPERATURE, config.MAX_TEMPERATURE],
                 a: [config.MAX_HILLS_LEVEL, config.MAX_MOUNTAINS_LEVEL]
             });
 
@@ -184,19 +184,22 @@ function getConfig() {
             Biome_Desert_Hills: '#c4a37e',
             Biome_Grass: '#659c29',
             Biome_Grass_Hills: '#778e5d',
-            Biome_Ice_Rocks: '#eeeeee',
+            Biome_Rocks: '#818f71',
+            Biome_Ice_Rocks: '#fff',
             Biome_Ocean: '#003eb2',
-            Biome_Rocks: '#52563d',
             Biome_Savanna: '#9b9e3f',
             Biome_Savanna_Hills: '#7f7946',
             Biome_Swamp: '#20a894',
             Biome_Tropic: '#3c8045',
-            Biome_Tundra: '#9c9f73',
-            Biome_Tundra_Hills: '#686a54',
-            Biome_Water: '#74aece'
+            Biome_Tundra: '#d5d7b7',
+            Biome_Tundra_Hills: '#a8a996',
+            Biome_Water: '#74aece',
         },
 
-        BIOME_ROCKS_IMAGE: 'images/mountains-1.png',
+        BIOME_IMAGES: {
+            Biome_Rocks: 'images/mountains-1.png',
+            Biome_Ice_Rocks: 'images/mountains-2.png',
+        },
 
         // Forests
         FOREST_LIMIT: 30, // %, compared to the possible tiles

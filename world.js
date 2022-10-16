@@ -1,5 +1,7 @@
 class World {
 
+    world;
+
     constructor(config, scrollingMapWrapper, scrollingMapCanvas, mainMapCanvas) {
 
         let cameraPos = getCenteredCameraPosition(config.VISIBLE_COLS);
@@ -58,9 +60,6 @@ class World {
         }
     }
 
-    /**
-     * @return {ImageData}
-     */
     generateWorld = function() {
 
         let surfaceOperator = new SurfaceOperator(),
@@ -74,7 +73,7 @@ class World {
             lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap),
             riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap),
             freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap),
-            humidity = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
+            humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
 
         let biomesOperator = new BiomesOperator(
             altitudeMap,
@@ -82,7 +81,7 @@ class World {
             coastMap,
             freshWaterMap,
             temperatureMap,
-            humidity,
+            humidityMap,
             this.layers.getLayer(LAYER_BIOMES)
         );
 
@@ -107,6 +106,18 @@ class World {
         if (config.LOGS) {
             logTimeEvent('World generated');
         }
+
+        this.world = {
+            'altitudeMap': altitudeMap,
+            'temperatureMap': temperatureMap,
+            'oceanMap': oceanMap,
+            'coastMap': coastMap,
+            'lakesMap': lakesMap,
+            'riversMap': riversMap,
+            'freshWaterMap': freshWaterMap,
+            'humidityMap': humidityMap,
+            'biomes': biomesOperator.getBiomes()
+        };
     };
 
     /**
@@ -196,15 +207,81 @@ class World {
                 ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.strokeRect(lx, ly, _this.cellSize, _this.cellSize);
-
-                if (config.SHOW_COORDINATES) {
-                    ctx.font = '7px senf';
-                    ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
-                    ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 20);
-                }
             }
         }
     };
+
+    drawCoordinates = function() {
+
+        let _this = this,
+            ctx = _this.scrollingMapCanvas.getContext('2d'),
+            x, y, lx, ly,
+            worldOffsetLeft = _this.cameraPosX * _this.cellSize,
+            worldOffsetTop = _this.cameraPosY * _this.cellSize;
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+
+        for (x = 0; x < config.VISIBLE_COLS; x++) {
+            for (y = 0; y < config.VISIBLE_COLS; y++) {
+
+                lx = x * _this.cellSize + worldOffsetLeft;
+                ly = y * _this.cellSize + worldOffsetTop;
+
+                ctx.font = '7px senf';
+                ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
+                ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 20);
+            }
+        }
+    }
+
+    drawTemperatures = function() {
+
+        let _this = this,
+            ctx = _this.scrollingMapCanvas.getContext('2d'),
+            x, y, lx, ly,
+            worldOffsetLeft = _this.cameraPosX * _this.cellSize,
+            worldOffsetTop = _this.cameraPosY * _this.cellSize,
+            temperatureMap = this.world.temperatureMap;
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+
+        for (x = 0; x < config.VISIBLE_COLS; x++) {
+            for (y = 0; y < config.VISIBLE_COLS; y++) {
+
+                lx = x * _this.cellSize + worldOffsetLeft;
+                ly = y * _this.cellSize + worldOffsetTop;
+
+                ctx.font = '7px senf';
+                ctx.fillText((Math.round(temperatureMap.getTile(_this.cameraPosX + x, _this.cameraPosY + y) * 450) / 10).toString(), lx + 2, ly + 10);
+            }
+        }
+    }
+
+    drawBiomesInfo = function() {
+
+        let _this = this,
+            ctx = _this.scrollingMapCanvas.getContext('2d'),
+            x, y, lx, ly,
+            worldOffsetLeft = _this.cameraPosX * _this.cellSize,
+            worldOffsetTop = _this.cameraPosY * _this.cellSize,
+            biomes = this.world.biomes;
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+
+        for (x = 0; x < config.VISIBLE_COLS; x++) {
+            for (y = 0; y < config.VISIBLE_COLS; y++) {
+
+                lx = x * _this.cellSize + worldOffsetLeft;
+                ly = y * _this.cellSize + worldOffsetTop;
+
+                ctx.font = '7px senf';
+                ctx.fillText(biomes.getTile(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(0, 6), lx + 2, ly + 10);
+            }
+        }
+    }
 
     /**
      * @param {number} x
@@ -218,7 +295,7 @@ class World {
             && y <= this.cameraPosY + config.VISIBLE_COLS;
     };
 
-    redrawWorld = function() {
+    drawLayers = function() {
 
         let _this = this,
             renderCanvas = document.createElement('canvas');
@@ -239,7 +316,6 @@ class World {
         this.scrollingMapWrapper.scrollTop = worldOffsetTop;
 
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-
             layer = _this.layers.getLayer(ln);
 
             layer.foreach(function(x, y) {
@@ -254,16 +330,17 @@ class World {
                     return;
                 }
 
-                if (tile.hasImage()) {
-                    ctxImages.push([x, y, tile.getImage()]);
-                    return;
+                if (tile.drawBackground()) {
+                    fillCanvasPixel(
+                        image,
+                        (x + y * config.WORLD_SIZE) * 4,
+                        tile.getColor()
+                    );
                 }
 
-                fillCanvasPixel(
-                    image,
-                    (x + y * config.WORLD_SIZE) * 4,
-                    tile.getColor()
-                );
+                if (tile.hasImage()) {
+                    ctxImages.push([x, y, tile.getImage()]);
+                }
             });
         }
 
@@ -295,7 +372,22 @@ class World {
             );
         }
 
-        _this.drawRectangles();
+        if (config.SHOW_RECTANGLES) {
+            _this.drawRectangles();
+        }
+
+        if (config.SHOW_COORDINATES) {
+            _this.drawCoordinates();
+        }
+
+        if (config.SHOW_TEMPERATURES) {
+            _this.drawTemperatures();
+        }
+
+        if (config.SHOW_BIOMES_INFO) {
+            _this.drawBiomesInfo();
+        }
+
         _this.drawMainMap();
     };
 
@@ -305,12 +397,18 @@ class World {
 
         _this.generateWorld();
 
-        _this.timer.tickTimer(function() {
+        setTimeout(function() {
             _this.update();
-        });
+        }, 100);
+
+        if (config.TICKS_ENABLED) {
+            _this.timer.tickTimer(function() {
+                _this.update();
+            });
+        }
     };
 
     update = function() {
-        this.redrawWorld();
+        this.drawLayers();
     };
 }
