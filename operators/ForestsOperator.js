@@ -29,6 +29,7 @@ class ForestsOperator {
         }
 
         _this.forestPalmImage = createImage(config.FOREST_PALM_IMAGE);
+        _this.forestTundraImage = createImage(config.FOREST_TUNDRA_IMAGE);
         _this.forestMap = new ForestMap(
             biomesOperator.getBiomes()
         );
@@ -51,11 +52,42 @@ class ForestsOperator {
      * @param {number} y
      * @returns {boolean}
      */
-    isPalm = function(x, y) {
+    isDesertForest = function(x, y) {
         return [Biome_Desert.NAME, Biome_Desert_Hills.NAME, Biome_Tropic.NAME].includes(
             this.biomesOperator.getBiome(x, y).getName()
         );
     }
+
+    /**
+     * Whether the tile is a palm or a normal forest
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {boolean}
+     */
+    isTundraForest = function(x, y) {
+        return [Biome_Tundra.NAME, Biome_Tundra_Hills.NAME].includes(
+            this.biomesOperator.getBiome(x, y).getName()
+        );
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {HTMLImageElement}
+     */
+    getForestImage = function(x, y) {
+
+        if (this.isDesertForest(x, y)) {
+            return this.forestPalmImage;
+        }
+
+        if (this.isTundraForest(x, y)) {
+            return this.forestTundraImage;
+        }
+
+        return this.forestImages.randomElement();
+    };
 
     /**
      * @returns {ForestMap}
@@ -91,9 +123,8 @@ class ForestsOperator {
         if (typeof this.forestImagesCache[x + ',' + y] === 'undefined') {
             this.forestImagesCache[x + ',' + y] = new DisplayCell(
                 this.forestColor,
-                this.isPalm(x, y)
-                    ? this.forestPalmImage
-                    : this.forestImages.randomElement()
+                this.getForestImage(x, y),
+                false
             );
         }
 

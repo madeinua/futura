@@ -185,7 +185,7 @@ function getConfig() {
             Biome_Grass: '#659c29',
             Biome_Grass_Hills: '#778e5d',
             Biome_Rocks: '#818f71',
-            Biome_Ice_Rocks: '#fff',
+            Biome_Ice_Rocks: '#a6a6a6',
             Biome_Ocean: '#003eb2',
             Biome_Savanna: '#9b9e3f',
             Biome_Savanna_Hills: '#7f7946',
@@ -230,6 +230,7 @@ function getConfig() {
             'images/forest-2.png'
         ],
         FOREST_PALM_IMAGE: 'images/palm-1.png',
+        FOREST_TUNDRA_IMAGE: 'images/forest-3.png',
 
         // Animals
         ANIMALS: {

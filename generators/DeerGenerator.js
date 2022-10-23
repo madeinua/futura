@@ -25,7 +25,7 @@ class DeerGenerator extends AnimalGenerator {
 
         // Remove palms
         habitat.foreachFilled(function(x, y) {
-            if (forestsOperator.isPalm(x, y)) {
+            if (forestsOperator.isDesertForest(x, y)) {
                 habitat.unfill(x, y);
             }
         });
