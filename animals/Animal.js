@@ -19,7 +19,7 @@ class Animal {
      * @param {number} y
      */
     constructor(x, y) {
-        this.id = this.getName() + '-' + getTick();
+        this.id = this.getName() + '-' + getStep();
         this.x = x;
         this.y = y;
         this.history = [];

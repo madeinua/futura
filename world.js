@@ -296,7 +296,7 @@ class World {
     };
 
     drawLayers = function() {
-
+        
         let _this = this,
             renderCanvas = document.createElement('canvas');
 
@@ -401,8 +401,8 @@ class World {
             _this.update();
         }, 100);
 
-        if (config.TICKS_ENABLED) {
-            _this.timer.tickTimer(function() {
+        if (config.STEPS_ENABLED) {
+            _this.timer.stepsTimer(function() {
                 _this.update();
             });
         }

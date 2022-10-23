@@ -37,7 +37,7 @@ class AnimalsOperator {
             logTimeEvent('Animals initialized.');
         }
 
-        timer.addTickHandler(function() {
+        timer.addStepsHandler(function() {
 
             habitatLayer.reset();
             _this.updateHabitats();
@@ -48,7 +48,7 @@ class AnimalsOperator {
             _this.maybeCreateAnimals();
             _this.moveAnimals(animalsLayer);
 
-            Filters.apply('animalsTick', _this.animals);
+            Filters.apply('animalsSteps', _this.animals);
         });
     }
 

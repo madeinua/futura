@@ -53,14 +53,14 @@ let Filters = {
     }
 };
 
-let tick = 0;
+let step = 0;
 
 /**
  * Always return unique autoincrement value
  * @returns {number}
  */
-function getTick() {
-    return ++tick;
+function getStep() {
+    return ++step;
 }
 
 /**

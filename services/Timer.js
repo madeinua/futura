@@ -1,64 +1,67 @@
 class Timer {
 
     timerStep = 0;
-    tickHandlers = [];
+    stepsHandlers = [];
 
     /**
      * @param {function} handler
      */
-    addTickHandler(handler) {
-        this.tickHandlers.push(handler);
+    addStepsHandler(handler) {
+        this.stepsHandlers.push(handler);
     }
 
     /**
      * @param {CallableFunction} callback
      */
-    tickTimer = function(callback) {
+    stepsTimer = function(callback) {
 
         let _this = this,
             timerStart = Date.now(),
-            minTickInterval = config.TICKS_MIN_INTERVAL / config.TICKS_BOOST,
+            minStepInterval = config.STEPS_MIN_INTERVAL / config.STEPS_BOOST,
             boosted = false,
             timerInterval;
 
-        if (config.LOGS) {
-            logTimeEvent('Start ticks.');
-        }
-
         _this.timerStep = 0;
 
-        let tickerFn = function() {
+        let makeStep = function() {
 
             if (_this.timerPaused) {
                 return;
             }
 
-            for (let i = 0; i < _this.tickHandlers.length; i++) {
-                _this.tickHandlers[i](_this.timerStep);
-            }
-
-            if (_this.timerStep === config.TICKS_LIMIT) {
-
-                if (config.LOGS) {
-                    logTimeEvent('Ticks ended. Avg. time per tick: ' + Math.round((Date.now() - timerStart) / config.TICKS_LIMIT) + 'ms');
-                }
-
-                clearInterval(timerInterval);
+            for (let i = 0; i < _this.stepsHandlers.length; i++) {
+                _this.stepsHandlers[i](_this.timerStep);
             }
 
             _this.timerStep++;
 
             callback();
 
-            if (!boosted && _this.timerStep > config.TICKS_BOOST_STEPS) {
+            if (_this.timerStep > config.STEPS_LIMIT) {
+
+                if (config.LOGS) {
+                    logTimeEvent('Steps running has been ended. Avg. time per step: ' + Math.round((Date.now() - timerStart) / config.STEPS_LIMIT) + 'ms');
+                }
+
                 clearInterval(timerInterval);
-                minTickInterval *= config.TICKS_BOOST;
-                timerInterval = setInterval(tickerFn, minTickInterval);
+                return;
+            }
+
+            if (!boosted && _this.timerStep > config.STEPS_BOOST_STEPS) {
+                clearInterval(timerInterval);
+                minStepInterval *= config.STEPS_BOOST;
+                timerInterval = setInterval(makeStep, minStepInterval);
                 boosted = true;
             }
         };
 
-        timerInterval = setInterval(tickerFn, minTickInterval);
+        timerInterval = setInterval(makeStep, minStepInterval);
+
+        if (config.LOGS) {
+            logTimeEvent('Steps counting started.');
+        }
+
+        makeStep();
     };
 
     /**

@@ -33,7 +33,7 @@ class ForestsOperator {
             biomesOperator.getBiomes()
         );
 
-        timer.addTickHandler(function(step) {
+        timer.addStepsHandler(function(step) {
             forestGenerator.generate(_this.forestMap, step);
             _this.addForestMapToLayer(forestLayer, _this.forestMap);
             _this.forestMap = Filters.apply('forestMap', _this.forestMap);

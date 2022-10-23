@@ -55,7 +55,7 @@ canvas {
     width: 66px;
 }
 
-#pauseTick {
+#pauseSteps {
     margin: 20px;
 }
 
@@ -75,7 +75,7 @@ button:hover {
     background: #e0dfdf;
 }
 
-#tickCounter {
+#stepsCounter {
     color: #00b5dc;
     font-weight: 600;
     min-width: 50px;

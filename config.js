@@ -18,12 +18,12 @@ function getConfig() {
         SHOW_RECTANGLES: false,
         SHOW_COORDINATES: false,
 
-        // Ticks
-        TICKS_ENABLED: true,
-        TICKS_MIN_INTERVAL: 500,
-        TICKS_LIMIT: 500,
-        TICKS_BOOST: 5,
-        TICKS_BOOST_STEPS: 50,
+        // Steps
+        STEPS_ENABLED: true,
+        STEPS_MIN_INTERVAL: 500,
+        STEPS_LIMIT: 50,
+        STEPS_BOOST: 5,
+        STEPS_BOOST_STEPS: 50,
 
         // Altitude
         WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -203,8 +203,7 @@ function getConfig() {
 
         // Forests
         FOREST_LIMIT: 30, // %, compared to the possible tiles
-        FOREST_BORN_STARTING_BOOST: 100,
-        FOREST_BORN_CHANCE: 0.00025, // %
+        FOREST_BORN_CHANCE: 0.005, // %
         FOREST_GROWTH_CHANCE: 0.05, // %
         FOREST_DIE_CHANCE: 0.001, // %
         FOREST_GROUNDS_MULTS: {

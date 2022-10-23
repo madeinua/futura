@@ -113,7 +113,7 @@ Filters.add('forestMap', function(map) {
     return map;
 });
 
-Filters.add('animalsTick', function(animals) {
+Filters.add('animalsSteps', function(animals) {
 
     let text = '',
         groups = {};
@@ -223,10 +223,10 @@ function pauseTimer() {
         : world.timer.pauseTimer();
 }
 
-document.getElementById('pauseTick').addEventListener("click", function() {
+document.getElementById('pauseSteps').addEventListener("click", function() {
     pauseTimer();
 });
 
-world.timer.addTickHandler(function(step) {
-    document.getElementById('tickCounter').innerHTML = step;
+world.timer.addStepsHandler(function(step) {
+    document.getElementById('stepsCounter').innerHTML = step;
 });
