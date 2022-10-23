@@ -13,7 +13,7 @@ class ForestGenerator {
 
     /** @var {number} */
     minCreateIntensity;
-
+    
     /**
      * @param {BiomesOperator} biomesOperator
      */
@@ -22,7 +22,7 @@ class ForestGenerator {
 
         _this.biomesOperator = biomesOperator;
         _this.maxForestTiles = Math.ceil(biomesOperator.altitudeMap.getLandTilesCount() * config.FOREST_LIMIT / 100);
-        _this.minCreateIntensity = _this.maxForestTiles / 100;
+        _this.minCreateIntensity = Math.ceil(_this.maxForestTiles / 10);
 
         let maxGroundMult = 0;
 
@@ -49,16 +49,17 @@ class ForestGenerator {
         let filledTiles = forestMap.getFilledTiles().shuffle();
 
         this.createTrees(forestMap, filledTiles, step);
-        this.growTrees(forestMap, filledTiles);
+        this.growTrees(forestMap, filledTiles, step);
     }
 
     /**
      * @param {ForestMap} forestMap
      * @param {array} filledTiles
+     * @param {number} step
      */
-    growTrees(forestMap, filledTiles) {
+    growTrees(forestMap, filledTiles, step) {
         this.cutTrees(forestMap, filledTiles);
-        this.expandTrees(forestMap, filledTiles);
+        this.expandTrees(forestMap, filledTiles, step);
     }
 
     /**
@@ -81,12 +82,14 @@ class ForestGenerator {
     /**
      * @param {ForestMap} forestMap
      * @param {array} filledTiles
+     * @param {number} step
      */
-    expandTrees(forestMap, filledTiles) {
+    expandTrees(forestMap, filledTiles, step) {
 
         let _this = this,
             usedSpace = filledTiles.length / this.maxForestTiles,
-            speed = config.FOREST_GROWTH_CHANCE * (1 - usedSpace);
+            chance = step <= config.STEPS_BOOST_STEPS ? config.FOREST_GROWTH_CHANCE * 3 : config.FOREST_GROWTH_CHANCE,
+            speed = chance * (1 - usedSpace);
 
         if (speed === 0) {
             return;
@@ -99,7 +102,9 @@ class ForestGenerator {
                     let growsChance = _this.getCreateChance(
                         forestMap,
                         _this.biomesOperator.humidityMap.getTile(x, y),
-                        x, y, speed
+                        x,
+                        y,
+                        speed
                     );
 
                     if (iAmLucky(growsChance)) {
@@ -120,7 +125,7 @@ class ForestGenerator {
      */
     createTrees(forestMap, filledTiles, step) {
         let _this = this,
-            createIntensity = Math.max(_this.minCreateIntensity, Math.ceil(this.maxForestTiles / Math.max(1, filledTiles.length))),
+            createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestTiles / Math.max(1, filledTiles.length))),
             potentialTiles = forestMap.getUnfilledTiles().shuffle().slice(0, createIntensity),
             i, x, y, createChance;
 
@@ -133,7 +138,9 @@ class ForestGenerator {
                 _this.biomesOperator.humidityMap.getTile(x, y),
                 x,
                 y,
-                step <= config.STEPS_BOOST_STEPS ? config.FOREST_BORN_CHANCE * config.STEPS_BOOST_STEPS : config.FOREST_BORN_CHANCE
+                step <= config.STEPS_BOOST_STEPS
+                    ? config.FOREST_BORN_CHANCE * config.FOREST_BORN_BOOST
+                    : config.FOREST_BORN_CHANCE
             );
 
             if (iAmLucky(createChance)) {
