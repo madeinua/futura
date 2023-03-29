@@ -4,7 +4,7 @@ class ForestGenerator {
     biomesOperator;
 
     /** @var {number} */
-    maxForestTiles;
+    maxForestCells;
 
     /** @var {object} */
     groundCreateMults = {};
@@ -21,8 +21,8 @@ class ForestGenerator {
         let _this = this;
 
         _this.biomesOperator = biomesOperator;
-        _this.maxForestTiles = Math.ceil(biomesOperator.altitudeMap.getLandTilesCount() * config.FOREST_LIMIT / 100);
-        _this.minCreateIntensity = Math.ceil(_this.maxForestTiles / 10);
+        _this.maxForestCells = Math.ceil(biomesOperator.altitudeMap.getLandCellsCount() * config.FOREST_LIMIT / 100);
+        _this.minCreateIntensity = Math.ceil(_this.maxForestCells / 10);
 
         let maxGroundMult = 0;
 
@@ -35,7 +35,7 @@ class ForestGenerator {
         }
 
         biomesOperator.altitudeMap.foreach(function(x, y) {
-            if (biomesOperator.altitudeMap.getTile(x, y) > config.MAX_HILLS_LEVEL) {
+            if (biomesOperator.altitudeMap.getCell(x, y) > config.MAX_HILLS_LEVEL) {
                 _this.unallowedCells.push([x, y]);
             }
         });
@@ -46,48 +46,48 @@ class ForestGenerator {
      * @param {number} step
      */
     generate(forestMap, step) {
-        let filledTiles = forestMap.getFilledTiles().shuffle();
+        let filledCells = forestMap.getFilledCells().shuffle();
 
-        this.createTrees(forestMap, filledTiles, step);
-        this.growTrees(forestMap, filledTiles, step);
+        this.createTrees(forestMap, filledCells, step);
+        this.growTrees(forestMap, filledCells, step);
     }
 
     /**
      * @param {ForestMap} forestMap
-     * @param {array} filledTiles
+     * @param {array} filledCells
      * @param {number} step
      */
-    growTrees(forestMap, filledTiles, step) {
-        this.cutTrees(forestMap, filledTiles);
-        this.expandTrees(forestMap, filledTiles, step);
+    growTrees(forestMap, filledCells, step) {
+        this.cutTrees(forestMap, filledCells);
+        this.expandTrees(forestMap, filledCells, step);
     }
 
     /**
      * @param {ForestMap} forestMap
-     * @param {array} filledTiles
+     * @param {array} filledCells
      */
-    cutTrees(forestMap, filledTiles) {
+    cutTrees(forestMap, filledCells) {
 
-        if (!filledTiles.length) {
+        if (!filledCells.length) {
             return;
         }
 
-        filledTiles
-            .slice(0, filledTiles.length * config.FOREST_DIE_CHANCE)
-            .forEach(function(tile) {
-                forestMap.unfill(tile[0], tile[1]);
+        filledCells
+            .slice(0, filledCells.length * config.FOREST_DIE_CHANCE)
+            .forEach(function(cell) {
+                forestMap.unfill(cell[0], cell[1]);
             });
     }
 
     /**
      * @param {ForestMap} forestMap
-     * @param {array} filledTiles
+     * @param {array} filledCells
      * @param {number} step
      */
-    expandTrees(forestMap, filledTiles, step) {
+    expandTrees(forestMap, filledCells, step) {
 
         let _this = this,
-            usedSpace = filledTiles.length / this.maxForestTiles,
+            usedSpace = filledCells.length / this.maxForestCells,
             chance = step <= config.STEPS_BOOST_STEPS ? config.FOREST_GROWTH_CHANCE * 3 : config.FOREST_GROWTH_CHANCE,
             speed = chance * (1 - usedSpace);
 
@@ -95,13 +95,13 @@ class ForestGenerator {
             return;
         }
 
-        filledTiles.forEach(function(tile) {
-            forestMap.foreachNeighbors(tile[0], tile[1], function(x, y) {
-                if (!filledTiles.includes([x, y])) {
+        filledCells.forEach(function(cell) {
+            forestMap.foreachNeighbors(cell[0], cell[1], function(x, y) {
+                if (!filledCells.includes([x, y])) {
 
                     let growsChance = _this.getCreateChance(
                         forestMap,
-                        _this.biomesOperator.humidityMap.getTile(x, y),
+                        _this.biomesOperator.humidityMap.getCell(x, y),
                         x,
                         y,
                         speed
@@ -120,22 +120,22 @@ class ForestGenerator {
 
     /**
      * @param {ForestMap} forestMap
-     * @param {array} filledTiles
+     * @param {array} filledCells
      * @param {number} step
      */
-    createTrees(forestMap, filledTiles, step) {
+    createTrees(forestMap, filledCells, step) {
         let _this = this,
-            createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestTiles / Math.max(1, filledTiles.length))),
-            potentialTiles = forestMap.getUnfilledTiles().shuffle().slice(0, createIntensity),
+            createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))),
+            potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity),
             i, x, y, createChance;
 
-        for (i = 0; i < potentialTiles.length; i++) {
-            x = potentialTiles[i][0];
-            y = potentialTiles[i][1];
+        for (i = 0; i < potentialCells.length; i++) {
+            x = potentialCells[i][0];
+            y = potentialCells[i][1];
 
             createChance = _this.getCreateChance(
                 forestMap,
-                _this.biomesOperator.humidityMap.getTile(x, y),
+                _this.biomesOperator.humidityMap.getCell(x, y),
                 x,
                 y,
                 step <= config.STEPS_BOOST_STEPS
@@ -159,11 +159,11 @@ class ForestGenerator {
      */
     getCreateChance(forestMap, humidity, x, y, speed) {
 
-        if (humidity === 0 || this.unallowedCells.includesTile([x, y])) {
+        if (humidity === 0 || this.unallowedCells.includesCell([x, y])) {
             return 0;
         }
 
-        let biome = forestMap.biomes.getTile(x, y);
+        let biome = forestMap.biomes.getCell(x, y);
 
         if (!this.groundCreateMults.hasOwnProperty(biome.getName())) {
             return 0;

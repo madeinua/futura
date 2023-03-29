@@ -17,7 +17,7 @@ class OceanMap extends BinaryMatrix {
      * @param {number} startX
      * @param {number} startY
      */
-    includeAllWatterTilesAround = function(startX, startY) {
+    includeAllWatterCellsAround = function(startX, startY) {
 
         let _this = this,
             activePoints = [],
@@ -33,7 +33,7 @@ class OceanMap extends BinaryMatrix {
 
             _this.altitudeMap.foreachAroundRadius(point[0], point[1], 1, function(x, y) {
 
-                let altitude = _this.altitudeMap.getTile(x, y);
+                let altitude = _this.altitudeMap.getCell(x, y);
 
                 if (_this.altitudeMap.isWater(altitude)) {
                     if (!_this.filled(x, y)) {
@@ -52,7 +52,7 @@ class OceanMap extends BinaryMatrix {
 
         _this.altitudeMap.foreach(function(x, y) {
             if (
-                _this.altitudeMap.isWater(_this.altitudeMap.getTile(x, y))
+                _this.altitudeMap.isWater(_this.altitudeMap.getCell(x, y))
                 && !_this.filled(x, y)
             ) {
                 tempMap.fill(x, y);
@@ -64,7 +64,7 @@ class OceanMap extends BinaryMatrix {
                 !_this.filled(x, y)
                 && tempMap.getSizeFromPoint(x, y) > config.WORLD_SIZE
             ) {
-                _this.includeAllWatterTilesAround(x, y);
+                _this.includeAllWatterCellsAround(x, y);
             }
         });
     };
@@ -78,11 +78,11 @@ class OceanMap extends BinaryMatrix {
             startX = 0,
             startY = 0;
 
-        if (!_this.altitudeMap.isWater(_this.altitudeMap.getTile(startX, startY))) {
+        if (!_this.altitudeMap.isWater(_this.altitudeMap.getCell(startX, startY))) {
             return _this;
         }
 
-        _this.includeAllWatterTilesAround(startX, startY);
+        _this.includeAllWatterCellsAround(startX, startY);
         _this.bigLakesToSeas();
 
         return _this;

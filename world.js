@@ -156,7 +156,7 @@ class World {
             layer = _this.layers.getLayer(ln);
             layer.foreach(function(x, y) {
 
-                displayCell = layer.getTile(x, y);
+                displayCell = layer.getCell(x, y);
 
                 if (displayCell === null) {
                     return;
@@ -254,7 +254,7 @@ class World {
                 ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.font = '7px senf';
-                ctx.fillText((Math.round(temperatureMap.getTile(_this.cameraPosX + x, _this.cameraPosY + y) * 450) / 10).toString(), lx + 2, ly + 10);
+                ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPosX + x, _this.cameraPosY + y) * 450) / 10).toString(), lx + 2, ly + 10);
             }
         }
     }
@@ -278,7 +278,7 @@ class World {
                 ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.font = '7px senf';
-                ctx.fillText(biomes.getTile(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(0, 6), lx + 2, ly + 10);
+                ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(0, 6), lx + 2, ly + 10);
             }
         }
     }
@@ -288,7 +288,7 @@ class World {
      * @param {number} y
      * @return {boolean}
      */
-    isTileVisible = function(x, y) {
+    isCellVisible = function(x, y) {
         return x >= this.cameraPosX
             && x <= this.cameraPosX + config.VISIBLE_COLS
             && y >= this.cameraPosY
@@ -308,7 +308,7 @@ class World {
             image = renderCtx.createImageData(config.WORLD_SIZE, config.WORLD_SIZE),
             ctxImages = [],
             layer,
-            tile,
+            cell,
             worldOffsetLeft = this.cameraPosX * _this.cellSize,
             worldOffsetTop = this.cameraPosY * _this.cellSize;
 
@@ -320,26 +320,26 @@ class World {
 
             layer.foreach(function(x, y) {
 
-                if (!_this.isTileVisible(x, y)) {
+                if (!_this.isCellVisible(x, y)) {
                     return;
                 }
 
-                tile = layer.getTile(x, y);
+                cell = layer.getCell(x, y);
 
-                if (tile === null) {
+                if (cell === null) {
                     return;
                 }
 
-                if (tile.drawBackground()) {
+                if (cell.drawBackground()) {
                     fillCanvasPixel(
                         image,
                         (x + y * config.WORLD_SIZE) * 4,
-                        tile.getColor()
+                        cell.getColor()
                     );
                 }
 
-                if (tile.hasImage()) {
-                    ctxImages.push([x, y, tile.getImage()]);
+                if (cell.hasImage()) {
+                    ctxImages.push([x, y, cell.getImage()]);
                 }
             });
         }
@@ -359,7 +359,7 @@ class World {
 
         for (let i = 0; i < ctxImages.length; i++) {
 
-            if (!_this.isTileVisible(ctxImages[i][0], ctxImages[i][1])) {
+            if (!_this.isCellVisible(ctxImages[i][0], ctxImages[i][1])) {
                 continue;
             }
 

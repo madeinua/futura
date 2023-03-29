@@ -35,7 +35,7 @@ class TemperatureMap extends PointMatrix {
         }
 
         _this.foreach(function(x, y) {
-            _this.addToTile(x, y, gradient[y]);
+            _this.addToCell(x, y, gradient[y]);
         });
     };
 
@@ -45,9 +45,9 @@ class TemperatureMap extends PointMatrix {
             altitude;
 
         _this.foreach(function(x, y) {
-            altitude = _this.altitudeMap.getTile(x, y);
+            altitude = _this.altitudeMap.getCell(x, y);
             altitude = altitude >= minLevel ? (altitude - minLevel) * (altitude - minLevel) : 0;
-            _this.subtractFromTile(x, y, altitude);
+            _this.subtractFromCell(x, y, altitude);
         });
     };
 }

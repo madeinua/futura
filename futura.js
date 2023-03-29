@@ -27,7 +27,7 @@ function drawColorMap(id, map) {
         for (y = 0; y < map.getHeight(); y++) {
 
             let point = (x + y * canvas.width) * 4,
-                color = map.getTile(x, y).getHexColor();
+                color = map.getCell(x, y).getHexColor();
 
             fillCanvasPixel(image, point, color);
         }

@@ -86,7 +86,7 @@ class AnimalGenerator {
      * @param {number} y
      * @returns {boolean}
      */
-    isTileInHabitat(x, y) {
+    isCellInHabitat(x, y) {
         return this.getHabitat().filled(x, y);
     }
 
@@ -97,7 +97,7 @@ class AnimalGenerator {
 
         let habitat = this.getHabitat().clone();
 
-        habitat.diffTiles(
+        habitat.diffCells(
             this.getRespawnPoints()
         );
 
@@ -106,7 +106,7 @@ class AnimalGenerator {
         }
 
         this.respawnPoints.push(
-            habitat.getFilledTiles().randomElement()
+            habitat.getFilledCells().randomElement()
         );
 
         return true;
@@ -155,7 +155,7 @@ class AnimalGenerator {
         }
 
         for (let i = 0; i < respawnPoints.length; i++) {
-            if (!this.isTileInHabitat(respawnPoints[i][0], respawnPoints[i][1])) {
+            if (!this.isCellInHabitat(respawnPoints[i][0], respawnPoints[i][1])) {
                 respawnPoints = respawnPoints.removeElementByIndex(i);
             }
         }
@@ -164,13 +164,13 @@ class AnimalGenerator {
             return false;
         }
 
-        let tile = respawnPoints.randomElement();
+        let cell = respawnPoints.randomElement();
 
-        if (!tile) {
+        if (!cell) {
             throwError('Can not create animal', 1, true);
             return false;
         }
 
-        return new (this.getAnimalClass())(tile[0], tile[1]);
+        return new (this.getAnimalClass())(cell[0], cell[1]);
     }
 }

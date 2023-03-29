@@ -27,7 +27,7 @@ class LakesMap extends BinaryMatrix {
 
         _this.altitudeMap.foreach(function(x, y) {
             if (
-                _this.altitudeMap.isWater(_this.altitudeMap.getTile(x, y))
+                _this.altitudeMap.isWater(_this.altitudeMap.getCell(x, y))
                 && !_this.oceanMap.filled(x, y)
             ) {
                 _this.fill(x, y);

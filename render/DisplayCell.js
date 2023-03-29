@@ -1,5 +1,14 @@
 class DisplayCell {
 
+    /** {array} */
+    color;
+
+    /** {null|HTMLImageElement} */
+    image;
+
+    /** {boolean} */
+    withBg;
+
     /**
      * @param {array} color
      * @param {null|HTMLImageElement} image

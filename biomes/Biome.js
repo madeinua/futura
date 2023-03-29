@@ -2,6 +2,24 @@ class Biome {
 
     static NAME = '';
 
+    /** @var {number} */
+    x;
+
+    /** @var {number} */
+    y;
+
+    /** @var {number} */
+    altitude;
+
+    /** @var {number} */
+    temperature;
+
+    /** @var {number} */
+    humidity;
+
+    /** @var {number} */
+    distanceToWater;
+
     /**
      * @param {number} x
      * @param {number} y

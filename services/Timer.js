@@ -1,6 +1,9 @@
 class Timer {
 
+    /** @var {number} */
     timerStep = 0;
+
+    /** @var {Array} */
     stepsHandlers = [];
 
     /**

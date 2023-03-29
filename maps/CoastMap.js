@@ -42,7 +42,7 @@ class CoastMap extends BinaryMatrix {
         let _this = this;
 
         _this.oceanMap.foreachFilled(function(x, y) {
-            if (_this.isCoast(_this.altitudeMap.getTile(x, y), _this.temperatureMap.getTile(x, y))) {
+            if (_this.isCoast(_this.altitudeMap.getCell(x, y), _this.temperatureMap.getCell(x, y))) {
                 _this.fill(x, y);
             }
         });

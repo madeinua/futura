@@ -1,5 +1,5 @@
 /**
- * Generate matrix of tiles
+ * Generate matrix of cells
  * @param {number} width
  * @param {number} height
  * @constructor
@@ -25,25 +25,25 @@ class NumericMatrix extends Matrix {
     };
 
     /**
-     * Add value to a current tile value
+     * Add value to a current cell value
      * @param {number} x
      * @param {number} y
      * @param {number} value
      * @return {this}
      */
-    addToTile(x, y, value) {
-        return this.setTile(x, y, this.getTile(x, y) + value);
+    addToCell(x, y, value) {
+        return this.setCell(x, y, this.getCell(x, y) + value);
     }
 
     /**
-     * Subtract value from a current tile value
+     * Subtract value from a current cell value
      * @param {number} x
      * @param {number} y
      * @param {number} value
      * @return {this}
      */
-    subtractFromTile(x, y, value) {
-        return this.setTile(x, y, this.getTile(x, y) - value);
+    subtractFromCell(x, y, value) {
+        return this.setCell(x, y, this.getCell(x, y) - value);
     }
 
     /**
@@ -62,7 +62,7 @@ class NumericMatrix extends Matrix {
      * @return {number}
      */
     getGrayscale(x, y) {
-        return fromFraction(this.getTile(x, y), 0, 255);
+        return fromFraction(this.getCell(x, y), 0, 255);
     }
 
     /**
@@ -77,7 +77,7 @@ class NumericMatrix extends Matrix {
             _this = this;
 
         _this.foreachNeighbors(x, y, function(nx, ny) {
-            sum += _this.getTile(nx, ny);
+            sum += _this.getCell(nx, ny);
         });
 
         return sum;
@@ -90,12 +90,12 @@ class NumericMatrix extends Matrix {
      * @param {number} value
      * @return {this}
      */
-    addToNeighborTiles(x, y, value) {
+    addToNeighborCells(x, y, value) {
 
         let _this = this;
 
         _this.foreachNeighbors(x, y, function(nx, ny) {
-            _this.addToTile(nx, ny, value);
+            _this.addToCell(nx, ny, value);
         });
 
         return _this;
@@ -112,7 +112,7 @@ class NumericMatrix extends Matrix {
             _this = this;
 
         _this.foreach(function(x, y) {
-            if (_this.getTile(x, y) === value) {
+            if (_this.getCell(x, y) === value) {
                 found = true;
             }
         });
@@ -135,7 +135,7 @@ class NumericMatrix extends Matrix {
 
         _this.map(function(x, y) {
             return changeRange(
-                _this.getTile(x, y),
+                _this.getCell(x, y),
                 currMin,
                 currMax,
                 min,

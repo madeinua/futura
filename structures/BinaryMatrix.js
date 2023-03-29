@@ -26,59 +26,59 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Retrieve all tiles that are filled
+     * Retrieve all cells that are filled
      * @return {Array}
      */
-    getFilledTiles() {
+    getFilledCells() {
 
-        let arr = [];
+        let cells = [];
 
         this.foreachFilled(function(x, y) {
-            arr.push([x, y]);
+            cells.push([x, y]);
         });
 
-        return arr;
+        return cells;
     }
 
     /**
-     * Retrieve all tiles that are not filled
+     * Retrieve all cells that are not filled
      * @return {Array}
      */
-    getUnfilledTiles() {
+    getUnfilledCells() {
 
-        let arr = [];
+        let cells = [];
 
         this.foreachUnfilled(function(x, y) {
-            arr.push([x, y]);
+            cells.push([x, y]);
         });
 
-        return arr;
+        return cells;
     }
 
     /**
-     * Fill the tile with the value
+     * Fill the cell with the value
      * @param {number} x
      * @param {number} y
      * @return {this}
      */
     fill(x, y) {
-        this.setTile(x, y, 1);
+        this.setCell(x, y, 1);
         return this;
     }
 
     /**
-     * Remove filling the tile with the value
+     * Remove filling the cell with the value
      * @param {number} x
      * @param {number} y
      * @return {this}
      */
     unfill(x, y) {
-        this.setTile(x, y, 0);
+        this.setCell(x, y, 0);
         return this;
     }
 
     /**
-     * Count the number of filled tiles
+     * Count the number of filled cells
      * @returns {number}
      */
     countFilled() {
@@ -88,7 +88,7 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Check if matrix has filled tiles
+     * Check if matrix has filled cells
      * @returns {boolean}
      */
     hasFilled() {
@@ -105,13 +105,13 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Check if the tile is filled
+     * Check if the cell is filled
      * @param {number} x
      * @param {number} y
      * @return {boolean}
      */
     filled(x, y) {
-        return this.getTile(x, y) === 1;
+        return this.getCell(x, y) === 1;
     }
 
     /**
@@ -196,7 +196,7 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Unfill tiles which are filled in the specified matrix
+     * Unfill cells which are filled in the specified matrix
      * @param {BinaryMatrix} matrix
      * @returns {BinaryMatrix}
      */
@@ -212,15 +212,15 @@ class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Unfill tiles which are filled in the specified array of tiles
-     * @param {Array} tiles
+     * Unfill cells which are filled in the specified array of cells
+     * @param {Array} cells
      * @returns {BinaryMatrix}
      */
-    diffTiles(tiles) {
+    diffCells(cells) {
 
-        for (let i = 0; i < tiles.length; i++) {
-            if (this.filled(tiles[i][0], tiles[i][1])) {
-                this.unfill(tiles[i][0], tiles[i][1]);
+        for (let i = 0; i < cells.length; i++) {
+            if (this.filled(cells[i][0], cells[i][1])) {
+                this.unfill(cells[i][0], cells[i][1]);
             }
         }
 
@@ -251,7 +251,7 @@ class BinaryMatrix extends NumericMatrix {
      * @return {number}
      */
     getSize() {
-        return round(this.getFilledTiles().length / (this.width * this.height), 2) * 100;
+        return round(this.getFilledCells().length / (this.width * this.height), 2) * 100;
     }
 
     /**

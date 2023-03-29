@@ -46,7 +46,7 @@ class ForestsOperator {
     }
 
     /**
-     * Whether the tile is a palm or a normal forest
+     * Whether the cell is a palm or a normal forest
      *
      * @param {number} x
      * @param {number} y
@@ -59,7 +59,7 @@ class ForestsOperator {
     }
 
     /**
-     * Whether the tile is a palm or a normal forest
+     * Whether the cell is a palm or a normal forest
      *
      * @param {number} x
      * @param {number} y
@@ -106,7 +106,7 @@ class ForestsOperator {
 
         forestMap.foreach(function(x, y) {
 
-            forestLayer.setTile(
+            forestLayer.setCell(
                 x, y,
                 forestMap.filled(x, y) ? _this.getDisplayCell(x, y) : null
             );

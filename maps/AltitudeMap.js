@@ -1,6 +1,9 @@
 class AltitudeMap extends PointMatrix {
 
+    /** @var {number} */
     waterSize = 0;
+
+    /** @var {number} */
     landSize = 0;
 
     generateMap = function() {
@@ -19,13 +22,14 @@ class AltitudeMap extends PointMatrix {
         _this.map(function(x, y) {
 
             let val = 0,
-                size = 0;
+                size = 0,
+                s;
 
             // blend maps
             for (let i = 0; i < maps.length; i++) {
-                let s = Math.pow(2, i);
+                s = Math.pow(2, i);
                 size += s;
-                val += maps[i].getTile(x, y) * s;
+                val += maps[i].getCell(x, y) * s;
             }
 
             val /= size;
@@ -55,7 +59,7 @@ class AltitudeMap extends PointMatrix {
         let _this = this;
 
         _this.foreach(function(x, y) {
-            _this.isWater(_this.getTile(x, y))
+            _this.isWater(_this.getCell(x, y))
                 ? _this.waterSize++
                 : _this.landSize++;
         });
@@ -99,14 +103,14 @@ class AltitudeMap extends PointMatrix {
     /**
      * @returns {number}
      */
-    getWaterTilesCount = function() {
+    getWaterCellsCount = function() {
         return this.landSize;
     }
 
     /**
      * @returns {number}
      */
-    getLandTilesCount = function() {
+    getLandCellsCount = function() {
         return this.landSize;
     }
 }

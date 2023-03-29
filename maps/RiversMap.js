@@ -28,7 +28,7 @@ class RiversMap extends BinaryMatrix {
     generateMap = function() {
 
         let riverSources = this.getRiverSources(this.altitudeMap),
-            rivers = this.generateRiversTiles(riverSources);
+            rivers = this.generateRiversCells(riverSources);
 
         //rivers = _this.addRiverDeltaToRiversMaps(rivers);
 
@@ -49,7 +49,7 @@ class RiversMap extends BinaryMatrix {
 
         altitudeMap.foreach(function(x, y) {
 
-            let altitude = altitudeMap.getTile(x, y);
+            let altitude = altitudeMap.getCell(x, y);
 
             if (
                 altitudeMap.isGround(altitude)
@@ -66,7 +66,7 @@ class RiversMap extends BinaryMatrix {
     /**
      * @returns {Array}
      */
-    generateRiversTiles = function(riverSources) {
+    generateRiversCells = function(riverSources) {
 
         let _this = this,
             rivers = [],
@@ -98,7 +98,7 @@ class RiversMap extends BinaryMatrix {
 
                 let x = nextRiverPoint[0],
                     y = nextRiverPoint[1],
-                    altitude = _this.altitudeMap.getTile(x, y);
+                    altitude = _this.altitudeMap.getCell(x, y);
 
                 // lake/ocean or another river found. means river ending point found.
                 if (_this.altitudeMap.isWater(altitude) || arrayHasPoint(allRiversPoints, x, y)) {
@@ -150,7 +150,7 @@ class RiversMap extends BinaryMatrix {
             prevPoint = river.length > 1 ? river[river.length - 2] : false,
             cx = currentPoint[0],
             cy = currentPoint[1],
-            currentAltitude = altitudeMap.getTile(cx, cy),
+            currentAltitude = altitudeMap.getCell(cx, cy),
             neighbors = altitudeMap.getNeighbors(cx, cy).shuffle(),
             lowerPoint = [];
 
@@ -158,7 +158,7 @@ class RiversMap extends BinaryMatrix {
 
             let nx = neighbors[i][0],
                 ny = neighbors[i][1],
-                altitude = altitudeMap.getTile(nx, ny);
+                altitude = altitudeMap.getCell(nx, ny);
 
             if (altitude > currentAltitude) {
                 continue;

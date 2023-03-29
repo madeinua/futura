@@ -1,5 +1,6 @@
 class List {
 
+    /** @var {Array} */
     items;
 
     /**
@@ -79,7 +80,7 @@ class List {
     /**
      * @param {function} callable
      */
-    foreachTile(callable) {
+    foreachCell(callable) {
         for (let i = 0; i < this.items.length; i++) {
             callable(this.items[i][0], this.items[i][1]);
         }

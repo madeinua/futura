@@ -10,8 +10,8 @@ class Layer extends Matrix {
      * @param {number} y
      * @return {null|DisplayCell}
      */
-    getTile(x, y) {
-        return super.getTile(x, y);
+    getCell(x, y) {
+        return super.getCell(x, y);
     }
 
     /**
@@ -20,13 +20,13 @@ class Layer extends Matrix {
      * @param {null|number|array|DisplayCell|HTMLImageElement} value
      * @return {Matrix}
      */
-    setTile(x, y, value) {
+    setCell(x, y, value) {
 
         if (value !== null && !(value instanceof DisplayCell)) {
             value = new DisplayCell(value, null, false);
         }
 
-        return super.setTile(x, y, value);
+        return super.setCell(x, y, value);
     }
 
     reset() {

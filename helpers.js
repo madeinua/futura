@@ -77,9 +77,7 @@ Array.prototype.randomElement = function() {
  * @returns {Array}
  */
 Array.prototype.removeElementByIndex = function(index) {
-    return this.filter((e, i) => {
-        return i !== index;
-    });
+    return this.filter((e, i) => i !== index);
 };
 
 /**
@@ -88,9 +86,7 @@ Array.prototype.removeElementByIndex = function(index) {
  * @returns {Array}
  */
 Array.prototype.removeElementByValue = function(value) {
-    return this.filter((e) => {
-        return e !== value;
-    });
+    return this.filter((e) => e !== value);
 };
 
 /**
@@ -128,7 +124,7 @@ Array.prototype.diff = function(array) {
  * @param {Array} xy
  * @return {boolean}
  */
-Array.prototype.includesTile = function(xy) {
+Array.prototype.includesCell = function(xy) {
     return this.some(e => ((e[0] === xy[0]) && (e[1] === xy[1])));
 };
 
@@ -136,16 +132,16 @@ Array.prototype.includesTile = function(xy) {
  * @param {Array} array
  * @return {Array}
  */
-Array.prototype.intersectTiles = function(array) {
-    return this.filter(value => array.includesTile(value));
+Array.prototype.intersectCells = function(array) {
+    return this.filter(value => array.includesCell(value));
 };
 
 /**
  * @param {Array} array
  * @return {Array}
  */
-Array.prototype.diffTiles = function(array) {
-    return this.filter(value => !array.includesTile(value));
+Array.prototype.diffCells = function(array) {
+    return this.filter(value => !array.includesCell(value));
 };
 
 /**
@@ -390,7 +386,7 @@ Array.prototype.unique = function() {
 };
 
 /**
- * Retrieve closest distance to the tile
+ * Retrieve closest distance to the cell
  * Note: Array([x1, y1], [x2, y2], ...)
  * @param {number} x
  * @param {number} y
@@ -411,7 +407,7 @@ Array.prototype.getClosestDistanceTo = function(x, y) {
 };
 
 /**
- * Check if tile is available in the array
+ * Check if the cell is available in the array
  * @param {number} x
  * @param {number} y
  * @param {Array} arr

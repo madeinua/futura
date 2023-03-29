@@ -63,7 +63,7 @@ class AnimalsOperator {
      * @param {Animal} animal
      */
     addAnimalToLayer = function(animalsLayer, animal) {
-        animalsLayer.setTile(
+        animalsLayer.setCell(
             animal.x,
             animal.y,
             this.getDisplayCell(animal)
@@ -86,20 +86,20 @@ class AnimalsOperator {
      * @param {Animal} animal
      * @return {Array}
      */
-    getTilesAvailableToMove(animal) {
+    getCellsAvailableToMove(animal) {
 
         let result = [],
             habitat = this.getAnimalGeneratorByAnimal(animal).getHabitat(),
-            tilesAround = getRectangleAround(
+            cellsAround = getRectangleAround(
                 animal.x,
                 animal.y,
                 config.WORLD_SIZE,
                 config.WORLD_SIZE
             );
 
-        for (let i = 0; i < tilesAround.length; i++) {
-            if (habitat.filled(tilesAround[i][0], tilesAround[i][1])) {
-                result.push(tilesAround[i]);
+        for (let i = 0; i < cellsAround.length; i++) {
+            if (habitat.filled(cellsAround[i][0], cellsAround[i][1])) {
+                result.push(cellsAround[i]);
             }
         }
 
@@ -107,20 +107,20 @@ class AnimalsOperator {
     }
 
     /**
-     * @param {Array} tile
+     * @param {Array} cell
      * @param {Animal} animalToExcept
      * @return {boolean}
      */
-    isAnimalsAroundPoint = function(tile, animalToExcept) {
+    isAnimalsAroundPoint = function(cell, animalToExcept) {
 
-        let availableTiles = getAroundRadius(tile[0], tile[1], config.WORLD_SIZE, config.WORLD_SIZE, 2);
+        let availableCells = getAroundRadius(cell[0], cell[1], config.WORLD_SIZE, config.WORLD_SIZE, 2);
 
-        for (let j = 0; j < availableTiles.length; j++) {
+        for (let j = 0; j < availableCells.length; j++) {
             for (let i = 0; i < this.animals.length; i++) {
                 if (
                     this.animals[i].id !== animalToExcept.id
-                    && this.animals[i].x === availableTiles[j][0]
-                    && this.animals[i].y === availableTiles[j][1]
+                    && this.animals[i].x === availableCells[j][0]
+                    && this.animals[i].y === availableCells[j][1]
                 ) {
                     return true;
                 }
@@ -244,7 +244,7 @@ class AnimalsOperator {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             if (this.animalsGenerators[i].getName() === animal.NAME) {
                 this.animalsGenerators[i].getHabitat().foreachFilled(function(x, y) {
-                    habitatLayer.setTile(x, y, [100, 100, 200, 255]);
+                    habitatLayer.setCell(x, y, [100, 100, 200, 255]);
                 });
             }
         }
@@ -261,14 +261,14 @@ class AnimalsOperator {
         }
 
         let nextPoint = false,
-            availableTiles = this.getTilesAvailableToMove(animal);
+            availableCells = this.getCellsAvailableToMove(animal);
 
-        while(!nextPoint && availableTiles.length) {
+        while(!nextPoint && availableCells.length) {
 
-            nextPoint = availableTiles.randomElement();
+            nextPoint = availableCells.randomElement();
 
             if (this.isAnimalsAroundPoint(nextPoint, animal)) {
-                availableTiles = availableTiles.removeElementByValue(nextPoint);
+                availableCells = availableCells.removeElementByValue(nextPoint);
                 nextPoint = false;
             }
         }
@@ -299,7 +299,7 @@ class AnimalsOperator {
 
                 let generator = this.getAnimalGeneratorByAnimal(animal);
 
-                if (generator.isTileInHabitat(animal.x, animal.y)) {
+                if (generator.isCellInHabitat(animal.x, animal.y)) {
                     this.addAnimalToLayer(animalsLayer, animal);
                 } else { // if animal can't move & it's not in habitat - it must be killed
                     this.killAnimal(animal);

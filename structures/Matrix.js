@@ -27,7 +27,7 @@ class Matrix {
     }
 
     /**
-     * Get all tiles of matrix
+     * Get all cells of matrix
      * @return {Array}
      */
     getValues() {
@@ -35,7 +35,7 @@ class Matrix {
     }
 
     /**
-     * Retrieve all tiles of the matrix as a list
+     * Retrieve all cells of the matrix as a list
      * @return {Array}
      */
     getList() {
@@ -54,13 +54,13 @@ class Matrix {
     }
 
     /**
-     * Set tile value
+     * Set cell value
      * @param {number} x
      * @param {number} y
      * @param {*} value
      * @return {this}
      */
-    setTile(x, y, value) {
+    setCell(x, y, value) {
 
         this.__values[x][y] = value;
 
@@ -68,12 +68,12 @@ class Matrix {
     };
 
     /**
-     * Retrieve tile value
+     * Retrieve cell value
      * @param x
      * @param y
      * @return {*}
      */
-    getTile(x, y) {
+    getCell(x, y) {
         return this.__values[x][y];
     }
 
@@ -104,7 +104,7 @@ class Matrix {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 arr.push(
-                    this.getTile(x, y)
+                    this.getCell(x, y)
                 );
             }
         }
@@ -113,7 +113,7 @@ class Matrix {
     }
 
     /**
-     * Applies the callback to the elements of the Matrix and accepts return value as the Matrix tile value
+     * Applies the callback to the elements of the Matrix and accepts return value as the Matrix cell value
      * @param {*|function} value
      * @return {this}
      */
@@ -123,7 +123,7 @@ class Matrix {
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                this.setTile(x, y, isFunc ? value(x, y) : value);
+                this.setCell(x, y, isFunc ? value(x, y) : value);
             }
         }
 
@@ -143,7 +143,7 @@ class Matrix {
     }
 
     /**
-     * Set all tiles of matrix
+     * Set all cells of matrix
      * @param {boolean|number|Array} values
      * @return {this}
      */
@@ -170,7 +170,7 @@ class Matrix {
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                arr[x][y] = this.getTile(x, y);
+                arr[x][y] = this.getCell(x, y);
             }
         }
 
@@ -178,7 +178,7 @@ class Matrix {
     }
 
     /**
-     * Retrieve tile neighbors around the tile
+     * Retrieve cell neighbors around the cell
      *
      * @param {number} x
      * @param {number} y
@@ -210,7 +210,7 @@ class Matrix {
     }
 
     /**
-     * Retrieve tiles around a specified tile in a specified radius
+     * Retrieve cells around a specified cell in a specified radius
      *
      * @param {number} x
      * @param {number} y
@@ -246,11 +246,11 @@ class Matrix {
     /**
      * @return {Array}
      */
-    getRandomTile() {
+    getRandomCell() {
 
         let x = Math.floor(Math.random() * this.width),
             y = Math.floor(Math.random() * this.height);
 
-        return [x, y, this.getTile(x, y)];
+        return [x, y, this.getCell(x, y)];
     }
 }

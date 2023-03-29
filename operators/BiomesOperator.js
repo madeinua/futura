@@ -44,7 +44,7 @@ class BiomesOperator {
         let _this = this;
 
         altitudeMap.foreach(function(x, y) {
-            _this.biomes.setTile(x, y, _this._getBiome(x, y));
+            _this.biomes.setCell(x, y, _this._getBiome(x, y));
         });
 
         if (config.LOGS) {
@@ -100,9 +100,9 @@ class BiomesOperator {
         distanceToWater = distanceToWater > 100 ? 100 : distanceToWater;
 
         let args = {
-            altitude: this.altitudeMap.getTile(x, y),
-            temperature: this.temperatureMap.getTile(x, y),
-            humidity: this.humidityMap.getTile(x, y),
+            altitude: this.altitudeMap.getCell(x, y),
+            temperature: this.temperatureMap.getCell(x, y),
+            humidity: this.humidityMap.getCell(x, y),
             distanceToWater: distanceToWater
         };
 
@@ -151,9 +151,9 @@ class BiomesOperator {
         let _this = this;
 
         _this.biomes.foreach(function(x, y) {
-            biomesLayer.setTile(
+            biomesLayer.setCell(
                 x, y,
-                _this.biomes.getTile(x, y).getDisplayCell()
+                _this.biomes.getCell(x, y).getDisplayCell()
             );
         });
     }
@@ -171,7 +171,7 @@ class BiomesOperator {
      * @returns {false|Biome}
      */
     getBiome(x, y) {
-        return this.biomes.getTile(x, y);
+        return this.biomes.getCell(x, y);
     }
 
     /**
@@ -184,7 +184,7 @@ class BiomesOperator {
             surface = new BinaryMatrix();
 
         this.altitudeMap.foreach(function(x, y) {
-            if (biomes.getTile(x, y).getName() === biomeName) {
+            if (biomes.getCell(x, y).getName() === biomeName) {
                 surface.fill(x, y);
             }
         });
