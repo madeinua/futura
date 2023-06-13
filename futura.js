@@ -1,3 +1,6 @@
+import {Filters, fillCanvasPixel} from "./src/helpers.js";
+import World from './src/World.js';
+
 let coordinatesField = document.getElementById('coordinates'),
     mainMapCanvas = document.getElementById('mainMap'),
     config = getConfig(),
@@ -5,7 +8,8 @@ let coordinatesField = document.getElementById('coordinates'),
         config,
         document.getElementById('scrollingMapWrapper'),
         document.getElementById('scrollingMap'),
-        mainMapCanvas
+        mainMapCanvas,
+        getCenteredCameraPosition(config.VISIBLE_COLS)
     );
 
 /**
@@ -122,10 +126,10 @@ Filters.add('animalsSteps', function(animals) {
         if (typeof groups[animals[i].getName()] === 'undefined') {
             groups[animals[i].getName()] = 0;
         }
-        
+
         groups[animals[i].getName()]++;
     }
-    
+
     for (let i in groups) {
         text += i + ': ' + groups[i] + '<br />';
     }

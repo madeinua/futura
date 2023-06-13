@@ -1,0 +1,130 @@
+import PointMatrix from "../structures/PointMatrix.js";
+import NoiseMapGenerator from "../generators/NoiseMapGenerator.js";
+
+export default class AltitudeMap extends PointMatrix {
+
+    /** @var {Object} */
+    config;
+
+    /** @var {number} */
+    waterSize = 0;
+
+    /** @var {number} */
+    landSize = 0;
+
+    /**
+     * @param {Object} config
+     */
+    constructor(config) {
+        super(config.WORLD_SIZE, config.WORLD_SIZE);
+
+        this.config = config;
+    }
+
+    generateMap = function() {
+
+        let _this = this,
+            octaves = [3, 5, 20], // [12, 20, 80]
+            maps = [];
+
+        for (let i in octaves) {
+            maps[i] = new NoiseMapGenerator(
+                this.config.WORLD_SIZE,
+                octaves[i] * (this.config.WORLD_SIZE / 75)
+            ).generate();
+        }
+
+        _this.map(function(x, y) {
+
+            let val = 0,
+                size = 0,
+                s;
+
+            // blend maps
+            for (let i = 0; i < maps.length; i++) {
+                s = Math.pow(2, i);
+                size += s;
+                val += maps[i].getCell(x, y) * s;
+            }
+
+            val /= size;
+
+            // stretch map
+            val = Math.min(1, Math.pow(val, _this.config.WORLD_MAP_OCEAN_LEVEL + 1));
+
+            // make island
+            val = _this.makeIsland(x, y, _this.config.WORLD_SIZE, val);
+
+            return val;
+        });
+
+        this.initVariables();
+    };
+
+    /**
+     * @param {String} str
+     */
+    loadMap = function(str) {
+        this.fromString(str);
+        this.initVariables();
+    }
+
+    initVariables() {
+        let _this = this;
+
+        _this.foreach(function(x, y) {
+            _this.isWater(_this.getCell(x, y))
+                ? _this.waterSize++
+                : _this.landSize++;
+        });
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} islandSize
+     * @param {number} altitude
+     * @return {number}
+     */
+    makeIsland = function(x, y, islandSize, altitude) {
+
+        // Circular Distance
+        let dx = Math.abs(x - islandSize * 0.5),
+            dy = Math.abs(y - islandSize * 0.5),
+            distance = Math.sqrt(dx * dx + dy * dy),
+            delta = distance / (islandSize * 0.42),
+            gradient = delta * delta - 0.2;
+
+        return Math.min(altitude, altitude * Math.max(0, 1 - gradient));
+    };
+
+    /**
+     * @param {number} level
+     * @return {boolean}
+     */
+    isGround = function(level) {
+        return level > this.config.MAX_WATER_LEVEL;
+    };
+
+    /**
+     * @param level
+     * @return {boolean}
+     */
+    isWater = function(level) {
+        return this.config.MAX_WATER_LEVEL >= level;
+    };
+
+    /**
+     * @returns {number}
+     */
+    getWaterCellsCount = function() {
+        return this.landSize;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getLandCellsCount = function() {
+        return this.landSize;
+    }
+}
