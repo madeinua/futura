@@ -1,9 +1,8 @@
 import Biome from "./Biome.js";
-import {LightenDarkenColor, createImage} from "../helpers.js";
+import {LightenDarkenColor} from "../helpers.js";
 
 export default class Biome_Rocks extends Biome {
-
-    static NAME = 'rocks';
+    static BIOME_NAME = 'rocks';
 
     /**
      * @return {string}

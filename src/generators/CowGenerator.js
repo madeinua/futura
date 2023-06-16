@@ -11,7 +11,7 @@ export default class CowGenerator extends AnimalGenerator {
      * @return {string}
      */
     getName() {
-        return Cow.NAME;
+        return Cow.ANIMAL_NAME;
     }
 
     /**
@@ -27,7 +27,7 @@ export default class CowGenerator extends AnimalGenerator {
     updateHabitat() {
 
         if (typeof this.grassMap === 'undefined') {
-            this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.NAME);
+            this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.BIOME_NAME);
         }
 
         let habitat = this.grassMap.clone();

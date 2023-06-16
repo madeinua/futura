@@ -2,8 +2,7 @@ import Biome from "./Biome.js";
 import {LightenDarkenColor} from "../helpers.js";
 
 export default class Biome_Tundra_Hills extends Biome {
-
-    static NAME = 'tundra-hills';
+    static BIOME_NAME = 'tundra-hills';
 
     /**
      * @return {string}

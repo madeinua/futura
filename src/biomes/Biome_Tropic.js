@@ -2,8 +2,7 @@ import Biome from "./Biome.js";
 import {LightenDarkenColor} from "../helpers.js";
 
 export default class Biome_Tropic extends Biome {
-
-    static NAME = 'tropic';
+    static BIOME_NAME = 'tropic';
 
     /**
      * @return {string}

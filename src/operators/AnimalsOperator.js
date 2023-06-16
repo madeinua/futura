@@ -253,7 +253,7 @@ export default class AnimalsOperator {
      */
     showHabitatsOnLayer(habitatLayer, animal) {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
-            if (this.animalsGenerators[i].getName() === animal.constructor.NAME) {
+            if (this.animalsGenerators[i].getName() === animal.constructor.ANIMAL_NAME) {
                 this.animalsGenerators[i].getHabitat().foreachFilled(function(x, y) {
                     habitatLayer.setCell(x, y, [100, 100, 200, 255]);
                 });

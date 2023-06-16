@@ -2,8 +2,7 @@ import Biome from "./Biome.js";
 import {LightenDarkenColor} from "../helpers.js";
 
 export default class Biome_Water extends Biome {
-
-    static NAME = 'water';
+    static BIOME_NAME = 'water';
 
     /**
      * @return {string}

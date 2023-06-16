@@ -65,7 +65,7 @@ export default class ForestsOperator {
      * @returns {boolean}
      */
     isDesertForest = function(x, y) {
-        return [biomes.Biome_Desert.NAME, biomes.Biome_Desert_Hills.NAME, biomes.Biome_Tropic.NAME].includes(
+        return [biomes.Biome_Desert.BIOME_NAME, biomes.Biome_Desert_Hills.BIOME_NAME, biomes.Biome_Tropic.BIOME_NAME].includes(
             this.biomesOperator.getBiome(x, y).getName()
         );
     }
@@ -78,7 +78,7 @@ export default class ForestsOperator {
      * @returns {boolean}
      */
     isTundraForest = function(x, y) {
-        return [biomes.Biome_Tundra.NAME, biomes.Biome_Tundra_Hills.NAME].includes(
+        return [biomes.Biome_Tundra.BIOME_NAME, biomes.Biome_Tundra_Hills.BIOME_NAME].includes(
             this.biomesOperator.getBiome(x, y).getName()
         );
     }

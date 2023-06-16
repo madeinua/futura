@@ -2,7 +2,7 @@ import {getStep, throwError} from "../helpers.js";
 
 export default class Animal {
 
-    static NAME = 'Animal';
+    static ANIMAL_NAME = 'Animal';
 
     /** @var {number} */
     x;
@@ -36,7 +36,7 @@ export default class Animal {
      * @returns {string}
      */
     getName() {
-        return this.constructor.NAME;
+        return this.constructor.ANIMAL_NAME;
     }
 
     /**

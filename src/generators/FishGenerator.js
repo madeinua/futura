@@ -7,7 +7,7 @@ export default class FishGenerator extends AnimalGenerator {
      * @return {string}
      */
     getName() {
-        return Fish.NAME;
+        return Fish.ANIMAL_NAME;
     }
 
     /**

@@ -31,7 +31,7 @@ export default class AnimalGenerator {
      * @return {string}
      */
     getName() {
-        return Animal.NAME;
+        return Animal.ANIMAL_NAME;
     }
 
     /**

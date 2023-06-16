@@ -2,8 +2,7 @@ import DisplayCell from "../render/DisplayCell.js"
 import {createImage, hexToRgb, throwError} from "../helpers.js";
 
 export default class Biome {
-
-    static NAME = '';
+    static ANIMAL_NAME = '';
 
     /** @var {number} */
     x;
@@ -49,7 +48,7 @@ export default class Biome {
      * @return {string}
      */
     getName() {
-        return this.constructor.NAME;
+        return this.constructor.BIOME_NAME;
     }
 
     /**
