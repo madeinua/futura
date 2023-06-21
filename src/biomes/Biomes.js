@@ -14,7 +14,6 @@ import Biome_Rocks from "./Biome_Rocks.js";
 import Biome_Ice_Rocks from "./Biome_Ice_Rocks.js";
 import Biome_Water from "./Biome_Water.js";
 import Biome_Swamp from "./Biome_Swamp.js";
-
 export default {
     Biome_Beach,
     Biome_Coast,

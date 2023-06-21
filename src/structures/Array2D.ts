@@ -1,0 +1,1 @@
+export type Array2D = Array<Array<number>>

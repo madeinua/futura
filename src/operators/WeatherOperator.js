@@ -1,44 +1,24 @@
 import TemperatureMap from "../maps/TemperatureMap.js";
-import {logTimeEvent, Filters} from "../helpers.js";
-
+import { logTimeEvent, Filters } from "../helpers.js";
+import Config from "../../config.js";
 export default class WeatherOperator {
-
-    /** @var {Object} */
-    config;
-
-    /**
-     * @param {Object} config
-     */
-    constructor(config) {
-        this.config = config;
-    }
-
-    /**
-     * @param {AltitudeMap} altitudeMap
-     * @return {TemperatureMap}
-     */
-    generateTemperatureMap = function(altitudeMap) {
-
-        let temperatureMap = new TemperatureMap(altitudeMap, this.config),
-            storage = this.config.STORE_DATA ? localStorage.getItem('temperatureMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
-            temperatureMap.fromString(storage);
-        } else {
-
-            temperatureMap.generateMap();
-
-            if (this.config.STORE_DATA) {
-                localStorage.setItem('temperatureMap', temperatureMap.toString());
+    constructor() {
+        this.generateTemperatureMap = function (altitudeMap) {
+            let temperatureMap = new TemperatureMap(altitudeMap), storage = Config.STORE_DATA ? localStorage.getItem('temperatureMap') : null;
+            if (typeof storage !== 'undefined' && storage !== null) {
+                temperatureMap.fromString(storage);
             }
-        }
-
-        temperatureMap = Filters.apply('temperatureMap', temperatureMap);
-
-        if (this.config.LOGS) {
-            logTimeEvent('Temperature map created. Min: ' + temperatureMap.getMin() + ' Max: ' + temperatureMap.getMax() + ' Avg.: ' + temperatureMap.getAvgValue());
-        }
-
-        return temperatureMap;
+            else {
+                temperatureMap.generateMap();
+                if (Config.STORE_DATA) {
+                    localStorage.setItem('temperatureMap', temperatureMap.toString());
+                }
+            }
+            temperatureMap = Filters.apply('temperatureMap', temperatureMap);
+            if (Config.LOGS) {
+                logTimeEvent('Temperature map created. Min: ' + temperatureMap.getMin() + ' Max: ' + temperatureMap.getMax() + ' Avg.: ' + temperatureMap.getAvgValue());
+            }
+            return temperatureMap;
+        };
     }
 }

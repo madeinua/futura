@@ -1,36 +1,15 @@
 import PointMatrix from "../structures/PointMatrix.js";
-
 export default class NoiseMapGenerator {
-
-    /** @var {number} */
-    size;
-
-    /** @var {number} */
-    power;
-
-    /**
-     * @param {number} size
-     * @param {number} power
-     */
     constructor(size, power) {
         this.size = size;
         this.power = power;
     }
-
-    /**
-     * @returns {PointMatrix}
-     */
     generate() {
-
         noise.seed(Math.random());
-
-        let _this = this,
-            map = new PointMatrix(_this.size, _this.size);
-
-        map.map(function(x, y) {
+        let _this = this, map = new PointMatrix(_this.size, _this.size);
+        map.map(function (x, y) {
             return (noise.simplex2(x / _this.power, y / _this.power) + 1) * 0.5; // [0, 1] blurred height map
         });
-
         return map;
     }
 }

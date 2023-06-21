@@ -1,37 +1,16 @@
 import AnimalGenerator from "./AnimalGenerator.js";
 import Fish from "../animals/Fish.js";
-
 export default class FishGenerator extends AnimalGenerator {
-
-    /**
-     * @return {string}
-     */
     getName() {
         return Fish.ANIMAL_NAME;
     }
-
-    /**
-     * @returns {Animal}
-     */
     getAnimalClass() {
         return Fish;
     }
-
-    /**
-     * @returns {FishGenerator}
-     */
     updateHabitat() {
-
         if (typeof this.habitat === 'undefined') {
-
-            /** @var {BinaryMatrix} freshWaterMap */
-            let freshWaterMap = this.objects.freshWaterMap;
-
-            this.setHabitat(
-                freshWaterMap.clone().combineWith(this.objects.coastMap)
-            );
+            this.setHabitat(this.objects.freshWaterMap.clone().combineWith(this.objects.coastMap));
         }
-
         return this;
     }
 }

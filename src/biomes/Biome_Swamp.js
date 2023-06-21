@@ -1,5 +1,4 @@
 import Biome from "./Biome.js";
-
 export default class Biome_Swamp extends Biome {
-    static BIOME_NAME = 'swamp';
 }
+Biome_Swamp.BIOME_NAME = 'swamp';
