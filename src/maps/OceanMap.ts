@@ -1,6 +1,6 @@
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import Config from "../../config.js";
-import AltitudeMap from "./AltitudeMap";
+import AltitudeMap from "./AltitudeMap.js";
 
 export default class OceanMap extends BinaryMatrix {
 

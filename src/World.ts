@@ -18,8 +18,8 @@ import LakesMap from "./maps/LakesMap.js";
 import RiversMap from "./maps/RiversMap.js";
 import BinaryMatrix from "./structures/BinaryMatrix.js";
 import HumidityMap from "./maps/HumidityMap.js";
-import Matrix from "./structures/Matrix.js";
 import {Cell} from "./structures/Cells.js";
+import BiomesMap from "./maps/BiomesMap.js";
 
 type WorldType = {
     altitudeMap: AltitudeMap,
@@ -30,7 +30,7 @@ type WorldType = {
     riversMap: RiversMap,
     freshWaterMap: BinaryMatrix,
     humidityMap: HumidityMap,
-    biomes: Matrix
+    biomes: BiomesMap
 }
 
 declare global {

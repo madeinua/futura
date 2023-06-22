@@ -87,11 +87,9 @@ export default class ForestsOperator {
     }
 
     addForestMapToLayer = function (forestLayer: Layer, forestMap: ForestMap) {
-
         const _this = this;
 
         forestMap.foreach(function (x: number, y: number) {
-
             forestLayer.setCell(
                 x, y,
                 forestMap.filled(x, y) ? _this.getDisplayCell(x, y) : null

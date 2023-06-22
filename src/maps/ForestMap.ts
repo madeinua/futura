@@ -1,12 +1,12 @@
-import Matrix from "../structures/Matrix";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import Config from "../../config.js";
+import BiomesMap from "./BiomesMap.js";
 
 export default class ForestMap extends BinaryMatrix {
 
-    biomes: Matrix;
+    biomes: BiomesMap;
 
-    constructor(biomes: Matrix) {
+    constructor(biomes: BiomesMap) {
         super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
 
         this.biomes = biomes;

@@ -1,6 +1,6 @@
 import PointMatrix from "../structures/PointMatrix.js";
 import Config from "../../config.js";
-import AltitudeMap from "./AltitudeMap";
+import AltitudeMap from "./AltitudeMap.js";
 
 export default class TemperatureMap extends PointMatrix {
 

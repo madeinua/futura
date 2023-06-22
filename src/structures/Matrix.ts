@@ -1,6 +1,6 @@
 import {create2DArray, getRectangleAround, getAroundRadius} from "../helpers.js";
-import {CellsList} from "./Cells";
-import {Array2D} from "./Array2D";
+import {CellsList} from "./Cells.js";
+import {Array2D} from "./Array2D.js";
 
 /**
  * Generate 2D matrix from the array

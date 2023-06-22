@@ -1,9 +1,9 @@
 import PointMatrix from "../structures/PointMatrix.js";
 import NoiseMapGenerator from "../generators/NoiseMapGenerator.js";
 import Config from "../../config.js";
-import AltitudeMap from "./AltitudeMap";
-import RiversMap from "./RiversMap";
-import LakesMap from "./LakesMap";
+import AltitudeMap from "./AltitudeMap.js";
+import RiversMap from "./RiversMap.js";
+import LakesMap from "./LakesMap.js";
 
 export default class HumidityMap extends PointMatrix {
 

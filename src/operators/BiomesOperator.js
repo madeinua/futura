@@ -1,10 +1,16 @@
-import Matrix from "../structures/Matrix.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import biomes from "../biomes/biomes.js";
 import { fromFraction, throwError, logTimeEvent, Filters } from "../helpers.js";
 import Config from "../../config.js";
+import BiomesMap from "../maps/BiomesMap.js";
 export default class BiomesOperator {
     constructor(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, biomesLayer) {
+        this.createBiomes = function (altitudeMap) {
+            const _this = this;
+            altitudeMap.foreach(function (x, y) {
+                _this.biomes.setCell(x, y, _this._getBiome(x, y));
+            });
+        };
         this._checkBiomeIndex = function (fig, index) {
             if (fig[0] === 0 && index === 0) {
                 return true;
@@ -20,7 +26,7 @@ export default class BiomesOperator {
                 biomesLayer.setCell(x, y, _this.biomes.getCell(x, y).getDisplayCell());
             });
         };
-        this.biomes = new Matrix(Config.WORLD_SIZE, Config.WORLD_SIZE);
+        this.biomes = new BiomesMap();
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;
         this.coastMap = coastMap;
@@ -28,15 +34,12 @@ export default class BiomesOperator {
         this.temperatureMap = temperatureMap;
         this.humidityMap = humidityMap;
         this.biomesConfig = Config.biomesConfig();
-        const _this = this;
-        altitudeMap.foreach(function (x, y) {
-            _this.biomes.setCell(x, y, _this._getBiome(x, y));
-        });
-        if (Config.LOGS) {
-            logTimeEvent('Biomes calculated');
-        }
+        this.createBiomes(altitudeMap);
         this.addBiomesToLayer(biomesLayer);
         this.biomes = Filters.apply('biomes', this.biomes);
+        if (Config.LOGS) {
+            logTimeEvent('Biomes added');
+        }
     }
     isBeach(x, y, altitude, temperature, humidity) {
         return altitude > Config.MAX_COAST_LEVEL
