@@ -16,7 +16,7 @@ export default class NoiseMapGenerator {
 
         noise.seed(Math.random());
 
-        const _this = this,
+        const _this: NoiseMapGenerator = this,
             map = new PointMatrix(_this.size, _this.size);
 
         map.map(function (x: number, y: number) {

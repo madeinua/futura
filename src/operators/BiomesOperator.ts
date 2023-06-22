@@ -61,7 +61,7 @@ export default class BiomesOperator {
     }
 
     createBiomes = function (altitudeMap: AltitudeMap) {
-        const _this = this;
+        const _this: BiomesOperator = this;
 
         altitudeMap.foreach(function (x: number, y: number) {
             _this.biomes.setCell(x, y, _this._getBiome(x, y));
@@ -138,7 +138,7 @@ export default class BiomesOperator {
     }
 
     addBiomesToLayer = function (biomesLayer: Layer) {
-        const _this = this;
+        const _this: BiomesOperator = this;
 
         _this.biomes.foreach(function (x: number, y: number) {
             biomesLayer.setCell(

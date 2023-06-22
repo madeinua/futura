@@ -24,14 +24,15 @@ export default class HumidityMap extends PointMatrix {
      * 1 = dry
      */
     generateMap = function (): HumidityMap {
+        let _this: HumidityMap = this;
 
-        this.generateNoiseMap();
-        this.considerAltitude();
-        this.considerRivers();
-        this.considerLakes();
-        this.normalize();
+        _this.generateNoiseMap();
+        _this.considerAltitude();
+        _this.considerRivers();
+        _this.considerLakes();
+        _this.normalize();
 
-        return this;
+        return _this;
     }
 
     generateNoiseMap() {
@@ -41,8 +42,7 @@ export default class HumidityMap extends PointMatrix {
     }
 
     considerAltitude() {
-
-        const _this = this;
+        const _this: HumidityMap = this;
 
         // higher altitude = lower humidity
         _this.foreach(function (x: number, y: number) {
@@ -51,8 +51,7 @@ export default class HumidityMap extends PointMatrix {
     }
 
     considerRivers() {
-
-        const _this = this;
+        const _this: HumidityMap = this;
 
         // rivers increase humidity
         _this.riversMap.foreachFilled(function (x: number, y: number) {
@@ -68,8 +67,7 @@ export default class HumidityMap extends PointMatrix {
     }
 
     considerLakes() {
-
-        const _this = this;
+        const _this: HumidityMap = this;
 
         // lakes increase humidity
         _this.lakesMap.foreachFilled(function (x: number, y: number) {

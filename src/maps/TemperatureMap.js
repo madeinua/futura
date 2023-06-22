@@ -4,10 +4,11 @@ export default class TemperatureMap extends PointMatrix {
     constructor(altitudeMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE);
         this.generateMap = function () {
-            this.addGradient();
-            this.considerAltitude();
-            this.normalize();
-            return this;
+            let _this = this;
+            _this.addGradient();
+            _this.considerAltitude();
+            _this.normalize();
+            return _this;
         };
         this.addGradient = function () {
             const _this = this, gradient = [];

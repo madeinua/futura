@@ -169,7 +169,7 @@ export default class BinaryMatrix extends NumericMatrix {
      * Unfill cells which are filled in the specified matrix
      */
     diff(matrix: BinaryMatrix): BinaryMatrix {
-        const _this = this;
+        const _this: BinaryMatrix = this;
 
         matrix.foreachFilled(function (x: number, y: number) {
             _this.unfill(x, y);
@@ -198,7 +198,7 @@ export default class BinaryMatrix extends NumericMatrix {
     getFilledNeighbors(x: number, y: number): CellsList {
 
         const result = [],
-            _this = this;
+            _this: BinaryMatrix = this;
 
         _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
             if (_this.filled(nx, ny)) {

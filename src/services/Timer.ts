@@ -5,6 +5,7 @@ export default class Timer {
 
     timerStep: number = 0;
     stepsHandlers: any[] = [];
+    timerPaused: boolean = false;
 
     addStepsHandler(handler: Function) {
         this.stepsHandlers.push(handler);
@@ -12,7 +13,7 @@ export default class Timer {
 
     stepsTimer = function (callback: Function) {
 
-        const _this = this,
+        const _this: Timer = this,
             timerStart = Date.now();
 
         let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST,

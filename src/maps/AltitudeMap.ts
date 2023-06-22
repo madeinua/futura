@@ -9,7 +9,7 @@ export default class AltitudeMap extends PointMatrix {
 
     generateMap = function () {
 
-        const _this = this,
+        const _this: AltitudeMap = this,
             octaves = [3, 5, 20], // [12, 20, 80]
             maps = [];
 
@@ -56,7 +56,7 @@ export default class AltitudeMap extends PointMatrix {
     }
 
     initVariables() {
-        const _this = this;
+        const _this: AltitudeMap = this;
 
         _this.foreach(function (x: number, y: number) {
             _this.isWater(_this.getCell(x, y))

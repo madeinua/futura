@@ -12,7 +12,8 @@ export default class AnimalsOperator {
         this.animalsGenerators = [];
         this.animalImagesCache = [];
         this.addAnimalToLayer = function (animalsLayer, animal) {
-            animalsLayer.setCell(animal.x, animal.y, this.getDisplayCell(animal));
+            const _this = this;
+            animalsLayer.setCell(animal.x, animal.y, _this.getDisplayCell(animal));
         };
         this.getAvailableGenerators = function () {
             return [

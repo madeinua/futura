@@ -54,7 +54,7 @@ export default class RiversMap extends BinaryMatrix {
 
     generateRiversCells = function (riverSources: CellsList): CellsArray {
 
-        const _this = this,
+        const _this: RiversMap = this,
             rivers = [],
             riversLimit = Math.floor(fromFraction(Config.RIVERS_DENSITY, 1, Config.WORLD_SIZE)),
             startCloseness = Math.max(Config.RIVER_MIN_LENGTH, Config.RIVER_START_CLOSENESS);
@@ -162,7 +162,7 @@ export default class RiversMap extends BinaryMatrix {
      */
     addRiverDeltaToRiverMap = function (river: CellsList): CellsList {
 
-        const _this = this,
+        const _this: RiversMap = this,
             ratio = randBetweenNumbers(0.01, Config.RIVER_DELTA_MAX_LENGTH),
             deltaLength = river.length * ratio,
             notDeltaLength = river.length - deltaLength,

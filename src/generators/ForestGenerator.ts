@@ -8,7 +8,6 @@ type ForestGeneratorMults = {
     [key: string]: number;
 }
 
-
 export default class ForestGenerator {
 
     biomesOperator: BiomesOperator;
@@ -18,7 +17,7 @@ export default class ForestGenerator {
     minCreateIntensity: number;
 
     constructor(biomesOperator: BiomesOperator) {
-        const _this = this;
+        const _this: ForestGenerator = this;
 
         _this.biomesOperator = biomesOperator;
         _this.maxForestCells = Math.ceil(biomesOperator.altitudeMap.getLandCellsCount() * Config.FOREST_LIMIT / 100);
@@ -68,7 +67,7 @@ export default class ForestGenerator {
 
     expandTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
 
-        const _this = this,
+        const _this: ForestGenerator = this,
             usedSpace = filledCells.length / this.maxForestCells,
             chance = step <= Config.STEPS_BOOST_STEPS ? Config.FOREST_GROWTH_CHANCE * 3 : Config.FOREST_GROWTH_CHANCE,
             speed = chance * (1 - usedSpace);
@@ -102,7 +101,7 @@ export default class ForestGenerator {
 
     createTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
 
-        const _this = this,
+        const _this: ForestGenerator = this,
             createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))),
             potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity);
 

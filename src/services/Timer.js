@@ -4,6 +4,7 @@ export default class Timer {
     constructor() {
         this.timerStep = 0;
         this.stepsHandlers = [];
+        this.timerPaused = false;
         this.stepsTimer = function (callback) {
             const _this = this, timerStart = Date.now();
             let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST, timerInterval, boosted = false;

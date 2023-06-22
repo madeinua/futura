@@ -1,1 +1,1 @@
-export type Array2D = Array<Array<number>>
+export type Array2D = Array<Array<any>>

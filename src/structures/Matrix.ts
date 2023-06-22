@@ -5,22 +5,22 @@ import {Array2D} from "./Array2D.js";
 /**
  * Generate 2D matrix from the array
  */
-export default class Matrix {
+export default class Matrix<T extends Array2D = Array2D> {
 
     width: number;
     height: number;
-    __values: Array2D;
+    __values: T;
 
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.__values = create2DArray(this.width, this.height, null);
+        this.__values = create2DArray(this.width, this.height, null) as T;
     }
 
     /**
      * Get all cells of matrix
      */
-    getValues(): Array2D {
+    getValues(): T {
         return this.__values;
     }
 
@@ -53,7 +53,7 @@ export default class Matrix {
     /**
      * Retrieve cell value
      */
-    getCell(x: number, y: number): any {
+    getCell(x: number, y: number): T[number][number] {
         return this.__values[x][y];
     }
 
@@ -117,7 +117,7 @@ export default class Matrix {
     /**
      * Set all cells of matrix
      */
-    setAll(values: boolean | number | Array2D): any {
+    setAll(values: T): any {
 
         if (values instanceof Array) {
             this.__values = values;

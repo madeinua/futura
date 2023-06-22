@@ -9,12 +9,13 @@ export default class HumidityMap extends PointMatrix {
          * 1 = dry
          */
         this.generateMap = function () {
-            this.generateNoiseMap();
-            this.considerAltitude();
-            this.considerRivers();
-            this.considerLakes();
-            this.normalize();
-            return this;
+            let _this = this;
+            _this.generateNoiseMap();
+            _this.considerAltitude();
+            _this.considerRivers();
+            _this.considerLakes();
+            _this.normalize();
+            return _this;
         };
         this.altitudeMap = altitudeMap;
         this.riversMap = riversMap;

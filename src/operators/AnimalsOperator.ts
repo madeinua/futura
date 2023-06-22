@@ -38,7 +38,7 @@ export default class AnimalsOperator {
 
         this.animalImagesCache = [];
 
-        const _this = this,
+        const _this: AnimalsOperator = this,
             animalGenerators = this.getAvailableGenerators();
 
         objects.timer = timer;
@@ -75,10 +75,12 @@ export default class AnimalsOperator {
     }
 
     addAnimalToLayer = function (animalsLayer: Layer, animal: Animal) {
+        const _this: AnimalsOperator = this;
+
         animalsLayer.setCell(
             animal.x,
             animal.y,
-            this.getDisplayCell(animal)
+            _this.getDisplayCell(animal)
         );
     }
 
@@ -266,16 +268,6 @@ export default class AnimalsOperator {
         }
     }
 
-    showHabitatsOnLayer(habitatLayer: Layer, animal: Animal) {
-        for (let i = 0; i < this.animalsGenerators.length; i++) {
-            if (this.animalsGenerators[i].getName() === animal.getName()) {
-                this.animalsGenerators[i].getHabitat().foreachFilled(function (x: number, y: number) {
-                    habitatLayer.setCell(x, y, [100, 100, 200, 255]);
-                });
-            }
-        }
-    }
-
     getDisplayCell = function (animal: Animal): DisplayCell {
 
         if (typeof this.animalImagesCache[animal.getName()] === 'undefined') {
@@ -287,5 +279,15 @@ export default class AnimalsOperator {
         }
 
         return this.animalImagesCache[animal.getName()];
+    }
+
+    showHabitatsOnLayer(habitatLayer: Layer, animal: Animal) {
+        for (let i = 0; i < this.animalsGenerators.length; i++) {
+            if (this.animalsGenerators[i].getName() === animal.getName()) {
+                this.animalsGenerators[i].getHabitat().foreachFilled(function (x: number, y: number) {
+                    habitatLayer.setCell(x, y, [100, 100, 200, 255]);
+                });
+            }
+        }
     }
 }

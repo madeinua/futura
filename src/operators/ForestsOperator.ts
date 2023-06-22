@@ -20,7 +20,7 @@ export default class ForestsOperator {
 
     constructor(biomesOperator: BiomesOperator, timer: Timer, forestLayer: Layer) {
 
-        const _this = this,
+        const _this: ForestsOperator = this,
             forestGenerator = new ForestGenerator(biomesOperator);
 
         _this.biomesOperator = biomesOperator;
@@ -87,7 +87,7 @@ export default class ForestsOperator {
     }
 
     addForestMapToLayer = function (forestLayer: Layer, forestMap: ForestMap) {
-        const _this = this;
+        const _this: ForestsOperator = this;
 
         forestMap.foreach(function (x: number, y: number) {
             forestLayer.setCell(

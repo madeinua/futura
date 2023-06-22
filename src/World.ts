@@ -1,6 +1,6 @@
 import Config from "../config.js";
 import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData} from "./helpers.js";
-import {LAYER_BIOMES, LAYER_FOREST, LAYER_HABITAT, LAYER_ANIMALS} from "./render/Layer.js";
+import {LAYER_BIOMES, LAYER_FOREST, LAYER_HABITAT, LAYER_ANIMALS, Layer} from "./render/Layer.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -20,6 +20,7 @@ import BinaryMatrix from "./structures/BinaryMatrix.js";
 import HumidityMap from "./maps/HumidityMap.js";
 import {Cell} from "./structures/Cells.js";
 import BiomesMap from "./maps/BiomesMap.js";
+import DisplayCell from "./render/DisplayCell";
 
 type WorldType = {
     altitudeMap: AltitudeMap,
@@ -178,7 +179,7 @@ export default class World {
 
     drawMainMap = function () {
 
-        const _this = this,
+        const _this: World = this,
             ctx = _this.mainMapCanvas.getContext('2d'),
             image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE),
             mainMapSize = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE,
@@ -227,7 +228,7 @@ export default class World {
 
     drawRectangles = function () {
 
-        const _this = this,
+        const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellSize,
             worldOffsetTop = _this.cameraPosY * _this.cellSize;
@@ -250,7 +251,7 @@ export default class World {
 
     drawCoordinates = function () {
 
-        const _this = this,
+        const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellSize,
             worldOffsetTop = _this.cameraPosY * _this.cellSize;
@@ -275,7 +276,7 @@ export default class World {
 
     drawTemperatures = function () {
 
-        const _this = this,
+        const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellSize,
             worldOffsetTop = _this.cameraPosY * _this.cellSize,
@@ -300,7 +301,7 @@ export default class World {
 
     drawBiomesInfo = function () {
 
-        const _this = this,
+        const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellSize,
             worldOffsetTop = _this.cameraPosY * _this.cellSize,
@@ -332,7 +333,7 @@ export default class World {
 
     drawLayers = function () {
 
-        const _this = this,
+        const _this: World = this,
             renderCanvas = document.createElement('canvas');
 
         renderCanvas.width = Config.WORLD_SIZE;
@@ -348,8 +349,8 @@ export default class World {
         this.scrollingMapWrapper.scrollLeft = worldOffsetLeft;
         this.scrollingMapWrapper.scrollTop = worldOffsetTop;
 
-        let layer,
-            cell;
+        let layer: Layer,
+            cell: DisplayCell;
 
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
             layer = _this.layers.getLayer(ln);
@@ -428,8 +429,7 @@ export default class World {
     }
 
     create = function () {
-
-        const _this = this;
+        const _this: World = this;
 
         _this.generateWorld();
 
