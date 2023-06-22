@@ -48,10 +48,10 @@ export default class NumericMatrix extends Matrix {
      */
     sumNeighbors(x: number, y: number): number {
 
-        let sum = 0,
-            _this = this;
+        let sum = 0;
+        const _this = this;
 
-        _this.foreachNeighbors(x, y, function (nx, ny) {
+        _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
             sum += _this.getCell(nx, ny);
         });
 
@@ -63,9 +63,9 @@ export default class NumericMatrix extends Matrix {
      */
     addToNeighborCells(x: number, y: number, value: number): any {
 
-        let _this = this;
+        const _this = this;
 
-        _this.foreachNeighbors(x, y, function (nx, ny) {
+        _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
             _this.addToCell(nx, ny, value);
         });
 
@@ -77,10 +77,10 @@ export default class NumericMatrix extends Matrix {
      */
     has(value: number): boolean {
 
-        let found = false,
-            _this = this;
+        let found = false;
+        const _this = this;
 
-        _this.foreach(function (x, y) {
+        _this.foreach(function (x: number, y: number) {
             if (_this.getCell(x, y) === value) {
                 found = true;
             }
@@ -94,12 +94,12 @@ export default class NumericMatrix extends Matrix {
      */
     setRange(min: number, max: number): any {
 
-        let _this = this,
+        const _this = this,
             values = _this.getValuesList(),
             currMin = Math.min(...values),
             currMax = Math.max(...values);
 
-        _this.map(function (x, y) {
+        _this.map(function (x: number, y: number) {
             return changeRange(
                 _this.getCell(x, y),
                 currMin,

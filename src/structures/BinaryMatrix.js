@@ -10,10 +10,10 @@ export default class BinaryMatrix extends NumericMatrix {
             if (!this.filled(startX, startY)) {
                 return 0;
             }
-            let sx, sy, coords = [];
+            const coords = [];
             for (let d = 0; d < 4; d++) {
-                sx = startX;
-                sy = startY;
+                let sx = startX;
+                let sy = startY;
                 while (true) {
                     if (d === 0) {
                         sx++;
@@ -39,7 +39,7 @@ export default class BinaryMatrix extends NumericMatrix {
         this.map(fill);
     }
     clone() {
-        let matrix = new BinaryMatrix(0, this.width, this.height);
+        const matrix = new BinaryMatrix(0, this.width, this.height);
         matrix.__values = JSON.parse(JSON.stringify(this.__values));
         return matrix;
     }
@@ -47,7 +47,7 @@ export default class BinaryMatrix extends NumericMatrix {
      * Retrieve all cells that are filled
      */
     getFilledCells() {
-        let cells = [];
+        const cells = [];
         this.foreachFilled(function (x, y) {
             cells.push([x, y]);
         });
@@ -57,7 +57,7 @@ export default class BinaryMatrix extends NumericMatrix {
      * Retrieve all cells that are not filled
      */
     getUnfilledCells() {
-        let cells = [];
+        const cells = [];
         this.foreachUnfilled(function (x, y) {
             cells.push([x, y]);
         });
@@ -131,7 +131,8 @@ export default class BinaryMatrix extends NumericMatrix {
      * Note: max affect the performance dramatically!
      */
     distanceTo(x, y, max) {
-        let result = Number.MAX_SAFE_INTEGER, minX = Math.max(0, x - max), maxX = Math.min(this.width - 1, x + max), minY = Math.max(0, y - max), maxY = Math.min(this.height - 1, y + max);
+        let result = Number.MAX_SAFE_INTEGER;
+        const minX = Math.max(0, x - max), maxX = Math.min(this.width - 1, x + max), minY = Math.max(0, y - max), maxY = Math.min(this.height - 1, y + max);
         for (let nx = minX; nx <= maxX; nx++) {
             for (let ny = minY; ny <= maxY; ny++) {
                 if (this.filled(nx, ny)) {
@@ -163,7 +164,7 @@ export default class BinaryMatrix extends NumericMatrix {
      * Unfill cells which are filled in the specified matrix
      */
     diff(matrix) {
-        let _this = this;
+        const _this = this;
         matrix.foreachFilled(function (x, y) {
             _this.unfill(x, y);
         });
@@ -184,7 +185,7 @@ export default class BinaryMatrix extends NumericMatrix {
      * Retrieve all filled neighbors of the specified cell
      */
     getFilledNeighbors(x, y) {
-        let result = [], _this = this;
+        const result = [], _this = this;
         _this.foreachNeighbors(x, y, function (nx, ny) {
             if (_this.filled(nx, ny)) {
                 result.push([nx, ny]);

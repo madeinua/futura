@@ -1,7 +1,7 @@
 import {changeRange, iAmLucky} from "../helpers.js";
 import Config from "../../config.js";
 import BiomesOperator from "../operators/BiomesOperator";
-import {CellsList} from "../structures/Cells";
+import {Cell, CellsList} from "../structures/Cells";
 import ForestMap from "../maps/ForestMap";
 
 type ForestGeneratorMults = {
@@ -18,7 +18,7 @@ export default class ForestGenerator {
     minCreateIntensity: number;
 
     constructor(biomesOperator: BiomesOperator) {
-        let _this = this;
+        const _this = this;
 
         _this.biomesOperator = biomesOperator;
         _this.maxForestCells = Math.ceil(biomesOperator.altitudeMap.getLandCellsCount() * Config.FOREST_LIMIT / 100);
@@ -34,7 +34,7 @@ export default class ForestGenerator {
             _this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
         }
 
-        biomesOperator.altitudeMap.foreach(function (x, y) {
+        biomesOperator.altitudeMap.foreach(function (x: number, y: number) {
             if (biomesOperator.altitudeMap.getCell(x, y) > Config.MAX_HILLS_LEVEL) {
                 _this.unallowedCells.push([x, y]);
             }
@@ -42,7 +42,7 @@ export default class ForestGenerator {
     }
 
     generate(forestMap: ForestMap, step: number) {
-        let filledCells = forestMap.getFilledCells().shuffle();
+        const filledCells = forestMap.getFilledCells().shuffle();
 
         this.createTrees(forestMap, filledCells, step);
         this.growTrees(forestMap, filledCells, step);
@@ -61,14 +61,14 @@ export default class ForestGenerator {
 
         filledCells
             .slice(0, filledCells.length * Config.FOREST_DIE_CHANCE)
-            .forEach(function (cell) {
+            .forEach(function (cell: Cell) {
                 forestMap.unfill(cell[0], cell[1]);
             });
     }
 
     expandTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
 
-        let _this = this,
+        const _this = this,
             usedSpace = filledCells.length / this.maxForestCells,
             chance = step <= Config.STEPS_BOOST_STEPS ? Config.FOREST_GROWTH_CHANCE * 3 : Config.FOREST_GROWTH_CHANCE,
             speed = chance * (1 - usedSpace);
@@ -77,11 +77,11 @@ export default class ForestGenerator {
             return;
         }
 
-        filledCells.forEach(function (cell) {
-            forestMap.foreachNeighbors(cell[0], cell[1], function (x, y) {
+        filledCells.forEach(function (cell: Cell) {
+            forestMap.foreachNeighbors(cell[0], cell[1], function (x: number, y: number) {
                 if (!filledCells.includes([x, y])) {
 
-                    let growsChance = _this.getCreateChance(
+                    const growsChance = _this.getCreateChance(
                         forestMap,
                         _this.biomesOperator.humidityMap.getCell(x, y),
                         x,
@@ -101,12 +101,14 @@ export default class ForestGenerator {
     }
 
     createTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
-        let _this = this,
-            createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))),
-            potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity),
-            i, x, y, createChance;
 
-        for (i = 0; i < potentialCells.length; i++) {
+        const _this = this,
+            createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))),
+            potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity);
+
+        let x, y, createChance;
+
+        for (let i = 0; i < potentialCells.length; i++) {
             x = potentialCells[i][0];
             y = potentialCells[i][1];
 
@@ -132,13 +134,13 @@ export default class ForestGenerator {
             return 0;
         }
 
-        let biome = forestMap.biomes.getCell(x, y);
+        const biome = forestMap.biomes.getCell(x, y);
 
         if (!this.groundCreateMults.hasOwnProperty(biome.getName())) {
             return 0;
         }
 
-        let waterRatio = Math.max(1, Config.FOREST_CREATE_MULTS.WATTER / biome.getDistanceToWater()),
+        const waterRatio = Math.max(1, Config.FOREST_CREATE_MULTS.WATTER / biome.getDistanceToWater()),
             humidityRatio = changeRange(humidity, 0, 1, 0, Config.FOREST_CREATE_MULTS.HUMIDITY),
             groundRatio = this.groundCreateMults[biome.getName()];
 

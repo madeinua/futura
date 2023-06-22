@@ -5,9 +5,10 @@ export default class Timer {
         this.timerStep = 0;
         this.stepsHandlers = [];
         this.stepsTimer = function (callback) {
-            let _this = this, timerStart = Date.now(), minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST, boosted = false, timerInterval;
+            const _this = this, timerStart = Date.now();
+            let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST, timerInterval, boosted = false;
             _this.timerStep = 0;
-            let makeStep = function () {
+            const makeStep = function () {
                 if (_this.timerPaused) {
                     return;
                 }

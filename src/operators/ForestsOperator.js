@@ -28,7 +28,7 @@ export default class ForestsOperator {
             return this.forestImages.randomElement();
         };
         this.addForestMapToLayer = function (forestLayer, forestMap) {
-            let _this = this;
+            const _this = this;
             forestMap.foreach(function (x, y) {
                 forestLayer.setCell(x, y, forestMap.filled(x, y) ? _this.getDisplayCell(x, y) : null);
             });
@@ -39,7 +39,7 @@ export default class ForestsOperator {
             }
             return this.forestImagesCache[x + ',' + y];
         };
-        let _this = this, forestGenerator = new ForestGenerator(biomesOperator);
+        const _this = this, forestGenerator = new ForestGenerator(biomesOperator);
         _this.biomesOperator = biomesOperator;
         _this.forestColor = hexToRgb(Config.FOREST_COLOR);
         _this.forestImages = [];

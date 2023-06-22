@@ -5,7 +5,7 @@ import {Cell} from "./src/structures/Cells.js";
 import Matrix from "./src/structures/Matrix.js";
 import NumericMatrix from "./src/structures/NumericMatrix.js";
 
-let coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
+const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     mainMapCanvas = document.getElementById('mainMap') as HTMLCanvasElement,
     world = new World(
         document.getElementById('scrollingMapWrapper'),
@@ -16,22 +16,20 @@ let coordinatesField = document.getElementById('coordinates') as HTMLInputElemen
 
 function drawColorMap(id: string, map: Matrix) {
 
-    let canvas = document.getElementById(id) as HTMLCanvasElement;
-
+    const canvas = document.getElementById(id) as HTMLCanvasElement;
     canvas.width = map.getWidth();
     canvas.height = map.getHeight();
 
-    let ctx = canvas.getContext('2d'),
-        image = ctx.createImageData(canvas.width, canvas.height),
-        x, y;
+    const ctx = canvas.getContext('2d'),
+        image = ctx.createImageData(canvas.width, canvas.height);
 
-    for (x = 0; x < map.getWidth(); x++) {
-        for (y = 0; y < map.getHeight(); y++) {
-
-            let point = (x + y * canvas.width) * 4,
-                color = map.getCell(x, y).getHexColor();
-
-            fillCanvasPixel(image, point, color);
+    for (let x = 0; x < map.getWidth(); x++) {
+        for (let y = 0; y < map.getHeight(); y++) {
+            fillCanvasPixel(
+                image,
+                (x + y * canvas.width) * 4,
+                map.getCell(x, y).getHexColor()
+            );
         }
     }
 
@@ -40,15 +38,14 @@ function drawColorMap(id: string, map: Matrix) {
 
 function drawMap(id: string, map: NumericMatrix, reverse: boolean) {
 
-    let canvas = document.getElementById(id) as HTMLCanvasElement;
-
+    const canvas = document.getElementById(id) as HTMLCanvasElement;
     canvas.width = map.getWidth();
     canvas.height = map.getHeight();
 
-    let ctx = canvas.getContext('2d'),
+    const ctx = canvas.getContext('2d'),
         image = ctx.createImageData(canvas.width, canvas.height);
 
-    map.foreach(function (x, y) {
+    map.foreach(function (x: number, y: number) {
 
         let point = (x + y * canvas.width) * 4,
             gray = reverse ? 255 - map.getGrayscale(x, y) : map.getGrayscale(x, y);
@@ -112,7 +109,7 @@ Filters.add('forestMap', function (map) {
 
 Filters.add('animalsSteps', function (animals) {
 
-    let text = '',
+    let text: string = '',
         groups = {};
 
     for (let i = 0; i < animals.length; i++) {
@@ -149,7 +146,7 @@ function getCameraPosition(): Cell {
 
 function centerCameraPoint(point: Cell, size: number): Cell {
 
-    let c = Math.floor(size / 2);
+    const c = Math.floor(size / 2);
 
     return [
         Math.max(0, point[0] - c),
@@ -166,7 +163,7 @@ function getCenteredCameraPosition(size: number): Cell {
 
 function centeredCameraPointToXY(point: Cell, size: number): Cell {
 
-    let c = Math.floor(size / 2);
+    const c = Math.floor(size / 2);
 
     return [
         Math.max(0, point[0] + c),
@@ -182,7 +179,7 @@ coordinatesField.addEventListener("change", function () {
 
 mainMapCanvas.addEventListener("click", function (e) {
 
-    let rect = this.getBoundingClientRect(),
+    const rect = this.getBoundingClientRect(),
         scale = Config.WORLD_SIZE / mainMapCanvas.offsetWidth;
 
     world.moveMapTo(

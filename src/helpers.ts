@@ -30,7 +30,7 @@ export let Filters = {
     apply: function (tag: string, val: any): any {
 
         if (this.filters[tag]) {
-            let filters = this.filters[tag];
+            const filters = this.filters[tag];
             for (let i = 0; i < filters.length; i++) {
                 val = filters[i](val);
             }
@@ -40,7 +40,7 @@ export let Filters = {
     }
 }
 
-let step = 0;
+let step: number = 0;
 
 /**
  * Always return unique autoincrement value
@@ -55,16 +55,15 @@ export function round(value: number, precision: number): number {
 
 export function getAroundRadius(x: number, y: number, maxWidth: number, maxHeight: number, radius: number): CellsList {
 
-    let result = [],
-        minX = Math.max(0, x - radius),
-        minY = Math.max(0, y - radius),
-        maxX = Math.min(maxWidth - 1, x + radius),
-        maxY = Math.min(maxHeight - 1, y + radius),
-        maxRadius = radius + 1,
-        nx, ny;
+    const result: CellsList = [],
+        minX: number = Math.max(0, x - radius),
+        minY: number = Math.max(0, y - radius),
+        maxX: number = Math.min(maxWidth - 1, x + radius),
+        maxY: number = Math.min(maxHeight - 1, y + radius),
+        maxRadius: number = radius + 1;
 
-    for (nx = minX; nx <= maxX; nx++) {
-        for (ny = minY; ny <= maxY; ny++) {
+    for (let nx = minX; nx <= maxX; nx++) {
+        for (let ny = minY; ny <= maxY; ny++) {
             if (
                 !(nx === x && ny === y)
                 && (
@@ -85,15 +84,14 @@ export function getAroundRadius(x: number, y: number, maxWidth: number, maxHeigh
 
 export function getRectangleAround(x: number, y: number, maxWidth: number, maxHeight: number): CellsList {
 
-    let result = [],
-        minX = Math.max(0, x - 1),
-        minY = Math.max(0, y - 1),
-        maxX = Math.min(maxWidth - 1, x + 1),
-        maxY = Math.min(maxHeight - 1, y + 1),
-        nx, ny;
+    const result: CellsList = [],
+        minX: number = Math.max(0, x - 1),
+        minY: number = Math.max(0, y - 1),
+        maxX: number = Math.min(maxWidth - 1, x + 1),
+        maxY: number = Math.min(maxHeight - 1, y + 1);
 
-    for (nx = minX; nx <= maxX; nx++) {
-        for (ny = minY; ny <= maxY; ny++) {
+    for (let nx = minX; nx <= maxX; nx++) {
+        for (let ny = minY; ny <= maxY; ny++) {
             if (!(nx === x && ny === y)) {
                 result.push([nx, ny]);
             }
@@ -109,7 +107,8 @@ export function getRectangleAround(x: number, y: number, maxWidth: number, maxHe
  */
 export function normalRandom(): number {
 
-    let u = 0, v = 0;
+    let u: number = 0,
+        v: number = 0;
 
     while (u === 0) {
         u = Math.random();
@@ -119,7 +118,7 @@ export function normalRandom(): number {
         v = Math.random();
     }
 
-    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    let num: number = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 
     num = num / 10.0 + 0.5;
 
@@ -244,13 +243,13 @@ export function fillCanvasPixel(image: ImageData, point: number, RGBa: RGB | RGB
  */
 export function scaleImageData(context: CanvasRenderingContext2D, imageData: ImageData, scale: number): ImageData {
 
-    let scaled = context.createImageData(imageData.width * scale, imageData.height * scale);
-    let subLine = context.createImageData(scale, 1).data;
+    const scaled: ImageData = context.createImageData(imageData.width * scale, imageData.height * scale),
+        subLine: Uint8ClampedArray = context.createImageData(scale, 1).data;
 
     for (let row = 0; row < imageData.height; row++) {
         for (let col = 0; col < imageData.width; col++) {
 
-            let sourcePixel = imageData.data.subarray(
+            const sourcePixel: Uint8ClampedArray = imageData.data.subarray(
                 (row * imageData.width + col) * 4,
                 (row * imageData.width + col) * 4 + 4
             );
@@ -261,8 +260,8 @@ export function scaleImageData(context: CanvasRenderingContext2D, imageData: Ima
 
             for (let x = 0; x < scale; x++) {
 
-                let destRow = row * scale + x;
-                let destCol = col * scale;
+                const destRow = row * scale + x;
+                const destCol = col * scale;
 
                 scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4)
             }
@@ -272,19 +271,19 @@ export function scaleImageData(context: CanvasRenderingContext2D, imageData: Ima
     return scaled;
 }
 
-let timer = Date.now();
+let timer: number = Date.now();
 
 export function getTimeForEvent(): number {
     return Math.max(0, (Date.now() - timer));
 }
 
 export function logTimeEvent(event: string) {
-    let t = Date.now();
+    const t: number = Date.now();
     console.log(event + ' [' + Math.max(0, (t - timer)) + 'ms]');
     timer = t;
 }
 
-let hexStorage = [];
+const hexStorage: RGB[] = [];
 
 export function hexToRgb(hex: string): RGB {
 
@@ -295,12 +294,12 @@ export function hexToRgb(hex: string): RGB {
     if (typeof hexStorage[hex] === "undefined") {
 
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-        let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        const shorthandRegex: RegExp = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
         hex = hex.replace(shorthandRegex, function (m, r, g, b) {
             return r + r + g + g + b + b;
         });
 
-        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        const result: RegExpExecArray = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
         hexStorage[hex] = result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
     }
@@ -320,7 +319,7 @@ export function LightenDarkenColor(col: string, amt: number): string {
         return colorCache[cacheKey];
     }
 
-    let usePound = false;
+    let usePound: boolean = false;
 
     if (col[0] === "#") {
         col = col.slice(1);
@@ -351,7 +350,7 @@ export function LightenDarkenColor(col: string, amt: number): string {
 
 export function getPolygonAreaSize(coords: Array2D): number {
 
-    let area = 0,
+    let area: number = 0,
         j;
 
     for (let i = 0; i < coords.length; i++) {
@@ -371,7 +370,7 @@ export function createImage(src: null | string): null | HTMLImageElement {
         return null;
     }
 
-    let img = new Image();
+    const img: HTMLImageElement = new Image();
     img.src = src;
 
     return img;

@@ -7,7 +7,7 @@ export default class AltitudeMap extends PointMatrix {
         this.waterSize = 0;
         this.landSize = 0;
         this.generateMap = function () {
-            let _this = this, octaves = [3, 5, 20], // [12, 20, 80]
+            const _this = this, octaves = [3, 5, 20], // [12, 20, 80]
             maps = [];
             for (let i in octaves) {
                 maps[i] = new NoiseMapGenerator(Config.WORLD_SIZE, octaves[i] * (Config.WORLD_SIZE / 75)).generate();
@@ -37,7 +37,7 @@ export default class AltitudeMap extends PointMatrix {
         };
         this.makeIsland = function (x, y, islandSize, altitude) {
             // Circular Distance
-            let dx = Math.abs(x - islandSize * 0.5), dy = Math.abs(y - islandSize * 0.5), distance = Math.sqrt(dx * dx + dy * dy), delta = distance / (islandSize * 0.42), gradient = delta * delta - 0.2;
+            const dx = Math.abs(x - islandSize * 0.5), dy = Math.abs(y - islandSize * 0.5), distance = Math.sqrt(dx * dx + dy * dy), delta = distance / (islandSize * 0.42), gradient = delta * delta - 0.2;
             return Math.min(altitude, altitude * Math.max(0, 1 - gradient));
         };
         this.isGround = function (level) {
@@ -54,7 +54,7 @@ export default class AltitudeMap extends PointMatrix {
         };
     }
     initVariables() {
-        let _this = this;
+        const _this = this;
         _this.foreach(function (x, y) {
             _this.isWater(_this.getCell(x, y))
                 ? _this.waterSize++

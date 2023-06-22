@@ -23,25 +23,24 @@ export default class TemperatureMap extends PointMatrix {
 
     addGradient = function () {
 
-        let _this = this,
+        const _this = this,
             gradient = [];
 
         for (let i = 0; i < Config.WORLD_SIZE; i++) {
             gradient[i] = i / Config.WORLD_SIZE;
         }
 
-        _this.foreach(function (x, y) {
+        _this.foreach(function (x: number, y: number) {
             _this.addToCell(x, y, gradient[y]);
         });
     }
 
     considerAltitude = function () {
-        let _this = this,
-            minLevel = Config.MAX_COAST_LEVEL,
-            altitude;
+        const _this = this,
+            minLevel = Config.MAX_COAST_LEVEL;
 
-        _this.foreach(function (x, y) {
-            altitude = _this.altitudeMap.getCell(x, y);
+        _this.foreach(function (x: number, y: number) {
+            let altitude = _this.altitudeMap.getCell(x, y);
             altitude = altitude >= minLevel ? (altitude - minLevel) * (altitude - minLevel) : 0;
             _this.subtractFromCell(x, y, altitude);
         });

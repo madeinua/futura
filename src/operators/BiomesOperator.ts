@@ -4,13 +4,13 @@ import biomes from "../biomes/biomes.js";
 import {Cell} from "../structures/Cells.js";
 import {fromFraction, throwError, logTimeEvent, Filters} from "../helpers.js";
 import Config from "../../config.js";
-import AltitudeMap from "../maps/AltitudeMap";
-import CoastMap from "../maps/CoastMap";
-import TemperatureMap from "../maps/TemperatureMap";
-import HumidityMap from "../maps/HumidityMap";
-import OceanMap from "../maps/OceanMap";
-import {Layer} from "../render/Layer";
-import Biome from "../biomes/Biome";
+import AltitudeMap from "../maps/AltitudeMap.js";
+import CoastMap from "../maps/CoastMap.js";
+import TemperatureMap from "../maps/TemperatureMap.js";
+import HumidityMap from "../maps/HumidityMap.js";
+import OceanMap from "../maps/OceanMap.js";
+import {Layer} from "../render/Layer.js";
+import Biome, {BiomeArgs} from "../biomes/Biome.js"
 
 type biomesConfig = {
     class: string,
@@ -49,9 +49,9 @@ export default class BiomesOperator {
         this.humidityMap = humidityMap;
         this.biomesConfig = Config.biomesConfig();
 
-        let _this = this;
+        const _this = this;
 
-        altitudeMap.foreach(function (x, y) {
+        altitudeMap.foreach(function (x: number, y: number) {
             _this.biomes.setCell(x, y, _this._getBiome(x, y));
         });
 
@@ -88,7 +88,7 @@ export default class BiomesOperator {
         let distanceToWater = this.freshWaterMap.distanceTo(x, y, 5);
         distanceToWater = distanceToWater > 100 ? 100 : distanceToWater;
 
-        let args = {
+        const args: BiomeArgs = {
             altitude: this.altitudeMap.getCell(x, y),
             temperature: this.temperatureMap.getCell(x, y),
             humidity: this.humidityMap.getCell(x, y),
@@ -109,10 +109,10 @@ export default class BiomesOperator {
             return new biomes.Biome_Beach(x, y, args);
         }
 
-        let matchedBiomes = [];
+        const matchedBiomes = [];
 
         for (let i = 0; i < this.biomesConfig.length; i++) {
-            let cfg = this.biomesConfig[i]
+            const cfg = this.biomesConfig[i];
 
             if (
                 this._checkBiomeIndex(cfg.h, fromFraction(args.humidity, Config.MIN_HUMIDITY, Config.MAX_HUMIDITY))
@@ -134,9 +134,9 @@ export default class BiomesOperator {
     }
 
     addBiomesToLayer = function (biomesLayer: Layer) {
-        let _this = this;
+        const _this = this;
 
-        _this.biomes.foreach(function (x, y) {
+        _this.biomes.foreach(function (x: number, y: number) {
             biomesLayer.setCell(
                 x, y,
                 _this.biomes.getCell(x, y).getDisplayCell()
@@ -154,10 +154,10 @@ export default class BiomesOperator {
 
     getSurfaceByBiomeName(biomeName: string): BinaryMatrix {
 
-        let biomes = this.biomes,
+        const biomes = this.biomes,
             surface = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
 
-        this.altitudeMap.foreach(function (x, y) {
+        this.altitudeMap.foreach(function (x: number, y: number) {
             if (biomes.getCell(x, y).getName() === biomeName) {
                 surface.fill(x, y);
             }

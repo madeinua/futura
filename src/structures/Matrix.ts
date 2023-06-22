@@ -28,7 +28,7 @@ export default class Matrix {
      * Retrieve all cells' values of the matrix as a list
      */
     getValuesList(): Array<number> {
-        let values = [];
+        const values = [];
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
@@ -75,7 +75,7 @@ export default class Matrix {
      * Convert Matrix to list
      */
     toList(): CellsList {
-        let arr = [];
+        const arr = [];
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
@@ -92,7 +92,7 @@ export default class Matrix {
      * Applies the callback to the elements of the Matrix and accepts return value as the Matrix cell value
      */
     map(value: any): any {
-        let isFunc = typeof value === 'function';
+        const isFunc = typeof value === 'function';
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
@@ -141,7 +141,7 @@ export default class Matrix {
      * Apply callback to all neighbors
      */
     foreachNeighbors(x: number, y: number, callback: Function, stopOnTrue: boolean = false): any {
-        let neighbors = this.getNeighbors(x, y);
+        const neighbors = this.getNeighbors(x, y);
 
         for (let i = 0; i < neighbors.length; i++) {
             if (callback(neighbors[i][0], neighbors[i][1]) && stopOnTrue) {
@@ -163,7 +163,7 @@ export default class Matrix {
      * Apply callback to all neighbors
      */
     foreachAroundRadius(x: number, y: number, radius: number, callback: Function, stopOnTrue: boolean = false): any {
-        let neighbors = this.getAroundRadius(x, y, radius);
+        const neighbors = this.getAroundRadius(x, y, radius);
 
         for (let i = 0; i < neighbors.length; i++) {
             if (callback(neighbors[i][0], neighbors[i][1]) && stopOnTrue) {
@@ -179,7 +179,7 @@ export default class Matrix {
      */
     toArray(): Array2D {
 
-        let arr = create2DArray(this.width, this.height, null);
+        const arr = create2DArray(this.width, this.height, null);
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
@@ -192,7 +192,7 @@ export default class Matrix {
 
     getRandomElement(): [number, number, number] {
 
-        let x = Math.floor(Math.random() * this.width),
+        const x = Math.floor(Math.random() * this.width),
             y = Math.floor(Math.random() * this.height);
 
         return [x, y, this.getCell(x, y)];

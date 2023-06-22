@@ -9,7 +9,7 @@ export default class AltitudeMap extends PointMatrix {
 
     generateMap = function () {
 
-        let _this = this,
+        const _this = this,
             octaves = [3, 5, 20], // [12, 20, 80]
             maps = [];
 
@@ -20,7 +20,7 @@ export default class AltitudeMap extends PointMatrix {
             ).generate();
         }
 
-        _this.map(function (x, y) {
+        _this.map(function (x: number, y: number) {
 
             let val = 0,
                 size = 0,
@@ -56,9 +56,9 @@ export default class AltitudeMap extends PointMatrix {
     }
 
     initVariables() {
-        let _this = this;
+        const _this = this;
 
-        _this.foreach(function (x, y) {
+        _this.foreach(function (x: number, y: number) {
             _this.isWater(_this.getCell(x, y))
                 ? _this.waterSize++
                 : _this.landSize++;
@@ -68,7 +68,7 @@ export default class AltitudeMap extends PointMatrix {
     makeIsland = function (x: number, y: number, islandSize: number, altitude: number): number {
 
         // Circular Distance
-        let dx = Math.abs(x - islandSize * 0.5),
+        const dx = Math.abs(x - islandSize * 0.5),
             dy = Math.abs(y - islandSize * 0.5),
             distance = Math.sqrt(dx * dx + dy * dy),
             delta = distance / (islandSize * 0.42),

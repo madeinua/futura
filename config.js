@@ -69,7 +69,7 @@ const Config = {
      */
     biomesConfig: function() {
 
-        let biomesConfig = [];
+        const biomesConfig = [];
 
         biomesConfig.push({
             class: 'Biome_Tundra',

@@ -13,7 +13,7 @@ export default class BinaryMatrix extends NumericMatrix {
     }
 
     clone(): BinaryMatrix {
-        let matrix = new BinaryMatrix(0, this.width, this.height);
+        const matrix = new BinaryMatrix(0, this.width, this.height);
         matrix.__values = JSON.parse(JSON.stringify(this.__values));
 
         return matrix;
@@ -23,9 +23,9 @@ export default class BinaryMatrix extends NumericMatrix {
      * Retrieve all cells that are filled
      */
     getFilledCells(): CellsList {
-        let cells = [];
+        const cells = [];
 
-        this.foreachFilled(function (x, y) {
+        this.foreachFilled(function (x: number, y: number) {
             cells.push([x, y]);
         });
 
@@ -36,9 +36,9 @@ export default class BinaryMatrix extends NumericMatrix {
      * Retrieve all cells that are not filled
      */
     getUnfilledCells(): CellsList {
-        let cells = [];
+        const cells = [];
 
-        this.foreachUnfilled(function (x, y) {
+        this.foreachUnfilled(function (x: number, y: number) {
             cells.push([x, y]);
         });
 
@@ -125,8 +125,9 @@ export default class BinaryMatrix extends NumericMatrix {
      */
     distanceTo(x: number, y: number, max: number): number {
 
-        let result = Number.MAX_SAFE_INTEGER,
-            minX = Math.max(0, x - max),
+        let result = Number.MAX_SAFE_INTEGER;
+
+        const minX = Math.max(0, x - max),
             maxX = Math.min(this.width - 1, x + max),
             minY = Math.max(0, y - max),
             maxY = Math.min(this.height - 1, y + max);
@@ -168,9 +169,9 @@ export default class BinaryMatrix extends NumericMatrix {
      * Unfill cells which are filled in the specified matrix
      */
     diff(matrix: BinaryMatrix): BinaryMatrix {
-        let _this = this;
+        const _this = this;
 
-        matrix.foreachFilled(function (x, y) {
+        matrix.foreachFilled(function (x: number, y: number) {
             _this.unfill(x, y);
         });
 
@@ -196,10 +197,10 @@ export default class BinaryMatrix extends NumericMatrix {
      */
     getFilledNeighbors(x: number, y: number): CellsList {
 
-        let result = [],
+        const result = [],
             _this = this;
 
-        _this.foreachNeighbors(x, y, function (nx, ny) {
+        _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
             if (_this.filled(nx, ny)) {
                 result.push([nx, ny]);
             }
@@ -224,14 +225,12 @@ export default class BinaryMatrix extends NumericMatrix {
             return 0;
         }
 
-        let sx,
-            sy,
-            coords = [];
+        const coords = [];
 
         for (let d = 0; d < 4; d++) {
 
-            sx = startX;
-            sy = startY;
+            let sx = startX;
+            let sy = startY;
 
             while (true) {
 

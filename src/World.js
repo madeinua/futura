@@ -13,9 +13,9 @@ import Layers from "./services/Layers.js";
 export default class World {
     constructor(scrollingMapWrapper, scrollingMapCanvas, mainMapCanvas, cameraPos) {
         this.generateWorld = function () {
-            let surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
-            let biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
-            let forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
+            const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
+            const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
+            const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
             new AnimalsOperator(this.timer, this.layers.getLayer(LAYER_HABITAT), this.layers.getLayer(LAYER_ANIMALS), {
                 freshWaterMap: freshWaterMap,
                 coastMap: coastMap,
@@ -39,7 +39,7 @@ export default class World {
             };
         };
         this.moveMapTo = function (point, silent = false) {
-            let max = Config.WORLD_SIZE - Config.VISIBLE_COLS;
+            const max = Config.WORLD_SIZE - Config.VISIBLE_COLS;
             point[0] = Math.max(0, Math.min(point[0], max));
             point[1] = Math.max(0, Math.min(point[1], max));
             this.cameraPosX = point[0];
@@ -50,7 +50,8 @@ export default class World {
             }
         };
         this.drawMainMap = function () {
-            let _this = this, ctx = _this.mainMapCanvas.getContext('2d'), layer, displayCell, image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), mainMapSize = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE, cameraPosX = _this.cameraPosX, cameraPosY = _this.cameraPosY;
+            const _this = this, ctx = _this.mainMapCanvas.getContext('2d'), image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), mainMapSize = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE, cameraPosX = _this.cameraPosX, cameraPosY = _this.cameraPosY;
+            let layer, displayCell;
             for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
                 layer = _this.layers.getLayer(ln);
                 layer.foreach(function (x, y) {
@@ -71,11 +72,12 @@ export default class World {
             });
         };
         this.drawRectangles = function () {
-            let _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), x, y, lx, ly, worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize;
+            const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            for (x = 0; x < Config.VISIBLE_COLS; x++) {
-                for (y = 0; y < Config.VISIBLE_COLS; y++) {
+            let lx, ly;
+            for (let x = 0; x < Config.VISIBLE_COLS; x++) {
+                for (let y = 0; y < Config.VISIBLE_COLS; y++) {
                     lx = x * _this.cellSize + worldOffsetLeft;
                     ly = y * _this.cellSize + worldOffsetTop;
                     ctx.strokeRect(lx, ly, _this.cellSize, _this.cellSize);
@@ -83,11 +85,12 @@ export default class World {
             }
         };
         this.drawCoordinates = function () {
-            let _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), x, y, lx, ly, worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize;
+            const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            for (x = 0; x < Config.VISIBLE_COLS; x++) {
-                for (y = 0; y < Config.VISIBLE_COLS; y++) {
+            let lx, ly;
+            for (let x = 0; x < Config.VISIBLE_COLS; x++) {
+                for (let y = 0; y < Config.VISIBLE_COLS; y++) {
                     lx = x * _this.cellSize + worldOffsetLeft;
                     ly = y * _this.cellSize + worldOffsetTop;
                     ctx.font = '7px senf';
@@ -97,11 +100,12 @@ export default class World {
             }
         };
         this.drawTemperatures = function () {
-            let _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), x, y, lx, ly, worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize, temperatureMap = this.world.temperatureMap;
+            const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize, temperatureMap = this.world.temperatureMap;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            for (x = 0; x < Config.VISIBLE_COLS; x++) {
-                for (y = 0; y < Config.VISIBLE_COLS; y++) {
+            let lx, ly;
+            for (let x = 0; x < Config.VISIBLE_COLS; x++) {
+                for (let y = 0; y < Config.VISIBLE_COLS; y++) {
                     lx = x * _this.cellSize + worldOffsetLeft;
                     ly = y * _this.cellSize + worldOffsetTop;
                     ctx.font = '7px senf';
@@ -110,11 +114,12 @@ export default class World {
             }
         };
         this.drawBiomesInfo = function () {
-            let _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), x, y, lx, ly, worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize, biomes = this.world.biomes;
+            const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize, biomes = this.world.biomes;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            for (x = 0; x < Config.VISIBLE_COLS; x++) {
-                for (y = 0; y < Config.VISIBLE_COLS; y++) {
+            let lx, ly;
+            for (let x = 0; x < Config.VISIBLE_COLS; x++) {
+                for (let y = 0; y < Config.VISIBLE_COLS; y++) {
                     lx = x * _this.cellSize + worldOffsetLeft;
                     ly = y * _this.cellSize + worldOffsetTop;
                     ctx.font = '7px senf';
@@ -129,12 +134,13 @@ export default class World {
                 && y <= this.cameraPosY + Config.VISIBLE_COLS;
         };
         this.drawLayers = function () {
-            let _this = this, renderCanvas = document.createElement('canvas');
+            const _this = this, renderCanvas = document.createElement('canvas');
             renderCanvas.width = Config.WORLD_SIZE;
             renderCanvas.height = Config.WORLD_SIZE;
-            let renderCtx = renderCanvas.getContext('2d'), ctx = _this.scrollingMapCanvas.getContext('2d'), image = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), ctxImages = [], layer, cell, worldOffsetLeft = this.cameraPosX * _this.cellSize, worldOffsetTop = this.cameraPosY * _this.cellSize;
+            const renderCtx = renderCanvas.getContext('2d'), ctx = _this.scrollingMapCanvas.getContext('2d'), image = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), ctxImages = [], worldOffsetLeft = this.cameraPosX * _this.cellSize, worldOffsetTop = this.cameraPosY * _this.cellSize;
             this.scrollingMapWrapper.scrollLeft = worldOffsetLeft;
             this.scrollingMapWrapper.scrollTop = worldOffsetTop;
+            let layer, cell;
             for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
                 layer = _this.layers.getLayer(ln);
                 layer.foreach(function (x, y) {
@@ -154,8 +160,8 @@ export default class World {
                 });
             }
             renderCtx.putImageData(image, 0, 0);
-            let imageData = renderCtx.getImageData(_this.cameraPosX, _this.cameraPosY, Config.VISIBLE_COLS, Config.VISIBLE_COLS);
-            let scaledData = scaleImageData(ctx, imageData, _this.cellSize);
+            const imageData = renderCtx.getImageData(_this.cameraPosX, _this.cameraPosY, Config.VISIBLE_COLS, Config.VISIBLE_COLS);
+            const scaledData = scaleImageData(ctx, imageData, _this.cellSize);
             ctx.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
             for (let i = 0; i < ctxImages.length; i++) {
                 if (!_this.isCellVisible(ctxImages[i][0], ctxImages[i][1])) {
@@ -178,7 +184,7 @@ export default class World {
             _this.drawMainMap();
         };
         this.create = function () {
-            let _this = this;
+            const _this = this;
             _this.generateWorld();
             setTimeout(function () {
                 _this.update();
@@ -198,18 +204,18 @@ export default class World {
             Math.seedrandom(Config.SEED);
         }
         this.cellSize = Math.ceil(scrollingMapWrapper.offsetWidth / Config.VISIBLE_COLS);
-        this.worldScalledSize = this.cellSize * Config.WORLD_SIZE;
+        this.worldScaledSize = this.cellSize * Config.WORLD_SIZE;
         this.scrollingMapWrapper = scrollingMapWrapper;
         this.scrollingMapCanvas = scrollingMapCanvas;
-        this.scrollingMapCanvas.width = this.worldScalledSize;
-        this.scrollingMapCanvas.height = this.worldScalledSize;
+        this.scrollingMapCanvas.width = this.worldScaledSize;
+        this.scrollingMapCanvas.height = this.worldScaledSize;
         this.mainMapCanvas = mainMapCanvas;
         this.mainMapCanvas.width = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE;
         this.mainMapCanvas.height = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE;
         this.timer = new Timer();
         this.layers = new Layers(Config.WORLD_SIZE, Config.WORLD_SIZE);
         if (Config.STORE_DATA) {
-            let worldSize = localStorage.getItem('worldSize'), actualSize = Config.WORLD_SIZE + 'x' + Config.WORLD_SIZE;
+            const worldSize = localStorage.getItem('worldSize'), actualSize = Config.WORLD_SIZE + 'x' + Config.WORLD_SIZE;
             if (actualSize !== worldSize) {
                 localStorage.clear();
             }

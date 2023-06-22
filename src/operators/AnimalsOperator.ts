@@ -38,7 +38,7 @@ export default class AnimalsOperator {
 
         this.animalImagesCache = [];
 
-        let _this = this,
+        const _this = this,
             animalGenerators = this.getAvailableGenerators();
 
         objects.timer = timer;
@@ -93,7 +93,7 @@ export default class AnimalsOperator {
 
     getCellsAvailableToMove(animal: Animal): CellsList {
 
-        let result = [],
+        const result = [],
             habitat = this.getAnimalGeneratorByAnimal(animal).getHabitat(),
             cellsAround = getRectangleAround(
                 animal.x,
@@ -113,7 +113,7 @@ export default class AnimalsOperator {
 
     isAnimalsAroundPoint = function (cell: Cell, animalToExcept: Animal): boolean {
 
-        let availableCells = getAroundRadius(cell[0], cell[1], Config.WORLD_SIZE, Config.WORLD_SIZE, 2);
+        const availableCells = getAroundRadius(cell[0], cell[1], Config.WORLD_SIZE, Config.WORLD_SIZE, 2);
 
         for (let j = 0; j < availableCells.length; j++) {
             for (let i = 0; i < this.animals.length; i++) {
@@ -172,7 +172,7 @@ export default class AnimalsOperator {
     maybeCreateAnimals() {
 
         for (let i = 0; i < this.animalsGenerators.length; i++) {
-            let generator = this.animalsGenerators[i],
+            const generator = this.animalsGenerators[i],
                 animalsCount = this.getAnimalsCountByName(generator.getName());
 
             if (animalsCount > generator.getMaxAnimals()) {
@@ -185,7 +185,7 @@ export default class AnimalsOperator {
 
             generator.checkRespawns(animalsCount);
 
-            let animal = generator.createAnimal(
+            const animal = generator.createAnimal(
                 this.animalsPositions
             );
 
@@ -251,7 +251,7 @@ export default class AnimalsOperator {
                 this.addAnimalToLayer(animalsLayer, animal);
             } else {
 
-                let generator = this.getAnimalGeneratorByAnimal(animal);
+                const generator = this.getAnimalGeneratorByAnimal(animal);
 
                 if (generator.isCellInHabitat(animal.x, animal.y)) {
                     this.addAnimalToLayer(animalsLayer, animal);
@@ -269,7 +269,7 @@ export default class AnimalsOperator {
     showHabitatsOnLayer(habitatLayer: Layer, animal: Animal) {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             if (this.animalsGenerators[i].getName() === animal.getName()) {
-                this.animalsGenerators[i].getHabitat().foreachFilled(function (x, y) {
+                this.animalsGenerators[i].getHabitat().foreachFilled(function (x: number, y: number) {
                     habitatLayer.setCell(x, y, [100, 100, 200, 255]);
                 });
             }

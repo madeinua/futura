@@ -1,25 +1,24 @@
 import Config from './config.js';
 import { Filters, fillCanvasPixel } from "./src/helpers.js";
 import World from './src/World.js';
-let coordinatesField = document.getElementById('coordinates'), mainMapCanvas = document.getElementById('mainMap'), world = new World(document.getElementById('scrollingMapWrapper'), document.getElementById('scrollingMap'), mainMapCanvas, getCenteredCameraPosition(Config.VISIBLE_COLS));
+const coordinatesField = document.getElementById('coordinates'), mainMapCanvas = document.getElementById('mainMap'), world = new World(document.getElementById('scrollingMapWrapper'), document.getElementById('scrollingMap'), mainMapCanvas, getCenteredCameraPosition(Config.VISIBLE_COLS));
 function drawColorMap(id, map) {
-    let canvas = document.getElementById(id);
+    const canvas = document.getElementById(id);
     canvas.width = map.getWidth();
     canvas.height = map.getHeight();
-    let ctx = canvas.getContext('2d'), image = ctx.createImageData(canvas.width, canvas.height), x, y;
-    for (x = 0; x < map.getWidth(); x++) {
-        for (y = 0; y < map.getHeight(); y++) {
-            let point = (x + y * canvas.width) * 4, color = map.getCell(x, y).getHexColor();
-            fillCanvasPixel(image, point, color);
+    const ctx = canvas.getContext('2d'), image = ctx.createImageData(canvas.width, canvas.height);
+    for (let x = 0; x < map.getWidth(); x++) {
+        for (let y = 0; y < map.getHeight(); y++) {
+            fillCanvasPixel(image, (x + y * canvas.width) * 4, map.getCell(x, y).getHexColor());
         }
     }
     ctx.putImageData(image, 0, 0);
 }
 function drawMap(id, map, reverse) {
-    let canvas = document.getElementById(id);
+    const canvas = document.getElementById(id);
     canvas.width = map.getWidth();
     canvas.height = map.getHeight();
-    let ctx = canvas.getContext('2d'), image = ctx.createImageData(canvas.width, canvas.height);
+    const ctx = canvas.getContext('2d'), image = ctx.createImageData(canvas.width, canvas.height);
     map.foreach(function (x, y) {
         let point = (x + y * canvas.width) * 4, gray = reverse ? 255 - map.getGrayscale(x, y) : map.getGrayscale(x, y);
         fillCanvasPixel(image, point, [gray, gray, gray]);
@@ -91,7 +90,7 @@ function getCameraPosition() {
     return [x, y];
 }
 function centerCameraPoint(point, size) {
-    let c = Math.floor(size / 2);
+    const c = Math.floor(size / 2);
     return [
         Math.max(0, point[0] - c),
         Math.max(0, point[1] - c)
@@ -101,7 +100,7 @@ function getCenteredCameraPosition(size) {
     return centerCameraPoint(getCameraPosition(), size);
 }
 function centeredCameraPointToXY(point, size) {
-    let c = Math.floor(size / 2);
+    const c = Math.floor(size / 2);
     return [
         Math.max(0, point[0] + c),
         Math.max(0, point[1] + c)
@@ -111,7 +110,7 @@ coordinatesField.addEventListener("change", function () {
     world.moveMapTo(getCenteredCameraPosition(Config.VISIBLE_COLS));
 });
 mainMapCanvas.addEventListener("click", function (e) {
-    let rect = this.getBoundingClientRect(), scale = Config.WORLD_SIZE / mainMapCanvas.offsetWidth;
+    const rect = this.getBoundingClientRect(), scale = Config.WORLD_SIZE / mainMapCanvas.offsetWidth;
     world.moveMapTo(centerCameraPoint([
         Math.floor((e.clientX - rect.left) * scale),
         Math.floor((e.clientY - rect.top) * scale)

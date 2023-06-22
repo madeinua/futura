@@ -17,9 +17,9 @@ export default class LakesMap extends BinaryMatrix {
 
     generateMap = function (): LakesMap {
 
-        let _this = this;
+        const _this = this;
 
-        _this.altitudeMap.foreach(function (x, y) {
+        _this.altitudeMap.foreach(function (x: number, y: number) {
             if (
                 _this.altitudeMap.isWater(_this.altitudeMap.getCell(x, y))
                 && !_this.oceanMap.filled(x, y)

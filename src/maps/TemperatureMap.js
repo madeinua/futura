@@ -10,7 +10,7 @@ export default class TemperatureMap extends PointMatrix {
             return this;
         };
         this.addGradient = function () {
-            let _this = this, gradient = [];
+            const _this = this, gradient = [];
             for (let i = 0; i < Config.WORLD_SIZE; i++) {
                 gradient[i] = i / Config.WORLD_SIZE;
             }
@@ -19,9 +19,9 @@ export default class TemperatureMap extends PointMatrix {
             });
         };
         this.considerAltitude = function () {
-            let _this = this, minLevel = Config.MAX_COAST_LEVEL, altitude;
+            const _this = this, minLevel = Config.MAX_COAST_LEVEL;
             _this.foreach(function (x, y) {
-                altitude = _this.altitudeMap.getCell(x, y);
+                let altitude = _this.altitudeMap.getCell(x, y);
                 altitude = altitude >= minLevel ? (altitude - minLevel) * (altitude - minLevel) : 0;
                 _this.subtractFromCell(x, y, altitude);
             });

@@ -58,8 +58,10 @@ Array.prototype.removeElementByValue = function (value: number | string): Array2
  * Shuffles array
  */
 Array.prototype.shuffle = function (): Array2D {
-    let j, x, i;
-    for (i = this.length - 1; i > 0; i--) {
+    let j: number,
+        x: number;
+
+    for (let i = this.length - 1; i > 0; i--) {
         j = Math.floor(Math.random() * (i + 1));
         x = this[i];
         this[i] = this[j];
@@ -93,7 +95,7 @@ Array.prototype.diffCells = function (array: Cell): Cell {
  */
 Array.prototype.unique = function (): any {
 
-    let a = this.concat(),
+    const a = this.concat(),
         isArray = a.length > 0 && a[0] instanceof Array;
 
     for (let i = 0; i < a.length; ++i) {
@@ -116,10 +118,11 @@ Array.prototype.unique = function (): any {
  */
 Array.prototype.getClosestDistanceTo = function (x: number, y: number): number {
 
-    let closeness = Number.MAX_SAFE_INTEGER,
-        distance = function (x1, y1, x2, y2) {
-            return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
-        };
+    let closeness: number = Number.MAX_SAFE_INTEGER;
+
+    const distance = function (x1, y1, x2, y2) {
+        return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+    };
 
     for (let i = 0; i < this.length; i++) {
         closeness = Math.min(

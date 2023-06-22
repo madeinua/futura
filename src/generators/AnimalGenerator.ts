@@ -68,7 +68,7 @@ export default class AnimalGenerator {
 
     createRespawnPoint(): boolean {
 
-        let habitat = this.getHabitat().clone();
+        const habitat = this.getHabitat().clone();
 
         habitat.diffCells(
             this.getRespawnPoints()
@@ -124,7 +124,7 @@ export default class AnimalGenerator {
             return null;
         }
 
-        let cell = respawnPoints.randomElement();
+        const cell = respawnPoints.randomElement();
 
         if (!cell) {
             throwError('Can not create animal', 1, true);

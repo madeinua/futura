@@ -112,7 +112,7 @@ export default class WaterOperator {
 
     getFreshWaterMap = function (lakesMap: LakesMap, riversMap: RiversMap): BinaryMatrix {
 
-        let freshWaterMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        const freshWaterMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
 
         freshWaterMap.combineWith(lakesMap);
         freshWaterMap.combineWith(riversMap);

@@ -16,7 +16,7 @@ export let Filters = {
     },
     apply: function (tag, val) {
         if (this.filters[tag]) {
-            let filters = this.filters[tag];
+            const filters = this.filters[tag];
             for (let i = 0; i < filters.length; i++) {
                 val = filters[i](val);
             }
@@ -35,9 +35,9 @@ export function round(value, precision) {
     return parseFloat(value.toFixed(precision));
 }
 export function getAroundRadius(x, y, maxWidth, maxHeight, radius) {
-    let result = [], minX = Math.max(0, x - radius), minY = Math.max(0, y - radius), maxX = Math.min(maxWidth - 1, x + radius), maxY = Math.min(maxHeight - 1, y + radius), maxRadius = radius + 1, nx, ny;
-    for (nx = minX; nx <= maxX; nx++) {
-        for (ny = minY; ny <= maxY; ny++) {
+    const result = [], minX = Math.max(0, x - radius), minY = Math.max(0, y - radius), maxX = Math.min(maxWidth - 1, x + radius), maxY = Math.min(maxHeight - 1, y + radius), maxRadius = radius + 1;
+    for (let nx = minX; nx <= maxX; nx++) {
+        for (let ny = minY; ny <= maxY; ny++) {
             if (!(nx === x && ny === y)
                 && ((x > nx ? x - nx : nx - x)
                     +
@@ -51,9 +51,9 @@ export function getAroundRadius(x, y, maxWidth, maxHeight, radius) {
     return result;
 }
 export function getRectangleAround(x, y, maxWidth, maxHeight) {
-    let result = [], minX = Math.max(0, x - 1), minY = Math.max(0, y - 1), maxX = Math.min(maxWidth - 1, x + 1), maxY = Math.min(maxHeight - 1, y + 1), nx, ny;
-    for (nx = minX; nx <= maxX; nx++) {
-        for (ny = minY; ny <= maxY; ny++) {
+    const result = [], minX = Math.max(0, x - 1), minY = Math.max(0, y - 1), maxX = Math.min(maxWidth - 1, x + 1), maxY = Math.min(maxHeight - 1, y + 1);
+    for (let nx = minX; nx <= maxX; nx++) {
+        for (let ny = minY; ny <= maxY; ny++) {
             if (!(nx === x && ny === y)) {
                 result.push([nx, ny]);
             }
@@ -174,17 +174,16 @@ export function fillCanvasPixel(image, point, RGBa) {
  * Scale canvas image
  */
 export function scaleImageData(context, imageData, scale) {
-    let scaled = context.createImageData(imageData.width * scale, imageData.height * scale);
-    let subLine = context.createImageData(scale, 1).data;
+    const scaled = context.createImageData(imageData.width * scale, imageData.height * scale), subLine = context.createImageData(scale, 1).data;
     for (let row = 0; row < imageData.height; row++) {
         for (let col = 0; col < imageData.width; col++) {
-            let sourcePixel = imageData.data.subarray((row * imageData.width + col) * 4, (row * imageData.width + col) * 4 + 4);
+            const sourcePixel = imageData.data.subarray((row * imageData.width + col) * 4, (row * imageData.width + col) * 4 + 4);
             for (let x = 0; x < scale; x++) {
                 subLine.set(sourcePixel, x * 4);
             }
             for (let x = 0; x < scale; x++) {
-                let destRow = row * scale + x;
-                let destCol = col * scale;
+                const destRow = row * scale + x;
+                const destCol = col * scale;
                 scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4);
             }
         }
@@ -196,22 +195,22 @@ export function getTimeForEvent() {
     return Math.max(0, (Date.now() - timer));
 }
 export function logTimeEvent(event) {
-    let t = Date.now();
+    const t = Date.now();
     console.log(event + ' [' + Math.max(0, (t - timer)) + 'ms]');
     timer = t;
 }
-let hexStorage = [];
+const hexStorage = [];
 export function hexToRgb(hex) {
     if (typeof hex === 'undefined') {
         return [0, 0, 0];
     }
     if (typeof hexStorage[hex] === "undefined") {
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-        let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
         hex = hex.replace(shorthandRegex, function (m, r, g, b) {
             return r + r + g + g + b + b;
         });
-        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         hexStorage[hex] = result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
     }
     return hexStorage[hex];
@@ -262,7 +261,7 @@ export function createImage(src) {
     if (src === null) {
         return null;
     }
-    let img = new Image();
+    const img = new Image();
     img.src = src;
     return img;
 }

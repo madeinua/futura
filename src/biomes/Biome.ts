@@ -2,7 +2,7 @@ import DisplayCell from "../render/DisplayCell.js"
 import {createImage, RGB, hexToRgb} from "../helpers.js";
 import Config from "../../config.js";
 
-type BiomeArgs = {
+export type BiomeArgs = {
     altitude: number;
     temperature: number;
     humidity: number;

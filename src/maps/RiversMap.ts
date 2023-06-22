@@ -21,7 +21,7 @@ export default class RiversMap extends BinaryMatrix {
 
     generateMap = function (): RiversMap {
 
-        let riverSources = this.getRiverSources(this.altitudeMap),
+        const riverSources = this.getRiverSources(this.altitudeMap),
             rivers = this.generateRiversCells(riverSources);
 
         //rivers = _this.addRiverDeltaToRiversMaps(rivers);
@@ -35,11 +35,10 @@ export default class RiversMap extends BinaryMatrix {
 
     getRiverSources = function (altitudeMap: AltitudeMap): CellsList {
 
-        let spawns = [];
+        const spawns = [];
 
-        altitudeMap.foreach(function (x, y) {
-
-            let altitude = altitudeMap.getCell(x, y);
+        altitudeMap.foreach(function (x: number, y: number) {
+            const altitude = altitudeMap.getCell(x, y);
 
             if (
                 altitudeMap.isGround(altitude)
@@ -55,11 +54,12 @@ export default class RiversMap extends BinaryMatrix {
 
     generateRiversCells = function (riverSources: CellsList): CellsArray {
 
-        let _this = this,
+        const _this = this,
             rivers = [],
-            allRiversPoints = [],
             riversLimit = Math.floor(fromFraction(Config.RIVERS_DENSITY, 1, Config.WORLD_SIZE)),
             startCloseness = Math.max(Config.RIVER_MIN_LENGTH, Config.RIVER_START_CLOSENESS);
+
+        let allRiversPoints = [];
 
         for (let i = 0; i < riverSources.length; i++) {
 
@@ -77,13 +77,13 @@ export default class RiversMap extends BinaryMatrix {
             // max river length = worldSize
             for (let j = 0; j < Config.WORLD_SIZE; j++) {
 
-                let nextRiverPoint = _this.getRiverDirection(river, _this.altitudeMap);
+                const nextRiverPoint = _this.getRiverDirection(river, _this.altitudeMap);
 
                 if (!nextRiverPoint) {
                     break;
                 }
 
-                let x = nextRiverPoint[0],
+                const x = nextRiverPoint[0],
                     y = nextRiverPoint[1],
                     altitude = _this.altitudeMap.getCell(x, y);
 
@@ -91,15 +91,13 @@ export default class RiversMap extends BinaryMatrix {
                 if (_this.altitudeMap.isWater(altitude) || arrayHasPoint(allRiversPoints, x, y)) {
 
                     if (_this.lakesMap.filled(x, y)) {
-
-                        let lakeSize = _this.lakesMap.getSizeFromPoint(x, y);
+                        const lakeSize = _this.lakesMap.getSizeFromPoint(x, y);
 
                         // finish only when the lake size is bigger than the river length
                         if (lakeSize > river.length * Config.LAKE_TO_RIVER_RATIO) {
                             finished = true;
                             break;
                         }
-
                     } else {
                         finished = true;
                         break;
@@ -128,17 +126,18 @@ export default class RiversMap extends BinaryMatrix {
 
     getRiverDirection = function (river: CellsList, altitudeMap: AltitudeMap): Cell | null {
 
-        let currentPoint = river[river.length - 1],
+        const currentPoint = river[river.length - 1],
             prevPoint = river.length > 1 ? river[river.length - 2] : false,
             cx = currentPoint[0],
             cy = currentPoint[1],
             currentAltitude = altitudeMap.getCell(cx, cy),
-            neighbors = altitudeMap.getNeighbors(cx, cy).shuffle(),
-            lowerPoint = null;
+            neighbors = altitudeMap.getNeighbors(cx, cy).shuffle();
+
+        let lowerPoint = null;
 
         for (let i = 0; i < neighbors.length; i++) {
 
-            let nx = neighbors[i][0],
+            const nx = neighbors[i][0],
                 ny = neighbors[i][1],
                 altitude = altitudeMap.getCell(nx, ny);
 
@@ -163,7 +162,7 @@ export default class RiversMap extends BinaryMatrix {
      */
     addRiverDeltaToRiverMap = function (river: CellsList): CellsList {
 
-        let _this = this,
+        const _this = this,
             ratio = randBetweenNumbers(0.01, Config.RIVER_DELTA_MAX_LENGTH),
             deltaLength = river.length * ratio,
             notDeltaLength = river.length - deltaLength,
@@ -171,7 +170,7 @@ export default class RiversMap extends BinaryMatrix {
 
         for (let p = 0; p < river.length; p++) {
             if (p > notDeltaLength) {
-                _this.foreachAroundRadius(river[p][0], river[p][1], 1, function (nx, ny) {
+                _this.foreachAroundRadius(river[p][0], river[p][1], 1, function (nx: number, ny: number) {
                     if ([0, 1].randomElement() === 0 && !river.includes([nx, ny])) {
                         delta.push([nx, ny]);
                     }

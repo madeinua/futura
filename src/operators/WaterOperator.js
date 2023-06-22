@@ -76,7 +76,7 @@ export default class WaterOperator {
             return riversMap;
         };
         this.getFreshWaterMap = function (lakesMap, riversMap) {
-            let freshWaterMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+            const freshWaterMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
             freshWaterMap.combineWith(lakesMap);
             freshWaterMap.combineWith(riversMap);
             return freshWaterMap;

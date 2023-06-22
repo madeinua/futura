@@ -13,7 +13,7 @@ export default class CoastMap extends BinaryMatrix {
             && altitude <= Config.MAX_COAST_LEVEL;
     }
     generateMap() {
-        let _this = this;
+        const _this = this;
         _this.oceanMap.foreachFilled(function (x, y) {
             if (_this.isCoast(_this.altitudeMap.getCell(x, y), _this.temperatureMap.getCell(x, y))) {
                 _this.fill(x, y);

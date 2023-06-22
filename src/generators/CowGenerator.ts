@@ -22,7 +22,7 @@ export default class CowGenerator extends AnimalGenerator {
             this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.BIOME_NAME);
         }
 
-        let habitat = this.grassMap.clone();
+        const habitat = this.grassMap.clone();
 
         habitat.diff(
             this.objects.forestsOperator.getForestMap()

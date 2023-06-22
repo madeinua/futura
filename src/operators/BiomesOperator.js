@@ -15,7 +15,7 @@ export default class BiomesOperator {
             return false;
         };
         this.addBiomesToLayer = function (biomesLayer) {
-            let _this = this;
+            const _this = this;
             _this.biomes.foreach(function (x, y) {
                 biomesLayer.setCell(x, y, _this.biomes.getCell(x, y).getDisplayCell());
             });
@@ -28,7 +28,7 @@ export default class BiomesOperator {
         this.temperatureMap = temperatureMap;
         this.humidityMap = humidityMap;
         this.biomesConfig = Config.biomesConfig();
-        let _this = this;
+        const _this = this;
         altitudeMap.foreach(function (x, y) {
             _this.biomes.setCell(x, y, _this._getBiome(x, y));
         });
@@ -48,7 +48,7 @@ export default class BiomesOperator {
     _getBiome(x, y) {
         let distanceToWater = this.freshWaterMap.distanceTo(x, y, 5);
         distanceToWater = distanceToWater > 100 ? 100 : distanceToWater;
-        let args = {
+        const args = {
             altitude: this.altitudeMap.getCell(x, y),
             temperature: this.temperatureMap.getCell(x, y),
             humidity: this.humidityMap.getCell(x, y),
@@ -65,9 +65,9 @@ export default class BiomesOperator {
         if (this.isBeach(x, y, args.altitude, args.temperature, args.humidity)) {
             return new biomes.Biome_Beach(x, y, args);
         }
-        let matchedBiomes = [];
+        const matchedBiomes = [];
         for (let i = 0; i < this.biomesConfig.length; i++) {
-            let cfg = this.biomesConfig[i];
+            const cfg = this.biomesConfig[i];
             if (this._checkBiomeIndex(cfg.h, fromFraction(args.humidity, Config.MIN_HUMIDITY, Config.MAX_HUMIDITY))
                 && this._checkBiomeIndex(cfg.t, fromFraction(args.temperature, Config.MIN_TEMPERATURE, Config.MAX_TEMPERATURE))
                 && this._checkBiomeIndex(cfg.a, args.altitude)) {
@@ -89,7 +89,7 @@ export default class BiomesOperator {
         return this.biomes.getCell(x, y);
     }
     getSurfaceByBiomeName(biomeName) {
-        let biomes = this.biomes, surface = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        const biomes = this.biomes, surface = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
         this.altitudeMap.foreach(function (x, y) {
             if (biomes.getCell(x, y).getName() === biomeName) {
                 surface.fill(x, y);
