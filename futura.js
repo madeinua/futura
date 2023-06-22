@@ -63,7 +63,7 @@ Filters.add('biomes', function (map) {
 });
 Filters.add('forestMap', function (map) {
     drawMap('forestMapCanvas', map, true);
-    document.getElementById('forestCounter').innerHTML = map.countFilled();
+    document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
     return map;
 });
 Filters.add('animalsSteps', function (animals) {
@@ -78,7 +78,7 @@ Filters.add('animalsSteps', function (animals) {
         text += i + ': ' + groups[i] + '<br />';
     }
     document.getElementById('animalsList').innerHTML = text;
-    document.getElementById('animalsCounter').innerHTML = animals.length;
+    document.getElementById('animalsCounter').innerHTML = animals.length.toString();
 });
 world.create();
 function getCameraPosition() {

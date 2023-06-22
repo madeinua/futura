@@ -4,6 +4,15 @@ import World from './src/World.js';
 import {Cell} from "./src/structures/Cells.js";
 import Matrix from "./src/structures/Matrix.js";
 import NumericMatrix from "./src/structures/NumericMatrix.js";
+import AltitudeMap from "./src/maps/AltitudeMap.js";
+import TemperatureMap from "./src/maps/TemperatureMap.js";
+import HumidityMap from "./src/maps/HumidityMap.js";
+import OceanMap from "./src/maps/OceanMap.js";
+import CoastMap from "./src/maps/CoastMap.js";
+import LakesMap from "./src/maps/LakesMap.js";
+import RiversMap from "./src/maps/RiversMap.js";
+import ForestMap from "./src/maps/ForestMap.js";
+import Animal from "./src/animals/Animal.js";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     mainMapCanvas = document.getElementById('mainMap') as HTMLCanvasElement,
@@ -61,53 +70,53 @@ Filters.add('mapMoved', function (point) {
     coordinatesField.value = point[0] + ',' + point[1];
 });
 
-Filters.add('altitudeMap', function (map) {
+Filters.add('altitudeMap', function (map: AltitudeMap) {
     drawMap('altitudeMapCanvas', map, false);
     return map;
 });
 
-Filters.add('temperatureMap', function (map) {
+Filters.add('temperatureMap', function (map: TemperatureMap) {
     drawMap('temperatureMapCanvas', map, false);
     return map;
 });
 
-Filters.add('humidityMap', function (map) {
+Filters.add('humidityMap', function (map: HumidityMap) {
     drawMap('humidityMapCanvas', map, true);
     return map;
 });
 
-Filters.add('oceanMap', function (map) {
+Filters.add('oceanMap', function (map: OceanMap) {
     drawMap('oceanMapCanvas', map, true);
     return map;
 });
 
-Filters.add('coastMap', function (map) {
+Filters.add('coastMap', function (map: CoastMap) {
     drawMap('coastMapCanvas', map, true);
     return map;
 });
 
-Filters.add('lakesMap', function (map) {
+Filters.add('lakesMap', function (map: LakesMap) {
     drawMap('lakesMapCanvas', map, true);
     return map;
 });
 
-Filters.add('riversMap', function (map) {
+Filters.add('riversMap', function (map: RiversMap) {
     drawMap('riversMapCanvas', map, false);
     return map;
 });
 
-Filters.add('biomes', function (map) {
+Filters.add('biomes', function (map: Matrix) {
     drawColorMap('biomesCanvas', map);
     return map;
 });
 
-Filters.add('forestMap', function (map) {
+Filters.add('forestMap', function (map: ForestMap) {
     drawMap('forestMapCanvas', map, true);
-    document.getElementById('forestCounter').innerHTML = map.countFilled();
+    document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
     return map;
 });
 
-Filters.add('animalsSteps', function (animals) {
+Filters.add('animalsSteps', function (animals: Animal[]) {
 
     let text: string = '',
         groups = {};
@@ -125,7 +134,7 @@ Filters.add('animalsSteps', function (animals) {
     }
 
     document.getElementById('animalsList').innerHTML = text;
-    document.getElementById('animalsCounter').innerHTML = animals.length;
+    document.getElementById('animalsCounter').innerHTML = animals.length.toString();
 });
 
 world.create();
