@@ -55,7 +55,7 @@ export default class AltitudeMap extends PointMatrix {
         this.initVariables();
     }
 
-    initVariables() {
+    private initVariables() {
         const _this: AltitudeMap = this;
 
         _this.foreach(function (x: number, y: number): void {
@@ -65,7 +65,7 @@ export default class AltitudeMap extends PointMatrix {
         });
     }
 
-    makeIsland = function (x: number, y: number, islandSize: number, altitude: number): number {
+    private makeIsland = function (x: number, y: number, islandSize: number, altitude: number): number {
 
         // Circular Distance
         const dx = Math.abs(x - islandSize * 0.5),

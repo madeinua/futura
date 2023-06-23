@@ -22,7 +22,7 @@ export default class TemperatureMap extends PointMatrix {
         return _this;
     }
 
-    addGradient = function (): void {
+    private addGradient = function (): void {
 
         const _this: TemperatureMap = this,
             gradient = [];
@@ -36,7 +36,7 @@ export default class TemperatureMap extends PointMatrix {
         });
     }
 
-    considerAltitude = function (): void {
+    private considerAltitude = function (): void {
         const _this: TemperatureMap = this,
             minLevel = Config.MAX_COAST_LEVEL;
 

@@ -60,7 +60,7 @@ export default class BiomesOperator {
         }
     }
 
-    createBiomes = function (altitudeMap: AltitudeMap): void {
+    private createBiomes = function (altitudeMap: AltitudeMap): void {
         const _this: BiomesOperator = this;
 
         altitudeMap.foreach(function (x: number, y: number): void {
@@ -76,7 +76,7 @@ export default class BiomesOperator {
             && this.oceanMap.aroundFilled(x, y, Config.MAX_BEACH_DISTANCE_FROM_OCEAN);
     }
 
-    _checkBiomeIndex = function (fig: Cell, index: number): boolean {
+    private _checkBiomeIndex = function (fig: Cell, index: number): boolean {
 
         if (fig[0] === 0 && index === 0) {
             return true;
@@ -87,7 +87,7 @@ export default class BiomesOperator {
         return false;
     }
 
-    _getBiome(x: number, y: number): Biome {
+    private _getBiome(x: number, y: number): Biome {
 
         let distanceToWater = this.freshWaterMap.distanceTo(x, y, 5);
         distanceToWater = distanceToWater > 100 ? 100 : distanceToWater;
@@ -113,7 +113,7 @@ export default class BiomesOperator {
             return new biomes.Biome_Beach(x, y, args);
         }
 
-        const matchedBiomes = [];
+        const matchedBiomes: string[] = [];
 
         for (let i = 0; i < this.biomesConfig.length; i++) {
             const cfg = this.biomesConfig[i];
@@ -137,7 +137,7 @@ export default class BiomesOperator {
             : new biomes.Biome_Grass(x, y, args);
     }
 
-    addBiomesToLayer = function (biomesLayer: Layer): void {
+    private addBiomesToLayer = function (biomesLayer: Layer): void {
         const _this: BiomesOperator = this;
 
         _this.biomes.foreach(function (x: number, y: number): void {

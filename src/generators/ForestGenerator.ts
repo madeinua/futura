@@ -48,12 +48,12 @@ export default class ForestGenerator {
         this.growTrees(forestMap, filledCells, step);
     }
 
-    growTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
+    private growTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
         this.cutTrees(forestMap, filledCells);
         this.expandTrees(forestMap, filledCells, step);
     }
 
-    cutTrees(forestMap: ForestMap, filledCells: CellsList) {
+    private cutTrees(forestMap: ForestMap, filledCells: CellsList) {
 
         if (!filledCells.length) {
             return;
@@ -66,7 +66,7 @@ export default class ForestGenerator {
             });
     }
 
-    expandTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
+    private expandTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
 
         const _this: ForestGenerator = this,
             usedSpace = filledCells.length / this.maxForestCells,
@@ -100,7 +100,7 @@ export default class ForestGenerator {
         });
     }
 
-    createTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
+    private createTrees(forestMap: ForestMap, filledCells: CellsList, step: number) {
 
         const _this: ForestGenerator = this,
             createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))),
@@ -128,7 +128,7 @@ export default class ForestGenerator {
         }
     }
 
-    getCreateChance(forestMap: ForestMap, humidity: number, x: number, y: number, speed: number): number {
+    private getCreateChance(forestMap: ForestMap, humidity: number, x: number, y: number, speed: number): number {
 
         if (humidity === 0 || this.unallowedCells.includesCell([x, y])) {
             return 0;

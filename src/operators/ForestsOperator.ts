@@ -70,7 +70,7 @@ export default class ForestsOperator {
         );
     }
 
-    getForestImage = function (x: number, y: number): HTMLImageElement {
+    private getForestImage = function (x: number, y: number): HTMLImageElement {
 
         if (this.isDesertForest(x, y)) {
             return this.forestPalmImage;
@@ -87,7 +87,7 @@ export default class ForestsOperator {
         return this.forestMap;
     }
 
-    addForestMapToLayer = function (forestLayer: Layer, forestMap: ForestMap): void {
+    private addForestMapToLayer = function (forestLayer: Layer, forestMap: ForestMap): void {
         const _this: ForestsOperator = this;
 
         forestMap.foreach(function (x: number, y: number): void {
@@ -98,7 +98,7 @@ export default class ForestsOperator {
         });
     }
 
-    getDisplayCell = function (x: number, y: number): DisplayCell {
+    private getDisplayCell = function (x: number, y: number): DisplayCell {
 
         if (typeof this.forestImagesCache[x + ',' + y] === 'undefined') {
             this.forestImagesCache[x + ',' + y] = new DisplayCell(

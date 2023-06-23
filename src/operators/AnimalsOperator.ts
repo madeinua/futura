@@ -68,13 +68,13 @@ export default class AnimalsOperator {
         });
     }
 
-    updateHabitats() {
+    private updateHabitats() {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             this.animalsGenerators[i].updateHabitat();
         }
     }
 
-    addAnimalToLayer = function (animalsLayer: Layer, animal: Animal): void {
+    private addAnimalToLayer = function (animalsLayer: Layer, animal: Animal): void {
         const _this: AnimalsOperator = this;
 
         animalsLayer.setCell(
@@ -84,7 +84,7 @@ export default class AnimalsOperator {
         );
     }
 
-    getAvailableGenerators = function (): typeof AnimalGenerator[] {
+    private getAvailableGenerators = function (): typeof AnimalGenerator[] {
         return [
             //AnimalGenerator,
             FishGenerator,
@@ -93,9 +93,9 @@ export default class AnimalsOperator {
         ];
     }
 
-    getCellsAvailableToMove(animal: Animal): CellsList {
+    private getCellsAvailableToMove(animal: Animal): CellsList {
 
-        const result = [],
+        const result: CellsList = [],
             habitat = this.getAnimalGeneratorByAnimal(animal).getHabitat(),
             cellsAround = getRectangleAround(
                 animal.x,
@@ -113,7 +113,7 @@ export default class AnimalsOperator {
         return result;
     }
 
-    isAnimalsAroundPoint = function (cell: Cell, animalToExcept: Animal): boolean {
+    private isAnimalsAroundPoint = function (cell: Cell, animalToExcept: Animal): boolean {
 
         const availableCells = getAroundRadius(cell[0], cell[1], Config.WORLD_SIZE, Config.WORLD_SIZE, 2);
 
@@ -132,7 +132,7 @@ export default class AnimalsOperator {
         return false;
     }
 
-    isAnimalsGeneratorRegistered(generator: AnimalGenerator): boolean {
+    private isAnimalsGeneratorRegistered(generator: AnimalGenerator): boolean {
 
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             if (this.animalsGenerators[i].getName() === generator.getName()) {
@@ -143,7 +143,7 @@ export default class AnimalsOperator {
         return false;
     }
 
-    registerAnimalsGenerator(generator: AnimalGenerator) {
+    private registerAnimalsGenerator(generator: AnimalGenerator) {
         if (!this.isAnimalsGeneratorRegistered(generator)) {
 
             this.animalsGenerators.push(generator);
@@ -154,15 +154,15 @@ export default class AnimalsOperator {
         }
     }
 
-    incAnimalsCount(name: string) {
+    private incAnimalsCount(name: string) {
         this.animalsTypesCounter[name]++;
     }
 
-    decAnimalsCount(name: string) {
+    private decAnimalsCount(name: string) {
         this.animalsTypesCounter[name]--;
     }
 
-    getAnimalsCountByName(name: string): number {
+    private getAnimalsCountByName(name: string): number {
 
         if (typeof this.animalsTypesCounter[name] === 'undefined') {
             this.animalsTypesCounter[name] = 0;
@@ -171,7 +171,7 @@ export default class AnimalsOperator {
         return this.animalsTypesCounter[name];
     }
 
-    maybeCreateAnimals() {
+    private maybeCreateAnimals() {
 
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             const generator = this.animalsGenerators[i],
@@ -187,9 +187,7 @@ export default class AnimalsOperator {
 
             generator.checkRespawns(animalsCount);
 
-            const animal = generator.createAnimal(
-                this.animalsPositions
-            );
+            const animal = generator.createAnimal(this.animalsPositions);
 
             if (animal) {
                 this.animals.push(animal);
@@ -198,7 +196,7 @@ export default class AnimalsOperator {
         }
     }
 
-    getAnimalGeneratorByAnimal(animal: Animal): null | AnimalGenerator {
+    private getAnimalGeneratorByAnimal(animal: Animal): null | AnimalGenerator {
 
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             if (this.animalsGenerators[i].getName() === animal.getName()) {
@@ -209,18 +207,18 @@ export default class AnimalsOperator {
         return null;
     }
 
-    killAnimal(animal: Animal) {
+    private killAnimal(animal: Animal) {
         this.animals = this.animals.removeElementByValue(animal);
         this.decAnimalsCount(animal.getName());
     }
 
-    getNextMove(animal: Animal): null | Cell {
+    private getNextMove(animal: Animal): null | Cell {
 
         if (!iAmLucky(animal.getMoveChance())) {
             return null;
         }
 
-        let nextPoint = null,
+        let nextPoint: null | Cell = null,
             availableCells = this.getCellsAvailableToMove(animal);
 
         while (!nextPoint && availableCells.length) {
@@ -235,17 +233,16 @@ export default class AnimalsOperator {
         return nextPoint;
     }
 
-    moveAnimals(animalsLayer: Layer) {
+    private moveAnimals(animalsLayer: Layer) {
 
-        let animal,
-            nextPoint;
+        let animal: Animal,
+            nextPoint: Cell;
 
         this.animalsPositions = [];
 
         for (let i = 0; i < this.animals.length; i++) {
 
             animal = this.animals[i];
-
             nextPoint = this.getNextMove(animal);
 
             if (nextPoint) {
@@ -268,7 +265,7 @@ export default class AnimalsOperator {
         }
     }
 
-    getDisplayCell = function (animal: Animal): DisplayCell {
+    private getDisplayCell = function (animal: Animal): DisplayCell {
 
         if (typeof this.animalImagesCache[animal.getName()] === 'undefined') {
             this.animalImagesCache[animal.getName()] = new DisplayCell(
@@ -281,7 +278,7 @@ export default class AnimalsOperator {
         return this.animalImagesCache[animal.getName()];
     }
 
-    showHabitatsOnLayer(habitatLayer: Layer, animal: Animal) {
+    private showHabitatsOnLayer(habitatLayer: Layer, animal: Animal) {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             if (this.animalsGenerators[i].getName() === animal.getName()) {
                 this.animalsGenerators[i].getHabitat().foreachFilled(function (x: number, y: number): void {

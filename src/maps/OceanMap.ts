@@ -12,7 +12,7 @@ export default class OceanMap extends BinaryMatrix {
         this.altitudeMap = altitudeMap;
     }
 
-    includeAllWatterCellsAround = function (startX: number, startY: number): void {
+    private includeAllWatterCellsAround = function (startX: number, startY: number): void {
 
         const _this: OceanMap = this,
             activePoints = [];
@@ -37,7 +37,7 @@ export default class OceanMap extends BinaryMatrix {
         }
     }
 
-    bigLakesToSeas = function (): void {
+    private bigLakesToSeas = function (): void {
 
         const _this: OceanMap = this,
             tempMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);

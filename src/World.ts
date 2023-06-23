@@ -99,7 +99,7 @@ export default class World {
         }
     }
 
-    generateWorld = function (): void {
+    private generateWorld = function (): void {
 
         const surfaceOperator = new SurfaceOperator(),
             weatherOperator = new WeatherOperator(),
@@ -177,7 +177,7 @@ export default class World {
         }
     }
 
-    drawMainMap = function (): void {
+    private drawMainMap = function (): void {
 
         const _this: World = this,
             ctx = _this.mainMapCanvas.getContext('2d'),
@@ -226,7 +226,7 @@ export default class World {
         });
     }
 
-    drawRectangles = function (): void {
+    private drawRectangles = function (): void {
 
         const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
@@ -249,7 +249,7 @@ export default class World {
         }
     }
 
-    drawCoordinates = function (): void {
+    private drawCoordinates = function (): void {
 
         const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
@@ -274,7 +274,7 @@ export default class World {
         }
     }
 
-    drawTemperatures = function (): void {
+    private drawTemperatures = function (): void {
 
         const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
@@ -299,7 +299,7 @@ export default class World {
         }
     }
 
-    drawBiomesInfo = function (): void {
+    private drawBiomesInfo = function (): void {
 
         const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
@@ -324,14 +324,14 @@ export default class World {
         }
     }
 
-    isCellVisible = function (x: number, y: number): boolean {
+    private isCellVisible = function (x: number, y: number): boolean {
         return x >= this.cameraPosX
             && x <= this.cameraPosX + Config.VISIBLE_COLS
             && y >= this.cameraPosY
             && y <= this.cameraPosY + Config.VISIBLE_COLS;
     }
 
-    drawLayers = function (): void {
+    private drawLayers = function (): void {
 
         const _this: World = this,
             renderCanvas = document.createElement('canvas');
