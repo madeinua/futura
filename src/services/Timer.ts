@@ -7,11 +7,11 @@ export default class Timer {
     stepsHandlers: any[] = [];
     timerPaused: boolean = false;
 
-    addStepsHandler(handler: Function) {
+    addStepsHandler(handler: Function): void {
         this.stepsHandlers.push(handler);
     }
 
-    stepsTimer = function (callback: Function) {
+    stepsTimer = function (callback: Function): void {
 
         const _this: Timer = this,
             timerStart = Date.now();
@@ -22,7 +22,7 @@ export default class Timer {
 
         _this.timerStep = 0;
 
-        const makeStep = function () {
+        const makeStep = function (): void {
 
             if (_this.timerPaused) {
                 return;

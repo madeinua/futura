@@ -6,7 +6,7 @@ export type RGBa = [number, number, number, number];
 
 let errors = [];
 
-export function throwError(msg: any, limit: number, unique: boolean) {
+export function throwError(msg: any, limit: number, unique: boolean): void {
 
     limit = typeof limit == 'undefined' ? 5 : limit;
     unique = typeof unique == 'undefined' ? true : unique;
@@ -231,7 +231,7 @@ export function create2DArray(width: number, height: number, value: any): Array2
     return [...Array(height)].map(() => [...Array(width)].map(() => value));
 }
 
-export function fillCanvasPixel(image: ImageData, point: number, RGBa: RGB | RGBa) {
+export function fillCanvasPixel(image: ImageData, point: number, RGBa: RGB | RGBa): void {
     image.data[point] = RGBa[0];
     image.data[point + 1] = RGBa[1];
     image.data[point + 2] = RGBa[2];

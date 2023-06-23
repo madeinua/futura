@@ -53,7 +53,7 @@ export default class AnimalsOperator {
             logTimeEvent('Animals initialized.');
         }
 
-        timer.addStepsHandler(function () {
+        timer.addStepsHandler(function (): void {
 
             habitatLayer.reset();
             _this.updateHabitats();
@@ -74,7 +74,7 @@ export default class AnimalsOperator {
         }
     }
 
-    addAnimalToLayer = function (animalsLayer: Layer, animal: Animal) {
+    addAnimalToLayer = function (animalsLayer: Layer, animal: Animal): void {
         const _this: AnimalsOperator = this;
 
         animalsLayer.setCell(
@@ -284,7 +284,7 @@ export default class AnimalsOperator {
     showHabitatsOnLayer(habitatLayer: Layer, animal: Animal) {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             if (this.animalsGenerators[i].getName() === animal.getName()) {
-                this.animalsGenerators[i].getHabitat().foreachFilled(function (x: number, y: number) {
+                this.animalsGenerators[i].getHabitat().foreachFilled(function (x: number, y: number): void {
                     habitatLayer.setCell(x, y, [100, 100, 200, 255]);
                 });
             }

@@ -45,8 +45,8 @@ export default class HumidityMap extends PointMatrix {
         const _this: HumidityMap = this;
 
         // higher altitude = lower humidity
-        _this.foreach(function (x: number, y: number) {
-            _this.addToCell(x, y, -_this.altitudeMap.getCell(x, y));
+        _this.foreach(function (x: number, y: number): void {
+            _this.addToCell(x, y, -_this.altitudeMap.getCell(x, y) * 0.5);
         });
     }
 
@@ -54,11 +54,11 @@ export default class HumidityMap extends PointMatrix {
         const _this: HumidityMap = this;
 
         // rivers increase humidity
-        _this.riversMap.foreachFilled(function (x: number, y: number) {
+        _this.riversMap.foreachFilled(function (x: number, y: number): void {
 
             _this.addToCell(x, y, 0.2);
 
-            _this.foreachAroundRadius(x, y, 5, function (nx: number, ny: number) {
+            _this.foreachAroundRadius(x, y, 5, function (nx: number, ny: number): void {
                 if (!_this.riversMap.filled(nx, ny)) {
                     _this.addToCell(nx, ny, 0.02);
                 }
@@ -70,8 +70,8 @@ export default class HumidityMap extends PointMatrix {
         const _this: HumidityMap = this;
 
         // lakes increase humidity
-        _this.lakesMap.foreachFilled(function (x: number, y: number) {
-            _this.foreachAroundRadius(x, y, 5, function (nx: number, ny: number) {
+        _this.lakesMap.foreachFilled(function (x: number, y: number): void {
+            _this.foreachAroundRadius(x, y, 5, function (nx: number, ny: number): void {
                 _this.addToCell(nx, ny, 0.015);
             });
         });

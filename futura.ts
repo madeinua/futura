@@ -13,6 +13,7 @@ import LakesMap from "./src/maps/LakesMap.js";
 import RiversMap from "./src/maps/RiversMap.js";
 import ForestMap from "./src/maps/ForestMap.js";
 import Animal from "./src/animals/Animal.js";
+import Biome from "./src/biomes/Biome.js";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     mainMapCanvas = document.getElementById('mainMap') as HTMLCanvasElement,
@@ -105,9 +106,39 @@ Filters.add('riversMap', function (map: RiversMap) {
     return map;
 });
 
-Filters.add('biomes', function (map: Matrix) {
-    drawColorMap('biomesCanvas', map);
-    return map;
+Filters.add('biomes', function (biomes: Matrix) {
+    drawColorMap('biomesCanvas', biomes);
+
+    let biomesTypesCounter: { [key: string]: number } = {};
+
+    biomes.foreach(function (x: number, y: number) {
+        let biome: Biome = biomes.getCell(x, y);
+
+        if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
+            biomesTypesCounter[biome.getName()] = 0;
+        }
+
+        biomesTypesCounter[biome.getName()]++;
+    });
+
+    // Sort by value
+    biomesTypesCounter = Object.keys(biomesTypesCounter).sort(function (a, b) {
+        return biomesTypesCounter[b] - biomesTypesCounter[a];
+    }).reduce(function (result, key) {
+        result[key] = biomesTypesCounter[key];
+        return result;
+    }, {});
+
+    // Add counters as list to <ul> element
+    let list = document.getElementById('biomesTypesCounter');
+
+    for (let i in biomesTypesCounter) {
+        let item = document.createElement('li');
+        item.innerHTML = i + ': ' + biomesTypesCounter[i];
+        list.appendChild(item);
+    }
+
+    return biomes;
 });
 
 Filters.add('forestMap', function (map: ForestMap) {

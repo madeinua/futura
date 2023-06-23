@@ -120,7 +120,7 @@ Array.prototype.getClosestDistanceTo = function (x: number, y: number): number {
 
     let closeness: number = Number.MAX_SAFE_INTEGER;
 
-    const distance = function (x1, y1, x2, y2) {
+    const distance = function (x1, y1, x2, y2): number {
         return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     };
 

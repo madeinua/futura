@@ -40,13 +40,13 @@ export default class List {
         return this.items.includes(item);
     }
 
-    foreach(callable: Function) {
+    foreach(callable: Function): void {
         for (let i = 0; i < this.items.length; i++) {
             callable(this.items[i]);
         }
     }
 
-    foreachCell(callable: Function) {
+    foreachCell(callable: Function): void {
         for (let i = 0; i < this.items.length; i++) {
             callable(this.items[i][0], this.items[i][1]);
         }

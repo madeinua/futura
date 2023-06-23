@@ -60,10 +60,10 @@ export default class BiomesOperator {
         }
     }
 
-    createBiomes = function (altitudeMap: AltitudeMap) {
+    createBiomes = function (altitudeMap: AltitudeMap): void {
         const _this: BiomesOperator = this;
 
-        altitudeMap.foreach(function (x: number, y: number) {
+        altitudeMap.foreach(function (x: number, y: number): void {
             _this.biomes.setCell(x, y, _this._getBiome(x, y));
         });
     }
@@ -137,10 +137,10 @@ export default class BiomesOperator {
             : new biomes.Biome_Grass(x, y, args);
     }
 
-    addBiomesToLayer = function (biomesLayer: Layer) {
+    addBiomesToLayer = function (biomesLayer: Layer): void {
         const _this: BiomesOperator = this;
 
-        _this.biomes.foreach(function (x: number, y: number) {
+        _this.biomes.foreach(function (x: number, y: number): void {
             biomesLayer.setCell(
                 x, y,
                 _this.biomes.getCell(x, y).getDisplayCell()
@@ -161,7 +161,7 @@ export default class BiomesOperator {
         const biomes = this.biomes,
             surface = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
 
-        this.altitudeMap.foreach(function (x: number, y: number) {
+        this.altitudeMap.foreach(function (x: number, y: number): void {
             if (biomes.getCell(x, y).getName() === biomeName) {
                 surface.fill(x, y);
             }

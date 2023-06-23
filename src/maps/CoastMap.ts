@@ -27,7 +27,7 @@ export default class CoastMap extends BinaryMatrix {
     generateMap(): CoastMap {
         const _this: CoastMap = this;
 
-        _this.oceanMap.foreachFilled(function (x: number, y: number) {
+        _this.oceanMap.foreachFilled(function (x: number, y: number): void {
             if (_this.isCoast(_this.altitudeMap.getCell(x, y), _this.temperatureMap.getCell(x, y))) {
                 _this.fill(x, y);
             }

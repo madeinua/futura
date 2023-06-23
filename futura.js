@@ -57,9 +57,31 @@ Filters.add('riversMap', function (map) {
     drawMap('riversMapCanvas', map, false);
     return map;
 });
-Filters.add('biomes', function (map) {
-    drawColorMap('biomesCanvas', map);
-    return map;
+Filters.add('biomes', function (biomes) {
+    drawColorMap('biomesCanvas', biomes);
+    let biomesTypesCounter = {};
+    biomes.foreach(function (x, y) {
+        let biome = biomes.getCell(x, y);
+        if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
+            biomesTypesCounter[biome.getName()] = 0;
+        }
+        biomesTypesCounter[biome.getName()]++;
+    });
+    // Sort by value
+    biomesTypesCounter = Object.keys(biomesTypesCounter).sort(function (a, b) {
+        return biomesTypesCounter[b] - biomesTypesCounter[a];
+    }).reduce(function (result, key) {
+        result[key] = biomesTypesCounter[key];
+        return result;
+    }, {});
+    // Add counters as list to <ul> element
+    let list = document.getElementById('biomesTypesCounter');
+    for (let i in biomesTypesCounter) {
+        let item = document.createElement('li');
+        item.innerHTML = i + ': ' + biomesTypesCounter[i];
+        list.appendChild(item);
+    }
+    return biomes;
 });
 Filters.add('forestMap', function (map) {
     drawMap('forestMapCanvas', map, true);

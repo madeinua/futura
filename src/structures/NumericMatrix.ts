@@ -9,7 +9,7 @@ export default class NumericMatrix extends Matrix {
         );
     }
 
-    fromString = function (string: string) {
+    fromString = function (string: string): void {
         this.setAll(
             JSON.parse(string)
         );
@@ -51,7 +51,7 @@ export default class NumericMatrix extends Matrix {
         let sum = 0;
         const _this: NumericMatrix = this;
 
-        _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
+        _this.foreachNeighbors(x, y, function (nx: number, ny: number): void {
             sum += _this.getCell(nx, ny);
         });
 
@@ -64,7 +64,7 @@ export default class NumericMatrix extends Matrix {
     addToNeighborCells(x: number, y: number, value: number): any {
         const _this: NumericMatrix = this;
 
-        _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
+        _this.foreachNeighbors(x, y, function (nx: number, ny: number): void {
             _this.addToCell(nx, ny, value);
         });
 
@@ -79,7 +79,7 @@ export default class NumericMatrix extends Matrix {
         let found = false;
         const _this: NumericMatrix = this;
 
-        _this.foreach(function (x: number, y: number) {
+        _this.foreach(function (x: number, y: number): void {
             if (_this.getCell(x, y) === value) {
                 found = true;
             }
@@ -98,7 +98,7 @@ export default class NumericMatrix extends Matrix {
             currMin = Math.min(...values),
             currMax = Math.max(...values);
 
-        _this.map(function (x: number, y: number) {
+        _this.map(function (x: number, y: number): number {
             return changeRange(
                 _this.getCell(x, y),
                 currMin,

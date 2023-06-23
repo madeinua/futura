@@ -99,7 +99,7 @@ export default class World {
         }
     }
 
-    generateWorld = function () {
+    generateWorld = function (): void {
 
         const surfaceOperator = new SurfaceOperator(),
             weatherOperator = new WeatherOperator(),
@@ -160,7 +160,7 @@ export default class World {
         }
     }
 
-    moveMapTo = function (point: Cell, silent: boolean = false) {
+    moveMapTo = function (point: Cell, silent: boolean = false): void {
 
         const max = Config.WORLD_SIZE - Config.VISIBLE_COLS;
 
@@ -177,7 +177,7 @@ export default class World {
         }
     }
 
-    drawMainMap = function () {
+    drawMainMap = function (): void {
 
         const _this: World = this,
             ctx = _this.mainMapCanvas.getContext('2d'),
@@ -191,7 +191,7 @@ export default class World {
 
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
             layer = _this.layers.getLayer(ln);
-            layer.foreach(function (x: number, y: number) {
+            layer.foreach(function (x: number, y: number): void {
 
                 displayCell = layer.getCell(x, y);
 
@@ -207,7 +207,7 @@ export default class World {
             });
         }
 
-        createImageBitmap(image).then(function (render) {
+        createImageBitmap(image).then(function (render): CanvasRenderingContext2D {
 
             ctx.imageSmoothingEnabled = false;
 
@@ -226,7 +226,7 @@ export default class World {
         });
     }
 
-    drawRectangles = function () {
+    drawRectangles = function (): void {
 
         const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
@@ -249,7 +249,7 @@ export default class World {
         }
     }
 
-    drawCoordinates = function () {
+    drawCoordinates = function (): void {
 
         const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
@@ -274,7 +274,7 @@ export default class World {
         }
     }
 
-    drawTemperatures = function () {
+    drawTemperatures = function (): void {
 
         const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
@@ -299,7 +299,7 @@ export default class World {
         }
     }
 
-    drawBiomesInfo = function () {
+    drawBiomesInfo = function (): void {
 
         const _this: World = this,
             ctx = _this.scrollingMapCanvas.getContext('2d'),
@@ -331,7 +331,7 @@ export default class World {
             && y <= this.cameraPosY + Config.VISIBLE_COLS;
     }
 
-    drawLayers = function () {
+    drawLayers = function (): void {
 
         const _this: World = this,
             renderCanvas = document.createElement('canvas');
@@ -428,23 +428,23 @@ export default class World {
         _this.drawMainMap();
     }
 
-    create = function () {
+    create = function (): void {
         const _this: World = this;
 
         _this.generateWorld();
 
-        setTimeout(function () {
+        setTimeout(function (): void {
             _this.update();
         }, 100);
 
         if (Config.STEPS_ENABLED) {
-            _this.timer.stepsTimer(function () {
+            _this.timer.stepsTimer(function (): void {
                 _this.update();
             });
         }
     }
 
-    update = function () {
+    update = function (): void {
         this.drawLayers();
     }
 }

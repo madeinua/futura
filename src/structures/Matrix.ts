@@ -106,7 +106,7 @@ export default class Matrix<T extends Array2D = Array2D> {
     /**
      * Applies the callback to the elements of the Matrix
      */
-    foreach(callback: Function) {
+    foreach(callback: Function): void {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 callback(x, y);
@@ -122,7 +122,7 @@ export default class Matrix<T extends Array2D = Array2D> {
         if (values instanceof Array) {
             this.__values = values;
         } else {
-            this.map(function () {
+            this.map(function (): any {
                 return values;
             });
         }

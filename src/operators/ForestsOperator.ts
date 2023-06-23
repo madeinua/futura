@@ -40,7 +40,7 @@ export default class ForestsOperator {
             biomesOperator.getBiomes()
         );
 
-        timer.addStepsHandler(function (step) {
+        timer.addStepsHandler(function (step): void {
             forestGenerator.generate(_this.forestMap, step);
             _this.addForestMapToLayer(forestLayer, _this.forestMap);
             _this.forestMap = Filters.apply('forestMap', _this.forestMap);
@@ -86,10 +86,10 @@ export default class ForestsOperator {
         return this.forestMap;
     }
 
-    addForestMapToLayer = function (forestLayer: Layer, forestMap: ForestMap) {
+    addForestMapToLayer = function (forestLayer: Layer, forestMap: ForestMap): void {
         const _this: ForestsOperator = this;
 
-        forestMap.foreach(function (x: number, y: number) {
+        forestMap.foreach(function (x: number, y: number): void {
             forestLayer.setCell(
                 x, y,
                 forestMap.filled(x, y) ? _this.getDisplayCell(x, y) : null

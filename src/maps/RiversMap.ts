@@ -37,7 +37,7 @@ export default class RiversMap extends BinaryMatrix {
 
         const spawns = [];
 
-        altitudeMap.foreach(function (x: number, y: number) {
+        altitudeMap.foreach(function (x: number, y: number): void {
             const altitude = altitudeMap.getCell(x, y);
 
             if (
@@ -170,7 +170,7 @@ export default class RiversMap extends BinaryMatrix {
 
         for (let p = 0; p < river.length; p++) {
             if (p > notDeltaLength) {
-                _this.foreachAroundRadius(river[p][0], river[p][1], 1, function (nx: number, ny: number) {
+                _this.foreachAroundRadius(river[p][0], river[p][1], 1, function (nx: number, ny: number): void {
                     if ([0, 1].randomElement() === 0 && !river.includes([nx, ny])) {
                         delta.push([nx, ny]);
                     }
@@ -181,7 +181,7 @@ export default class RiversMap extends BinaryMatrix {
         return river.concat(delta);
     }
 
-    createRiverMapFromRiversPoints = function (rivers: CellsArray) {
+    createRiverMapFromRiversPoints = function (rivers: CellsArray): void {
         for (let i = 0; i < rivers.length; i++) {
             for (let p = 0; p < rivers[i].length; p++) {
                 this.fill(rivers[i][p][0], rivers[i][p][1]);

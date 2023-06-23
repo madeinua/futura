@@ -33,7 +33,7 @@ export default class ForestGenerator {
             _this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
         }
 
-        biomesOperator.altitudeMap.foreach(function (x: number, y: number) {
+        biomesOperator.altitudeMap.foreach(function (x: number, y: number): void {
             if (biomesOperator.altitudeMap.getCell(x, y) > Config.MAX_HILLS_LEVEL) {
                 _this.unallowedCells.push([x, y]);
             }
@@ -60,7 +60,7 @@ export default class ForestGenerator {
 
         filledCells
             .slice(0, filledCells.length * Config.FOREST_DIE_CHANCE)
-            .forEach(function (cell: Cell) {
+            .forEach(function (cell: Cell): void {
                 forestMap.unfill(cell[0], cell[1]);
             });
     }
@@ -76,8 +76,8 @@ export default class ForestGenerator {
             return;
         }
 
-        filledCells.forEach(function (cell: Cell) {
-            forestMap.foreachNeighbors(cell[0], cell[1], function (x: number, y: number) {
+        filledCells.forEach(function (cell: Cell): void {
+            forestMap.foreachNeighbors(cell[0], cell[1], function (x: number, y: number): boolean {
                 if (!filledCells.includes([x, y])) {
 
                     const growsChance = _this.getCreateChance(

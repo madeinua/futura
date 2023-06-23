@@ -12,7 +12,7 @@ export default class OceanMap extends BinaryMatrix {
         this.altitudeMap = altitudeMap;
     }
 
-    includeAllWatterCellsAround = function (startX: number, startY: number) {
+    includeAllWatterCellsAround = function (startX: number, startY: number): void {
 
         const _this: OceanMap = this,
             activePoints = [];
@@ -24,7 +24,7 @@ export default class OceanMap extends BinaryMatrix {
         while (activePoints.length) {
             let point = activePoints.pop();
 
-            _this.altitudeMap.foreachAroundRadius(point[0], point[1], 1, function (x: number, y: number) {
+            _this.altitudeMap.foreachAroundRadius(point[0], point[1], 1, function (x: number, y: number): void {
                 const altitude = _this.altitudeMap.getCell(x, y);
 
                 if (_this.altitudeMap.isWater(altitude)) {
@@ -37,12 +37,12 @@ export default class OceanMap extends BinaryMatrix {
         }
     }
 
-    bigLakesToSeas = function () {
+    bigLakesToSeas = function (): void {
 
         const _this: OceanMap = this,
             tempMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
 
-        _this.altitudeMap.foreach(function (x: number, y: number) {
+        _this.altitudeMap.foreach(function (x: number, y: number): void {
             if (
                 _this.altitudeMap.isWater(_this.altitudeMap.getCell(x, y))
                 && !_this.filled(x, y)
@@ -51,7 +51,7 @@ export default class OceanMap extends BinaryMatrix {
             }
         });
 
-        tempMap.foreachFilled(function (x: number, y: number) {
+        tempMap.foreachFilled(function (x: number, y: number): void {
             if (
                 !_this.filled(x, y)
                 && tempMap.getSizeFromPoint(x, y) > Config.WORLD_SIZE

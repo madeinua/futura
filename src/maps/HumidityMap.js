@@ -28,7 +28,7 @@ export default class HumidityMap extends PointMatrix {
         const _this = this;
         // higher altitude = lower humidity
         _this.foreach(function (x, y) {
-            _this.addToCell(x, y, -_this.altitudeMap.getCell(x, y));
+            _this.addToCell(x, y, -_this.altitudeMap.getCell(x, y) * 0.5);
         });
     }
     considerRivers() {

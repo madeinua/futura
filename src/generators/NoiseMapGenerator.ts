@@ -19,7 +19,7 @@ export default class NoiseMapGenerator {
         const _this: NoiseMapGenerator = this,
             map = new PointMatrix(_this.size, _this.size);
 
-        map.map(function (x: number, y: number) {
+        map.map(function (x: number, y: number): number {
             return (noise.simplex2(x / _this.power, y / _this.power) + 1) * 0.5; // [0, 1] blurred height map
         });
 

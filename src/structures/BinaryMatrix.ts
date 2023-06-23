@@ -25,7 +25,7 @@ export default class BinaryMatrix extends NumericMatrix {
     getFilledCells(): CellsList {
         const cells = [];
 
-        this.foreachFilled(function (x: number, y: number) {
+        this.foreachFilled(function (x: number, y: number): void {
             cells.push([x, y]);
         });
 
@@ -38,7 +38,7 @@ export default class BinaryMatrix extends NumericMatrix {
     getUnfilledCells(): CellsList {
         const cells = [];
 
-        this.foreachUnfilled(function (x: number, y: number) {
+        this.foreachUnfilled(function (x: number, y: number): void {
             cells.push([x, y]);
         });
 
@@ -96,7 +96,7 @@ export default class BinaryMatrix extends NumericMatrix {
     /**
      * Applies the callback to the filled elements of the Matrix
      */
-    foreachFilled(callback: Function) {
+    foreachFilled(callback: Function): void {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 if (this.filled(x, y)) {
@@ -109,7 +109,7 @@ export default class BinaryMatrix extends NumericMatrix {
     /**
      * Applies the callback to the unfilled elements of the Matrix
      */
-    foreachUnfilled(callback: Function) {
+    foreachUnfilled(callback: Function): void {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 if (!this.filled(x, y)) {
@@ -171,7 +171,7 @@ export default class BinaryMatrix extends NumericMatrix {
     diff(matrix: BinaryMatrix): BinaryMatrix {
         const _this: BinaryMatrix = this;
 
-        matrix.foreachFilled(function (x: number, y: number) {
+        matrix.foreachFilled(function (x: number, y: number): void {
             _this.unfill(x, y);
         });
 
