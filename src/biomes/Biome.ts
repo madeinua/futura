@@ -12,12 +12,12 @@ export type BiomeArgs = {
 export default class Biome {
     static BIOME_NAME = '';
 
-    x: number;
-    y: number;
-    altitude: number;
-    temperature: number;
-    humidity: number;
-    distanceToWater: number;
+    readonly x: number;
+    readonly y: number;
+    readonly altitude: number;
+    readonly temperature: number;
+    readonly humidity: number;
+    readonly distanceToWater: number;
 
     constructor(x: number, y: number, args: BiomeArgs) {
         this.x = x;

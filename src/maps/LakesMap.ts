@@ -5,8 +5,8 @@ import OceanMap from "./OceanMap.js";
 
 export default class LakesMap extends BinaryMatrix {
 
-    altitudeMap: AltitudeMap;
-    oceanMap: OceanMap;
+    readonly altitudeMap: AltitudeMap;
+    readonly oceanMap: OceanMap;
 
     constructor(altitudeMap: AltitudeMap, oceanMap: OceanMap) {
         super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);

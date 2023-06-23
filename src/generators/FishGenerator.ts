@@ -12,7 +12,7 @@ export default class FishGenerator extends AnimalGenerator {
         return Fish;
     }
 
-    updateHabitat(): any {
+    updateHabitat(): this {
 
         if (typeof this.habitat === 'undefined') {
             this.setHabitat(

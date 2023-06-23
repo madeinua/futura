@@ -31,8 +31,8 @@ export default class Animal {
 
     x: number;
     y: number;
-    settings: AnimalSettings;
-    id: string;
+    readonly settings: AnimalSettings;
+    readonly id: string;
     history: Cell[];
 
     constructor(x: number, y: number, settings: AnimalSettings) {

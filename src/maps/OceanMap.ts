@@ -4,7 +4,7 @@ import AltitudeMap from "./AltitudeMap.js";
 
 export default class OceanMap extends BinaryMatrix {
 
-    altitudeMap: AltitudeMap;
+    readonly altitudeMap: AltitudeMap;
 
     constructor(altitudeMap: AltitudeMap) {
         super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);

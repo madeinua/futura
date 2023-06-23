@@ -45,11 +45,11 @@ export default class World {
     cameraPosX: number;
     cameraPosY: number;
     world: WorldType;
-    cellSize: number;
-    worldScaledSize: number;
-    scrollingMapWrapper: HTMLElement;
-    scrollingMapCanvas: HTMLCanvasElement;
-    mainMapCanvas: HTMLCanvasElement;
+    readonly cellSize: number;
+    readonly worldScaledSize: number;
+    readonly scrollingMapWrapper: HTMLElement;
+    readonly scrollingMapCanvas: HTMLCanvasElement;
+    readonly mainMapCanvas: HTMLCanvasElement;
     timer: Timer;
     layers: Layers;
 

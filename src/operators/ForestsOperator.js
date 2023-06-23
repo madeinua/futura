@@ -39,16 +39,16 @@ export default class ForestsOperator {
             }
             return this.forestImagesCache[x + ',' + y];
         };
+        this.biomesOperator = biomesOperator;
+        this.forestColor = hexToRgb(Config.FOREST_COLOR);
+        this.forestPalmImage = createImage(Config.FOREST_PALM_IMAGE);
+        this.forestTundraImage = createImage(Config.FOREST_TUNDRA_IMAGE);
         const _this = this, forestGenerator = new ForestGenerator(biomesOperator);
-        _this.biomesOperator = biomesOperator;
-        _this.forestColor = hexToRgb(Config.FOREST_COLOR);
         _this.forestImages = [];
         _this.forestImagesCache = [];
         for (let i = 0; i < Config.FOREST_IMAGES.length; i++) {
             _this.forestImages.push(createImage(Config.FOREST_IMAGES[i]));
         }
-        _this.forestPalmImage = createImage(Config.FOREST_PALM_IMAGE);
-        _this.forestTundraImage = createImage(Config.FOREST_TUNDRA_IMAGE);
         _this.forestMap = new ForestMap(biomesOperator.getBiomes());
         timer.addStepsHandler(function (step) {
             forestGenerator.generate(_this.forestMap, step);

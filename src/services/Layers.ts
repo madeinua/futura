@@ -3,8 +3,8 @@ import {Layer} from '../render/Layer.js';
 export default class Layers {
 
     layers: any[] = [];
-    width: number;
-    height: number;
+    readonly width: number;
+    readonly height: number;
 
     constructor(width: number, height: number) {
         this.width = width;

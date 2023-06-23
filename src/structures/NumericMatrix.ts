@@ -1,12 +1,10 @@
 import Matrix from "./Matrix.js";
 import {fromFraction, changeRange, round} from "../helpers.js";
 
-export default class NumericMatrix extends Matrix {
+export default class NumericMatrix<T extends number = number> extends Matrix<T> {
 
     toString = function (): string {
-        return JSON.stringify(
-            this.__values
-        );
+        return JSON.stringify(this.__values);
     }
 
     fromString = function (string: string): void {
@@ -18,15 +16,15 @@ export default class NumericMatrix extends Matrix {
     /**
      * Add value to a current cell value
      */
-    addToCell(x: number, y: number, value: number): any {
-        return this.setCell(x, y, this.getCell(x, y) + value);
+    addToCell(x: number, y: number, value: T): this {
+        return this.setCell(x, y, this.getCell(x, y) + value as T);
     }
 
     /**
      * Subtract value from a current cell value
      */
-    subtractFromCell(x: number, y: number, value: number): any {
-        return this.setCell(x, y, this.getCell(x, y) - value);
+    subtractFromCell(x: number, y: number, value: T): this {
+        return this.setCell(x, y, this.getCell(x, y) - value as T);
     }
 
     /**
@@ -61,14 +59,14 @@ export default class NumericMatrix extends Matrix {
     /**
      * Add value to all neighbors of the point [x, y]
      */
-    addToNeighborCells(x: number, y: number, value: number): any {
+    addToNeighborCells(x: number, y: number, value: number): this {
         const _this: NumericMatrix = this;
 
         _this.foreachNeighbors(x, y, function (nx: number, ny: number): void {
             _this.addToCell(nx, ny, value);
         });
 
-        return _this;
+        return this;
     }
 
     /**
@@ -91,7 +89,7 @@ export default class NumericMatrix extends Matrix {
     /**
      * Scale matrix to fit min/max ranges
      */
-    setRange(min: number, max: number): any {
+    setRange(min: number, max: number): this {
 
         const _this: NumericMatrix = this,
             values = _this.getValuesList(),
@@ -108,7 +106,7 @@ export default class NumericMatrix extends Matrix {
             );
         });
 
-        return _this;
+        return this;
     }
 
     /**

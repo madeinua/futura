@@ -15,7 +15,7 @@ type AnimalType = {
 
 export default class AnimalGenerator {
 
-    objects: AnimalsOperatorArgs;
+    readonly objects: AnimalsOperatorArgs;
     habitat: BinaryMatrix;
     respawnPoints: CellsList = [];
     maxAnimals: number = -1;
@@ -44,7 +44,7 @@ export default class AnimalGenerator {
         return this.getSettings().rarity;
     }
 
-    updateHabitat(): any {
+    updateHabitat(): this {
 
         if (typeof this.habitat === 'undefined') {
             this.setHabitat(new BinaryMatrix(1, Config.WORLD_SIZE, Config.WORLD_SIZE));

@@ -4,17 +4,17 @@ export default class ForestGenerator {
     constructor(biomesOperator) {
         this.groundCreateMults = {};
         this.unallowedCells = [];
-        const _this = this;
-        _this.biomesOperator = biomesOperator;
-        _this.maxForestCells = Math.ceil(biomesOperator.altitudeMap.getLandCellsCount() * Config.FOREST_LIMIT / 100);
-        _this.minCreateIntensity = Math.ceil(_this.maxForestCells / 10);
+        this.biomesOperator = biomesOperator;
+        this.maxForestCells = Math.ceil(biomesOperator.altitudeMap.getLandCellsCount() * Config.FOREST_LIMIT / 100);
+        this.minCreateIntensity = Math.ceil(this.maxForestCells / 10);
         let maxGroundMult = 0;
         for (let i in Config.FOREST_GROUNDS_MULTS) {
             maxGroundMult = Math.max(maxGroundMult, Config.FOREST_GROUNDS_MULTS[i]);
         }
         for (let i in Config.FOREST_GROUNDS_MULTS) {
-            _this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
+            this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
         }
+        const _this = this;
         biomesOperator.altitudeMap.foreach(function (x, y) {
             if (biomesOperator.altitudeMap.getCell(x, y) > Config.MAX_HILLS_LEVEL) {
                 _this.unallowedCells.push([x, y]);

@@ -35,8 +35,7 @@ export default class BinaryMatrix extends NumericMatrix {
             }
             return Math.abs(getPolygonAreaSize(coords));
         };
-        fill = typeof fill === 'undefined' ? 0 : fill;
-        this.map(fill);
+        this.map(typeof fill === 'undefined' ? 0 : fill);
     }
     clone() {
         const matrix = new BinaryMatrix(0, this.width, this.height);
@@ -81,7 +80,11 @@ export default class BinaryMatrix extends NumericMatrix {
      * Count the number of filled cells
      */
     countFilled() {
-        return this.__values.reduce((r, a) => r + a.reduce((pv, cv) => pv + cv, 0), 0);
+        let count = 0;
+        this.foreachFilled(function () {
+            count++;
+        });
+        return count;
     }
     /**
      * Check if matrix has filled cells
@@ -155,7 +158,7 @@ export default class BinaryMatrix extends NumericMatrix {
     combineWith(matrix) {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                this.__values[x][y] |= matrix.__values[x][y];
+                this.__values[x][y] = this.__values[x][y] || matrix.__values[x][y];
             }
         }
         return this;

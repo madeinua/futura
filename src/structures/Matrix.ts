@@ -5,29 +5,29 @@ import {Array2D} from "./Array2D.js";
 /**
  * Generate 2D matrix from the array
  */
-export default class Matrix<T extends Array2D = Array2D> {
+export default class Matrix<T extends any = any> {
 
-    width: number;
-    height: number;
-    __values: T;
+    readonly width: number;
+    readonly height: number;
+    __values: Array2D<T>;
 
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.__values = create2DArray(this.width, this.height, null) as T;
+        this.__values = create2DArray(this.width, this.height, null);
     }
 
     /**
      * Get all cells of matrix
      */
-    getValues(): T {
+    getValues(): Array2D<T> {
         return this.__values;
     }
 
     /**
      * Retrieve all cells' values of the matrix as a list
      */
-    getValuesList(): Array<number> {
+    getValuesList(): Array<T> {
         const values = [];
 
         for (let x = 0; x < this.width; x++) {
@@ -44,7 +44,7 @@ export default class Matrix<T extends Array2D = Array2D> {
     /**
      * Set cell value
      */
-    setCell(x: number, y: number, value: any): any {
+    setCell(x: number, y: number, value: T): this {
         this.__values[x][y] = value;
 
         return this;
@@ -53,7 +53,7 @@ export default class Matrix<T extends Array2D = Array2D> {
     /**
      * Retrieve cell value
      */
-    getCell(x: number, y: number): T[number][number] {
+    getCell(x: number, y: number): T {
         return this.__values[x][y];
     }
 
@@ -91,12 +91,15 @@ export default class Matrix<T extends Array2D = Array2D> {
     /**
      * Applies the callback to the elements of the Matrix and accepts return value as the Matrix cell value
      */
-    map(value: any): any {
+    map(value: T | Function): this {
         const isFunc = typeof value === 'function';
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                this.setCell(x, y, isFunc ? value(x, y) : value);
+                this.setCell(
+                    x, y,
+                    isFunc ? (value as Function)(x, y) : value
+                );
             }
         }
 
@@ -117,7 +120,7 @@ export default class Matrix<T extends Array2D = Array2D> {
     /**
      * Set all cells of matrix
      */
-    setAll(values: T): any {
+    setAll(values: Array2D<T>): this {
 
         if (values instanceof Array) {
             this.__values = values;
@@ -140,7 +143,7 @@ export default class Matrix<T extends Array2D = Array2D> {
     /**
      * Apply callback to all neighbors
      */
-    foreachNeighbors(x: number, y: number, callback: Function, stopOnTrue: boolean = false): any {
+    foreachNeighbors(x: number, y: number, callback: Function, stopOnTrue: boolean = false): this {
         const neighbors = this.getNeighbors(x, y);
 
         for (let i = 0; i < neighbors.length; i++) {
@@ -162,7 +165,7 @@ export default class Matrix<T extends Array2D = Array2D> {
     /**
      * Apply callback to all neighbors
      */
-    foreachAroundRadius(x: number, y: number, radius: number, callback: Function, stopOnTrue: boolean = false): any {
+    foreachAroundRadius(x: number, y: number, radius: number, callback: Function, stopOnTrue: boolean = false): this {
         const neighbors = this.getAroundRadius(x, y, radius);
 
         for (let i = 0; i < neighbors.length; i++) {
@@ -177,7 +180,7 @@ export default class Matrix<T extends Array2D = Array2D> {
     /**
      * Convert Matrix to array
      */
-    toArray(): Array2D {
+    toArray(): Array2D<T> {
 
         const arr = create2DArray(this.width, this.height, null);
 
@@ -190,7 +193,7 @@ export default class Matrix<T extends Array2D = Array2D> {
         return arr;
     }
 
-    getRandomElement(): [number, number, number] {
+    getRandomElement(): [number, number, T] {
 
         const x = Math.floor(Math.random() * this.width),
             y = Math.floor(Math.random() * this.height);

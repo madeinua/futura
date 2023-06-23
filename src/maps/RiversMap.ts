@@ -8,8 +8,8 @@ import {Cell, CellsArray, CellsList} from "../structures/Cells";
 export default class RiversMap extends BinaryMatrix {
 
     riversCount: number;
-    altitudeMap: AltitudeMap;
-    lakesMap: LakesMap;
+    readonly altitudeMap: AltitudeMap;
+    readonly lakesMap: LakesMap;
 
     constructor(altitudeMap: AltitudeMap, lakesMap: LakesMap) {
         super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);

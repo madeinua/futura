@@ -4,8 +4,8 @@ declare const noise: any;
 
 export default class NoiseMapGenerator {
 
-    size: number;
-    power: number;
+    readonly size: number;
+    readonly power: number;
 
     constructor(size: number, power: number) {
         this.size = size;

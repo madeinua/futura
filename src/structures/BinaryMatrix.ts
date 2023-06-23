@@ -1,15 +1,18 @@
 import NumericMatrix from './NumericMatrix.js';
 import {distance, round, getPolygonAreaSize} from "../helpers.js";
-import {CellsList} from "./Cells";
-import {Array2D} from "./Array2D";
+import {CellsList} from "./Cells.js";
+import {Array2D} from "./Array2D.js";
+
+type BinaryMatrixValues = 0 | 1;
 
 export default class BinaryMatrix extends NumericMatrix {
 
-    constructor(fill: number, width: number, height: number) {
+    constructor(fill: BinaryMatrixValues, width: number, height: number) {
         super(width, height);
 
-        fill = typeof fill === 'undefined' ? 0 : fill;
-        this.map(fill);
+        this.map(
+            typeof fill === 'undefined' ? 0 : fill
+        );
     }
 
     clone(): BinaryMatrix {
@@ -48,7 +51,7 @@ export default class BinaryMatrix extends NumericMatrix {
     /**
      * Fill the cell with the value
      */
-    fill(x: number, y: number): any {
+    fill(x: number, y: number): this {
         this.setCell(x, y, 1);
         return this;
     }
@@ -56,7 +59,7 @@ export default class BinaryMatrix extends NumericMatrix {
     /**
      * Remove filling the cell with the value
      */
-    unfill(x: number, y: number): any {
+    unfill(x: number, y: number): this {
         this.setCell(x, y, 0);
         return this;
     }
@@ -65,9 +68,13 @@ export default class BinaryMatrix extends NumericMatrix {
      * Count the number of filled cells
      */
     countFilled(): number {
-        return this.__values.reduce(
-            (r, a) => r + a.reduce((pv, cv) => pv + cv, 0), 0
-        );
+        let count = 0;
+
+        this.foreachFilled(function (): void {
+            count++;
+        });
+
+        return count;
     }
 
     /**
@@ -154,11 +161,11 @@ export default class BinaryMatrix extends NumericMatrix {
     /**
      * Apply binary "OR" between two binary matrix
      */
-    combineWith(matrix: BinaryMatrix): any {
+    combineWith(matrix: BinaryMatrix): this {
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                this.__values[x][y] |= matrix.__values[x][y];
+                this.__values[x][y] = this.__values[x][y] || matrix.__values[x][y];
             }
         }
 

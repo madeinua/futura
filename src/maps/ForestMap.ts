@@ -4,7 +4,7 @@ import BiomesMap from "./BiomesMap.js";
 
 export default class ForestMap extends BinaryMatrix {
 
-    biomes: BiomesMap;
+    readonly biomes: BiomesMap;
 
     constructor(biomes: BiomesMap) {
         super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);

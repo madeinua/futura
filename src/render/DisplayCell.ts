@@ -2,9 +2,9 @@ import {RGB} from "../helpers.js";
 
 export default class DisplayCell {
 
-    color: RGB;
-    image: null | HTMLImageElement;
-    withBg: boolean;
+    readonly color: RGB;
+    readonly image: null | HTMLImageElement;
+    readonly withBg: boolean;
 
     constructor(color: RGB, image: null | HTMLImageElement, withBackground: boolean) {
         this.color = color;

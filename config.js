@@ -240,7 +240,7 @@ const Config = {
         'Fish': {
             intensity: 75,
             moveChance: 50,
-            rarity: 0.01,
+            rarity: 0.05,
             color: '#4fd0ff',
             image: 'public/images/fish-1.png'
         },

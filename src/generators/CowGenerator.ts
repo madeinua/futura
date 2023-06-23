@@ -16,7 +16,7 @@ export default class CowGenerator extends AnimalGenerator {
         return Cow;
     }
 
-    updateHabitat(): any {
+    updateHabitat(): this {
 
         if (typeof this.grassMap === 'undefined') {
             this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.BIOME_NAME);

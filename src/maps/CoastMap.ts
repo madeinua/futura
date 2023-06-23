@@ -6,9 +6,9 @@ import TemperatureMap from "./TemperatureMap.js";
 
 export default class CoastMap extends BinaryMatrix {
 
-    oceanMap: OceanMap;
-    altitudeMap: AltitudeMap;
-    temperatureMap: TemperatureMap;
+    readonly oceanMap: OceanMap;
+    readonly altitudeMap: AltitudeMap;
+    readonly temperatureMap: TemperatureMap;
 
     constructor(oceanMap: OceanMap, altitudeMap: AltitudeMap, temperatureMap: TemperatureMap) {
         super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);

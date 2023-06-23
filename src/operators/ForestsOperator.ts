@@ -10,21 +10,24 @@ import {Layer} from "../render/Layer.js";
 
 export default class ForestsOperator {
 
-    forestColor: RGB;
+    readonly forestColor: RGB;
+    readonly biomesOperator: BiomesOperator;
+    readonly forestPalmImage: HTMLImageElement;
+    readonly forestTundraImage: HTMLImageElement;
     forestImages: HTMLImageElement[];
     forestImagesCache: HTMLImageElement[];
     forestMap: ForestMap;
-    biomesOperator: BiomesOperator;
-    forestPalmImage: HTMLImageElement;
-    forestTundraImage: HTMLImageElement;
 
     constructor(biomesOperator: BiomesOperator, timer: Timer, forestLayer: Layer) {
+
+        this.biomesOperator = biomesOperator;
+        this.forestColor = hexToRgb(Config.FOREST_COLOR);
+        this.forestPalmImage = createImage(Config.FOREST_PALM_IMAGE);
+        this.forestTundraImage = createImage(Config.FOREST_TUNDRA_IMAGE);
 
         const _this: ForestsOperator = this,
             forestGenerator = new ForestGenerator(biomesOperator);
 
-        _this.biomesOperator = biomesOperator;
-        _this.forestColor = hexToRgb(Config.FOREST_COLOR);
         _this.forestImages = [];
         _this.forestImagesCache = [];
 
@@ -34,8 +37,6 @@ export default class ForestsOperator {
             );
         }
 
-        _this.forestPalmImage = createImage(Config.FOREST_PALM_IMAGE);
-        _this.forestTundraImage = createImage(Config.FOREST_TUNDRA_IMAGE);
         _this.forestMap = new ForestMap(
             biomesOperator.getBiomes()
         );

@@ -53,7 +53,7 @@ export default class NumericMatrix extends Matrix {
         _this.foreachNeighbors(x, y, function (nx, ny) {
             _this.addToCell(nx, ny, value);
         });
-        return _this;
+        return this;
     }
     /**
      * Check if Matrix has at least one element with a specified value
@@ -76,7 +76,7 @@ export default class NumericMatrix extends Matrix {
         _this.map(function (x, y) {
             return changeRange(_this.getCell(x, y), currMin, currMax, min, max);
         });
-        return _this;
+        return this;
     }
     /**
      * Retrieve minimum value

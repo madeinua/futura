@@ -4,7 +4,7 @@ import AltitudeMap from "./AltitudeMap.js";
 
 export default class TemperatureMap extends PointMatrix {
 
-    altitudeMap: AltitudeMap;
+    readonly altitudeMap: AltitudeMap;
 
     constructor(altitudeMap: AltitudeMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE);

@@ -6,13 +6,13 @@ export const LAYER_FOREST = 1;
 export const LAYER_HABITAT = 2;
 export const LAYER_ANIMALS = 3;
 
-export class Layer extends Matrix {
+export class Layer extends Matrix<null | DisplayCell> {
 
     getCell(x: number, y: number): null | DisplayCell {
         return super.getCell(x, y);
     }
 
-    setCell(x: number, y: number, value: any): Matrix {
+    setCell(x: number, y: number, value: any): this {
 
         if (value !== null && !(value instanceof DisplayCell)) {
             value = new DisplayCell(value, null, false);

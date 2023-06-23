@@ -7,9 +7,9 @@ import LakesMap from "./LakesMap.js";
 
 export default class HumidityMap extends PointMatrix {
 
-    altitudeMap: AltitudeMap;
-    riversMap: RiversMap;
-    lakesMap: LakesMap;
+    readonly altitudeMap: AltitudeMap;
+    readonly riversMap: RiversMap;
+    readonly lakesMap: LakesMap;
 
     constructor(altitudeMap: AltitudeMap, riversMap: RiversMap, lakesMap: LakesMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE);

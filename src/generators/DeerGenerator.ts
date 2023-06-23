@@ -12,7 +12,7 @@ export default class DeerGenerator extends AnimalGenerator {
         return Deer;
     }
 
-    updateHabitat(): any {
+    updateHabitat(): this {
 
         const forestsOperator = this.objects.forestsOperator,
             habitat = forestsOperator.getForestMap().clone();

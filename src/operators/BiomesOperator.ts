@@ -22,14 +22,14 @@ type biomesConfig = {
 
 export default class BiomesOperator {
 
-    biomes: BiomesMap;
-    altitudeMap: AltitudeMap;
-    coastMap: CoastMap;
-    oceanMap: OceanMap;
-    freshWaterMap: BinaryMatrix;
-    temperatureMap: TemperatureMap;
-    humidityMap: HumidityMap;
-    biomesConfig: biomesConfig;
+    readonly biomes: BiomesMap;
+    readonly altitudeMap: AltitudeMap;
+    readonly coastMap: CoastMap;
+    readonly oceanMap: OceanMap;
+    readonly freshWaterMap: BinaryMatrix;
+    readonly temperatureMap: TemperatureMap;
+    readonly humidityMap: HumidityMap;
+    readonly biomesConfig: biomesConfig;
 
     constructor(
         altitudeMap: AltitudeMap,
