@@ -20,7 +20,7 @@ import BinaryMatrix from "./structures/BinaryMatrix.js";
 import HumidityMap from "./maps/HumidityMap.js";
 import {Cell} from "./structures/Cells.js";
 import BiomesMap from "./maps/BiomesMap.js";
-import DisplayCell from "./render/DisplayCell";
+import DisplayCell from "./render/DisplayCell.js";
 
 type WorldType = {
     altitudeMap: AltitudeMap,

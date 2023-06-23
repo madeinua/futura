@@ -125,7 +125,7 @@ export default class Matrix<T extends any = any> {
         if (values instanceof Array) {
             this.__values = values;
         } else {
-            this.map(function (): any {
+            this.map(function (): Array2D<T> {
                 return values;
             });
         }

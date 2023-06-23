@@ -3,11 +3,9 @@ import {distance, round, getPolygonAreaSize} from "../helpers.js";
 import {CellsList} from "./Cells.js";
 import {Array2D} from "./Array2D.js";
 
-type BinaryMatrixValues = 0 | 1;
-
 export default class BinaryMatrix extends NumericMatrix {
 
-    constructor(fill: BinaryMatrixValues, width: number, height: number) {
+    constructor(fill: 0 | 1, width: number, height: number) {
         super(width, height);
 
         this.map(

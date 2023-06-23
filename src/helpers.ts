@@ -2,7 +2,7 @@ import {CellsList} from "./structures/Cells.js";
 import {Array2D} from "./structures/Array2D.js";
 
 export type RGB = [number, number, number];
-export type RGBa = [number, number, number, number];
+export type RGBa = RGB | [number, number, number, number];
 
 let errors = [];
 
@@ -231,7 +231,7 @@ export function create2DArray(width: number, height: number, value: any): Array2
     return [...Array(height)].map(() => [...Array(width)].map(() => value));
 }
 
-export function fillCanvasPixel(image: ImageData, point: number, RGBa: RGB | RGBa): void {
+export function fillCanvasPixel(image: ImageData, point: number, RGBa: RGBa): void {
     image.data[point] = RGBa[0];
     image.data[point + 1] = RGBa[1];
     image.data[point + 2] = RGBa[2];

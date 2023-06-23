@@ -1,18 +1,18 @@
-import {RGB} from "../helpers.js";
+import {RGBa} from "../helpers.js";
 
 export default class DisplayCell {
 
-    readonly color: RGB;
+    readonly color: RGBa;
     readonly image: null | HTMLImageElement;
     readonly withBg: boolean;
 
-    constructor(color: RGB, image: null | HTMLImageElement, withBackground: boolean) {
+    constructor(color: RGBa, image: null | HTMLImageElement, withBackground: boolean) {
         this.color = color;
         this.image = typeof image === 'undefined' ? null : image;
         this.withBg = withBackground;
     }
 
-    getColor(): RGB {
+    getColor(): RGBa {
         return this.color;
     }
 
