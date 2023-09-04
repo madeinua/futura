@@ -10,7 +10,6 @@ export type BiomeArgs = {
 }
 
 export default class Biome {
-    static BIOME_NAME = '';
 
     readonly x: number;
     readonly y: number;
@@ -29,13 +28,13 @@ export default class Biome {
     }
 
     getName(): string {
-        return (this.constructor as typeof Biome).BIOME_NAME;
+        return this.constructor.name;
     }
 
     getColor(): string {
-        return typeof Config.BIOME_COLORS[this.constructor.name] === 'undefined'
+        return typeof Config.BIOME_COLORS[this.getName()] === 'undefined'
             ? '#FFFFFF'
-            : Config.BIOME_COLORS[this.constructor.name];
+            : Config.BIOME_COLORS[this.getName()];
     }
 
     getHexColor(): RGB {
@@ -47,9 +46,9 @@ export default class Biome {
     }
 
     getImage(): null | HTMLImageElement {
-        return typeof Config.BIOME_IMAGES[this.constructor.name] === 'undefined'
+        return typeof Config.BIOME_IMAGES[this.getName()] === 'undefined'
             ? null
-            : createImage(Config.BIOME_IMAGES[this.constructor.name]);
+            : createImage(Config.BIOME_IMAGES[this.getName()]);
     }
 
     getDisplayCell(): DisplayCell {

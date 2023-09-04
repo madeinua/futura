@@ -203,17 +203,17 @@ const Config = {
     FOREST_GROWTH_CHANCE: 0.02, // %
     FOREST_DIE_CHANCE: 0.001, // %
     FOREST_GROUNDS_MULTS: {
-        'tundra': 1.2,
-        'tundra-hills': 0.8,
-        'grass': 2,
-        'grass-hills': 5,
-        'desert': 0.5,
-        'desert-hills': 1.5,
-        'swamp': 2,
-        'rocks': 0.8,
-        'savanna': 2.5,
-        'savanna-hills': 4,
-        'tropic': 6
+        Biome_Tundra: 1.2,
+        Biome_Tundra_Hills: 0.8,
+        Biome_Grass: 2,
+        Biome_Grass_Hills: 5,
+        Biome_Desert: 0.5,
+        Biome_Desert_Hills: 1.5,
+        Biome_Swamp: 2,
+        Biome_Rocks: 0.8,
+        Biome_Savanna: 2.5,
+        Biome_Savanna_Hills: 4,
+        Biome_Tropic: 6
     },
     FOREST_CREATE_MULTS: { // Must be 100 in the total
         WATTER: 35,

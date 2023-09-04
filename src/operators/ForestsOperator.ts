@@ -56,7 +56,7 @@ export default class ForestsOperator {
      * Whether the cell is a palm or a normal forest
      */
     isDesertForest = function (x: number, y: number): boolean {
-        return [biomes.Biome_Desert.BIOME_NAME, biomes.Biome_Desert_Hills.BIOME_NAME, biomes.Biome_Tropic.BIOME_NAME].includes(
+        return [biomes.Biome_Desert.name, biomes.Biome_Desert_Hills.name, biomes.Biome_Tropic.name].includes(
             this.biomesOperator.getBiome(x, y).getName()
         );
     }
@@ -65,7 +65,7 @@ export default class ForestsOperator {
      * Whether the cell is a palm or a normal forest
      */
     isTundraForest = function (x: number, y: number): boolean {
-        return [biomes.Biome_Tundra.BIOME_NAME, biomes.Biome_Tundra_Hills.BIOME_NAME].includes(
+        return [biomes.Biome_Tundra.name, biomes.Biome_Tundra_Hills.name].includes(
             this.biomesOperator.getBiome(x, y).getName()
         );
     }

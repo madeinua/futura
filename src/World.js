@@ -114,7 +114,7 @@ export default class World {
                 for (let y = 0; y < Config.VISIBLE_COLS; y++) {
                     const lx = x * _this.cellSize + worldOffsetLeft, ly = y * _this.cellSize + worldOffsetTop;
                     ctx.font = '7px senf';
-                    ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(0, 6), lx + 2, ly + 10);
+                    ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(6, 12), lx + 2, ly + 10);
                 }
             }
         };

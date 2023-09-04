@@ -8,6 +8,7 @@ import HumidityOperator from "./operators/HumidityOperator.js";
 import BiomesOperator from "./operators/BiomesOperator.js";
 import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
+import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
 import Layers from "./services/Layers.js";
 import AltitudeMap from "./maps/AltitudeMap.js";
@@ -302,7 +303,7 @@ export default class World {
                     ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.font = '7px senf';
-                ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(0, 6), lx + 2, ly + 10);
+                ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(6, 12), lx + 2, ly + 10);
             }
         }
     }
@@ -422,5 +423,15 @@ export default class World {
 
     update = function (): void {
         this.drawLayers();
+    }
+
+    generateFractions = function (): void {
+        const fractionsOperator = new FractionsOperator(
+            this.world.freshWaterMap,
+            this.world.forestOperator.getForestMap(),
+            this.world.biomesOperator
+        );
+
+        fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
     }
 }

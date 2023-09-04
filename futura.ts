@@ -132,7 +132,7 @@ Filters.add('biomes', function (biomes: Matrix) {
 
     for (let i in biomesTypesCounter) {
         let item = document.createElement('li');
-        item.innerHTML = i + ': ' + biomesTypesCounter[i];
+        item.innerHTML = i.substring(6) + ': ' + biomesTypesCounter[i];
         list.appendChild(item);
     }
 
@@ -241,5 +241,7 @@ document.getElementById('pauseSteps').addEventListener("click", function () {
 world.timer.addStepsHandler(function (step: string) {
     document.getElementById('stepsCounter').innerHTML = step;
 });
+
+document.getElementById('generateFractions').addEventListener("click", function () {
     world.generateFractions();
 });
