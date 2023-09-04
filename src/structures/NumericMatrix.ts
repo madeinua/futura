@@ -72,13 +72,13 @@ export default class NumericMatrix<T extends number = number> extends Matrix<T> 
     /**
      * Check if Matrix has at least one element with a specified value
      */
-    has(value: number): boolean {
+    has(targetValue: number): boolean {
 
         let found = false;
         const _this: NumericMatrix = this;
 
-        _this.foreach(function (x: number, y: number): void {
-            if (_this.getCell(x, y) === value) {
+        _this.foreachValues(function (value: number): void {
+            if (value === targetValue) {
                 found = true;
             }
         });
@@ -128,5 +128,56 @@ export default class NumericMatrix<T extends number = number> extends Matrix<T> 
      */
     getAvgValue(): number {
         return round(this.getValuesList().reduce((a, b) => a + b, 0) / (this.width * this.height), 2);
+    }
+
+    /**
+     * Retrieve a random point based on the values of the matrix
+     */
+    getRandomWeightedPoint(): [number, number] {
+        const matrix = this.getValues();
+
+        // Calculate the total sum of values in each row
+        const rowSums: number[] = matrix.map((row) => row.reduce((acc, val) => acc + val, 0));
+
+        // Calculate the total sum of row sums
+        const totalSum: number = rowSums.reduce((acc, sum) => acc + sum, 0);
+
+        // Generate a random number between 0 and the totalSum
+        const randomValue: number = Math.random() * totalSum;
+
+        // Initialize variables to keep track of the cumulative sum
+        let cumulativeSum: number = 0;
+        let rowIndex: number = 0;
+
+        // Find the row index based on probabilities
+        for (let i: number = 0; i < matrix.length; i++) {
+            cumulativeSum += rowSums[i];
+            if (randomValue <= cumulativeSum) {
+                rowIndex = i; // Store the selected row index
+                break;
+            }
+        }
+
+        // Calculate the total sum of values in the selected row
+        const selectedRowSum: number = rowSums[rowIndex];
+
+        // Generate a random number between 0 and the selectedRowSum
+        const randomColValue: number = Math.random() * selectedRowSum;
+
+        // Initialize variables to keep track of the cumulative sum for columns
+        cumulativeSum = 0;
+        let colIndex: number = 0;
+
+        // Find the column index within the selected row based on probabilities
+        for (let j: number = 0; j < matrix[rowIndex].length; j++) {
+            cumulativeSum += matrix[rowIndex][j];
+            if (randomColValue <= cumulativeSum) {
+                colIndex = j; // Store the selected column index
+                break;
+            }
+        }
+
+        // Return the random coordinate as [row, col]
+        return [rowIndex, colIndex];
     }
 }

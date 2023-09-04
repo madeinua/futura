@@ -13,8 +13,7 @@ export default class RiversMap extends BinaryMatrix {
         };
         this.getRiverSources = function (altitudeMap) {
             const spawns = [];
-            altitudeMap.foreach(function (x, y) {
-                const altitude = altitudeMap.getCell(x, y);
+            altitudeMap.foreachValues(function (altitude, x, y) {
                 if (altitudeMap.isGround(altitude)
                     && altitude >= Config.RIVER_SOURCE_MIN_ALTITUDE
                     && Config.RIVER_SOURCE_MAX_ALTITUDE >= altitude) {

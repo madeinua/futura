@@ -5,25 +5,13 @@ import DeerGenerator from "../generators/DeerGenerator.js";
 import DisplayCell from "../render/DisplayCell.js";
 import {Cell, CellsList} from "../structures/Cells.js";
 import Animal from "../animals/Animal.js";
-import AnimalGenerator from "../generators/AnimalGenerator.js";
+import AnimalGenerator, {AnimalsGeneratorArgs} from "../generators/AnimalGenerator.js";
 import Timer from "../services/Timer.js";
 import {Layer} from "../render/Layer.js";
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import CoastMap from "../maps/CoastMap.js";
-import BiomesOperator from "./BiomesOperator.js";
-import ForestsOperator from "./ForestsOperator.js";
 import FishGenerator from "../generators/FishGenerator.js";
 
 type AnimalsTypesCounter = {
     [key: string]: number;
-}
-
-export type AnimalsOperatorArgs = {
-    freshWaterMap: BinaryMatrix,
-    coastMap: CoastMap,
-    forestsOperator: ForestsOperator,
-    biomesOperator: BiomesOperator,
-    timer: Timer
 }
 
 export default class AnimalsOperator {
@@ -34,7 +22,7 @@ export default class AnimalsOperator {
     animalsGenerators: AnimalGenerator[] = [];
     animalImagesCache: DisplayCell[] = [];
 
-    constructor(timer: Timer, habitatLayer: Layer, animalsLayer: Layer, objects: AnimalsOperatorArgs) {
+    constructor(timer: Timer, habitatLayer: Layer, animalsLayer: Layer, objects: AnimalsGeneratorArgs) {
 
         this.animalImagesCache = [];
 

@@ -3,10 +3,10 @@ import { create2DArray, getRectangleAround, getAroundRadius } from "../helpers.j
  * Generate 2D matrix from the array
  */
 export default class Matrix {
-    constructor(width, height) {
+    constructor(width, height, defaultValue) {
         this.width = width;
         this.height = height;
-        this.__values = create2DArray(this.width, this.height, null);
+        this.__values = create2DArray(this.width, this.height, defaultValue || null);
     }
     /**
      * Get all cells of matrix
@@ -25,6 +25,16 @@ export default class Matrix {
             }
         }
         return values;
+    }
+    /**
+     * Set all cells of matrix to the specified value
+     * @param value
+     */
+    set(value) {
+        this.foreach(function (x, y) {
+            this.setCell(x, y, value);
+        });
+        return this;
     }
     /**
      * Set cell value
@@ -82,6 +92,16 @@ export default class Matrix {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 callback(x, y);
+            }
+        }
+    }
+    /**
+     * Applies the callback to the elements of the Matrix
+     */
+    foreachValues(callback) {
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                callback(this.getCell(x, y), x, y);
             }
         }
     }

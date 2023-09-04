@@ -5,8 +5,8 @@ export default class LakesMap extends BinaryMatrix {
         super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
         this.generateMap = function () {
             const _this = this;
-            _this.altitudeMap.foreach(function (x, y) {
-                if (_this.altitudeMap.isWater(_this.altitudeMap.getCell(x, y))
+            _this.altitudeMap.foreachValues(function (altitude, x, y) {
+                if (_this.altitudeMap.isWater(altitude)
                     && !_this.oceanMap.filled(x, y)) {
                     _this.fill(x, y);
                 }

@@ -66,7 +66,7 @@ function drawMap(id: string, map: NumericMatrix, reverse: boolean) {
     ctx.putImageData(image, 0, 0);
 }
 
-Filters.add('mapMoved', function (point) {
+Filters.add('mapMoved', function (point: Cell) {
     point = centeredCameraPointToXY(point, Config.VISIBLE_COLS);
     coordinatesField.value = point[0] + ',' + point[1];
 });
@@ -111,9 +111,7 @@ Filters.add('biomes', function (biomes: Matrix) {
 
     let biomesTypesCounter: { [key: string]: number } = {};
 
-    biomes.foreach(function (x: number, y: number) {
-        let biome: Biome = biomes.getCell(x, y);
-
+    biomes.foreachValues(function (biome: Biome) {
         if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
             biomesTypesCounter[biome.getName()] = 0;
         }
@@ -240,6 +238,8 @@ document.getElementById('pauseSteps').addEventListener("click", function () {
     pauseTimer();
 });
 
-world.timer.addStepsHandler(function (step) {
+world.timer.addStepsHandler(function (step: string) {
     document.getElementById('stepsCounter').innerHTML = step;
+});
+    world.generateFractions();
 });

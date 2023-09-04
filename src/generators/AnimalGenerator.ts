@@ -2,8 +2,11 @@ import BinaryMatrix from "../structures/BinaryMatrix.js";
 import {throwError} from "../helpers.js";
 import Config from "../../config.js";
 import Animal from "../animals/Animal.js";
-import {AnimalsOperatorArgs} from "../operators/AnimalsOperator.js";
 import {CellsList} from "../structures/Cells.js";
+import CoastMap from "../maps/CoastMap";
+import ForestsOperator from "../operators/ForestsOperator";
+import BiomesOperator from "../operators/BiomesOperator";
+import Timer from "../services/Timer";
 
 type AnimalType = {
     intensity: number;
@@ -13,14 +16,22 @@ type AnimalType = {
     image: string | null;
 };
 
+export type AnimalsGeneratorArgs = {
+    freshWaterMap: BinaryMatrix,
+    coastMap: CoastMap,
+    forestsOperator: ForestsOperator,
+    biomesOperator: BiomesOperator,
+    timer: Timer
+};
+
 export default class AnimalGenerator {
 
-    readonly objects: AnimalsOperatorArgs;
+    readonly objects: AnimalsGeneratorArgs;
     habitat: BinaryMatrix;
     respawnPoints: CellsList = [];
     maxAnimals: number = -1;
 
-    constructor(objects: AnimalsOperatorArgs) {
+    constructor(objects: AnimalsGeneratorArgs) {
         this.objects = objects;
     }
 

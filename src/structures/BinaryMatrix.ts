@@ -1,6 +1,6 @@
 import NumericMatrix from './NumericMatrix.js';
 import {distance, round, getPolygonAreaSize} from "../helpers.js";
-import {Cell, CellsList} from "./Cells.js";
+import {CellsList} from "./Cells.js";
 import {Array2D} from "./Array2D.js";
 
 export default class BinaryMatrix extends NumericMatrix {

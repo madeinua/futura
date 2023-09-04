@@ -15,8 +15,8 @@ export default class ForestGenerator {
             this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
         }
         const _this = this;
-        biomesOperator.altitudeMap.foreach(function (x, y) {
-            if (biomesOperator.altitudeMap.getCell(x, y) > Config.MAX_HILLS_LEVEL) {
+        biomesOperator.altitudeMap.foreachValues(function (altitude, x, y) {
+            if (altitude > Config.MAX_HILLS_LEVEL) {
                 _this.unallowedCells.push([x, y]);
             }
         });
@@ -60,11 +60,9 @@ export default class ForestGenerator {
     }
     createTrees(forestMap, filledCells, step) {
         const _this = this, createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))), potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity);
-        let x, y, createChance;
         for (let i = 0; i < potentialCells.length; i++) {
-            x = potentialCells[i][0];
-            y = potentialCells[i][1];
-            createChance = _this.getCreateChance(forestMap, _this.biomesOperator.humidityMap.getCell(x, y), x, y, step <= Config.STEPS_BOOST_STEPS
+            const x = potentialCells[i][0], y = potentialCells[i][1];
+            const createChance = _this.getCreateChance(forestMap, _this.biomesOperator.humidityMap.getCell(x, y), x, y, step <= Config.STEPS_BOOST_STEPS
                 ? Config.FOREST_BORN_CHANCE * Config.FOREST_BORN_BOOST
                 : Config.FOREST_BORN_CHANCE);
             if (iAmLucky(createChance)) {

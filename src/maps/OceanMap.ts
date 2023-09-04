@@ -42,9 +42,9 @@ export default class OceanMap extends BinaryMatrix {
         const _this: OceanMap = this,
             tempMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
 
-        _this.altitudeMap.foreach(function (x: number, y: number): void {
+        _this.altitudeMap.foreachValues(function (altitude: number, x: number, y: number): void {
             if (
-                _this.altitudeMap.isWater(_this.altitudeMap.getCell(x, y))
+                _this.altitudeMap.isWater(altitude)
                 && !_this.filled(x, y)
             ) {
                 tempMap.fill(x, y);

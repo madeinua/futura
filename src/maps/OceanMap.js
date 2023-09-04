@@ -22,8 +22,8 @@ export default class OceanMap extends BinaryMatrix {
         };
         this.bigLakesToSeas = function () {
             const _this = this, tempMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
-            _this.altitudeMap.foreach(function (x, y) {
-                if (_this.altitudeMap.isWater(_this.altitudeMap.getCell(x, y))
+            _this.altitudeMap.foreachValues(function (altitude, x, y) {
+                if (_this.altitudeMap.isWater(altitude)
                     && !_this.filled(x, y)) {
                     tempMap.fill(x, y);
                 }

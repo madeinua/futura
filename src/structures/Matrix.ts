@@ -11,10 +11,10 @@ export default class Matrix<T extends any = any> {
     readonly height: number;
     __values: Array2D<T>;
 
-    constructor(width: number, height: number) {
+    constructor(width: number, height: number, defaultValue?: any) {
         this.width = width;
         this.height = height;
-        this.__values = create2DArray(this.width, this.height, null);
+        this.__values = create2DArray(this.width, this.height, defaultValue || null);
     }
 
     /**
@@ -39,6 +39,18 @@ export default class Matrix<T extends any = any> {
         }
 
         return values;
+    }
+
+    /**
+     * Set all cells of matrix to the specified value
+     * @param value
+     */
+    set(value: T): this {
+        this.foreach(function (x: number, y: number): void {
+            this.setCell(x, y, value);
+        });
+
+        return this;
     }
 
     /**
@@ -113,6 +125,17 @@ export default class Matrix<T extends any = any> {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 callback(x, y);
+            }
+        }
+    }
+
+    /**
+     * Applies the callback to the elements of the Matrix
+     */
+    foreachValues(callback: Function): void {
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                callback(this.getCell(x, y), x, y);
             }
         }
     }

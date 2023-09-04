@@ -2,7 +2,7 @@ import ForestMap from "../maps/ForestMap.js";
 import ForestGenerator from "../generators/ForestGenerator.js";
 import DisplayCell from "../render/DisplayCell.js"
 import Timer from "../services/Timer.js";
-import biomes from "../biomes/biomes.js";
+import biomes from "../biomes/Biomes.js";
 import {hexToRgb, createImage, Filters, logTimeEvent, RGB} from "../helpers.js";
 import Config from "../../config.js";
 import BiomesOperator from "./BiomesOperator.js";
@@ -41,7 +41,7 @@ export default class ForestsOperator {
             biomesOperator.getBiomes()
         );
 
-        timer.addStepsHandler(function (step): void {
+        timer.addStepsHandler(function (step: number): void {
             forestGenerator.generate(_this.forestMap, step);
             _this.addForestMapToLayer(forestLayer, _this.forestMap);
             _this.forestMap = Filters.apply('forestMap', _this.forestMap);
@@ -70,7 +70,7 @@ export default class ForestsOperator {
         );
     }
 
-    private getForestImage = function (x: number, y: number): HTMLImageElement {
+    protected getForestImage = function (x: number, y: number): HTMLImageElement {
 
         if (this.isDesertForest(x, y)) {
             return this.forestPalmImage;

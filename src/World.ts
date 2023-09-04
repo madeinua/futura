@@ -19,7 +19,6 @@ import RiversMap from "./maps/RiversMap.js";
 import BinaryMatrix from "./structures/BinaryMatrix.js";
 import HumidityMap from "./maps/HumidityMap.js";
 import {Cell} from "./structures/Cells.js";
-import BiomesMap from "./maps/BiomesMap.js";
 import DisplayCell from "./render/DisplayCell.js";
 
 type WorldType = {
@@ -31,7 +30,8 @@ type WorldType = {
     riversMap: RiversMap,
     freshWaterMap: BinaryMatrix,
     humidityMap: HumidityMap,
-    biomes: BiomesMap
+    biomesOperator: BiomesOperator,
+    forestOperator: ForestsOperator,
 }
 
 declare global {
@@ -156,7 +156,8 @@ export default class World {
             'riversMap': riversMap,
             'freshWaterMap': freshWaterMap,
             'humidityMap': humidityMap,
-            'biomes': biomesOperator.getBiomes()
+            'biomesOperator': biomesOperator,
+            'forestOperator': forestsOperator,
         }
     }
 
@@ -186,24 +187,17 @@ export default class World {
             cameraPosX = _this.cameraPosX,
             cameraPosY = _this.cameraPosY;
 
-        let layer,
-            displayCell;
-
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-            layer = _this.layers.getLayer(ln);
-            layer.foreach(function (x: number, y: number): void {
+            const layer = _this.layers.getLayer(ln);
 
-                displayCell = layer.getCell(x, y);
-
-                if (displayCell === null) {
-                    return;
+            layer.foreachValues(function (displayCell: DisplayCell, x: number, y: number): void {
+                if (displayCell !== null) {
+                    fillCanvasPixel(
+                        image,
+                        (x + y * Config.WORLD_SIZE) * 4,
+                        displayCell.getColor()
+                    );
                 }
-
-                fillCanvasPixel(
-                    image,
-                    (x + y * Config.WORLD_SIZE) * 4,
-                    displayCell.getColor()
-                );
             });
         }
 
@@ -236,13 +230,10 @@ export default class World {
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
 
-        let lx, ly;
-
         for (let x = 0; x < Config.VISIBLE_COLS; x++) {
             for (let y = 0; y < Config.VISIBLE_COLS; y++) {
-
-                lx = x * _this.cellSize + worldOffsetLeft;
-                ly = y * _this.cellSize + worldOffsetTop;
+                const lx = x * _this.cellSize + worldOffsetLeft,
+                    ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.strokeRect(lx, ly, _this.cellSize, _this.cellSize);
             }
@@ -259,13 +250,10 @@ export default class World {
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
 
-        let lx, ly;
-
         for (let x = 0; x < Config.VISIBLE_COLS; x++) {
             for (let y = 0; y < Config.VISIBLE_COLS; y++) {
-
-                lx = x * _this.cellSize + worldOffsetLeft;
-                ly = y * _this.cellSize + worldOffsetTop;
+                const lx = x * _this.cellSize + worldOffsetLeft,
+                    ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.font = '7px senf';
                 ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
@@ -285,13 +273,11 @@ export default class World {
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
 
-        let lx, ly;
-
         for (let x = 0; x < Config.VISIBLE_COLS; x++) {
             for (let y = 0; y < Config.VISIBLE_COLS; y++) {
 
-                lx = x * _this.cellSize + worldOffsetLeft;
-                ly = y * _this.cellSize + worldOffsetTop;
+                const lx = x * _this.cellSize + worldOffsetLeft,
+                    ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.font = '7px senf';
                 ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPosX + x, _this.cameraPosY + y) * 450) / 10).toString(), lx + 2, ly + 10);
@@ -305,18 +291,15 @@ export default class World {
             ctx = _this.scrollingMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellSize,
             worldOffsetTop = _this.cameraPosY * _this.cellSize,
-            biomes = this.world.biomes;
+            biomes = this.world.biomesOperator.getBiomes();
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
 
-        let lx, ly;
-
         for (let x = 0; x < Config.VISIBLE_COLS; x++) {
             for (let y = 0; y < Config.VISIBLE_COLS; y++) {
-
-                lx = x * _this.cellSize + worldOffsetLeft;
-                ly = y * _this.cellSize + worldOffsetTop;
+                const lx = x * _this.cellSize + worldOffsetLeft,
+                    ly = y * _this.cellSize + worldOffsetTop;
 
                 ctx.font = '7px senf';
                 ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(0, 6), lx + 2, ly + 10);
@@ -331,7 +314,7 @@ export default class World {
             && y <= this.cameraPosY + Config.VISIBLE_COLS;
     }
 
-    private drawLayers = function (): void {
+    protected drawLayers = function (): void {
 
         const _this: World = this,
             renderCanvas = document.createElement('canvas');
@@ -349,21 +332,14 @@ export default class World {
         this.scrollingMapWrapper.scrollLeft = worldOffsetLeft;
         this.scrollingMapWrapper.scrollTop = worldOffsetTop;
 
-        let layer: Layer,
-            cell: DisplayCell;
+        let layer: Layer;
 
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
             layer = _this.layers.getLayer(ln);
 
-            layer.foreach(function (x: number, y: number) {
+            layer.foreachValues(function (cell: null | DisplayCell, x: number, y: number) {
 
-                if (!_this.isCellVisible(x, y)) {
-                    return;
-                }
-
-                cell = layer.getCell(x, y);
-
-                if (cell === null) {
+                if (cell === null || !_this.isCellVisible(x, y)) {
                     return;
                 }
 

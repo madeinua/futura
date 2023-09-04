@@ -17,7 +17,7 @@ export default class Timer {
             timerStart = Date.now();
 
         let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST,
-            timerInterval,
+            timerInterval: NodeJS.Timer,
             boosted = false;
 
         _this.timerStep = 0;

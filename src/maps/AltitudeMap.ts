@@ -21,14 +21,12 @@ export default class AltitudeMap extends PointMatrix {
         }
 
         _this.map(function (x: number, y: number): number {
-
             let val = 0,
-                size = 0,
-                s;
+                size = 0;
 
             // blend maps
             for (let i = 0; i < maps.length; i++) {
-                s = Math.pow(2, i);
+                let s = Math.pow(2, i);
                 size += s;
                 val += maps[i].getCell(x, y) * s;
             }
@@ -55,11 +53,11 @@ export default class AltitudeMap extends PointMatrix {
         this.initVariables();
     }
 
-    private initVariables() {
+    protected initVariables() {
         const _this: AltitudeMap = this;
 
-        _this.foreach(function (x: number, y: number): void {
-            _this.isWater(_this.getCell(x, y))
+        _this.foreachValues(function (altitude: number): void {
+            _this.isWater(altitude)
                 ? _this.waterSize++
                 : _this.landSize++;
         });

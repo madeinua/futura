@@ -2,7 +2,7 @@ import {Layer} from '../render/Layer.js';
 
 export default class Layers {
 
-    layers: any[] = [];
+    layers: Layer[] = [];
     readonly width: number;
     readonly height: number;
 

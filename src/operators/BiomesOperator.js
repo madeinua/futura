@@ -1,5 +1,5 @@
 import BinaryMatrix from "../structures/BinaryMatrix.js";
-import biomes from "../biomes/biomes.js";
+import biomes from "../biomes/Biomes.js";
 import { fromFraction, throwError, logTimeEvent, Filters } from "../helpers.js";
 import Config from "../../config.js";
 import BiomesMap from "../maps/BiomesMap.js";
@@ -21,9 +21,8 @@ export default class BiomesOperator {
             return false;
         };
         this.addBiomesToLayer = function (biomesLayer) {
-            const _this = this;
-            _this.biomes.foreach(function (x, y) {
-                biomesLayer.setCell(x, y, _this.biomes.getCell(x, y).getDisplayCell());
+            this.biomes.foreachValues(function (biome, x, y) {
+                biomesLayer.setCell(x, y, biome.getDisplayCell());
             });
         };
         this.biomes = new BiomesMap();

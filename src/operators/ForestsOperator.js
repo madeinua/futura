@@ -1,7 +1,7 @@
 import ForestMap from "../maps/ForestMap.js";
 import ForestGenerator from "../generators/ForestGenerator.js";
 import DisplayCell from "../render/DisplayCell.js";
-import biomes from "../biomes/biomes.js";
+import biomes from "../biomes/Biomes.js";
 import { hexToRgb, createImage, Filters, logTimeEvent } from "../helpers.js";
 import Config from "../../config.js";
 export default class ForestsOperator {

@@ -60,8 +60,7 @@ Filters.add('riversMap', function (map) {
 Filters.add('biomes', function (biomes) {
     drawColorMap('biomesCanvas', biomes);
     let biomesTypesCounter = {};
-    biomes.foreach(function (x, y) {
-        let biome = biomes.getCell(x, y);
+    biomes.foreachValues(function (biome) {
         if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
             biomesTypesCounter[biome.getName()] = 0;
         }

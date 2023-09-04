@@ -1,5 +1,5 @@
 import { getStep, throwError } from "../helpers.js";
-export default class Animal {
+class Animal {
     constructor(x, y, settings) {
         this.id = this.getName() + '-' + getStep();
         this.x = x;
@@ -44,3 +44,4 @@ export default class Animal {
     }
 }
 Animal.ANIMAL_NAME = 'Animal';
+export default Animal;

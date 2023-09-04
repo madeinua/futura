@@ -33,13 +33,11 @@ export default class RiversMap extends BinaryMatrix {
         return this;
     }
 
-    private getRiverSources = function (altitudeMap: AltitudeMap): CellsList {
+    protected getRiverSources = function (altitudeMap: AltitudeMap): CellsList {
 
         const spawns = [];
 
-        altitudeMap.foreach(function (x: number, y: number): void {
-            const altitude = altitudeMap.getCell(x, y);
-
+        altitudeMap.foreachValues(function (altitude: number, x: number, y: number): void {
             if (
                 altitudeMap.isGround(altitude)
                 && altitude >= Config.RIVER_SOURCE_MIN_ALTITUDE
@@ -52,7 +50,7 @@ export default class RiversMap extends BinaryMatrix {
         return spawns.shuffle();
     }
 
-    private generateRiversCells = function (riverSources: CellsList): CellsArray {
+    protected generateRiversCells = function (riverSources: CellsList): CellsArray {
 
         const _this: RiversMap = this,
             rivers = [],
@@ -160,7 +158,7 @@ export default class RiversMap extends BinaryMatrix {
     /**
      * Add river delta
      */
-    private addRiverDeltaToRiverMap = function (river: CellsList): CellsList {
+    protected addRiverDeltaToRiverMap = function (river: CellsList): CellsList {
 
         const _this: RiversMap = this,
             ratio = randBetweenNumbers(0.01, Config.RIVER_DELTA_MAX_LENGTH),
@@ -181,7 +179,7 @@ export default class RiversMap extends BinaryMatrix {
         return river.concat(delta);
     }
 
-    private createRiverMapFromRiversPoints = function (rivers: CellsArray): void {
+    protected createRiverMapFromRiversPoints = function (rivers: CellsArray): void {
         for (let i = 0; i < rivers.length; i++) {
             for (let p = 0; p < rivers[i].length; p++) {
                 this.fill(rivers[i][p][0], rivers[i][p][1]);
@@ -193,7 +191,7 @@ export default class RiversMap extends BinaryMatrix {
         return this.riversCount;
     }
 
-    private addRiverDeltaToRiversMaps = function (rivers: CellsArray): CellsArray {
+    protected addRiverDeltaToRiversMaps = function (rivers: CellsArray): CellsArray {
 
         for (let i = 0; i < rivers.length; i++) {
             rivers[i] = this.addRiverDeltaToRiverMap(rivers[i]);

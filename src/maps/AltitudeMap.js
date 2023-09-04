@@ -13,10 +13,10 @@ export default class AltitudeMap extends PointMatrix {
                 maps[i] = new NoiseMapGenerator(Config.WORLD_SIZE, octaves[i] * (Config.WORLD_SIZE / 75)).generate();
             }
             _this.map(function (x, y) {
-                let val = 0, size = 0, s;
+                let val = 0, size = 0;
                 // blend maps
                 for (let i = 0; i < maps.length; i++) {
-                    s = Math.pow(2, i);
+                    let s = Math.pow(2, i);
                     size += s;
                     val += maps[i].getCell(x, y) * s;
                 }
@@ -55,8 +55,8 @@ export default class AltitudeMap extends PointMatrix {
     }
     initVariables() {
         const _this = this;
-        _this.foreach(function (x, y) {
-            _this.isWater(_this.getCell(x, y))
+        _this.foreachValues(function (altitude) {
+            _this.isWater(altitude)
                 ? _this.waterSize++
                 : _this.landSize++;
         });

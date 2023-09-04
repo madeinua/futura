@@ -8,6 +8,7 @@ import HumidityOperator from "./operators/HumidityOperator.js";
 import BiomesOperator from "./operators/BiomesOperator.js";
 import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
+import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
 import Layers from "./services/Layers.js";
 export default class World {
@@ -35,7 +36,8 @@ export default class World {
                 'riversMap': riversMap,
                 'freshWaterMap': freshWaterMap,
                 'humidityMap': humidityMap,
-                'biomes': biomesOperator.getBiomes()
+                'biomesOperator': biomesOperator,
+                'forestOperator': forestsOperator,
             };
         };
         this.moveMapTo = function (point, silent = false) {
@@ -51,15 +53,12 @@ export default class World {
         };
         this.drawMainMap = function () {
             const _this = this, ctx = _this.mainMapCanvas.getContext('2d'), image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), mainMapSize = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE, cameraPosX = _this.cameraPosX, cameraPosY = _this.cameraPosY;
-            let layer, displayCell;
             for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-                layer = _this.layers.getLayer(ln);
-                layer.foreach(function (x, y) {
-                    displayCell = layer.getCell(x, y);
-                    if (displayCell === null) {
-                        return;
+                const layer = _this.layers.getLayer(ln);
+                layer.foreachValues(function (displayCell, x, y) {
+                    if (displayCell !== null) {
+                        fillCanvasPixel(image, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
                     }
-                    fillCanvasPixel(image, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
                 });
             }
             createImageBitmap(image).then(function (render) {
@@ -75,11 +74,9 @@ export default class World {
             const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            let lx, ly;
             for (let x = 0; x < Config.VISIBLE_COLS; x++) {
                 for (let y = 0; y < Config.VISIBLE_COLS; y++) {
-                    lx = x * _this.cellSize + worldOffsetLeft;
-                    ly = y * _this.cellSize + worldOffsetTop;
+                    const lx = x * _this.cellSize + worldOffsetLeft, ly = y * _this.cellSize + worldOffsetTop;
                     ctx.strokeRect(lx, ly, _this.cellSize, _this.cellSize);
                 }
             }
@@ -88,11 +85,9 @@ export default class World {
             const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            let lx, ly;
             for (let x = 0; x < Config.VISIBLE_COLS; x++) {
                 for (let y = 0; y < Config.VISIBLE_COLS; y++) {
-                    lx = x * _this.cellSize + worldOffsetLeft;
-                    ly = y * _this.cellSize + worldOffsetTop;
+                    const lx = x * _this.cellSize + worldOffsetLeft, ly = y * _this.cellSize + worldOffsetTop;
                     ctx.font = '7px senf';
                     ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
                     ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 20);
@@ -103,25 +98,21 @@ export default class World {
             const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize, temperatureMap = this.world.temperatureMap;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            let lx, ly;
             for (let x = 0; x < Config.VISIBLE_COLS; x++) {
                 for (let y = 0; y < Config.VISIBLE_COLS; y++) {
-                    lx = x * _this.cellSize + worldOffsetLeft;
-                    ly = y * _this.cellSize + worldOffsetTop;
+                    const lx = x * _this.cellSize + worldOffsetLeft, ly = y * _this.cellSize + worldOffsetTop;
                     ctx.font = '7px senf';
                     ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPosX + x, _this.cameraPosY + y) * 450) / 10).toString(), lx + 2, ly + 10);
                 }
             }
         };
         this.drawBiomesInfo = function () {
-            const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize, biomes = this.world.biomes;
+            const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize, biomes = this.world.biomesOperator.getBiomes();
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            let lx, ly;
             for (let x = 0; x < Config.VISIBLE_COLS; x++) {
                 for (let y = 0; y < Config.VISIBLE_COLS; y++) {
-                    lx = x * _this.cellSize + worldOffsetLeft;
-                    ly = y * _this.cellSize + worldOffsetTop;
+                    const lx = x * _this.cellSize + worldOffsetLeft, ly = y * _this.cellSize + worldOffsetTop;
                     ctx.font = '7px senf';
                     ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(0, 6), lx + 2, ly + 10);
                 }
@@ -140,15 +131,11 @@ export default class World {
             const renderCtx = renderCanvas.getContext('2d'), ctx = _this.scrollingMapCanvas.getContext('2d'), image = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), ctxImages = [], worldOffsetLeft = this.cameraPosX * _this.cellSize, worldOffsetTop = this.cameraPosY * _this.cellSize;
             this.scrollingMapWrapper.scrollLeft = worldOffsetLeft;
             this.scrollingMapWrapper.scrollTop = worldOffsetTop;
-            let layer, cell;
+            let layer;
             for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
                 layer = _this.layers.getLayer(ln);
-                layer.foreach(function (x, y) {
-                    if (!_this.isCellVisible(x, y)) {
-                        return;
-                    }
-                    cell = layer.getCell(x, y);
-                    if (cell === null) {
+                layer.foreachValues(function (cell, x, y) {
+                    if (cell === null || !_this.isCellVisible(x, y)) {
                         return;
                     }
                     if (cell.drawBackground()) {
@@ -197,6 +184,10 @@ export default class World {
         };
         this.update = function () {
             this.drawLayers();
+        };
+        this.generateFractions = function () {
+            const fractionsOperator = new FractionsOperator(this.world.freshWaterMap, this.world.forestOperator.getForestMap(), this.world.biomesOperator);
+            fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
         };
         this.cameraPosX = cameraPos[0];
         this.cameraPosY = cameraPos[1];

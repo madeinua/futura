@@ -34,8 +34,8 @@ export default class ForestGenerator {
 
         const _this: ForestGenerator = this;
 
-        biomesOperator.altitudeMap.foreach(function (x: number, y: number): void {
-            if (biomesOperator.altitudeMap.getCell(x, y) > Config.MAX_HILLS_LEVEL) {
+        biomesOperator.altitudeMap.foreachValues(function (altitude: number, x: number, y: number): void {
+            if (altitude > Config.MAX_HILLS_LEVEL) {
                 _this.unallowedCells.push([x, y]);
             }
         });
@@ -106,13 +106,11 @@ export default class ForestGenerator {
             createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))),
             potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity);
 
-        let x, y, createChance;
-
         for (let i = 0; i < potentialCells.length; i++) {
-            x = potentialCells[i][0];
-            y = potentialCells[i][1];
+            const x = potentialCells[i][0],
+                y = potentialCells[i][1];
 
-            createChance = _this.getCreateChance(
+            const createChance = _this.getCreateChance(
                 forestMap,
                 _this.biomesOperator.humidityMap.getCell(x, y),
                 x,

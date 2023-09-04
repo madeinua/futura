@@ -351,10 +351,9 @@ export function LightenDarkenColor(col: string, amt: number): string {
 export function getPolygonAreaSize(coords: Array2D): number {
 
     let area: number = 0,
-        j;
+        j: number;
 
     for (let i = 0; i < coords.length; i++) {
-
         j = (i + 1) % coords.length;
 
         area += coords[i][0] * coords[j][1];
