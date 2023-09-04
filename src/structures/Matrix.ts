@@ -14,7 +14,7 @@ export default class Matrix<T extends any = any> {
     constructor(width: number, height: number, defaultValue?: any) {
         this.width = width;
         this.height = height;
-        this.__values = create2DArray(this.width, this.height, defaultValue || null);
+        this.__values = create2DArray(this.width, this.height, defaultValue ?? null);
     }
 
     /**

@@ -6,7 +6,7 @@ export default class Matrix {
     constructor(width, height, defaultValue) {
         this.width = width;
         this.height = height;
-        this.__values = create2DArray(this.width, this.height, defaultValue || null);
+        this.__values = create2DArray(this.width, this.height, defaultValue !== null && defaultValue !== void 0 ? defaultValue : null);
     }
     /**
      * Get all cells of matrix
