@@ -20,6 +20,10 @@
             <button id="pauseSteps">Pause</button>
         </div>
         <div>
+           <label>Fractions:</label>
+            <button id="generateFractions">Generate</button>
+        </div>
+        <div>
             <label>Animals (<span id="animalsCounter">0</span>):</label>
             <div id="animalsList"></div>
         </div>
@@ -135,12 +139,14 @@
 <script type="module" src='src/animals/Fish.js'></script>
 <script type="module" src='src/animals/Deer.js'></script>
 <script type="module" src='src/animals/Cow.js'></script>
+<script type="module" src='src/human/Fraction.js'></script>
 <script type="module" src='src/generators/NoiseMapGenerator.js'></script>
 <script type="module" src='src/generators/ForestGenerator.js'></script>
 <script type="module" src='src/generators/AnimalGenerator.js'></script>
 <script type="module" src='src/generators/FishGenerator.js'></script>
 <script type="module" src='src/generators/DeerGenerator.js'></script>
 <script type="module" src='src/generators/CowGenerator.js'></script>
+<script type="module" src='src/generators/FractionGenerator.js'></script>
 <script type="module" src='src/operators/SurfaceOperator.js'></script>
 <script type="module" src='src/operators/WeatherOperator.js'></script>
 <script type="module" src='src/operators/WaterOperator.js'></script>
@@ -148,6 +154,7 @@
 <script type="module" src='src/operators/BiomesOperator.js'></script>
 <script type="module" src='src/operators/ForestsOperator.js'></script>
 <script type="module" src='src/operators/AnimalsOperator.js'></script>
+<script type="module" src='src/operators/FractionsOperator.js'></script>
 <script type="module" src='src/render/DisplayCell.js'></script>
 <script type="module" src='src/render/Layer.js'></script>
 <script type="module" src='src/World.js'></script>

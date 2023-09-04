@@ -429,7 +429,7 @@ export default class World {
         const fractionsOperator = new FractionsOperator(
             this.world.freshWaterMap,
             this.world.forestOperator.getForestMap(),
-            this.world.biomesOperator
+            this.world.biomesOperator.getBiomes()
         );
 
         fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);

@@ -1,0 +1,40 @@
+import Config from "../../config.js";
+import { throwError } from "../helpers.js";
+import NumericMatrix from "../structures/NumericMatrix.js";
+import Fraction from "../human/Fraction.js";
+export default class FractionGenerator {
+    constructor(objects) {
+        this.objects = objects;
+    }
+    getBiomeProbability(biomeName) {
+        var _a;
+        return (_a = Config.FRACTIONS.CREATE_PROBABILITIES.BIOMES[biomeName]) !== null && _a !== void 0 ? _a : 0;
+    }
+    createOccurrenceProbabilityMap() {
+        const _this = this, map = new NumericMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
+        _this.objects.biomesMap.foreachValues(function (biome) {
+            const biomeProbability = _this.getBiomeProbability(biome.getName());
+            if (biomeProbability === 0) {
+                return;
+            }
+            const distanceToWater = _this.objects.freshWaterMap.distanceTo(biome.x, biome.y, 5), waterFactor = Config.FRACTIONS.CREATE_PROBABILITIES.DISTANCE_TO_WATER / distanceToWater, isForest = _this.objects.freshWaterMap.filled(biome.x, biome.y), distanceToForest = _this.objects.freshWaterMap.distanceTo(biome.x, biome.y, 5), forestFactor = isForest ? -Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : Config.FRACTIONS.CREATE_PROBABILITIES.DISTANCE_TO_FOREST / distanceToForest;
+            map.setCell(biome.x, biome.y, biomeProbability + waterFactor + forestFactor);
+        });
+        return map;
+    }
+    generateFractions(count) {
+        const probabilitiesMap = this.createOccurrenceProbabilityMap();
+        let list = [], point;
+        for (let i = 0; i < count; i++) {
+            do {
+                point = probabilitiesMap.getRandomWeightedPoint();
+            } while (list.includes(point));
+            list.push(new Fraction(point[0], point[1], {
+                name: 'Fraction #' + (i + 1),
+                color: 'rgb(' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ')'
+            }));
+        }
+        throwError(list, 1, true);
+        return list;
+    }
+}

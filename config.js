@@ -258,6 +258,29 @@ const Config = {
             color: '#ffffff',
             image: 'public/images/cow-1.png'
         }
+    },
+
+    // Fractions
+    FRACTIONS: {
+        CREATE_PROBABILITIES: {
+            BIOMES: {
+                Biome_Tundra: 0.05,
+                Biome_Tundra_Hills: 0.01,
+                Biome_Grass: 0.3,
+                Biome_Grass_Hills: 0.2,
+                Biome_Savanna: 0.2,
+                Biome_Savanna_Hills: 0.15,
+                Biome_Desert: 0.01,
+                Biome_Desert_Hills: 0.05,
+                Biome_Swamp: 0.1,
+                Biome_Tropic: 0.25,
+                Biome_Rocks: 0.01,
+            },
+            DISTANCE_TO_WATER: 0.3,
+            IS_FOREST: -0.2,
+            DISTANCE_TO_FOREST: 0.1,
+        },
+        CREATE_COUNT: 1
     }
 }
 

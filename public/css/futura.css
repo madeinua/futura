@@ -55,7 +55,8 @@ canvas {
     width: 66px;
 }
 
-#pauseSteps {
+#pauseSteps,
+#generateFractions {
     margin: 20px;
 }
 

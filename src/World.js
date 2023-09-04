@@ -186,7 +186,7 @@ export default class World {
             this.drawLayers();
         };
         this.generateFractions = function () {
-            const fractionsOperator = new FractionsOperator(this.world.freshWaterMap, this.world.forestOperator.getForestMap(), this.world.biomesOperator);
+            const fractionsOperator = new FractionsOperator(this.world.freshWaterMap, this.world.forestOperator.getForestMap(), this.world.biomesOperator.getBiomes());
             fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
         };
         this.cameraPosX = cameraPos[0];
