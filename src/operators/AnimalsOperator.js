@@ -5,7 +5,7 @@ import DeerGenerator from "../generators/DeerGenerator.js";
 import DisplayCell from "../render/DisplayCell.js";
 import FishGenerator from "../generators/FishGenerator.js";
 export default class AnimalsOperator {
-    constructor(timer, habitatLayer, animalsLayer, objects) {
+    constructor(habitatLayer, animalsLayer, objects) {
         this.animals = [];
         this.animalsPositions = [];
         this.animalsTypesCounter = {};
@@ -44,14 +44,13 @@ export default class AnimalsOperator {
         };
         this.animalImagesCache = [];
         const _this = this, animalGenerators = this.getAvailableGenerators();
-        objects.timer = timer;
         for (let i = 0; i < animalGenerators.length; i++) {
             _this.registerAnimalsGenerator(new animalGenerators[i](objects));
         }
         if (Config.LOGS) {
             logTimeEvent('Animals initialized.');
         }
-        timer.addStepsHandler(function () {
+        objects.timer.addStepsHandler(function () {
             habitatLayer.reset();
             _this.updateHabitats();
             //_this.showHabitatsOnLayer(habitatLayer, Fish);

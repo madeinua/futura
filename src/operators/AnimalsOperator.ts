@@ -6,7 +6,6 @@ import DisplayCell from "../render/DisplayCell.js";
 import {Cell, CellsList} from "../structures/Cells.js";
 import Animal from "../animals/Animal.js";
 import AnimalGenerator, {AnimalsGeneratorArgs} from "../generators/AnimalGenerator.js";
-import Timer from "../services/Timer.js";
 import {Layer} from "../render/Layer.js";
 import FishGenerator from "../generators/FishGenerator.js";
 
@@ -22,14 +21,12 @@ export default class AnimalsOperator {
     animalsGenerators: AnimalGenerator[] = [];
     animalImagesCache: DisplayCell[] = [];
 
-    constructor(timer: Timer, habitatLayer: Layer, animalsLayer: Layer, objects: AnimalsGeneratorArgs) {
+    constructor(habitatLayer: Layer, animalsLayer: Layer, objects: AnimalsGeneratorArgs) {
 
         this.animalImagesCache = [];
 
         const _this: AnimalsOperator = this,
             animalGenerators = this.getAvailableGenerators();
-
-        objects.timer = timer;
 
         for (let i = 0; i < animalGenerators.length; i++) {
             _this.registerAnimalsGenerator(
@@ -41,7 +38,7 @@ export default class AnimalsOperator {
             logTimeEvent('Animals initialized.');
         }
 
-        timer.addStepsHandler(function (): void {
+        objects.timer.addStepsHandler(function (): void {
 
             habitatLayer.reset();
             _this.updateHabitats();

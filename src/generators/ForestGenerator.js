@@ -1,11 +1,12 @@
 import { changeRange, iAmLucky } from "../helpers.js";
 import Config from "../../config.js";
 export default class ForestGenerator {
-    constructor(biomesOperator) {
+    constructor(altitudeMap, humidityMap) {
         this.groundCreateMults = {};
-        this.unallowedCells = [];
-        this.biomesOperator = biomesOperator;
-        this.maxForestCells = Math.ceil(biomesOperator.altitudeMap.getLandCellsCount() * Config.FOREST_LIMIT / 100);
+        this.notAllowedCells = [];
+        this.altitudeMap = altitudeMap;
+        this.humidityMap = humidityMap;
+        this.maxForestCells = Math.ceil(altitudeMap.getLandCellsCount() * Config.FOREST_LIMIT / 100);
         this.minCreateIntensity = Math.ceil(this.maxForestCells / 10);
         let maxGroundMult = 0;
         for (let i in Config.FOREST_GROUNDS_MULTS) {
@@ -15,9 +16,9 @@ export default class ForestGenerator {
             this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
         }
         const _this = this;
-        biomesOperator.altitudeMap.foreachValues(function (altitude, x, y) {
+        altitudeMap.foreachValues(function (altitude, x, y) {
             if (altitude > Config.MAX_HILLS_LEVEL) {
-                _this.unallowedCells.push([x, y]);
+                _this.notAllowedCells.push([x, y]);
             }
         });
     }
@@ -48,7 +49,7 @@ export default class ForestGenerator {
         filledCells.forEach(function (cell) {
             forestMap.foreachNeighbors(cell[0], cell[1], function (x, y) {
                 if (!filledCells.includes([x, y])) {
-                    const growsChance = _this.getCreateChance(forestMap, _this.biomesOperator.humidityMap.getCell(x, y), x, y, speed);
+                    const growsChance = _this.getCreateChance(forestMap, _this.humidityMap.getCell(x, y), x, y, speed);
                     if (iAmLucky(growsChance)) {
                         forestMap.fill(x, y);
                         return true;
@@ -62,7 +63,7 @@ export default class ForestGenerator {
         const _this = this, createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))), potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity);
         for (let i = 0; i < potentialCells.length; i++) {
             const x = potentialCells[i][0], y = potentialCells[i][1];
-            const createChance = _this.getCreateChance(forestMap, _this.biomesOperator.humidityMap.getCell(x, y), x, y, step <= Config.STEPS_BOOST_STEPS
+            const createChance = _this.getCreateChance(forestMap, _this.humidityMap.getCell(x, y), x, y, step <= Config.STEPS_BOOST_STEPS
                 ? Config.FOREST_BORN_CHANCE * Config.FOREST_BORN_BOOST
                 : Config.FOREST_BORN_CHANCE);
             if (iAmLucky(createChance)) {
@@ -71,7 +72,7 @@ export default class ForestGenerator {
         }
     }
     getCreateChance(forestMap, humidity, x, y, speed) {
-        if (humidity === 0 || this.unallowedCells.includesCell([x, y])) {
+        if (humidity === 0 || this.notAllowedCells.includesCell([x, y])) {
             return 0;
         }
         const biome = forestMap.biomes.getCell(x, y);

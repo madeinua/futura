@@ -43,7 +43,7 @@ export default class ForestsOperator {
         this.forestColor = hexToRgb(Config.FOREST_COLOR);
         this.forestPalmImage = createImage(Config.FOREST_PALM_IMAGE);
         this.forestTundraImage = createImage(Config.FOREST_TUNDRA_IMAGE);
-        const _this = this, forestGenerator = new ForestGenerator(biomesOperator);
+        const _this = this, forestGenerator = new ForestGenerator(biomesOperator.altitudeMap, biomesOperator.humidityMap);
         _this.forestImages = [];
         _this.forestImagesCache = [];
         for (let i = 0; i < Config.FOREST_IMAGES.length; i++) {

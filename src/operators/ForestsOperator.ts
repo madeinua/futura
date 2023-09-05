@@ -26,7 +26,7 @@ export default class ForestsOperator {
         this.forestTundraImage = createImage(Config.FOREST_TUNDRA_IMAGE);
 
         const _this: ForestsOperator = this,
-            forestGenerator = new ForestGenerator(biomesOperator);
+            forestGenerator = new ForestGenerator(biomesOperator.altitudeMap, biomesOperator.humidityMap);
 
         _this.forestImages = [];
         _this.forestImagesCache = [];

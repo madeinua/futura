@@ -1,6 +1,6 @@
 import Config from "../config.js";
 import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData} from "./helpers.js";
-import {LAYER_BIOMES, LAYER_FOREST, LAYER_HABITAT, LAYER_ANIMALS, Layer} from "./render/Layer.js";
+import {LAYER_BIOMES, LAYER_FOREST, LAYER_HABITAT, LAYER_ANIMALS, Layer, LAYER_FRACTIONS} from "./render/Layer.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -132,7 +132,6 @@ export default class World {
         );
 
         new AnimalsOperator(
-            this.timer,
             this.layers.getLayer(LAYER_HABITAT),
             this.layers.getLayer(LAYER_ANIMALS),
             {
@@ -427,9 +426,12 @@ export default class World {
 
     generateFractions = function (): void {
         const fractionsOperator = new FractionsOperator(
-            this.world.freshWaterMap,
-            this.world.forestOperator.getForestMap(),
-            this.world.biomesOperator.getBiomes()
+            this.layers.getLayer(LAYER_FRACTIONS),
+            {
+                freshWaterMap: this.world.freshWaterMap,
+                forestMap: this.world.forestOperator.getForestMap(),
+                biomesMap: this.world.biomesOperator.getBiomes(),
+            }
         );
 
         fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
