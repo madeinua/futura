@@ -180,4 +180,8 @@ export default class NumericMatrix<T extends number = number> extends Matrix<T> 
         // Return the random coordinate as [row, col]
         return [rowIndex, colIndex];
     }
+
+    sum(): number {
+        return this.getValuesList().reduce((a, b) => a + b, 0);
+    }
 }

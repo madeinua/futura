@@ -136,4 +136,7 @@ export default class NumericMatrix extends Matrix {
         // Return the random coordinate as [row, col]
         return [rowIndex, colIndex];
     }
+    sum() {
+        return this.getValuesList().reduce((a, b) => a + b, 0);
+    }
 }

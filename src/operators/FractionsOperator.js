@@ -18,6 +18,5 @@ export default class FractionsOperator {
         if (Config.LOGS) {
             logTimeEvent('Fractions created.');
         }
-        //return this.fractionsGenerator.createOccurrenceProbabilityMap();
     }
 }

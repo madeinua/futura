@@ -1,6 +1,6 @@
 import Config from "../config.js";
 import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData } from "./helpers.js";
-import { LAYER_BIOMES, LAYER_FOREST, LAYER_HABITAT, LAYER_ANIMALS } from "./render/Layer.js";
+import { LAYER_BIOMES, LAYER_FOREST, LAYER_HABITAT, LAYER_ANIMALS, LAYER_FRACTIONS } from "./render/Layer.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -17,7 +17,7 @@ export default class World {
             const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
             const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
             const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
-            new AnimalsOperator(this.timer, this.layers.getLayer(LAYER_HABITAT), this.layers.getLayer(LAYER_ANIMALS), {
+            new AnimalsOperator(this.layers.getLayer(LAYER_HABITAT), this.layers.getLayer(LAYER_ANIMALS), {
                 freshWaterMap: freshWaterMap,
                 coastMap: coastMap,
                 forestsOperator: forestsOperator,
@@ -186,8 +186,13 @@ export default class World {
             this.drawLayers();
         };
         this.generateFractions = function () {
-            const fractionsOperator = new FractionsOperator(this.world.freshWaterMap, this.world.forestOperator.getForestMap(), this.world.biomesOperator.getBiomes());
+            const fractionsOperator = new FractionsOperator(this.timer, this.layers.getLayer(LAYER_FRACTIONS), {
+                freshWaterMap: this.world.freshWaterMap,
+                forestMap: this.world.forestOperator.getForestMap(),
+                biomesMap: this.world.biomesOperator.getBiomes(),
+            });
             fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
+            this.update();
         };
         this.cameraPosX = cameraPos[0];
         this.cameraPosY = cameraPos[1];

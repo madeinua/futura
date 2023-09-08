@@ -196,6 +196,9 @@ export default class BinaryMatrix extends NumericMatrix {
         });
         return result;
     }
+    hasFilledNeighbors(x, y) {
+        return this.getFilledNeighbors(x, y).length > 0;
+    }
     /**
      * Retrieve size of the array compared to the total number size of the map
      */

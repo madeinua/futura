@@ -425,7 +425,9 @@ export default class World {
     }
 
     generateFractions = function (): void {
+
         const fractionsOperator = new FractionsOperator(
+            this.timer,
             this.layers.getLayer(LAYER_FRACTIONS),
             {
                 freshWaterMap: this.world.freshWaterMap,
@@ -435,5 +437,7 @@ export default class World {
         );
 
         fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
+
+        this.update();
     }
 }

@@ -214,6 +214,10 @@ export default class BinaryMatrix extends NumericMatrix {
         return result;
     }
 
+    hasFilledNeighbors(x: number, y: number): boolean {
+        return this.getFilledNeighbors(x, y).length > 0;
+    }
+
     /**
      * Retrieve size of the array compared to the total number size of the map
      */

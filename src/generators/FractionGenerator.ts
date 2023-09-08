@@ -36,13 +36,13 @@ export default class FractionGenerator {
                 return;
             }
 
-            const distanceToWater = _this.objects.freshWaterMap.distanceTo(biome.x, biome.y, 5),
-                waterFactor = Config.FRACTIONS.CREATE_PROBABILITIES.DISTANCE_TO_WATER / distanceToWater,
-                isForest = _this.objects.freshWaterMap.filled(biome.x, biome.y),
-                distanceToForest = _this.objects.freshWaterMap.distanceTo(biome.x, biome.y, 5),
-                forestFactor = isForest ? -Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : Config.FRACTIONS.CREATE_PROBABILITIES.DISTANCE_TO_FOREST / distanceToForest;
+            const waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 0,
+                isForest = _this.objects.forestMap.filled(biome.x, biome.y),
+                forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (
+                    _this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1
+                );
 
-            map.setCell(biome.x, biome.y, biomeProbability + waterFactor + forestFactor);
+            map.setCell(biome.x, biome.y, biomeProbability * waterFactor * forestFactor);
         });
 
         return map;

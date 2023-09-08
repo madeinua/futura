@@ -276,9 +276,9 @@ const Config = {
                 Biome_Tropic: 0.25,
                 Biome_Rocks: 0.01,
             },
-            DISTANCE_TO_WATER: 0.3,
-            IS_FOREST: -0.2,
-            DISTANCE_TO_FOREST: 0.1,
+            CLOSE_TO_WATER: 20,
+            IS_FOREST: -2,
+            CLOSE_TO_FOREST: 5,
         },
         CREATE_COUNT: 5,
         COLORS: [
