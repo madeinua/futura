@@ -171,7 +171,7 @@ export default class AnimalsOperator {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             if (this.animalsGenerators[i].getName() === animal.getName()) {
                 this.animalsGenerators[i].getHabitat().foreachFilled(function (x, y) {
-                    habitatLayer.setCell(x, y, [100, 100, 200, 255]);
+                    habitatLayer.setCell(x, y, new DisplayCell([100, 100, 200, 255], null, false));
                 });
             }
         }

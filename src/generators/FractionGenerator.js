@@ -31,7 +31,7 @@ export default class FractionGenerator {
             } while (list.includes(point));
             list.push(new Fraction(point[0], point[1], {
                 name: 'Fraction #' + (i + 1),
-                color: 'rgb(' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ')'
+                color: Config.FRACTIONS.COLORS[i]
             }));
         }
         throwError(list, 1, true);

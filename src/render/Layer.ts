@@ -1,11 +1,11 @@
 import Matrix from "../structures/Matrix.js"
 import DisplayCell from "../render/DisplayCell.js"
-import {RGBa} from "../helpers.js";
 
 export const LAYER_BIOMES = 0;
 export const LAYER_FOREST = 1;
 export const LAYER_HABITAT = 2;
 export const LAYER_ANIMALS = 3;
+export const LAYER_FRACTIONS = 4;
 
 export class Layer extends Matrix<null | DisplayCell> {
 
@@ -13,13 +13,8 @@ export class Layer extends Matrix<null | DisplayCell> {
         return super.getCell(x, y);
     }
 
-    setCell(x: number, y: number, value: null | RGBa | DisplayCell): this {
-
-        if (value !== null && !(value instanceof DisplayCell)) {
-            value = new DisplayCell(value as RGBa, null, false);
-        }
-
-        return super.setCell(x, y, value as null | DisplayCell);
+    setCell(x: number, y: number, value: null | DisplayCell): this {
+        return super.setCell(x, y, value);
     }
 
     reset() {

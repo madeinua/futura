@@ -1,6 +1,7 @@
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import Config from "../../config.js";
 import {Cell} from "../structures/Cells.js";
+import {hexToRgb, RGB} from "../helpers.js";
 
 export interface FractionSettings {
     name: string;
@@ -46,8 +47,8 @@ export default class Fraction {
         return this.fractionName;
     }
 
-    getFractionColor(): string {
-        return this.fractionColor;
+    getFractionColor(): RGB {
+        return hexToRgb(this.fractionColor);
     }
 
     getStartPosition(): Cell {

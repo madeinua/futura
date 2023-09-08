@@ -1,9 +1,8 @@
 import Config from "../../config.js";
-import {throwError} from "../helpers.js";
+import {Filters, throwError} from "../helpers.js";
 import Biome from "../biomes/Biome.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import NumericMatrix from "../structures/NumericMatrix.js";
-import {CellsList} from "../structures/Cells.js";
 import Fraction from "../human/Fraction.js";
 import ForestMap from "../maps/ForestMap.js";
 import BiomesMap from "../maps/BiomesMap.js";
@@ -49,7 +48,7 @@ export default class FractionGenerator {
         return map;
     }
 
-    generateFractions(count: number): CellsList {
+    generateFractions(count: number): Fraction[] {
         const probabilitiesMap = this.createOccurrenceProbabilityMap();
 
         let list = [],
@@ -63,7 +62,7 @@ export default class FractionGenerator {
             list.push(
                 new Fraction(point[0], point[1], {
                     name: 'Fraction #' + (i + 1),
-                    color: 'rgb(' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ')'
+                    color: Config.FRACTIONS.COLORS[i]
                 })
             );
         }

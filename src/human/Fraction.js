@@ -1,5 +1,6 @@
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import Config from "../../config.js";
+import { hexToRgb } from "../helpers.js";
 export default class Fraction {
     constructor(startPointX, startPointY, fractionSettings) {
         this.maxHistoryLength = 10;
@@ -26,7 +27,7 @@ export default class Fraction {
         return this.fractionName;
     }
     getFractionColor() {
-        return this.fractionColor;
+        return hexToRgb(this.fractionColor);
     }
     getStartPosition() {
         return this.startPosition;
