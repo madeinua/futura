@@ -1,5 +1,5 @@
 import Config from "../../config.js";
-import { throwError } from "../helpers.js";
+import { fromMiddleFractionValue } from "../helpers.js";
 import NumericMatrix from "../structures/NumericMatrix.js";
 import Fraction from "../human/Fraction.js";
 export default class FractionGenerator {
@@ -17,8 +17,8 @@ export default class FractionGenerator {
             if (biomeProbability === 0) {
                 return;
             }
-            const waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 0, isForest = _this.objects.forestMap.filled(biome.x, biome.y), forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (_this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1);
-            map.setCell(biome.x, biome.y, biomeProbability * waterFactor * forestFactor);
+            const waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 0, temperatureFactor = fromMiddleFractionValue(_this.objects.temperatureMap.getCell(biome.x, biome.y)), isForest = _this.objects.forestMap.filled(biome.x, biome.y), forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (_this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1);
+            map.setCell(biome.x, biome.y, biomeProbability * waterFactor * temperatureFactor * forestFactor);
         });
         return map;
     }
@@ -34,7 +34,6 @@ export default class FractionGenerator {
                 color: Config.FRACTIONS.COLORS[i]
             }));
         }
-        throwError(list, 1, true);
         return list;
     }
 }

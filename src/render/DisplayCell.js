@@ -1,8 +1,9 @@
 export default class DisplayCell {
-    constructor(color, image, withBackground) {
+    constructor(color, image, withBackground, miniMapSettings = null) {
         this.color = color;
         this.image = typeof image === 'undefined' ? null : image;
         this.withBg = withBackground;
+        this.miniMapSettings = miniMapSettings;
     }
     getColor() {
         return this.color;
@@ -15,5 +16,10 @@ export default class DisplayCell {
     }
     drawBackground() {
         return this.withBg || !this.hasImage();
+    }
+    getMiniMapColor() {
+        return this.miniMapSettings === null
+            ? this.color
+            : this.miniMapSettings.color;
     }
 }

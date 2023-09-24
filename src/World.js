@@ -57,7 +57,7 @@ export default class World {
                 const layer = _this.layers.getLayer(ln);
                 layer.foreachValues(function (displayCell, x, y) {
                     if (displayCell !== null) {
-                        fillCanvasPixel(image, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
+                        fillCanvasPixel(image, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMiniMapColor());
                     }
                 });
             }
@@ -134,15 +134,15 @@ export default class World {
             let layer;
             for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
                 layer = _this.layers.getLayer(ln);
-                layer.foreachValues(function (cell, x, y) {
-                    if (cell === null || !_this.isCellVisible(x, y)) {
+                layer.foreachValues(function (displayCell, x, y) {
+                    if (displayCell === null || !_this.isCellVisible(x, y)) {
                         return;
                     }
-                    if (cell.drawBackground()) {
-                        fillCanvasPixel(image, (x + y * Config.WORLD_SIZE) * 4, cell.getColor());
+                    if (displayCell.drawBackground()) {
+                        fillCanvasPixel(image, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
                     }
-                    if (cell.hasImage()) {
-                        ctxImages.push([x, y, cell.getImage()]);
+                    if (displayCell.hasImage()) {
+                        ctxImages.push([x, y, displayCell.getImage()]);
                     }
                 });
             }
@@ -188,6 +188,7 @@ export default class World {
         this.generateFractions = function () {
             const fractionsOperator = new FractionsOperator(this.timer, this.layers.getLayer(LAYER_FRACTIONS), {
                 freshWaterMap: this.world.freshWaterMap,
+                temperatureMap: this.world.temperatureMap,
                 forestMap: this.world.forestOperator.getForestMap(),
                 biomesMap: this.world.biomesOperator.getBiomes(),
             });

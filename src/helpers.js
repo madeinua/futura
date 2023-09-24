@@ -122,12 +122,8 @@ export function toFraction(value, min, max) {
  * E.g. if the value 0.5 is the best option in between the range [0-1]
  * then the function will return 1 for 0.5 and 0 for 0/1.
  */
-export function fromMiddleFractionValue(highestValue, value) {
-    if (highestValue === 0) {
-        return 0;
-    }
-    return Math.max(0, 1 - Math.abs(value - highestValue)
-        / (highestValue === 1 ? 1 : Math.min(highestValue, 1 - highestValue)));
+export function fromMiddleFractionValue(value, targetValue = 0.5) {
+    return Math.max(0, 1 - Math.abs(value - targetValue));
 }
 /**
  * Convert range [minOld-maxOld] to another range [minNew-maxNew]

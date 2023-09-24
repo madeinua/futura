@@ -195,7 +195,7 @@ export default class World {
                     fillCanvasPixel(
                         image,
                         (x + y * Config.WORLD_SIZE) * 4,
-                        displayCell.getColor()
+                        displayCell.getMiniMapColor()
                     );
                 }
             });
@@ -337,22 +337,22 @@ export default class World {
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
             layer = _this.layers.getLayer(ln);
 
-            layer.foreachValues(function (cell: null | DisplayCell, x: number, y: number) {
+            layer.foreachValues(function (displayCell: null | DisplayCell, x: number, y: number) {
 
-                if (cell === null || !_this.isCellVisible(x, y)) {
+                if (displayCell === null || !_this.isCellVisible(x, y)) {
                     return;
                 }
 
-                if (cell.drawBackground()) {
+                if (displayCell.drawBackground()) {
                     fillCanvasPixel(
                         image,
                         (x + y * Config.WORLD_SIZE) * 4,
-                        cell.getColor()
+                        displayCell.getColor()
                     );
                 }
 
-                if (cell.hasImage()) {
-                    ctxImages.push([x, y, cell.getImage()]);
+                if (displayCell.hasImage()) {
+                    ctxImages.push([x, y, displayCell.getImage()]);
                 }
             });
         }
@@ -431,6 +431,7 @@ export default class World {
             this.layers.getLayer(LAYER_FRACTIONS),
             {
                 freshWaterMap: this.world.freshWaterMap,
+                temperatureMap: this.world.temperatureMap,
                 forestMap: this.world.forestOperator.getForestMap(),
                 biomesMap: this.world.biomesOperator.getBiomes(),
             }

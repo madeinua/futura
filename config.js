@@ -16,9 +16,9 @@ const Config = {
     // Steps
     STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
-    STEPS_LIMIT: 60,
+    STEPS_LIMIT: 40,
     STEPS_BOOST: 5,
-    STEPS_BOOST_STEPS: 50,
+    STEPS_BOOST_STEPS: 40,
 
     // Altitude
     WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
