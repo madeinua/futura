@@ -195,7 +195,7 @@ export default class World {
                     fillCanvasPixel(
                         image,
                         (x + y * Config.WORLD_SIZE) * 4,
-                        displayCell.getMiniMapColor()
+                        displayCell.getMapColor()
                     );
                 }
             });

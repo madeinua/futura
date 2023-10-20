@@ -1,6 +1,6 @@
 import {RGBa} from "../helpers.js";
 
-type DisplayCellMiniMap = {
+type DisplayCellMap = {
     color: RGBa
 }
 
@@ -9,13 +9,13 @@ export default class DisplayCell {
     readonly color: RGBa;
     readonly image: null | HTMLImageElement;
     readonly withBg: boolean;
-    readonly miniMapSettings: null | DisplayCellMiniMap;
+    readonly mapSettings: null | DisplayCellMap;
 
-    constructor(color: RGBa, image: null | HTMLImageElement, withBackground: boolean, miniMapSettings: DisplayCellMiniMap = null) {
+    constructor(color: RGBa, image: null | HTMLImageElement, withBackground: boolean, mapSettings: DisplayCellMap = null) {
         this.color = color;
         this.image = typeof image === 'undefined' ? null : image;
         this.withBg = withBackground;
-        this.miniMapSettings = miniMapSettings;
+        this.mapSettings = mapSettings;
     }
 
     getColor(): RGBa {
@@ -34,9 +34,9 @@ export default class DisplayCell {
         return this.withBg || !this.hasImage();
     }
 
-    getMiniMapColor(): RGBa {
-        return this.miniMapSettings === null
+    getMapColor(): RGBa {
+        return this.mapSettings === null
             ? this.color
-            : this.miniMapSettings.color;
+            : this.mapSettings.color;
     }
 }

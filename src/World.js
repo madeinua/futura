@@ -57,7 +57,7 @@ export default class World {
                 const layer = _this.layers.getLayer(ln);
                 layer.foreachValues(function (displayCell, x, y) {
                     if (displayCell !== null) {
-                        fillCanvasPixel(image, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMiniMapColor());
+                        fillCanvasPixel(image, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMapColor());
                     }
                 });
             }
