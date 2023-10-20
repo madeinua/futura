@@ -169,17 +169,18 @@ export function fillCanvasPixel(image, point, RGBa) {
 /**
  * Scale canvas image
  */
-export function scaleImageData(context, imageData, scale) {
-    const scaled = context.createImageData(imageData.width * scale, imageData.height * scale), subLine = context.createImageData(scale, 1).data;
+export function scaleImageData(context, imageData, widthScale, heightScale) {
+    const scaled = context.createImageData(imageData.width * widthScale, imageData.height * heightScale);
+    const subLine = context.createImageData(widthScale, 1).data;
     for (let row = 0; row < imageData.height; row++) {
         for (let col = 0; col < imageData.width; col++) {
             const sourcePixel = imageData.data.subarray((row * imageData.width + col) * 4, (row * imageData.width + col) * 4 + 4);
-            for (let x = 0; x < scale; x++) {
+            for (let x = 0; x < widthScale; x++) {
                 subLine.set(sourcePixel, x * 4);
             }
-            for (let x = 0; x < scale; x++) {
-                const destRow = row * scale + x;
-                const destCol = col * scale;
+            for (let y = 0; y < heightScale; y++) {
+                const destRow = row * heightScale + y;
+                const destCol = col * widthScale;
                 scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4);
             }
         }

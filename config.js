@@ -8,7 +8,8 @@ const Config = {
 
     // Maps
     WORLD_SIZE: 250,
-    VISIBLE_COLS: 30,
+    VISIBLE_COLS: 60,
+    VISIBLE_ROWS: 30,
     MAIN_MAP_SCALE: 2.5,
     SHOW_RECTANGLES: false,
     SHOW_COORDINATES: false,

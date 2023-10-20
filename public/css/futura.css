@@ -31,11 +31,12 @@ canvas {
 
 .left-bar canvas {
     width: 250px;
+    border: #eee solid 1px;
 }
 
 #scrollingMapWrapper {
     box-shadow: 0 0 10px #777;
-    width: 900px;
+    width: 1800px;
     height: 900px;
     overflow: hidden;
 }

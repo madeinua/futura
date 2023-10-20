@@ -235,29 +235,34 @@ export function fillCanvasPixel(image: ImageData, point: number, RGBa: RGBa): vo
 /**
  * Scale canvas image
  */
-export function scaleImageData(context: CanvasRenderingContext2D, imageData: ImageData, scale: number): ImageData {
-
-    const scaled: ImageData = context.createImageData(imageData.width * scale, imageData.height * scale),
-        subLine: Uint8ClampedArray = context.createImageData(scale, 1).data;
+export function scaleImageData(
+    context: CanvasRenderingContext2D,
+    imageData: ImageData,
+    widthScale: number,
+    heightScale: number
+): ImageData {
+    const scaled: ImageData = context.createImageData(
+        imageData.width * widthScale,
+        imageData.height * heightScale
+    );
+    const subLine: Uint8ClampedArray = context.createImageData(widthScale, 1).data;
 
     for (let row = 0; row < imageData.height; row++) {
         for (let col = 0; col < imageData.width; col++) {
-
             const sourcePixel: Uint8ClampedArray = imageData.data.subarray(
                 (row * imageData.width + col) * 4,
                 (row * imageData.width + col) * 4 + 4
             );
 
-            for (let x = 0; x < scale; x++) {
+            for (let x = 0; x < widthScale; x++) {
                 subLine.set(sourcePixel, x * 4);
             }
 
-            for (let x = 0; x < scale; x++) {
+            for (let y = 0; y < heightScale; y++) {
+                const destRow = row * heightScale + y;
+                const destCol = col * widthScale;
 
-                const destRow = row * scale + x;
-                const destCol = col * scale;
-
-                scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4)
+                scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4);
             }
         }
     }

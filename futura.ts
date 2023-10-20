@@ -21,7 +21,7 @@ const coordinatesField = document.getElementById('coordinates') as HTMLInputElem
         document.getElementById('scrollingMapWrapper'),
         document.getElementById('scrollingMap') as HTMLCanvasElement,
         miniMapCanvas,
-        getCenteredCameraPosition(Config.VISIBLE_COLS)
+        getCenteredCameraPosition()
     );
 
 function drawColorMap(id: string, map: Matrix) {
@@ -67,7 +67,7 @@ function drawMap(id: string, map: NumericMatrix, reverse: boolean) {
 }
 
 Filters.add('mapMoved', function (point: Cell) {
-    point = centeredCameraPointToXY(point, Config.VISIBLE_COLS);
+    point = centeredCameraPointToXY(point);
     coordinatesField.value = point[0] + ',' + point[1];
 });
 
@@ -182,36 +182,37 @@ function getCameraPosition(): Cell {
     return [x, y];
 }
 
-function centerCameraPoint(point: Cell, size: number): Cell {
+function centerCameraPoint(point: Cell): Cell {
 
-    const c = Math.floor(size / 2);
+    const cw = Math.floor(Config.VISIBLE_COLS / 2),
+        ch = Math.floor(Config.VISIBLE_ROWS / 2);
 
     return [
-        Math.max(0, point[0] - c),
-        Math.max(0, point[1] - c)
+        Math.max(0, point[0] - cw),
+        Math.max(0, point[1] - ch)
     ];
 }
 
-function getCenteredCameraPosition(size: number): Cell {
+function getCenteredCameraPosition(): Cell {
     return centerCameraPoint(
-        getCameraPosition(),
-        size
+        getCameraPosition()
     );
 }
 
-function centeredCameraPointToXY(point: Cell, size: number): Cell {
+function centeredCameraPointToXY(point: Cell): Cell {
 
-    const c = Math.floor(size / 2);
+    const cw = Math.floor(Config.VISIBLE_COLS / 2),
+        ch = Math.floor(Config.VISIBLE_ROWS / 2);
 
     return [
-        Math.max(0, point[0] + c),
-        Math.max(0, point[1] + c)
+        Math.max(0, point[0] + cw),
+        Math.max(0, point[1] + ch)
     ];
 }
 
 coordinatesField.addEventListener("change", function () {
     world.moveMapTo(
-        getCenteredCameraPosition(Config.VISIBLE_COLS)
+        getCenteredCameraPosition()
     );
 });
 
@@ -224,7 +225,7 @@ miniMapCanvas.addEventListener("click", function (e) {
         centerCameraPoint([
             Math.floor((e.clientX - rect.left) * scale),
             Math.floor((e.clientY - rect.top) * scale)
-        ], Config.VISIBLE_COLS)
+        ])
     );
 });
 
