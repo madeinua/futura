@@ -16,6 +16,12 @@
 <div class="content">
     <div class="left-bar">
         <div>
+            <canvas id="miniMap"></canvas>
+        </div>
+        <div class="coordinatesWrapper">
+            <label for="coordinates">X,Y: <input id="coordinates" type="text" value="0,0"/></label>
+        </div>
+        <div>
             <label>Steps: <span id="stepsCounter"></span></label>
             <button id="pauseSteps">Pause</button>
         </div>
@@ -82,12 +88,6 @@
                 <canvas id="altitudeMapCanvas"></canvas>
             </p>
         </div>
-    </div>
-    <div class="central-panel">
-        <div class="coordinatesWrapper">
-            <label for="coordinates">X,Y: <input id="coordinates" type="text" value="0,0"/></label>
-        </div>
-        <canvas id="mainMap"></canvas>
     </div>
     <div class="right-bar">
         <div id="scrollingMapWrapper">

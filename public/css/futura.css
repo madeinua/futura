@@ -11,24 +11,22 @@ canvas {
     -ms-interpolation-mode: nearest-neighbor;
 }
 
-.left-bar {
-    overflow-x: hidden;
-    overflow-y: scroll;
-    width: 268px;
-    height: 650px;
-    background-color: #fff;
-    padding: 5px;
-    float: left;
+.content {
+    display: flex;
 }
 
-.central-panel {
-    float: left;
-    padding: 5px 20px;
+.left-bar {
+    overflow: auto;
+    max-height: 100vh;
+    background-color: #fff;
+}
+
+.left-bar > div {
+    padding: 10px;
 }
 
 .right-bar {
-    float: left;
-    padding: 5px;
+    padding: 10px;
 }
 
 .left-bar canvas {
@@ -42,8 +40,11 @@ canvas {
     overflow: hidden;
 }
 
-#mainMap {
+#miniMap {
     cursor: crosshair;
+    border: #777 solid 1px;
+    width: 250px;
+    height: 250px;
 }
 
 .coordinatesWrapper {

@@ -50,14 +50,15 @@ export default class World {
     readonly worldScaledSize: number;
     readonly scrollingMapWrapper: HTMLElement;
     readonly scrollingMapCanvas: HTMLCanvasElement;
-    readonly mainMapCanvas: HTMLCanvasElement;
+    readonly mainMapCanvas: OffscreenCanvas;
+    readonly miniMapCanvas: HTMLCanvasElement;
     timer: Timer;
     layers: Layers;
 
     constructor(
         scrollingMapWrapper: HTMLElement,
         scrollingMapCanvas: HTMLCanvasElement,
-        mainMapCanvas: HTMLCanvasElement,
+        miniMapCanvas: HTMLCanvasElement,
         cameraPos: Cell
     ) {
 
@@ -76,9 +77,11 @@ export default class World {
         this.scrollingMapCanvas.width = this.worldScaledSize;
         this.scrollingMapCanvas.height = this.worldScaledSize;
 
-        this.mainMapCanvas = mainMapCanvas;
+        this.mainMapCanvas = new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE);
         this.mainMapCanvas.width = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE;
         this.mainMapCanvas.height = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE;
+
+        this.miniMapCanvas = miniMapCanvas;
 
         this.timer = new Timer();
         this.layers = new Layers(Config.WORLD_SIZE, Config.WORLD_SIZE);
@@ -178,14 +181,11 @@ export default class World {
         }
     }
 
-    private drawMainMap = function (): void {
+    private drawMainMap = function (afterCallback: () => void): void {
 
         const _this: World = this,
             ctx = _this.mainMapCanvas.getContext('2d'),
-            image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE),
-            mainMapSize = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE,
-            cameraPosX = _this.cameraPosX,
-            cameraPosY = _this.cameraPosY;
+            image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
             const layer = _this.layers.getLayer(ln);
@@ -201,23 +201,41 @@ export default class World {
             });
         }
 
-        createImageBitmap(image).then(function (render): CanvasRenderingContext2D {
+        createImageBitmap(image).then(function (render) {
 
             ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(render, 0, 0, _this.mainMapCanvas.width, _this.mainMapCanvas.height);
 
-            ctx.drawImage(render, 0, 0, mainMapSize, mainMapSize);
-
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(
-                cameraPosX * Config.MAIN_MAP_SCALE,
-                cameraPosY * Config.MAIN_MAP_SCALE,
-                Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE,
-                Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE
-            );
-
-            return ctx;
+            if (typeof afterCallback !== 'undefined') {
+                afterCallback();
+            }
         });
+    }
+
+    private drawRectangleAroundMiniMap = function (ctx: CanvasRenderingContext2D): void {
+
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(
+            this.cameraPosX * Config.MAIN_MAP_SCALE,
+            this.cameraPosY * Config.MAIN_MAP_SCALE,
+            Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE,
+            Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE
+        );
+    }
+
+    private drawMiniMap = function (): void {
+
+        const mainMapCtx = this.mainMapCanvas.getContext('2d'),
+            miniMapCtx = this.miniMapCanvas.getContext('2d'),
+            imageData = mainMapCtx.getImageData(0, 0, this.mainMapCanvas.width, this.mainMapCanvas.height);
+
+        this.miniMapCanvas.width = imageData.width;
+        this.miniMapCanvas.height = imageData.height;
+
+        miniMapCtx.putImageData(imageData, 0, 0);
+
+        this.drawRectangleAroundMiniMap(miniMapCtx);
     }
 
     private drawRectangles = function (): void {
@@ -401,7 +419,9 @@ export default class World {
             _this.drawBiomesInfo();
         }
 
-        _this.drawMainMap();
+        _this.drawMainMap(function () {
+            _this.drawMiniMap();
+        });
     }
 
     create = function (): void {

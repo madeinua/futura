@@ -16,11 +16,11 @@ import Animal from "./src/animals/Animal.js";
 import Biome from "./src/biomes/Biome.js";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
-    mainMapCanvas = document.getElementById('mainMap') as HTMLCanvasElement,
+    miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement,
     world = new World(
         document.getElementById('scrollingMapWrapper'),
         document.getElementById('scrollingMap') as HTMLCanvasElement,
-        mainMapCanvas,
+        miniMapCanvas,
         getCenteredCameraPosition(Config.VISIBLE_COLS)
     );
 
@@ -215,10 +215,10 @@ coordinatesField.addEventListener("change", function () {
     );
 });
 
-mainMapCanvas.addEventListener("click", function (e) {
+miniMapCanvas.addEventListener("click", function (e) {
 
     const rect = this.getBoundingClientRect(),
-        scale = Config.WORLD_SIZE / mainMapCanvas.offsetWidth;
+        scale = Config.WORLD_SIZE / miniMapCanvas.offsetWidth;
 
     world.moveMapTo(
         centerCameraPoint([

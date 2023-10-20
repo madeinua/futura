@@ -12,7 +12,7 @@ import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
 import Layers from "./services/Layers.js";
 export default class World {
-    constructor(scrollingMapWrapper, scrollingMapCanvas, mainMapCanvas, cameraPos) {
+    constructor(scrollingMapWrapper, scrollingMapCanvas, miniMapCanvas, cameraPos) {
         this.generateWorld = function () {
             const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
             const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
@@ -51,8 +51,8 @@ export default class World {
                 Filters.apply('mapMoved', point);
             }
         };
-        this.drawMainMap = function () {
-            const _this = this, ctx = _this.mainMapCanvas.getContext('2d'), image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), mainMapSize = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE, cameraPosX = _this.cameraPosX, cameraPosY = _this.cameraPosY;
+        this.drawMainMap = function (afterCallback) {
+            const _this = this, ctx = _this.mainMapCanvas.getContext('2d'), image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
             for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
                 const layer = _this.layers.getLayer(ln);
                 layer.foreachValues(function (displayCell, x, y) {
@@ -63,12 +63,23 @@ export default class World {
             }
             createImageBitmap(image).then(function (render) {
                 ctx.imageSmoothingEnabled = false;
-                ctx.drawImage(render, 0, 0, mainMapSize, mainMapSize);
-                ctx.strokeStyle = '#FFFFFF';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(cameraPosX * Config.MAIN_MAP_SCALE, cameraPosY * Config.MAIN_MAP_SCALE, Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE, Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE);
-                return ctx;
+                ctx.drawImage(render, 0, 0, _this.mainMapCanvas.width, _this.mainMapCanvas.height);
+                if (typeof afterCallback !== 'undefined') {
+                    afterCallback();
+                }
             });
+        };
+        this.drawRectangleAroundMiniMap = function (ctx) {
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(this.cameraPosX * Config.MAIN_MAP_SCALE, this.cameraPosY * Config.MAIN_MAP_SCALE, Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE, Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE);
+        };
+        this.drawMiniMap = function () {
+            const mainMapCtx = this.mainMapCanvas.getContext('2d'), miniMapCtx = this.miniMapCanvas.getContext('2d'), imageData = mainMapCtx.getImageData(0, 0, this.mainMapCanvas.width, this.mainMapCanvas.height);
+            this.miniMapCanvas.width = imageData.width;
+            this.miniMapCanvas.height = imageData.height;
+            miniMapCtx.putImageData(imageData, 0, 0);
+            this.drawRectangleAroundMiniMap(miniMapCtx);
         };
         this.drawRectangles = function () {
             const _this = this, ctx = _this.scrollingMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellSize, worldOffsetTop = _this.cameraPosY * _this.cellSize;
@@ -168,7 +179,9 @@ export default class World {
             if (Config.SHOW_BIOMES_INFO) {
                 _this.drawBiomesInfo();
             }
-            _this.drawMainMap();
+            _this.drawMainMap(function () {
+                _this.drawMiniMap();
+            });
         };
         this.create = function () {
             const _this = this;
@@ -206,9 +219,10 @@ export default class World {
         this.scrollingMapCanvas = scrollingMapCanvas;
         this.scrollingMapCanvas.width = this.worldScaledSize;
         this.scrollingMapCanvas.height = this.worldScaledSize;
-        this.mainMapCanvas = mainMapCanvas;
+        this.mainMapCanvas = new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE);
         this.mainMapCanvas.width = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE;
         this.mainMapCanvas.height = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE;
+        this.miniMapCanvas = miniMapCanvas;
         this.timer = new Timer();
         this.layers = new Layers(Config.WORLD_SIZE, Config.WORLD_SIZE);
         if (Config.STORE_DATA) {

@@ -1,7 +1,7 @@
 import Config from './config.js';
 import { Filters, fillCanvasPixel } from "./src/helpers.js";
 import World from './src/World.js';
-const coordinatesField = document.getElementById('coordinates'), mainMapCanvas = document.getElementById('mainMap'), world = new World(document.getElementById('scrollingMapWrapper'), document.getElementById('scrollingMap'), mainMapCanvas, getCenteredCameraPosition(Config.VISIBLE_COLS));
+const coordinatesField = document.getElementById('coordinates'), miniMapCanvas = document.getElementById('miniMap'), world = new World(document.getElementById('scrollingMapWrapper'), document.getElementById('scrollingMap'), miniMapCanvas, getCenteredCameraPosition(Config.VISIBLE_COLS));
 function drawColorMap(id, map) {
     const canvas = document.getElementById(id);
     canvas.width = map.getWidth();
@@ -130,8 +130,8 @@ function centeredCameraPointToXY(point, size) {
 coordinatesField.addEventListener("change", function () {
     world.moveMapTo(getCenteredCameraPosition(Config.VISIBLE_COLS));
 });
-mainMapCanvas.addEventListener("click", function (e) {
-    const rect = this.getBoundingClientRect(), scale = Config.WORLD_SIZE / mainMapCanvas.offsetWidth;
+miniMapCanvas.addEventListener("click", function (e) {
+    const rect = this.getBoundingClientRect(), scale = Config.WORLD_SIZE / miniMapCanvas.offsetWidth;
     world.moveMapTo(centerCameraPoint([
         Math.floor((e.clientX - rect.left) * scale),
         Math.floor((e.clientY - rect.top) * scale)
