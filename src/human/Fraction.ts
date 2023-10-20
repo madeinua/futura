@@ -15,8 +15,7 @@ export default class Fraction {
     fractionColor: string;
     startPosition: Cell;
     territory: BinaryMatrix;
-    territoryHistory: BinaryMatrix[];
-    maxHistoryLength: number = 10;
+    borders: BinaryMatrix;
 
     static latestId: number;
 
@@ -26,7 +25,7 @@ export default class Fraction {
         this.fractionColor = fractionSettings.color;
         this.startPosition = [startPointX, startPointY];
         this.territory = (new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE)).fill(startPointX, startPointY);
-        this.territoryHistory = [];
+        this.borders = (new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE)).fill(startPointX, startPointY);
     }
 
     static incrementId() {
@@ -39,29 +38,7 @@ export default class Fraction {
         return this.latestId;
     }
 
-    getId(): string {
-        return this.id;
-    }
-
-    getFractionName(): string {
-        return this.fractionName;
-    }
-
     getFractionColor(): RGB {
         return hexToRgb(this.fractionColor);
-    }
-
-    getStartPosition(): Cell {
-        return this.startPosition;
-    }
-
-    getTerritory(): BinaryMatrix {
-        return this.territory;
-    }
-
-    getHistoryAt(pos: number): BinaryMatrix | boolean {
-        return this.territoryHistory.length >= pos && pos > 0
-            ? this.territoryHistory[this.territoryHistory.length - pos]
-            : false;
     }
 }

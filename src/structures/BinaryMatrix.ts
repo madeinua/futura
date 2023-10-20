@@ -1,6 +1,6 @@
 import NumericMatrix from './NumericMatrix.js';
 import {distance, round, getPolygonAreaSize} from "../helpers.js";
-import {CellsList} from "./Cells.js";
+import {Cell, CellsList} from "./Cells.js";
 import {Array2D} from "./Array2D.js";
 
 export default class BinaryMatrix extends NumericMatrix {
@@ -216,6 +216,19 @@ export default class BinaryMatrix extends NumericMatrix {
 
     hasFilledNeighbors(x: number, y: number): boolean {
         return this.getFilledNeighbors(x, y).length > 0;
+    }
+
+    /**
+     * Retrieve all unfilled neighbors of the specified cell
+     */
+    foreachFilledNeighborsToAllCells(callback: Function): void {
+        const _this: BinaryMatrix = this;
+
+        _this.foreachFilled(function (x: number, y: number): void {
+            _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
+                callback(nx, ny, x, y);
+            });
+        });
     }
 
     /**

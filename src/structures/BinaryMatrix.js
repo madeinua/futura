@@ -200,6 +200,17 @@ export default class BinaryMatrix extends NumericMatrix {
         return this.getFilledNeighbors(x, y).length > 0;
     }
     /**
+     * Retrieve all unfilled neighbors of the specified cell
+     */
+    foreachFilledNeighborsToAllCells(callback) {
+        const _this = this;
+        _this.foreachFilled(function (x, y) {
+            _this.foreachNeighbors(x, y, function (nx, ny) {
+                callback(nx, ny, x, y);
+            });
+        });
+    }
+    /**
      * Retrieve size of the array compared to the total number size of the map
      */
     getSize() {
