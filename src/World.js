@@ -131,9 +131,9 @@ export default class World {
         };
         this.isCellVisible = function (x, y) {
             return x >= this.cameraPosX
-                && x <= this.cameraPosX + Config.VISIBLE_COLS
+                && x < this.cameraPosX + Config.VISIBLE_COLS
                 && y >= this.cameraPosY
-                && y <= this.cameraPosY + Config.VISIBLE_ROWS;
+                && y < this.cameraPosY + Config.VISIBLE_ROWS;
         };
         this.drawLayers = function () {
             const _this = this, renderCanvas = document.createElement('canvas');

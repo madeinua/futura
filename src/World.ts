@@ -328,9 +328,9 @@ export default class World {
 
     private isCellVisible = function (x: number, y: number): boolean {
         return x >= this.cameraPosX
-            && x <= this.cameraPosX + Config.VISIBLE_COLS
+            && x < this.cameraPosX + Config.VISIBLE_COLS
             && y >= this.cameraPosY
-            && y <= this.cameraPosY + Config.VISIBLE_ROWS;
+            && y < this.cameraPosY + Config.VISIBLE_ROWS;
     }
 
     protected drawLayers = function (): void {

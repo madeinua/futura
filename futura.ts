@@ -16,6 +16,7 @@ import Animal from "./src/animals/Animal.js";
 import Biome from "./src/biomes/Biome.js";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
+    displayMapVisibleRange = document.getElementById('displayMapVisibleRange') as HTMLInputElement,
     miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement,
     world = new World(
         document.getElementById('displayMapWrapper'),
@@ -69,6 +70,7 @@ function drawMap(id: string, map: NumericMatrix, reverse: boolean) {
 Filters.add('mapMoved', function (point: Cell) {
     point = centeredCameraPointToXY(point);
     coordinatesField.value = point[0] + ',' + point[1];
+    displayMapVisibleRange.innerHTML = '[' + world.cameraPosX + '-' + (world.cameraPosY + Config.VISIBLE_COLS) + ' | ' + world.cameraPosY + '-' + (world.cameraPosY + Config.VISIBLE_ROWS) + ']';
 });
 
 Filters.add('altitudeMap', function (map: AltitudeMap) {
@@ -166,8 +168,6 @@ Filters.add('animalsSteps', function (animals: Animal[]) {
     document.getElementById('animalsCounter').innerHTML = animals.length.toString();
 });
 
-world.create();
-
 function getCameraPosition(): Cell {
 
     let point = coordinatesField.value.split(','),
@@ -209,6 +209,8 @@ function centeredCameraPointToXY(point: Cell): Cell {
         Math.max(0, point[1] + ch)
     ];
 }
+
+world.create();
 
 coordinatesField.addEventListener("change", function () {
     world.moveMapTo(

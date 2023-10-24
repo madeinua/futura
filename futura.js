@@ -1,7 +1,7 @@
 import Config from './config.js';
 import { Filters, fillCanvasPixel } from "./src/helpers.js";
 import World from './src/World.js';
-const coordinatesField = document.getElementById('coordinates'), miniMapCanvas = document.getElementById('miniMap'), world = new World(document.getElementById('displayMapWrapper'), document.getElementById('displayMap'), miniMapCanvas, getCenteredCameraPosition());
+const coordinatesField = document.getElementById('coordinates'), displayMapVisibleRange = document.getElementById('displayMapVisibleRange'), miniMapCanvas = document.getElementById('miniMap'), world = new World(document.getElementById('displayMapWrapper'), document.getElementById('displayMap'), miniMapCanvas, getCenteredCameraPosition());
 function drawColorMap(id, map) {
     const canvas = document.getElementById(id);
     canvas.width = map.getWidth();
@@ -28,6 +28,7 @@ function drawMap(id, map, reverse) {
 Filters.add('mapMoved', function (point) {
     point = centeredCameraPointToXY(point);
     coordinatesField.value = point[0] + ',' + point[1];
+    displayMapVisibleRange.innerHTML = '[' + world.cameraPosX + '-' + (world.cameraPosY + Config.VISIBLE_COLS) + ' | ' + world.cameraPosY + '-' + (world.cameraPosY + Config.VISIBLE_ROWS) + ']';
 });
 Filters.add('altitudeMap', function (map) {
     drawMap('altitudeMapCanvas', map, false);
@@ -101,7 +102,6 @@ Filters.add('animalsSteps', function (animals) {
     document.getElementById('animalsList').innerHTML = text;
     document.getElementById('animalsCounter').innerHTML = animals.length.toString();
 });
-world.create();
 function getCameraPosition() {
     let point = coordinatesField.value.split(','), x = 0, y = 0;
     if (point.length === 2) {
@@ -127,6 +127,7 @@ function centeredCameraPointToXY(point) {
         Math.max(0, point[1] + ch)
     ];
 }
+world.create();
 coordinatesField.addEventListener("change", function () {
     world.moveMapTo(getCenteredCameraPosition());
 });
