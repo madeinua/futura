@@ -1,7 +1,7 @@
 import Config from './config.js';
 import { Filters, fillCanvasPixel } from "./src/helpers.js";
 import World from './src/World.js';
-const coordinatesField = document.getElementById('coordinates'), miniMapCanvas = document.getElementById('miniMap'), world = new World(document.getElementById('scrollingMapWrapper'), document.getElementById('scrollingMap'), miniMapCanvas, getCenteredCameraPosition());
+const coordinatesField = document.getElementById('coordinates'), miniMapCanvas = document.getElementById('miniMap'), world = new World(document.getElementById('displayMapWrapper'), document.getElementById('displayMap'), miniMapCanvas, getCenteredCameraPosition());
 function drawColorMap(id, map) {
     const canvas = document.getElementById(id);
     canvas.width = map.getWidth();

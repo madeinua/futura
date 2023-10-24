@@ -18,8 +18,8 @@ import Biome from "./src/biomes/Biome.js";
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement,
     world = new World(
-        document.getElementById('scrollingMapWrapper'),
-        document.getElementById('scrollingMap') as HTMLCanvasElement,
+        document.getElementById('displayMapWrapper'),
+        document.getElementById('displayMap') as HTMLCanvasElement,
         miniMapCanvas,
         getCenteredCameraPosition()
     );

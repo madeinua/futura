@@ -34,11 +34,11 @@ canvas {
     border: #eee solid 1px;
 }
 
-#scrollingMapWrapper {
+#displayMapWrapper {
     box-shadow: 0 0 10px #777;
     width: 1800px;
     height: 900px;
-    overflow: hidden;
+    overflow: auto;
 }
 
 #miniMap {
