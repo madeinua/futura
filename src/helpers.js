@@ -212,6 +212,10 @@ export function hexToRgb(hex) {
     }
     return hexStorage[hex];
 }
+export function rgbToHex(rgb) {
+    const hex = rgb.map((value) => value.toString(16).padStart(2, '0')).join('');
+    return `#${hex}`;
+}
 const colorCache = {};
 /**
  * Make a Hex color darken/brighten

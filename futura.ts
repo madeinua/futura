@@ -19,13 +19,17 @@ const coordinatesField = document.getElementById('coordinates') as HTMLInputElem
     displayMapVisibleRange = document.getElementById('displayMapVisibleRange') as HTMLInputElement,
     displayMapWrapper = document.getElementById('displayMapWrapper') as HTMLDivElement,
     displayMap = document.getElementById('displayMap') as HTMLCanvasElement,
-    miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement,
-    world = new World(
-        displayMapWrapper,
-        displayMap,
-        miniMapCanvas,
-        getCenteredCameraPosition()
-    );
+    miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement;
+
+const world = new World(
+    displayMap,
+    displayMapWrapper.offsetWidth,
+    displayMapWrapper.offsetHeight,
+    miniMapCanvas,
+    getCenteredCameraPosition()
+);
+
+world.create();
 
 function drawColorMap(id: string, map: Matrix) {
 
@@ -69,10 +73,63 @@ function drawMap(id: string, map: NumericMatrix, reverse: boolean) {
     ctx.putImageData(image, 0, 0);
 }
 
+function getCameraPosition(): Cell {
+
+    let point = coordinatesField.value.split(','),
+        x = 0,
+        y = 0;
+
+    if (point.length === 2) {
+        x = parseInt(point[0], 10);
+        y = parseInt(point[1], 10);
+    }
+
+    return [x, y];
+}
+
+function centerCameraPoint(point: Cell): Cell {
+
+    const cw = Math.floor(Config.VISIBLE_COLS / 2),
+        ch = Math.floor(Config.VISIBLE_ROWS / 2);
+
+    return [
+        Math.max(0, point[0] - cw),
+        Math.max(0, point[1] - ch)
+    ];
+}
+
+function getCenteredCameraPosition(): Cell {
+    return centerCameraPoint(
+        getCameraPosition()
+    );
+}
+
+function centeredCameraPointToXY(point: Cell): Cell {
+
+    const cw = Math.floor(Config.VISIBLE_COLS / 2),
+        ch = Math.floor(Config.VISIBLE_ROWS / 2);
+
+    return [
+        Math.max(0, point[0] + cw),
+        Math.max(0, point[1] + ch)
+    ];
+}
+
+function scrollIntoToView() {
+    displayMapWrapper.scrollLeft = world.cameraPosLeft * world.cellWidth;
+    displayMapWrapper.scrollTop = world.cameraPosTop * world.cellHeight;
+}
+
+function pauseTimer(): boolean {
+    return world.timer.isTimerPaused()
+        ? world.timer.unpauseTimer()
+        : world.timer.pauseTimer();
+}
+
 Filters.add('mapMoved', function (point: Cell) {
     point = centeredCameraPointToXY(point);
     coordinatesField.value = point[0] + ',' + point[1];
-    displayMapVisibleRange.innerHTML = '[' + world.cameraPosX + '-' + (world.cameraPosY + Config.VISIBLE_COLS) + ' | ' + world.cameraPosY + '-' + (world.cameraPosY + Config.VISIBLE_ROWS) + ']';
+    displayMapVisibleRange.innerHTML = '[' + world.cameraPosLeft + '-' + (world.cameraPosTop + Config.VISIBLE_COLS) + ' | ' + world.cameraPosTop + '-' + (world.cameraPosTop + Config.VISIBLE_ROWS) + ']';
 });
 
 Filters.add('altitudeMap', function (map: AltitudeMap) {
@@ -170,54 +227,13 @@ Filters.add('animalsSteps', function (animals: Animal[]) {
     document.getElementById('animalsCounter').innerHTML = animals.length.toString();
 });
 
-function getCameraPosition(): Cell {
-
-    let point = coordinatesField.value.split(','),
-        x = 0,
-        y = 0;
-
-    if (point.length === 2) {
-        x = parseInt(point[0], 10);
-        y = parseInt(point[1], 10);
-    }
-
-    return [x, y];
-}
-
-function centerCameraPoint(point: Cell): Cell {
-
-    const cw = Math.floor(Config.VISIBLE_COLS / 2),
-        ch = Math.floor(Config.VISIBLE_ROWS / 2);
-
-    return [
-        Math.max(0, point[0] - cw),
-        Math.max(0, point[1] - ch)
-    ];
-}
-
-function getCenteredCameraPosition(): Cell {
-    return centerCameraPoint(
-        getCameraPosition()
-    );
-}
-
-function centeredCameraPointToXY(point: Cell): Cell {
-
-    const cw = Math.floor(Config.VISIBLE_COLS / 2),
-        ch = Math.floor(Config.VISIBLE_ROWS / 2);
-
-    return [
-        Math.max(0, point[0] + cw),
-        Math.max(0, point[1] + ch)
-    ];
-}
-
-world.create();
-
 coordinatesField.addEventListener("change", function () {
+
     world.moveMapTo(
         getCenteredCameraPosition()
     );
+
+    scrollIntoToView()
 });
 
 miniMapCanvas.addEventListener("click", function (e) {
@@ -227,17 +243,13 @@ miniMapCanvas.addEventListener("click", function (e) {
 
     world.moveMapTo(
         centerCameraPoint([
-            Math.floor((e.clientX - rect.left) * scale),
-            Math.floor((e.clientY - rect.top) * scale)
+            Math.floor(e.clientX - rect.left * scale),
+            Math.floor(e.clientY - rect.top * scale)
         ])
     );
-});
 
-function pauseTimer(): boolean {
-    return world.timer.isTimerPaused()
-        ? world.timer.unpauseTimer()
-        : world.timer.pauseTimer();
-}
+    scrollIntoToView();
+});
 
 document.getElementById('pauseSteps').addEventListener("click", function () {
     pauseTimer();

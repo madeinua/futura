@@ -26,7 +26,9 @@ export default class Layers {
         return this.layers[level];
     }
 
-    getLayersCount = function (): number {
-        return this.layers.length;
+    foreachLayersValues = function (callback: Function): void {
+        for (let i = 0; i < this.layers.length; i++) {
+            this.layers[i].foreachValues(callback);
+        }
     }
 }

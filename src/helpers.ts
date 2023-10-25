@@ -306,6 +306,11 @@ export function hexToRgb(hex: string): RGB {
     return hexStorage[hex];
 }
 
+export function rgbToHex(rgb: RGBa): string {
+    const hex = rgb.map((value) => value.toString(16).padStart(2, '0')).join('');
+    return `#${hex}`;
+}
+
 const colorCache = {};
 
 /**

@@ -13,8 +13,10 @@ export default class Layers {
             }
             return this.layers[level];
         };
-        this.getLayersCount = function () {
-            return this.layers.length;
+        this.foreachLayersValues = function (callback) {
+            for (let i = 0; i < this.layers.length; i++) {
+                this.layers[i].foreachValues(callback);
+            }
         };
         this.width = width;
         this.height = height;
