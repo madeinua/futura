@@ -13,6 +13,18 @@ import Timer from "./services/Timer.js";
 import Layers from "./services/Layers.js";
 export default class World {
     constructor(displayMapWrapper, displayMapCanvas, miniMapCanvas, cameraPos) {
+        this.create = function () {
+            const _this = this;
+            _this.generateWorld();
+            setTimeout(function () {
+                _this.update();
+            }, 100);
+            if (Config.STEPS_ENABLED) {
+                _this.timer.stepsTimer(function () {
+                    _this.update();
+                });
+            }
+        };
         this.generateWorld = function () {
             const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
             const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
@@ -40,22 +52,59 @@ export default class World {
                 'forestOperator': forestsOperator,
             };
         };
-        this.moveMapTo = function (point, silent = false) {
-            const _this = this, maxWidth = Config.WORLD_SIZE - Config.VISIBLE_COLS, maxHeight = Config.WORLD_SIZE - Config.VISIBLE_ROWS;
-            point[0] = Math.max(0, Math.min(point[0], maxWidth));
-            point[1] = Math.max(0, Math.min(point[1], maxHeight));
-            _this.cameraPosX = point[0];
-            _this.cameraPosY = point[1];
-            _this.update();
-            if (!silent) {
-                Filters.apply('mapMoved', point);
+        this.update = function () {
+            const _this = this, renderCanvas = document.createElement('canvas');
+            renderCanvas.width = Config.WORLD_SIZE;
+            renderCanvas.height = Config.WORLD_SIZE;
+            const renderCtx = renderCanvas.getContext('2d'), ctx = _this.displayMapCanvas.getContext('2d'), ctxImages = [], worldOffsetLeft = this.cameraPosX * _this.cellWidth, worldOffsetTop = this.cameraPosY * _this.cellHeight, imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
+            _this.displayMapWrapper.scrollLeft = worldOffsetLeft;
+            _this.displayMapWrapper.scrollTop = worldOffsetTop;
+            let layer;
+            for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
+                layer = _this.layers.getLayer(ln);
+                layer.foreachValues(function (displayCell, x, y) {
+                    if (displayCell === null || !_this.isCellVisible(x, y)) {
+                        return;
+                    }
+                    if (displayCell.drawBackground()) {
+                        fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
+                    }
+                    if (displayCell.hasImage()) {
+                        ctxImages.push([x, y, displayCell.getImage()]);
+                    }
+                });
             }
+            renderCtx.putImageData(imageData, 0, 0);
+            const imageData2 = renderCtx.getImageData(_this.cameraPosX, _this.cameraPosY, Config.VISIBLE_COLS, Config.VISIBLE_ROWS);
+            const scaledData = scaleImageData(ctx, imageData2, _this.cellWidth, _this.cellHeight);
+            ctx.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
+            for (let i = 0; i < ctxImages.length; i++) {
+                if (!_this.isCellVisible(ctxImages[i][0], ctxImages[i][1])) {
+                    continue;
+                }
+                ctx.drawImage(ctxImages[i][2], ctxImages[i][0] * _this.cellWidth, ctxImages[i][1] * _this.cellHeight, _this.cellWidth, _this.cellHeight);
+            }
+            if (Config.SHOW_RECTANGLES) {
+                _this.drawRectangles();
+            }
+            if (Config.SHOW_COORDINATES) {
+                _this.drawCoordinates();
+            }
+            if (Config.SHOW_TEMPERATURES) {
+                _this.drawTemperatures();
+            }
+            if (Config.SHOW_BIOMES_INFO) {
+                _this.drawBiomesInfo();
+            }
+            _this.drawDisplayMap(ctx, imageData, function (ctx) {
+                _this.drawMiniMap(ctx);
+            });
         };
-        this.getCellByXY = function (x, y) {
-            return [
-                Math.floor(x / this.cellWidth),
-                Math.floor(y / this.cellHeight)
-            ];
+        this.isCellVisible = function (x, y) {
+            return x >= this.cameraPosX
+                && x < this.cameraPosX + Config.VISIBLE_COLS
+                && y >= this.cameraPosY
+                && y < this.cameraPosY + Config.VISIBLE_ROWS;
         };
         this.drawDisplayMap = function (ctx, imageData, afterCallback) {
             const _this = this;
@@ -75,16 +124,16 @@ export default class World {
                 }
             });
         };
+        this.drawMiniMap = function (ctx) {
+            const _this = this, imageData = ctx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE), miniMapCtx = _this.miniMapCanvas.getContext('2d');
+            miniMapCtx.putImageData(imageData, 0, 0);
+            _this.drawRectangleAroundMiniMap(miniMapCtx);
+        };
         this.drawRectangleAroundMiniMap = function (ctx) {
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = '#FFFFFF';
             ctx.lineWidth = 2;
             ctx.strokeRect(this.cameraPosX, this.cameraPosY, Config.VISIBLE_COLS, Config.VISIBLE_ROWS);
-        };
-        this.drawMiniMap = function (ctx) {
-            const _this = this, imageData = ctx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE), miniMapCtx = _this.miniMapCanvas.getContext('2d');
-            miniMapCtx.putImageData(imageData, 0, 0);
-            _this.drawRectangleAroundMiniMap(miniMapCtx);
         };
         this.drawRectangles = function () {
             const _this = this, ctx = _this.displayMapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosX * _this.cellWidth, worldOffsetTop = _this.cameraPosY * _this.cellHeight;
@@ -134,74 +183,22 @@ export default class World {
                 }
             }
         };
-        this.isCellVisible = function (x, y) {
-            return x >= this.cameraPosX
-                && x < this.cameraPosX + Config.VISIBLE_COLS
-                && y >= this.cameraPosY
-                && y < this.cameraPosY + Config.VISIBLE_ROWS;
-        };
-        this.drawLayers = function () {
-            const _this = this, renderCanvas = document.createElement('canvas');
-            renderCanvas.width = Config.WORLD_SIZE;
-            renderCanvas.height = Config.WORLD_SIZE;
-            const renderCtx = renderCanvas.getContext('2d'), ctx = _this.displayMapCanvas.getContext('2d'), ctxImages = [], worldOffsetLeft = this.cameraPosX * _this.cellWidth, worldOffsetTop = this.cameraPosY * _this.cellHeight, imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
-            _this.displayMapWrapper.scrollLeft = worldOffsetLeft;
-            _this.displayMapWrapper.scrollTop = worldOffsetTop;
-            let layer;
-            for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-                layer = _this.layers.getLayer(ln);
-                layer.foreachValues(function (displayCell, x, y) {
-                    if (displayCell === null || !_this.isCellVisible(x, y)) {
-                        return;
-                    }
-                    if (displayCell.drawBackground()) {
-                        fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
-                    }
-                    if (displayCell.hasImage()) {
-                        ctxImages.push([x, y, displayCell.getImage()]);
-                    }
-                });
-            }
-            renderCtx.putImageData(imageData, 0, 0);
-            const imageData2 = renderCtx.getImageData(_this.cameraPosX, _this.cameraPosY, Config.VISIBLE_COLS, Config.VISIBLE_ROWS);
-            const scaledData = scaleImageData(ctx, imageData2, _this.cellWidth, _this.cellHeight);
-            ctx.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
-            for (let i = 0; i < ctxImages.length; i++) {
-                if (!_this.isCellVisible(ctxImages[i][0], ctxImages[i][1])) {
-                    continue;
-                }
-                ctx.drawImage(ctxImages[i][2], ctxImages[i][0] * _this.cellWidth, ctxImages[i][1] * _this.cellHeight, _this.cellWidth, _this.cellHeight);
-            }
-            if (Config.SHOW_RECTANGLES) {
-                _this.drawRectangles();
-            }
-            if (Config.SHOW_COORDINATES) {
-                _this.drawCoordinates();
-            }
-            if (Config.SHOW_TEMPERATURES) {
-                _this.drawTemperatures();
-            }
-            if (Config.SHOW_BIOMES_INFO) {
-                _this.drawBiomesInfo();
-            }
-            _this.drawDisplayMap(ctx, imageData, function (ctx) {
-                _this.drawMiniMap(ctx);
-            });
-        };
-        this.create = function () {
-            const _this = this;
-            _this.generateWorld();
-            setTimeout(function () {
-                _this.update();
-            }, 100);
-            if (Config.STEPS_ENABLED) {
-                _this.timer.stepsTimer(function () {
-                    _this.update();
-                });
+        this.moveMapTo = function (point, silent = false) {
+            const _this = this, maxWidth = Config.WORLD_SIZE - Config.VISIBLE_COLS, maxHeight = Config.WORLD_SIZE - Config.VISIBLE_ROWS;
+            point[0] = Math.max(0, Math.min(point[0], maxWidth));
+            point[1] = Math.max(0, Math.min(point[1], maxHeight));
+            _this.cameraPosX = point[0];
+            _this.cameraPosY = point[1];
+            _this.update();
+            if (!silent) {
+                Filters.apply('mapMoved', point);
             }
         };
-        this.update = function () {
-            this.drawLayers();
+        this.getCellByXY = function (x, y) {
+            return [
+                Math.floor(x / this.cellWidth),
+                Math.floor(y / this.cellHeight)
+            ];
         };
         this.generateFractions = function () {
             const _this = this;

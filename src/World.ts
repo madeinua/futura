@@ -104,6 +104,22 @@ export default class World {
         }
     }
 
+    create = function (): void {
+        const _this: World = this;
+
+        _this.generateWorld();
+
+        setTimeout(function (): void {
+            _this.update();
+        }, 100);
+
+        if (Config.STEPS_ENABLED) {
+            _this.timer.stepsTimer(function (): void {
+                _this.update();
+            });
+        }
+    }
+
     private generateWorld = function (): void {
 
         const surfaceOperator = new SurfaceOperator(),
@@ -165,181 +181,7 @@ export default class World {
         }
     }
 
-    moveMapTo = function (point: Cell, silent: boolean = false): void {
-
-        const _this: World = this,
-            maxWidth = Config.WORLD_SIZE - Config.VISIBLE_COLS,
-            maxHeight = Config.WORLD_SIZE - Config.VISIBLE_ROWS;
-
-        point[0] = Math.max(0, Math.min(point[0], maxWidth));
-        point[1] = Math.max(0, Math.min(point[1], maxHeight));
-
-        _this.cameraPosX = point[0];
-        _this.cameraPosY = point[1];
-
-        _this.update();
-
-        if (!silent) {
-            Filters.apply('mapMoved', point);
-        }
-    }
-
-    getCellByXY = function (x: number, y: number): Cell {
-        return [
-            Math.floor(x / this.cellWidth),
-            Math.floor(y / this.cellHeight)
-        ];
-    }
-
-    private drawDisplayMap = function (
-        ctx: CanvasRenderingContext2D,
-        imageData: ImageData,
-        afterCallback: (ctx: CanvasRenderingContext2D) => void
-    ): void {
-        const _this: World = this;
-
-        for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-            const layer = _this.layers.getLayer(ln);
-
-            layer.foreachValues(function (displayCell: DisplayCell, x: number, y: number): void {
-                if (displayCell !== null) {
-                    fillCanvasPixel(
-                        imageData,
-                        (x + y * Config.WORLD_SIZE) * 4,
-                        displayCell.getMapColor()
-                    );
-                }
-            });
-        }
-
-        createImageBitmap(imageData).then(function (render) {
-            ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(render, 0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE);
-
-            if (typeof afterCallback !== 'undefined') {
-                afterCallback(ctx);
-            }
-        });
-    }
-
-    private drawRectangleAroundMiniMap = function (ctx: CanvasRenderingContext2D): void {
-        ctx.imageSmoothingEnabled = false;
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(
-            this.cameraPosX,
-            this.cameraPosY,
-            Config.VISIBLE_COLS,
-            Config.VISIBLE_ROWS
-        );
-    }
-
-    private drawMiniMap = function (ctx: CanvasRenderingContext2D): void {
-
-        const _this: World = this,
-            imageData = ctx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE),
-            miniMapCtx = _this.miniMapCanvas.getContext('2d');
-
-        miniMapCtx.putImageData(imageData, 0, 0);
-
-        _this.drawRectangleAroundMiniMap(miniMapCtx);
-    }
-
-    private drawRectangles = function (): void {
-
-        const _this: World = this,
-            ctx = _this.displayMapCanvas.getContext('2d'),
-            worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
-            worldOffsetTop = _this.cameraPosY * _this.cellHeight;
-
-        ctx.imageSmoothingEnabled = false;
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-
-        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
-            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
-                const lx = x * _this.cellWidth + worldOffsetLeft,
-                    ly = y * _this.cellHeight + worldOffsetTop;
-
-                ctx.strokeRect(lx, ly, _this.cellWidth, _this.cellHeight);
-            }
-        }
-    }
-
-    private drawCoordinates = function (): void {
-
-        const _this: World = this,
-            ctx = _this.displayMapCanvas.getContext('2d'),
-            worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
-            worldOffsetTop = _this.cameraPosY * _this.cellHeight;
-
-        ctx.imageSmoothingEnabled = false;
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-
-        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
-            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
-                const lx = x * _this.cellWidth + worldOffsetLeft,
-                    ly = y * _this.cellHeight + worldOffsetTop;
-
-                ctx.font = '7px senf';
-                ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
-                ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 20);
-            }
-        }
-    }
-
-    private drawTemperatures = function (): void {
-
-        const _this: World = this,
-            ctx = _this.displayMapCanvas.getContext('2d'),
-            worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
-            worldOffsetTop = _this.cameraPosY * _this.cellHeight,
-            temperatureMap = this.world.temperatureMap;
-
-        ctx.imageSmoothingEnabled = false;
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-
-        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
-            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
-
-                const lx = x * _this.cellWidth + worldOffsetLeft,
-                    ly = y * _this.cellHeight + worldOffsetTop;
-
-                ctx.font = '7px senf';
-                ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPosX + x, _this.cameraPosY + y) * 450) / 10).toString(), lx + 2, ly + 10);
-            }
-        }
-    }
-
-    private drawBiomesInfo = function (): void {
-
-        const _this: World = this,
-            ctx = _this.displayMapCanvas.getContext('2d'),
-            worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
-            worldOffsetTop = _this.cameraPosY * _this.cellHeight,
-            biomes = this.world.biomesOperator.getBiomes();
-
-        ctx.imageSmoothingEnabled = false;
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-
-        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
-            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
-                const lx = x * _this.cellWidth + worldOffsetLeft,
-                    ly = y * _this.cellHeight + worldOffsetTop;
-
-                ctx.font = '7px senf';
-                ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(6, 12), lx + 2, ly + 10);
-            }
-        }
-    }
-
-    private isCellVisible = function (x: number, y: number): boolean {
-        return x >= this.cameraPosX
-            && x < this.cameraPosX + Config.VISIBLE_COLS
-            && y >= this.cameraPosY
-            && y < this.cameraPosY + Config.VISIBLE_ROWS;
-    }
-
-    protected drawLayers = function (): void {
+    update = function (): void {
 
         const _this: World = this,
             renderCanvas = document.createElement('canvas');
@@ -431,24 +273,178 @@ export default class World {
         });
     }
 
-    create = function (): void {
+    private isCellVisible = function (x: number, y: number): boolean {
+        return x >= this.cameraPosX
+            && x < this.cameraPosX + Config.VISIBLE_COLS
+            && y >= this.cameraPosY
+            && y < this.cameraPosY + Config.VISIBLE_ROWS;
+    }
+
+    private drawDisplayMap = function (
+        ctx: CanvasRenderingContext2D,
+        imageData: ImageData,
+        afterCallback: (ctx: CanvasRenderingContext2D) => void
+    ): void {
         const _this: World = this;
 
-        _this.generateWorld();
+        for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
+            const layer = _this.layers.getLayer(ln);
 
-        setTimeout(function (): void {
-            _this.update();
-        }, 100);
-
-        if (Config.STEPS_ENABLED) {
-            _this.timer.stepsTimer(function (): void {
-                _this.update();
+            layer.foreachValues(function (displayCell: DisplayCell, x: number, y: number): void {
+                if (displayCell !== null) {
+                    fillCanvasPixel(
+                        imageData,
+                        (x + y * Config.WORLD_SIZE) * 4,
+                        displayCell.getMapColor()
+                    );
+                }
             });
+        }
+
+        createImageBitmap(imageData).then(function (render) {
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(render, 0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+
+            if (typeof afterCallback !== 'undefined') {
+                afterCallback(ctx);
+            }
+        });
+    }
+
+    private drawMiniMap = function (ctx: CanvasRenderingContext2D): void {
+
+        const _this: World = this,
+            imageData = ctx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE),
+            miniMapCtx = _this.miniMapCanvas.getContext('2d');
+
+        miniMapCtx.putImageData(imageData, 0, 0);
+
+        _this.drawRectangleAroundMiniMap(miniMapCtx);
+    }
+
+    private drawRectangleAroundMiniMap = function (ctx: CanvasRenderingContext2D): void {
+        ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(
+            this.cameraPosX,
+            this.cameraPosY,
+            Config.VISIBLE_COLS,
+            Config.VISIBLE_ROWS
+        );
+    }
+
+    private drawRectangles = function (): void {
+
+        const _this: World = this,
+            ctx = _this.displayMapCanvas.getContext('2d'),
+            worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
+            worldOffsetTop = _this.cameraPosY * _this.cellHeight;
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+
+        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
+            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
+                const lx = x * _this.cellWidth + worldOffsetLeft,
+                    ly = y * _this.cellHeight + worldOffsetTop;
+
+                ctx.strokeRect(lx, ly, _this.cellWidth, _this.cellHeight);
+            }
         }
     }
 
-    update = function (): void {
-        this.drawLayers();
+    private drawCoordinates = function (): void {
+
+        const _this: World = this,
+            ctx = _this.displayMapCanvas.getContext('2d'),
+            worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
+            worldOffsetTop = _this.cameraPosY * _this.cellHeight;
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+
+        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
+            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
+                const lx = x * _this.cellWidth + worldOffsetLeft,
+                    ly = y * _this.cellHeight + worldOffsetTop;
+
+                ctx.font = '7px senf';
+                ctx.fillText((_this.cameraPosX + x).toString(), lx + 2, ly + 10);
+                ctx.fillText((_this.cameraPosY + y).toString(), lx + 2, ly + 20);
+            }
+        }
+    }
+
+    private drawTemperatures = function (): void {
+
+        const _this: World = this,
+            ctx = _this.displayMapCanvas.getContext('2d'),
+            worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
+            worldOffsetTop = _this.cameraPosY * _this.cellHeight,
+            temperatureMap = this.world.temperatureMap;
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+
+        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
+            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
+
+                const lx = x * _this.cellWidth + worldOffsetLeft,
+                    ly = y * _this.cellHeight + worldOffsetTop;
+
+                ctx.font = '7px senf';
+                ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPosX + x, _this.cameraPosY + y) * 450) / 10).toString(), lx + 2, ly + 10);
+            }
+        }
+    }
+
+    private drawBiomesInfo = function (): void {
+
+        const _this: World = this,
+            ctx = _this.displayMapCanvas.getContext('2d'),
+            worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
+            worldOffsetTop = _this.cameraPosY * _this.cellHeight,
+            biomes = this.world.biomesOperator.getBiomes();
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+
+        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
+            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
+                const lx = x * _this.cellWidth + worldOffsetLeft,
+                    ly = y * _this.cellHeight + worldOffsetTop;
+
+                ctx.font = '7px senf';
+                ctx.fillText(biomes.getCell(_this.cameraPosX + x, _this.cameraPosY + y).getName().substring(6, 12), lx + 2, ly + 10);
+            }
+        }
+    }
+
+    moveMapTo = function (point: Cell, silent: boolean = false): void {
+
+        const _this: World = this,
+            maxWidth = Config.WORLD_SIZE - Config.VISIBLE_COLS,
+            maxHeight = Config.WORLD_SIZE - Config.VISIBLE_ROWS;
+
+        point[0] = Math.max(0, Math.min(point[0], maxWidth));
+        point[1] = Math.max(0, Math.min(point[1], maxHeight));
+
+        _this.cameraPosX = point[0];
+        _this.cameraPosY = point[1];
+
+        _this.update();
+
+        if (!silent) {
+            Filters.apply('mapMoved', point);
+        }
+    }
+
+    getCellByXY = function (x: number, y: number): Cell {
+        return [
+            Math.floor(x / this.cellWidth),
+            Math.floor(y / this.cellHeight)
+        ];
     }
 
     generateFractions = function (): void {
