@@ -10,12 +10,11 @@ const Config = {
     WORLD_SIZE: 250,
     VISIBLE_COLS: 60,
     VISIBLE_ROWS: 30,
-    MAIN_MAP_SCALE: 2.5,
     SHOW_RECTANGLES: false,
     SHOW_COORDINATES: false,
 
     // Steps
-    STEPS_ENABLED: true,
+    STEPS_ENABLED: false,
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 40,
     STEPS_BOOST: 5,

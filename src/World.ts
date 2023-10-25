@@ -48,9 +48,10 @@ export default class World {
     world: WorldType;
     readonly cellWidth: number;
     readonly cellHeight: number;
+    readonly worldWidth: number;
+    readonly worldHeight: number;
     readonly displayMapWrapper: HTMLElement;
     readonly displayMapCanvas: HTMLCanvasElement;
-    readonly mainMapCanvas: OffscreenCanvas;
     readonly miniMapCanvas: HTMLCanvasElement;
     timer: Timer;
     layers: Layers;
@@ -71,17 +72,17 @@ export default class World {
 
         this.cellWidth = Math.ceil(displayMapWrapper.offsetWidth / Config.VISIBLE_COLS);
         this.cellHeight = Math.ceil(displayMapWrapper.offsetHeight / Config.VISIBLE_ROWS);
-
-        this.mainMapCanvas = new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE);
-        this.mainMapCanvas.width = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE;
-        this.mainMapCanvas.height = Config.WORLD_SIZE * Config.MAIN_MAP_SCALE;
-
-        this.miniMapCanvas = miniMapCanvas;
+        this.worldWidth = this.cellWidth * Config.WORLD_SIZE;
+        this.worldHeight = this.cellHeight * Config.WORLD_SIZE;
 
         this.displayMapWrapper = displayMapWrapper;
         this.displayMapCanvas = displayMapCanvas;
-        this.displayMapCanvas.width = this.cellWidth * Config.WORLD_SIZE;
-        this.displayMapCanvas.height = this.cellHeight * Config.WORLD_SIZE;
+        this.displayMapCanvas.width = this.worldWidth;
+        this.displayMapCanvas.height = this.worldHeight;
+
+        this.miniMapCanvas = miniMapCanvas;
+        this.miniMapCanvas.width = Config.WORLD_SIZE;
+        this.miniMapCanvas.height = Config.WORLD_SIZE;
 
         this.timer = new Timer();
         this.layers = new Layers(Config.WORLD_SIZE, Config.WORLD_SIZE);
@@ -166,27 +167,36 @@ export default class World {
 
     moveMapTo = function (point: Cell, silent: boolean = false): void {
 
-        const maxWidth = Config.WORLD_SIZE - Config.VISIBLE_COLS,
+        const _this: World = this,
+            maxWidth = Config.WORLD_SIZE - Config.VISIBLE_COLS,
             maxHeight = Config.WORLD_SIZE - Config.VISIBLE_ROWS;
 
         point[0] = Math.max(0, Math.min(point[0], maxWidth));
         point[1] = Math.max(0, Math.min(point[1], maxHeight));
 
-        this.cameraPosX = point[0];
-        this.cameraPosY = point[1];
+        _this.cameraPosX = point[0];
+        _this.cameraPosY = point[1];
 
-        this.update();
+        _this.update();
 
         if (!silent) {
             Filters.apply('mapMoved', point);
         }
     }
 
-    private drawDisplayMap = function (afterCallback: () => void): void {
+    getCellByXY = function (x: number, y: number): Cell {
+        return [
+            Math.floor(x / this.cellWidth),
+            Math.floor(y / this.cellHeight)
+        ];
+    }
 
-        const _this: World = this,
-            ctx = _this.mainMapCanvas.getContext('2d'),
-            image = ctx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
+    private drawDisplayMap = function (
+        ctx: CanvasRenderingContext2D,
+        imageData: ImageData,
+        afterCallback: (ctx: CanvasRenderingContext2D) => void
+    ): void {
+        const _this: World = this;
 
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
             const layer = _this.layers.getLayer(ln);
@@ -194,7 +204,7 @@ export default class World {
             layer.foreachValues(function (displayCell: DisplayCell, x: number, y: number): void {
                 if (displayCell !== null) {
                     fillCanvasPixel(
-                        image,
+                        imageData,
                         (x + y * Config.WORLD_SIZE) * 4,
                         displayCell.getMapColor()
                     );
@@ -202,41 +212,37 @@ export default class World {
             });
         }
 
-        createImageBitmap(image).then(function (render) {
-
+        createImageBitmap(imageData).then(function (render) {
             ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(render, 0, 0, _this.mainMapCanvas.width, _this.mainMapCanvas.height);
+            ctx.drawImage(render, 0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE);
 
             if (typeof afterCallback !== 'undefined') {
-                afterCallback();
+                afterCallback(ctx);
             }
         });
     }
 
     private drawRectangleAroundMiniMap = function (ctx: CanvasRenderingContext2D): void {
-
+        ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.strokeRect(
-            this.cameraPosX * Config.MAIN_MAP_SCALE,
-            this.cameraPosY * Config.MAIN_MAP_SCALE,
-            Config.VISIBLE_COLS * Config.MAIN_MAP_SCALE,
-            Config.VISIBLE_ROWS * Config.MAIN_MAP_SCALE
+            this.cameraPosX,
+            this.cameraPosY,
+            Config.VISIBLE_COLS,
+            Config.VISIBLE_ROWS
         );
     }
 
-    private drawMiniMap = function (): void {
+    private drawMiniMap = function (ctx: CanvasRenderingContext2D): void {
 
-        const mainMapCtx = this.mainMapCanvas.getContext('2d'),
-            miniMapCtx = this.miniMapCanvas.getContext('2d'),
-            imageData = mainMapCtx.getImageData(0, 0, this.mainMapCanvas.width, this.mainMapCanvas.height);
-
-        this.miniMapCanvas.width = imageData.width;
-        this.miniMapCanvas.height = imageData.height;
+        const _this: World = this,
+            imageData = ctx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE),
+            miniMapCtx = _this.miniMapCanvas.getContext('2d');
 
         miniMapCtx.putImageData(imageData, 0, 0);
 
-        this.drawRectangleAroundMiniMap(miniMapCtx);
+        _this.drawRectangleAroundMiniMap(miniMapCtx);
     }
 
     private drawRectangles = function (): void {
@@ -343,13 +349,13 @@ export default class World {
 
         const renderCtx = renderCanvas.getContext('2d'),
             ctx = _this.displayMapCanvas.getContext('2d'),
-            image = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE),
             ctxImages = [],
             worldOffsetLeft = this.cameraPosX * _this.cellWidth,
-            worldOffsetTop = this.cameraPosY * _this.cellHeight;
+            worldOffsetTop = this.cameraPosY * _this.cellHeight,
+            imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
-        this.displayMapWrapper.scrollLeft = worldOffsetLeft;
-        this.displayMapWrapper.scrollTop = worldOffsetTop;
+        _this.displayMapWrapper.scrollLeft = worldOffsetLeft;
+        _this.displayMapWrapper.scrollTop = worldOffsetTop;
 
         let layer: Layer;
 
@@ -364,7 +370,7 @@ export default class World {
 
                 if (displayCell.drawBackground()) {
                     fillCanvasPixel(
-                        image,
+                        imageData,
                         (x + y * Config.WORLD_SIZE) * 4,
                         displayCell.getColor()
                     );
@@ -376,16 +382,16 @@ export default class World {
             });
         }
 
-        renderCtx.putImageData(image, 0, 0);
+        renderCtx.putImageData(imageData, 0, 0);
 
-        const imageData = renderCtx.getImageData(
+        const imageData2 = renderCtx.getImageData(
             _this.cameraPosX,
             _this.cameraPosY,
             Config.VISIBLE_COLS,
             Config.VISIBLE_ROWS
         );
 
-        const scaledData = scaleImageData(ctx, imageData, _this.cellWidth, _this.cellHeight);
+        const scaledData = scaleImageData(ctx, imageData2, _this.cellWidth, _this.cellHeight);
 
         ctx.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
 
@@ -420,8 +426,8 @@ export default class World {
             _this.drawBiomesInfo();
         }
 
-        _this.drawDisplayMap(function () {
-            _this.drawMiniMap();
+        _this.drawDisplayMap(ctx, imageData, function (ctx: CanvasRenderingContext2D) {
+            _this.drawMiniMap(ctx);
         });
     }
 
@@ -447,19 +453,21 @@ export default class World {
 
     generateFractions = function (): void {
 
+        const _this: World = this;
+
         const fractionsOperator = new FractionsOperator(
-            this.timer,
-            this.layers.getLayer(LAYER_FRACTIONS),
+            _this.timer,
+            _this.layers.getLayer(LAYER_FRACTIONS),
             {
-                freshWaterMap: this.world.freshWaterMap,
-                temperatureMap: this.world.temperatureMap,
-                forestMap: this.world.forestOperator.getForestMap(),
-                biomesMap: this.world.biomesOperator.getBiomes(),
+                freshWaterMap: _this.world.freshWaterMap,
+                temperatureMap: _this.world.temperatureMap,
+                forestMap: _this.world.forestOperator.getForestMap(),
+                biomesMap: _this.world.biomesOperator.getBiomes(),
             }
         );
 
         fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
 
-        this.update();
+        _this.update();
     }
 }

@@ -17,10 +17,12 @@ import Biome from "./src/biomes/Biome.js";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     displayMapVisibleRange = document.getElementById('displayMapVisibleRange') as HTMLInputElement,
+    displayMapWrapper = document.getElementById('displayMapWrapper') as HTMLDivElement,
+    displayMap = document.getElementById('displayMap') as HTMLCanvasElement,
     miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement,
     world = new World(
-        document.getElementById('displayMapWrapper'),
-        document.getElementById('displayMap') as HTMLCanvasElement,
+        displayMapWrapper,
+        displayMap,
         miniMapCanvas,
         getCenteredCameraPosition()
     );
@@ -247,4 +249,10 @@ world.timer.addStepsHandler(function (step: string) {
 
 document.getElementById('generateFractions').addEventListener("click", function () {
     world.generateFractions();
+});
+
+displayMapWrapper.addEventListener("scroll", function () {
+    world.moveMapTo(
+        world.getCellByXY(displayMapWrapper.scrollLeft, displayMapWrapper.scrollTop)
+    );
 });

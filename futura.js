@@ -1,7 +1,7 @@
 import Config from './config.js';
 import { Filters, fillCanvasPixel } from "./src/helpers.js";
 import World from './src/World.js';
-const coordinatesField = document.getElementById('coordinates'), displayMapVisibleRange = document.getElementById('displayMapVisibleRange'), miniMapCanvas = document.getElementById('miniMap'), world = new World(document.getElementById('displayMapWrapper'), document.getElementById('displayMap'), miniMapCanvas, getCenteredCameraPosition());
+const coordinatesField = document.getElementById('coordinates'), displayMapVisibleRange = document.getElementById('displayMapVisibleRange'), displayMapWrapper = document.getElementById('displayMapWrapper'), displayMap = document.getElementById('displayMap'), miniMapCanvas = document.getElementById('miniMap'), world = new World(displayMapWrapper, displayMap, miniMapCanvas, getCenteredCameraPosition());
 function drawColorMap(id, map) {
     const canvas = document.getElementById(id);
     canvas.width = map.getWidth();
@@ -151,4 +151,7 @@ world.timer.addStepsHandler(function (step) {
 });
 document.getElementById('generateFractions').addEventListener("click", function () {
     world.generateFractions();
+});
+displayMapWrapper.addEventListener("scroll", function () {
+    world.moveMapTo(world.getCellByXY(displayMapWrapper.scrollLeft, displayMapWrapper.scrollTop));
 });
