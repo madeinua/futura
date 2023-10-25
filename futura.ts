@@ -29,8 +29,6 @@ const world = new World(
     getCenteredCameraPosition()
 );
 
-world.create();
-
 function drawColorMap(id: string, map: Matrix) {
 
     const canvas = document.getElementById(id) as HTMLCanvasElement;
@@ -268,3 +266,5 @@ displayMapWrapper.addEventListener("scroll", function () {
         world.getCellByXY(displayMapWrapper.scrollLeft, displayMapWrapper.scrollTop)
     );
 });
+
+world.create();
