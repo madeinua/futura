@@ -1,6 +1,6 @@
 import Config from "../config.js";
 import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData} from "./helpers.js";
-import {LAYER_BIOMES, LAYER_FOREST, LAYER_HABITAT, LAYER_ANIMALS, Layer, LAYER_FRACTIONS} from "./render/Layer.js";
+import {Layer} from "./render/Layer.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -10,7 +10,7 @@ import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
 import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
-import Layers from "./services/Layers.js";
+import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT} from "./services/Layers.js";
 import AltitudeMap from "./maps/AltitudeMap.js";
 import TemperatureMap from "./maps/TemperatureMap.js";
 import OceanMap from "./maps/OceanMap.js";
@@ -62,7 +62,6 @@ export default class World {
         miniMapCanvas: HTMLCanvasElement,
         cameraPos: Cell
     ) {
-
         this.cameraPosX = cameraPos[0];
         this.cameraPosY = cameraPos[1];
 
@@ -121,7 +120,6 @@ export default class World {
     }
 
     private generateWorld = function (): void {
-
         const surfaceOperator = new SurfaceOperator(),
             weatherOperator = new WeatherOperator(),
             waterOperator = new WaterOperator(),
@@ -182,7 +180,6 @@ export default class World {
     }
 
     update = function (): void {
-
         const _this: World = this,
             renderCanvas = document.createElement('canvas');
 
@@ -190,8 +187,8 @@ export default class World {
         renderCanvas.height = Config.WORLD_SIZE;
 
         const renderCtx = renderCanvas.getContext('2d'),
-            ctx = _this.displayMapCanvas.getContext('2d'),
-            ctxImages = [],
+            ctxDisplayMap = _this.displayMapCanvas.getContext('2d'),
+            ctxDisplayMapImages = [],
             worldOffsetLeft = this.cameraPosX * _this.cellWidth,
             worldOffsetTop = this.cameraPosY * _this.cellHeight,
             imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
@@ -199,29 +196,28 @@ export default class World {
         _this.displayMapWrapper.scrollLeft = worldOffsetLeft;
         _this.displayMapWrapper.scrollTop = worldOffsetTop;
 
-        let layer: Layer;
-
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-            layer = _this.layers.getLayer(ln);
+            _this
+                .layers
+                .getLayer(ln)
+                .foreachValues(function (displayCell: null | DisplayCell, x: number, y: number) {
 
-            layer.foreachValues(function (displayCell: null | DisplayCell, x: number, y: number) {
+                    if (displayCell === null || !_this.isCellVisible(x, y)) {
+                        return;
+                    }
 
-                if (displayCell === null || !_this.isCellVisible(x, y)) {
-                    return;
-                }
+                    if (displayCell.drawBackground()) {
+                        fillCanvasPixel(
+                            imageData,
+                            (x + y * Config.WORLD_SIZE) * 4,
+                            displayCell.getColor()
+                        );
+                    }
 
-                if (displayCell.drawBackground()) {
-                    fillCanvasPixel(
-                        imageData,
-                        (x + y * Config.WORLD_SIZE) * 4,
-                        displayCell.getColor()
-                    );
-                }
-
-                if (displayCell.hasImage()) {
-                    ctxImages.push([x, y, displayCell.getImage()]);
-                }
-            });
+                    if (displayCell.hasImage()) {
+                        ctxDisplayMapImages.push([x, y, displayCell.getImage()]);
+                    }
+                });
         }
 
         renderCtx.putImageData(imageData, 0, 0);
@@ -233,20 +229,20 @@ export default class World {
             Config.VISIBLE_ROWS
         );
 
-        const scaledData = scaleImageData(ctx, imageData2, _this.cellWidth, _this.cellHeight);
+        const scaledData = scaleImageData(ctxDisplayMap, imageData2, _this.cellWidth, _this.cellHeight);
 
-        ctx.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
+        ctxDisplayMap.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
 
-        for (let i = 0; i < ctxImages.length; i++) {
+        for (let i = 0; i < ctxDisplayMapImages.length; i++) {
 
-            if (!_this.isCellVisible(ctxImages[i][0], ctxImages[i][1])) {
+            if (!_this.isCellVisible(ctxDisplayMapImages[i][0], ctxDisplayMapImages[i][1])) {
                 continue;
             }
 
-            ctx.drawImage(
-                ctxImages[i][2],
-                ctxImages[i][0] * _this.cellWidth,
-                ctxImages[i][1] * _this.cellHeight,
+            ctxDisplayMap.drawImage(
+                ctxDisplayMapImages[i][2],
+                ctxDisplayMapImages[i][0] * _this.cellWidth,
+                ctxDisplayMapImages[i][1] * _this.cellHeight,
                 _this.cellWidth,
                 _this.cellHeight
             );
@@ -268,9 +264,7 @@ export default class World {
             _this.drawBiomesInfo();
         }
 
-        _this.drawDisplayMap(ctx, imageData, function (ctx: CanvasRenderingContext2D) {
-            _this.drawMiniMap(ctx);
-        });
+        _this.drawMiniMap(imageData);
     }
 
     private isCellVisible = function (x: number, y: number): boolean {
@@ -280,46 +274,31 @@ export default class World {
             && y < this.cameraPosY + Config.VISIBLE_ROWS;
     }
 
-    private drawDisplayMap = function (
-        ctx: CanvasRenderingContext2D,
-        imageData: ImageData,
-        afterCallback: (ctx: CanvasRenderingContext2D) => void
-    ): void {
+    private drawMiniMap = function (imageData: ImageData): void {
         const _this: World = this;
 
         for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-            const layer = _this.layers.getLayer(ln);
-
-            layer.foreachValues(function (displayCell: DisplayCell, x: number, y: number): void {
-                if (displayCell !== null) {
-                    fillCanvasPixel(
-                        imageData,
-                        (x + y * Config.WORLD_SIZE) * 4,
-                        displayCell.getMapColor()
-                    );
-                }
-            });
+            _this
+                .layers
+                .getLayer(ln)
+                .foreachValues(function (displayCell: DisplayCell, x: number, y: number): void {
+                    if (displayCell !== null) {
+                        fillCanvasPixel(
+                            imageData,
+                            (x + y * Config.WORLD_SIZE) * 4,
+                            displayCell.getMapColor()
+                        );
+                    }
+                });
         }
 
-        createImageBitmap(imageData).then(function (render) {
-            ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(render, 0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        createImageBitmap(imageData).then(function () {
+            const miniMapCtx = _this.miniMapCanvas.getContext('2d');
 
-            if (typeof afterCallback !== 'undefined') {
-                afterCallback(ctx);
-            }
+            miniMapCtx.putImageData(imageData, 0, 0);
+
+            _this.drawRectangleAroundMiniMap(miniMapCtx);
         });
-    }
-
-    private drawMiniMap = function (ctx: CanvasRenderingContext2D): void {
-
-        const _this: World = this,
-            imageData = ctx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE),
-            miniMapCtx = _this.miniMapCanvas.getContext('2d');
-
-        miniMapCtx.putImageData(imageData, 0, 0);
-
-        _this.drawRectangleAroundMiniMap(miniMapCtx);
     }
 
     private drawRectangleAroundMiniMap = function (ctx: CanvasRenderingContext2D): void {
@@ -335,7 +314,6 @@ export default class World {
     }
 
     private drawRectangles = function (): void {
-
         const _this: World = this,
             ctx = _this.displayMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
@@ -355,7 +333,6 @@ export default class World {
     }
 
     private drawCoordinates = function (): void {
-
         const _this: World = this,
             ctx = _this.displayMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
@@ -377,7 +354,6 @@ export default class World {
     }
 
     private drawTemperatures = function (): void {
-
         const _this: World = this,
             ctx = _this.displayMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
@@ -400,7 +376,6 @@ export default class World {
     }
 
     private drawBiomesInfo = function (): void {
-
         const _this: World = this,
             ctx = _this.displayMapCanvas.getContext('2d'),
             worldOffsetLeft = _this.cameraPosX * _this.cellWidth,
@@ -422,7 +397,6 @@ export default class World {
     }
 
     moveMapTo = function (point: Cell, silent: boolean = false): void {
-
         const _this: World = this,
             maxWidth = Config.WORLD_SIZE - Config.VISIBLE_COLS,
             maxHeight = Config.WORLD_SIZE - Config.VISIBLE_ROWS;
@@ -448,7 +422,6 @@ export default class World {
     }
 
     generateFractions = function (): void {
-
         const _this: World = this;
 
         const fractionsOperator = new FractionsOperator(

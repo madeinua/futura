@@ -14,7 +14,7 @@ const Config = {
     SHOW_COORDINATES: false,
 
     // Steps
-    STEPS_ENABLED: false,
+    STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 40,
     STEPS_BOOST: 5,

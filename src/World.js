@@ -1,6 +1,5 @@
 import Config from "../config.js";
 import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData } from "./helpers.js";
-import { LAYER_BIOMES, LAYER_FOREST, LAYER_HABITAT, LAYER_ANIMALS, LAYER_FRACTIONS } from "./render/Layer.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -10,7 +9,7 @@ import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
 import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
-import Layers from "./services/Layers.js";
+import Layers, { LAYER_ANIMALS, LAYER_BIOMES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT } from "./services/Layers.js";
 export default class World {
     constructor(displayMapWrapper, displayMapCanvas, miniMapCanvas, cameraPos) {
         this.create = function () {
@@ -56,13 +55,14 @@ export default class World {
             const _this = this, renderCanvas = document.createElement('canvas');
             renderCanvas.width = Config.WORLD_SIZE;
             renderCanvas.height = Config.WORLD_SIZE;
-            const renderCtx = renderCanvas.getContext('2d'), ctx = _this.displayMapCanvas.getContext('2d'), ctxImages = [], worldOffsetLeft = this.cameraPosX * _this.cellWidth, worldOffsetTop = this.cameraPosY * _this.cellHeight, imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
+            const renderCtx = renderCanvas.getContext('2d'), ctxDisplayMap = _this.displayMapCanvas.getContext('2d'), ctxDisplayMapImages = [], worldOffsetLeft = this.cameraPosX * _this.cellWidth, worldOffsetTop = this.cameraPosY * _this.cellHeight, imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
             _this.displayMapWrapper.scrollLeft = worldOffsetLeft;
             _this.displayMapWrapper.scrollTop = worldOffsetTop;
-            let layer;
             for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-                layer = _this.layers.getLayer(ln);
-                layer.foreachValues(function (displayCell, x, y) {
+                _this
+                    .layers
+                    .getLayer(ln)
+                    .foreachValues(function (displayCell, x, y) {
                     if (displayCell === null || !_this.isCellVisible(x, y)) {
                         return;
                     }
@@ -70,19 +70,19 @@ export default class World {
                         fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
                     }
                     if (displayCell.hasImage()) {
-                        ctxImages.push([x, y, displayCell.getImage()]);
+                        ctxDisplayMapImages.push([x, y, displayCell.getImage()]);
                     }
                 });
             }
             renderCtx.putImageData(imageData, 0, 0);
             const imageData2 = renderCtx.getImageData(_this.cameraPosX, _this.cameraPosY, Config.VISIBLE_COLS, Config.VISIBLE_ROWS);
-            const scaledData = scaleImageData(ctx, imageData2, _this.cellWidth, _this.cellHeight);
-            ctx.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
-            for (let i = 0; i < ctxImages.length; i++) {
-                if (!_this.isCellVisible(ctxImages[i][0], ctxImages[i][1])) {
+            const scaledData = scaleImageData(ctxDisplayMap, imageData2, _this.cellWidth, _this.cellHeight);
+            ctxDisplayMap.putImageData(scaledData, worldOffsetLeft, worldOffsetTop);
+            for (let i = 0; i < ctxDisplayMapImages.length; i++) {
+                if (!_this.isCellVisible(ctxDisplayMapImages[i][0], ctxDisplayMapImages[i][1])) {
                     continue;
                 }
-                ctx.drawImage(ctxImages[i][2], ctxImages[i][0] * _this.cellWidth, ctxImages[i][1] * _this.cellHeight, _this.cellWidth, _this.cellHeight);
+                ctxDisplayMap.drawImage(ctxDisplayMapImages[i][2], ctxDisplayMapImages[i][0] * _this.cellWidth, ctxDisplayMapImages[i][1] * _this.cellHeight, _this.cellWidth, _this.cellHeight);
             }
             if (Config.SHOW_RECTANGLES) {
                 _this.drawRectangles();
@@ -96,9 +96,7 @@ export default class World {
             if (Config.SHOW_BIOMES_INFO) {
                 _this.drawBiomesInfo();
             }
-            _this.drawDisplayMap(ctx, imageData, function (ctx) {
-                _this.drawMiniMap(ctx);
-            });
+            _this.drawMiniMap(imageData);
         };
         this.isCellVisible = function (x, y) {
             return x >= this.cameraPosX
@@ -106,28 +104,23 @@ export default class World {
                 && y >= this.cameraPosY
                 && y < this.cameraPosY + Config.VISIBLE_ROWS;
         };
-        this.drawDisplayMap = function (ctx, imageData, afterCallback) {
+        this.drawMiniMap = function (imageData) {
             const _this = this;
             for (let ln = 0; ln < _this.layers.getLayersCount(); ln++) {
-                const layer = _this.layers.getLayer(ln);
-                layer.foreachValues(function (displayCell, x, y) {
+                _this
+                    .layers
+                    .getLayer(ln)
+                    .foreachValues(function (displayCell, x, y) {
                     if (displayCell !== null) {
                         fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMapColor());
                     }
                 });
             }
-            createImageBitmap(imageData).then(function (render) {
-                ctx.imageSmoothingEnabled = false;
-                ctx.drawImage(render, 0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE);
-                if (typeof afterCallback !== 'undefined') {
-                    afterCallback(ctx);
-                }
+            createImageBitmap(imageData).then(function () {
+                const miniMapCtx = _this.miniMapCanvas.getContext('2d');
+                miniMapCtx.putImageData(imageData, 0, 0);
+                _this.drawRectangleAroundMiniMap(miniMapCtx);
             });
-        };
-        this.drawMiniMap = function (ctx) {
-            const _this = this, imageData = ctx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE), miniMapCtx = _this.miniMapCanvas.getContext('2d');
-            miniMapCtx.putImageData(imageData, 0, 0);
-            _this.drawRectangleAroundMiniMap(miniMapCtx);
         };
         this.drawRectangleAroundMiniMap = function (ctx) {
             ctx.imageSmoothingEnabled = false;

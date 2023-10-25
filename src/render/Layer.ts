@@ -1,12 +1,6 @@
 import Matrix from "../structures/Matrix.js"
 import DisplayCell from "../render/DisplayCell.js"
 
-export const LAYER_BIOMES = 0;
-export const LAYER_FOREST = 1;
-export const LAYER_HABITAT = 2;
-export const LAYER_ANIMALS = 3;
-export const LAYER_FRACTIONS = 4;
-
 export class Layer extends Matrix<null | DisplayCell> {
 
     getCell(x: number, y: number): null | DisplayCell {
