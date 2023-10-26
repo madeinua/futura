@@ -7,13 +7,13 @@ type DisplayCellMap = {
 export default class DisplayCell {
 
     readonly color: RGBa;
-    readonly image: null | HTMLImageElement;
+    readonly image: null | string;
     readonly withBg: boolean;
     readonly mapSettings: null | DisplayCellMap;
 
-    constructor(color: RGBa, image: null | HTMLImageElement, withBackground: boolean, mapSettings: DisplayCellMap = null) {
+    constructor(color: RGBa, image: null | string, withBackground: boolean, mapSettings: DisplayCellMap = null) {
         this.color = color;
-        this.image = typeof image === 'undefined' ? null : image;
+        this.image = image;
         this.withBg = withBackground;
         this.mapSettings = mapSettings;
     }
@@ -22,12 +22,12 @@ export default class DisplayCell {
         return this.color;
     }
 
-    getImage(): null | HTMLImageElement {
+    getImage(): null | string {
         return this.image;
     }
 
     hasImage(): boolean {
-        return this.image instanceof HTMLImageElement;
+        return this.image !== null;
     }
 
     drawBackground(): boolean {

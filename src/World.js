@@ -1,5 +1,14 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import Config from "../config.js";
-import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent } from "./helpers.js";
+import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, createImage } from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -14,43 +23,59 @@ export default class World {
     constructor(mapCanvas, mapWidth, mapHeight, miniMapCanvas, cameraPos) {
         this.create = function () {
             const _this = this;
-            _this.generateWorld();
-            // Give a time to load images...
-            setTimeout(function () {
+            _this.generateWorld().then(() => {
                 _this.update();
                 if (Config.STEPS_ENABLED) {
-                    _this.timer.stepsTimer(function () {
-                        _this.update();
-                    });
+                    _this.timer.stepsTimer(() => _this.update());
                 }
-            }, 100);
+            });
         };
         this.generateWorld = function () {
-            const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
-            const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
-            const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
-            new AnimalsOperator(this.layers.getLayer(LAYER_HABITAT), this.layers.getLayer(LAYER_ANIMALS), {
-                freshWaterMap: freshWaterMap,
-                coastMap: coastMap,
-                forestsOperator: forestsOperator,
-                biomesOperator: biomesOperator,
-                timer: this.timer
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.preloadImages();
+                const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
+                const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
+                const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
+                new AnimalsOperator(this.layers.getLayer(LAYER_HABITAT), this.layers.getLayer(LAYER_ANIMALS), {
+                    freshWaterMap: freshWaterMap,
+                    coastMap: coastMap,
+                    forestsOperator: forestsOperator,
+                    biomesOperator: biomesOperator,
+                    timer: this.timer
+                });
+                if (Config.LOGS) {
+                    logTimeEvent('World generated');
+                }
+                this.world = {
+                    'altitudeMap': altitudeMap,
+                    'temperatureMap': temperatureMap,
+                    'oceanMap': oceanMap,
+                    'coastMap': coastMap,
+                    'lakesMap': lakesMap,
+                    'riversMap': riversMap,
+                    'freshWaterMap': freshWaterMap,
+                    'humidityMap': humidityMap,
+                    'biomesOperator': biomesOperator,
+                    'forestOperator': forestsOperator,
+                };
             });
-            if (Config.LOGS) {
-                logTimeEvent('World generated');
-            }
-            this.world = {
-                'altitudeMap': altitudeMap,
-                'temperatureMap': temperatureMap,
-                'oceanMap': oceanMap,
-                'coastMap': coastMap,
-                'lakesMap': lakesMap,
-                'riversMap': riversMap,
-                'freshWaterMap': freshWaterMap,
-                'humidityMap': humidityMap,
-                'biomesOperator': biomesOperator,
-                'forestOperator': forestsOperator,
-            };
+        };
+        this.preloadImages = function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                let _this = this, preload = function (obj) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        for (let key in obj) {
+                            if (typeof obj[key] === 'object') {
+                                yield preload(obj[key]);
+                            }
+                            else if (typeof obj[key] === 'string' && obj[key].indexOf('.png') !== -1) {
+                                _this.imagesCache[obj[key]] = yield createImage(obj[key]);
+                            }
+                        }
+                    });
+                };
+                yield preload(Config);
+            });
         };
         this.update = function () {
             resetTimeEvent();
@@ -75,7 +100,7 @@ export default class World {
             mapCtx.putImageData(scaledData, _this.cameraPosLeft * _this.cellWidth, _this.cameraPosTop * _this.cellHeight);
             // Step 3: add images
             for (let i = 0; i < mapImages.length; i++) {
-                mapCtx.drawImage(mapImages[i][2], mapImages[i][0] * _this.cellWidth, mapImages[i][1] * _this.cellHeight, _this.cellWidth, _this.cellHeight);
+                mapCtx.drawImage(_this.imagesCache[mapImages[i][2]], mapImages[i][0] * _this.cellWidth, mapImages[i][1] * _this.cellHeight, _this.cellWidth, _this.cellHeight);
             }
             // Step 4: add extras
             if (Config.SHOW_RECTANGLES) {
@@ -218,6 +243,7 @@ export default class World {
         this.miniMapCanvas.height = Config.WORLD_SIZE;
         this.timer = new Timer();
         this.layers = new Layers(Config.WORLD_SIZE, Config.WORLD_SIZE);
+        this.imagesCache = [];
         if (Config.STORE_DATA) {
             const worldSize = localStorage.getItem('worldSize'), actualSize = Config.WORLD_SIZE + 'x' + Config.WORLD_SIZE;
             if (actualSize !== worldSize) {

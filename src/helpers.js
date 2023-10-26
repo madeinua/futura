@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 let errors = [];
 export function throwError(msg, limit, unique) {
     limit = typeof limit == 'undefined' ? 5 : limit;
@@ -262,10 +271,13 @@ export function getPolygonAreaSize(coords) {
     return area / 2;
 }
 export function createImage(src) {
-    if (src === null) {
-        return null;
-    }
-    const img = new Image();
-    img.src = src;
-    return img;
+    return __awaiter(this, void 0, void 0, function* () {
+        if (src === null) {
+            return null;
+        }
+        const img = new Image();
+        img.src = src;
+        yield img.decode();
+        return img;
+    });
 }

@@ -3,7 +3,7 @@ import ForestGenerator from "../generators/ForestGenerator.js";
 import DisplayCell from "../render/DisplayCell.js"
 import Timer from "../services/Timer.js";
 import biomes from "../biomes/Biomes.js";
-import {hexToRgb, createImage, Filters, logTimeEvent, RGB} from "../helpers.js";
+import {hexToRgb, Filters, logTimeEvent, RGB} from "../helpers.js";
 import Config from "../../config.js";
 import BiomesOperator from "./BiomesOperator.js";
 import {Layer} from "../render/Layer.js";
@@ -12,18 +12,18 @@ export default class ForestsOperator {
 
     readonly forestColor: RGB;
     readonly biomesOperator: BiomesOperator;
-    readonly forestPalmImage: HTMLImageElement;
-    readonly forestTundraImage: HTMLImageElement;
-    forestImages: HTMLImageElement[];
-    forestImagesCache: HTMLImageElement[];
+    readonly forestPalmImage: null | string;
+    readonly forestTundraImage: null | string;
+    forestImages: string[];
+    forestImagesCache: string[];
     forestMap: ForestMap;
 
     constructor(biomesOperator: BiomesOperator, timer: Timer, forestLayer: Layer) {
 
         this.biomesOperator = biomesOperator;
         this.forestColor = hexToRgb(Config.FOREST_COLOR);
-        this.forestPalmImage = createImage(Config.FOREST_PALM_IMAGE);
-        this.forestTundraImage = createImage(Config.FOREST_TUNDRA_IMAGE);
+        this.forestPalmImage = Config.FOREST_PALM_IMAGE;
+        this.forestTundraImage = Config.FOREST_TUNDRA_IMAGE;
 
         const _this: ForestsOperator = this,
             forestGenerator = new ForestGenerator(biomesOperator.altitudeMap, biomesOperator.humidityMap);
@@ -31,10 +31,8 @@ export default class ForestsOperator {
         _this.forestImages = [];
         _this.forestImagesCache = [];
 
-        for (let i = 0; i < Config.FOREST_IMAGES.length; i++) {
-            _this.forestImages.push(
-                createImage(Config.FOREST_IMAGES[i])
-            );
+        for (let i in Config.FOREST_IMAGES) {
+            _this.forestImages.push(Config.FOREST_IMAGES[i]);
         }
 
         _this.forestMap = new ForestMap(

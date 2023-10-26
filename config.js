@@ -12,9 +12,10 @@ const Config = {
     VISIBLE_ROWS: 30,
     SHOW_RECTANGLES: false,
     SHOW_COORDINATES: false,
+    DRAW_TECHNICAL_MAPS: false,
 
     // Steps
-    STEPS_ENABLED: true,
+    STEPS_ENABLED: false,
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 40,
     STEPS_BOOST: 5,
@@ -221,10 +222,10 @@ const Config = {
         GROUND: 30
     },
     FOREST_COLOR: '#3c5626',
-    FOREST_IMAGES: [
-        'public/images/forest-1.png',
-        'public/images/forest-2.png'
-    ],
+    FOREST_IMAGES: {
+        'forest_1': 'public/images/forest-1.png',
+        'forest_2': 'public/images/forest-2.png',
+    },
     FOREST_PALM_IMAGE: 'public/images/palm-1.png',
     FOREST_TUNDRA_IMAGE: 'public/images/forest-3.png',
 

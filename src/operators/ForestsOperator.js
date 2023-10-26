@@ -2,7 +2,7 @@ import ForestMap from "../maps/ForestMap.js";
 import ForestGenerator from "../generators/ForestGenerator.js";
 import DisplayCell from "../render/DisplayCell.js";
 import biomes from "../biomes/Biomes.js";
-import { hexToRgb, createImage, Filters, logTimeEvent } from "../helpers.js";
+import { hexToRgb, Filters, logTimeEvent } from "../helpers.js";
 import Config from "../../config.js";
 export default class ForestsOperator {
     constructor(biomesOperator, timer, forestLayer) {
@@ -41,13 +41,13 @@ export default class ForestsOperator {
         };
         this.biomesOperator = biomesOperator;
         this.forestColor = hexToRgb(Config.FOREST_COLOR);
-        this.forestPalmImage = createImage(Config.FOREST_PALM_IMAGE);
-        this.forestTundraImage = createImage(Config.FOREST_TUNDRA_IMAGE);
+        this.forestPalmImage = Config.FOREST_PALM_IMAGE;
+        this.forestTundraImage = Config.FOREST_TUNDRA_IMAGE;
         const _this = this, forestGenerator = new ForestGenerator(biomesOperator.altitudeMap, biomesOperator.humidityMap);
         _this.forestImages = [];
         _this.forestImagesCache = [];
-        for (let i = 0; i < Config.FOREST_IMAGES.length; i++) {
-            _this.forestImages.push(createImage(Config.FOREST_IMAGES[i]));
+        for (let i in Config.FOREST_IMAGES) {
+            _this.forestImages.push(Config.FOREST_IMAGES[i]);
         }
         _this.forestMap = new ForestMap(biomesOperator.getBiomes());
         timer.addStepsHandler(function (step) {

@@ -371,7 +371,7 @@ export function getPolygonAreaSize(coords: Array2D): number {
     return area / 2;
 }
 
-export function createImage(src: null | string): null | HTMLImageElement {
+export async function createImage(src: null | string): Promise<null | HTMLImageElement> {
 
     if (src === null) {
         return null;
@@ -379,6 +379,8 @@ export function createImage(src: null | string): null | HTMLImageElement {
 
     const img: HTMLImageElement = new Image();
     img.src = src;
+
+    await img.decode();
 
     return img;
 }

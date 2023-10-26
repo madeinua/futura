@@ -1,7 +1,7 @@
 export default class DisplayCell {
     constructor(color, image, withBackground, mapSettings = null) {
         this.color = color;
-        this.image = typeof image === 'undefined' ? null : image;
+        this.image = image;
         this.withBg = withBackground;
         this.mapSettings = mapSettings;
     }
@@ -12,7 +12,7 @@ export default class DisplayCell {
         return this.image;
     }
     hasImage() {
-        return this.image instanceof HTMLImageElement;
+        return this.image !== null;
     }
     drawBackground() {
         return this.withBg || !this.hasImage();

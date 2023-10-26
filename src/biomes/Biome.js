@@ -1,5 +1,5 @@
 import DisplayCell from "../render/DisplayCell.js";
-import { createImage, hexToRgb } from "../helpers.js";
+import { hexToRgb } from "../helpers.js";
 import Config from "../../config.js";
 export default class Biome {
     constructor(x, y, args) {
@@ -27,7 +27,7 @@ export default class Biome {
     getImage() {
         return typeof Config.BIOME_IMAGES[this.getName()] === 'undefined'
             ? null
-            : createImage(Config.BIOME_IMAGES[this.getName()]);
+            : Config.BIOME_IMAGES[this.getName()];
     }
     getDisplayCell() {
         return new DisplayCell(this.getHexColor(), this.getImage(), this.displayCellWithBackground());

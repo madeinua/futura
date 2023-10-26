@@ -1,4 +1,4 @@
-import { getAroundRadius, getRectangleAround, iAmLucky, hexToRgb, createImage, logTimeEvent, Filters } from '../helpers.js';
+import { getAroundRadius, getRectangleAround, iAmLucky, hexToRgb, logTimeEvent, Filters } from '../helpers.js';
 import Config from "../../config.js";
 import CowGenerator from "../generators/CowGenerator.js";
 import DeerGenerator from "../generators/DeerGenerator.js";
@@ -38,7 +38,7 @@ export default class AnimalsOperator {
         };
         this.getDisplayCell = function (animal) {
             if (typeof this.animalImagesCache[animal.getName()] === 'undefined') {
-                this.animalImagesCache[animal.getName()] = new DisplayCell(hexToRgb(animal.getColor()), createImage(animal.getImage()), false);
+                this.animalImagesCache[animal.getName()] = new DisplayCell(hexToRgb(animal.getColor()), animal.getImage(), false);
             }
             return this.animalImagesCache[animal.getName()];
         };
