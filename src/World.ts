@@ -282,10 +282,11 @@ export default class World {
             && y < this.cameraPosTop + Config.VISIBLE_ROWS;
     }
 
+    // TODO: refactor this
     private drawMiniMap = function (imageData: ImageData): void {
         const _this: World = this;
 
-        _this.layers.foreachLayersValues(function (displayCell: DisplayCell, x: number, y: number): void {
+        _this.layers.foreachLayersValues(function (displayCell: null | DisplayCell, x: number, y: number): void {
             if (displayCell !== null) {
                 fillCanvasPixel(
                     imageData,
