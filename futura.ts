@@ -19,7 +19,8 @@ const coordinatesField = document.getElementById('coordinates') as HTMLInputElem
     displayMapVisibleRange = document.getElementById('displayMapVisibleRange') as HTMLInputElement,
     displayMapWrapper = document.getElementById('displayMapWrapper') as HTMLDivElement,
     displayMap = document.getElementById('displayMap') as HTMLCanvasElement,
-    miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement;
+    miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement,
+    technicalMaps = document.getElementById('technicalMaps') as HTMLDivElement;
 
 const world = new World(
     displayMap,
@@ -51,7 +52,7 @@ function drawColorMap(id: string, map: Matrix) {
     ctx.putImageData(image, 0, 0);
 }
 
-function drawMap(id: string, map: NumericMatrix, reverse: boolean) {
+function drawInfoMap(id: string, map: NumericMatrix, reverse: boolean) {
 
     const canvas = document.getElementById(id) as HTMLCanvasElement;
     canvas.width = map.getWidth();
@@ -130,100 +131,105 @@ Filters.add('mapMoved', function (point: Cell) {
     displayMapVisibleRange.innerHTML = '[' + world.cameraPosLeft + '-' + (world.cameraPosTop + Config.VISIBLE_COLS) + ' | ' + world.cameraPosTop + '-' + (world.cameraPosTop + Config.VISIBLE_ROWS) + ']';
 });
 
-Filters.add('altitudeMap', function (map: AltitudeMap) {
-    drawMap('altitudeMapCanvas', map, false);
-    return map;
-});
+if (Config.DRAW_TECHNICAL_MAPS) {
 
-Filters.add('temperatureMap', function (map: TemperatureMap) {
-    drawMap('temperatureMapCanvas', map, false);
-    return map;
-});
-
-Filters.add('humidityMap', function (map: HumidityMap) {
-    drawMap('humidityMapCanvas', map, true);
-    return map;
-});
-
-Filters.add('oceanMap', function (map: OceanMap) {
-    drawMap('oceanMapCanvas', map, true);
-    return map;
-});
-
-Filters.add('coastMap', function (map: CoastMap) {
-    drawMap('coastMapCanvas', map, true);
-    return map;
-});
-
-Filters.add('lakesMap', function (map: LakesMap) {
-    drawMap('lakesMapCanvas', map, true);
-    return map;
-});
-
-Filters.add('riversMap', function (map: RiversMap) {
-    drawMap('riversMapCanvas', map, false);
-    return map;
-});
-
-Filters.add('biomes', function (biomes: Matrix) {
-    drawColorMap('biomesCanvas', biomes);
-
-    let biomesTypesCounter: { [key: string]: number } = {};
-
-    biomes.foreachValues(function (biome: Biome) {
-        if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
-            biomesTypesCounter[biome.getName()] = 0;
-        }
-
-        biomesTypesCounter[biome.getName()]++;
+    Filters.add('altitudeMap', function (map: AltitudeMap) {
+        drawInfoMap('altitudeMapCanvas', map, false);
+        return map;
     });
 
-    // Sort by value
-    biomesTypesCounter = Object.keys(biomesTypesCounter).sort(function (a, b) {
-        return biomesTypesCounter[b] - biomesTypesCounter[a];
-    }).reduce(function (result, key) {
-        result[key] = biomesTypesCounter[key];
-        return result;
-    }, {});
+    Filters.add('temperatureMap', function (map: TemperatureMap) {
+        drawInfoMap('temperatureMapCanvas', map, false);
+        return map;
+    });
 
-    // Add counters as list to <ul> element
-    let list = document.getElementById('biomesTypesCounter');
+    Filters.add('humidityMap', function (map: HumidityMap) {
+        drawInfoMap('humidityMapCanvas', map, true);
+        return map;
+    });
 
-    for (let i in biomesTypesCounter) {
-        let item = document.createElement('li');
-        item.innerHTML = i.substring(6) + ': ' + biomesTypesCounter[i];
-        list.appendChild(item);
-    }
+    Filters.add('oceanMap', function (map: OceanMap) {
+        drawInfoMap('oceanMapCanvas', map, true);
+        return map;
+    });
 
-    return biomes;
-});
+    Filters.add('coastMap', function (map: CoastMap) {
+        drawInfoMap('coastMapCanvas', map, true);
+        return map;
+    });
 
-Filters.add('forestMap', function (map: ForestMap) {
-    drawMap('forestMapCanvas', map, true);
-    document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
-    return map;
-});
+    Filters.add('lakesMap', function (map: LakesMap) {
+        drawInfoMap('lakesMapCanvas', map, true);
+        return map;
+    });
 
-Filters.add('animalsSteps', function (animals: Animal[]) {
+    Filters.add('riversMap', function (map: RiversMap) {
+        drawInfoMap('riversMapCanvas', map, false);
+        return map;
+    });
 
-    let text: string = '',
-        groups = {};
+    Filters.add('biomes', function (biomes: Matrix) {
+        drawColorMap('biomesCanvas', biomes);
 
-    for (let i = 0; i < animals.length; i++) {
-        if (typeof groups[animals[i].getName()] === 'undefined') {
-            groups[animals[i].getName()] = 0;
+        let biomesTypesCounter: { [key: string]: number } = {};
+
+        biomes.foreachValues(function (biome: Biome) {
+            if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
+                biomesTypesCounter[biome.getName()] = 0;
+            }
+
+            biomesTypesCounter[biome.getName()]++;
+        });
+
+        // Sort by value
+        biomesTypesCounter = Object.keys(biomesTypesCounter).sort(function (a, b) {
+            return biomesTypesCounter[b] - biomesTypesCounter[a];
+        }).reduce(function (result, key) {
+            result[key] = biomesTypesCounter[key];
+            return result;
+        }, {});
+
+        // Add counters as list to <ul> element
+        let list = document.getElementById('biomesTypesCounter');
+
+        for (let i in biomesTypesCounter) {
+            let item = document.createElement('li');
+            item.innerHTML = i.substring(6) + ': ' + biomesTypesCounter[i];
+            list.appendChild(item);
         }
 
-        groups[animals[i].getName()]++;
-    }
+        return biomes;
+    });
 
-    for (let i in groups) {
-        text += i + ': ' + groups[i] + '<br />';
-    }
+    Filters.add('forestMap', function (map: ForestMap) {
+        drawInfoMap('forestMapCanvas', map, true);
+        document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
+        return map;
+    });
 
-    document.getElementById('animalsList').innerHTML = text;
-    document.getElementById('animalsCounter').innerHTML = animals.length.toString();
-});
+    Filters.add('animalsSteps', function (animals: Animal[]) {
+
+        let text: string = '',
+            groups = {};
+
+        for (let i = 0; i < animals.length; i++) {
+            if (typeof groups[animals[i].getName()] === 'undefined') {
+                groups[animals[i].getName()] = 0;
+            }
+
+            groups[animals[i].getName()]++;
+        }
+
+        for (let i in groups) {
+            text += i + ': ' + groups[i] + '<br />';
+        }
+
+        document.getElementById('animalsList').innerHTML = text;
+        document.getElementById('animalsCounter').innerHTML = animals.length.toString();
+    });
+
+    technicalMaps.style.display = 'block';
+}
 
 coordinatesField.addEventListener("change", function () {
 
@@ -261,10 +267,13 @@ document.getElementById('generateFractions').addEventListener("click", function 
     world.generateFractions();
 });
 
-displayMapWrapper.addEventListener("scroll", function () {
-    world.moveMapTo(
-        world.getCellByXY(displayMapWrapper.scrollLeft, displayMapWrapper.scrollTop)
-    );
-});
+// Timeout is needed to wait for the map to be generated (the process resizes the canvas and triggers scroll event)
+setTimeout(function () {
+    displayMapWrapper.addEventListener("scroll", function () {
+        world.moveMapTo(
+            world.getCellByXY(displayMapWrapper.scrollLeft, displayMapWrapper.scrollTop)
+        );
+    });
+}, 1000);
 
 world.create();

@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData} from "./helpers.js";
+import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent} from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -106,15 +106,17 @@ export default class World {
 
         _this.generateWorld();
 
+        // Give a time to load images...
         setTimeout(function (): void {
             _this.update();
-        }, 100);
 
-        if (Config.STEPS_ENABLED) {
-            _this.timer.stepsTimer(function (): void {
-                _this.update();
-            });
-        }
+            if (Config.STEPS_ENABLED) {
+                _this.timer.stepsTimer(function (): void {
+                    _this.update();
+                });
+            }
+
+        }, 100);
     }
 
     private generateWorld = function (): void {
@@ -178,6 +180,8 @@ export default class World {
     }
 
     update = function (): void {
+        resetTimeEvent();
+
         const _this: World = this,
             mapCtx = _this.mapCanvas.getContext('2d'),
             renderCtx = _this.createRenderCanvasCtx(),
@@ -258,6 +262,8 @@ export default class World {
 
         // Step 5: add minimap
         _this.drawMiniMap(renderImageData);
+
+        logTimeEvent('World rendered');
     }
 
     private createRenderCanvasCtx = function (): CanvasRenderingContext2D {

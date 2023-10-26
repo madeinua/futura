@@ -282,6 +282,10 @@ export function logTimeEvent(event: string) {
     timer = t;
 }
 
+export function resetTimeEvent() {
+    timer = Date.now();
+}
+
 const hexStorage: RGB[] = [];
 
 export function hexToRgb(hex: string): RGB {

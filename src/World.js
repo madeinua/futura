@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData } from "./helpers.js";
+import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent } from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -15,14 +15,15 @@ export default class World {
         this.create = function () {
             const _this = this;
             _this.generateWorld();
+            // Give a time to load images...
             setTimeout(function () {
                 _this.update();
+                if (Config.STEPS_ENABLED) {
+                    _this.timer.stepsTimer(function () {
+                        _this.update();
+                    });
+                }
             }, 100);
-            if (Config.STEPS_ENABLED) {
-                _this.timer.stepsTimer(function () {
-                    _this.update();
-                });
-            }
         };
         this.generateWorld = function () {
             const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
@@ -52,6 +53,7 @@ export default class World {
             };
         };
         this.update = function () {
+            resetTimeEvent();
             const _this = this, mapCtx = _this.mapCanvas.getContext('2d'), renderCtx = _this.createRenderCanvasCtx(), renderImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), mapImages = [];
             // Step 1: Create canvas. Size = 1px per cell.
             // Fill only visible cells.
@@ -90,6 +92,7 @@ export default class World {
             }
             // Step 5: add minimap
             _this.drawMiniMap(renderImageData);
+            logTimeEvent('World rendered');
         };
         this.createRenderCanvasCtx = function () {
             const renderCanvas = document.createElement('canvas');

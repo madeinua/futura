@@ -196,6 +196,9 @@ export function logTimeEvent(event) {
     console.log(event + ' [' + Math.max(0, (t - timer)) + 'ms]');
     timer = t;
 }
+export function resetTimeEvent() {
+    timer = Date.now();
+}
 const hexStorage = [];
 export function hexToRgb(hex) {
     if (typeof hex === 'undefined') {
