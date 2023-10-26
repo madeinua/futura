@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, createImage} from "./helpers.js";
+import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages} from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -111,14 +111,14 @@ export default class World {
             _this.update();
 
             if (Config.STEPS_ENABLED) {
-                _this.timer.stepsTimer(() =>_this.update());
+                _this.timer.stepsTimer(() => _this.update());
             }
         });
     }
 
     private generateWorld = async function (): Promise<void> {
 
-        await this.preloadImages();
+        await preloadImages(Config, this.imagesCache);
 
         const surfaceOperator = new SurfaceOperator(),
             weatherOperator = new WeatherOperator(),
@@ -177,22 +177,6 @@ export default class World {
             'biomesOperator': biomesOperator,
             'forestOperator': forestsOperator,
         }
-    }
-
-    preloadImages = async function (): Promise<void> {
-
-        let _this = this,
-            preload = async function (obj: any): Promise<void> {
-                for (let key in obj) {
-                    if (typeof obj[key] === 'object') {
-                        await preload(obj[key]);
-                    } else if (typeof obj[key] === 'string' && obj[key].indexOf('.png') !== -1) {
-                        _this.imagesCache[obj[key]] = await createImage(obj[key]);
-                    }
-                }
-            };
-
-        await preload(Config);
     }
 
     update = function (): void {

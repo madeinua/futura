@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import Config from "../config.js";
-import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, createImage } from "./helpers.js";
+import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages } from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -32,7 +32,7 @@ export default class World {
         };
         this.generateWorld = function () {
             return __awaiter(this, void 0, void 0, function* () {
-                yield this.preloadImages();
+                yield preloadImages(Config, this.imagesCache);
                 const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
                 const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
                 const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
@@ -58,23 +58,6 @@ export default class World {
                     'biomesOperator': biomesOperator,
                     'forestOperator': forestsOperator,
                 };
-            });
-        };
-        this.preloadImages = function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                let _this = this, preload = function (obj) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        for (let key in obj) {
-                            if (typeof obj[key] === 'object') {
-                                yield preload(obj[key]);
-                            }
-                            else if (typeof obj[key] === 'string' && obj[key].indexOf('.png') !== -1) {
-                                _this.imagesCache[obj[key]] = yield createImage(obj[key]);
-                            }
-                        }
-                    });
-                };
-                yield preload(Config);
             });
         };
         this.update = function () {

@@ -371,6 +371,16 @@ export function getPolygonAreaSize(coords: Array2D): number {
     return area / 2;
 }
 
+export async function preloadImages(obj: any, container: HTMLImageElement[]): Promise<void> {
+    for (let key in obj) {
+        if (typeof obj[key] === 'object') {
+            await preloadImages(obj[key], container);
+        } else if (typeof obj[key] === 'string' && obj[key].indexOf('.png') !== -1) {
+            container[obj[key]] = await createImage(obj[key]);
+        }
+    }
+}
+
 export async function createImage(src: null | string): Promise<null | HTMLImageElement> {
 
     if (src === null) {

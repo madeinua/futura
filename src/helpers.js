@@ -270,6 +270,18 @@ export function getPolygonAreaSize(coords) {
     }
     return area / 2;
 }
+export function preloadImages(obj, container) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (let key in obj) {
+            if (typeof obj[key] === 'object') {
+                yield preloadImages(obj[key], container);
+            }
+            else if (typeof obj[key] === 'string' && obj[key].indexOf('.png') !== -1) {
+                container[obj[key]] = yield createImage(obj[key]);
+            }
+        }
+    });
+}
 export function createImage(src) {
     return __awaiter(this, void 0, void 0, function* () {
         if (src === null) {
