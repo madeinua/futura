@@ -66,13 +66,13 @@ export default class World {
             if (_this.terrainCanvasCtx === undefined) {
                 // 1. Create canvas are where 1px = 1 cell
                 const renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d');
-                _this.minimapCanvasImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
+                _this.terrainCachedBgImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
                 _this.layers.foreachLayersValues(function (displayCell, x, y) {
                     if (displayCell !== null && displayCell.drawBackground()) {
-                        fillCanvasPixel(_this.minimapCanvasImageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
+                        fillCanvasPixel(_this.terrainCachedBgImageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
                     }
                 });
-                renderCtx.putImageData(_this.minimapCanvasImageData, 0, 0);
+                renderCtx.putImageData(_this.terrainCachedBgImageData, 0, 0);
                 // 2. Scale canvas to actual size of cells
                 const scaledImageData = scaleImageData(mapCtx, renderCtx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE), _this.cellWidth, _this.cellHeight);
                 _this.terrainCanvasCtx = (new OffscreenCanvas(_this.worldWidth, _this.worldHeight)).getContext('2d');
@@ -102,7 +102,7 @@ export default class World {
                 _this.drawBiomesInfo();
             }
             // Step 6: add minimap
-            _this.drawMiniMap(_this.minimapCanvasImageData);
+            _this.drawMiniMap();
             logTimeEvent('World rendered');
         };
         this.isCellVisible = function (x, y) {
@@ -111,9 +111,8 @@ export default class World {
                 && y >= this.cameraPosTop
                 && y < this.cameraPosTop + Config.VISIBLE_ROWS;
         };
-        // TODO: refactor this
-        this.drawMiniMap = function (imageData) {
-            const _this = this;
+        this.drawMiniMap = function () {
+            const _this = this, renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d'), imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
             _this.layers.foreachLayersValues(function (displayCell, x, y) {
                 if (displayCell !== null) {
                     fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMapColor());

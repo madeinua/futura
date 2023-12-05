@@ -54,7 +54,7 @@ export default class World {
     timer: Timer;
     layers: Layers;
     imagesCache: HTMLImageElement[];
-    minimapCanvasImageData: ImageData;
+    terrainCachedBgImageData: ImageData;
     terrainCanvasCtx: OffscreenCanvasRenderingContext2D;
 
     constructor(
@@ -192,19 +192,19 @@ export default class World {
             // 1. Create canvas are where 1px = 1 cell
             const renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d');
 
-            _this.minimapCanvasImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
+            _this.terrainCachedBgImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
             _this.layers.foreachLayersValues(function (displayCell: null | DisplayCell, x: number, y: number) {
                 if (displayCell !== null && displayCell.drawBackground()) {
                     fillCanvasPixel(
-                        _this.minimapCanvasImageData,
+                        _this.terrainCachedBgImageData,
                         (x + y * Config.WORLD_SIZE) * 4,
                         displayCell.getColor()
                     );
                 }
             });
 
-            renderCtx.putImageData(_this.minimapCanvasImageData, 0, 0);
+            renderCtx.putImageData(_this.terrainCachedBgImageData, 0, 0);
 
             // 2. Scale canvas to actual size of cells
             const scaledImageData = scaleImageData(
@@ -265,7 +265,7 @@ export default class World {
         }
 
         // Step 6: add minimap
-        _this.drawMiniMap(_this.minimapCanvasImageData);
+        _this.drawMiniMap();
 
         logTimeEvent('World rendered');
     }
@@ -277,9 +277,10 @@ export default class World {
             && y < this.cameraPosTop + Config.VISIBLE_ROWS;
     }
 
-    // TODO: refactor this
-    private drawMiniMap = function (imageData: ImageData): void {
-        const _this: World = this;
+    private drawMiniMap = function (): void {
+        const _this: World = this,
+            renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d'),
+            imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
         _this.layers.foreachLayersValues(function (displayCell: null | DisplayCell, x: number, y: number): void {
             if (displayCell !== null) {
@@ -293,9 +294,7 @@ export default class World {
 
         createImageBitmap(imageData).then(function () {
             const miniMapCtx = _this.miniMapCanvas.getContext('2d');
-
             miniMapCtx.putImageData(imageData, 0, 0);
-
             _this.drawRectangleAroundMiniMap(miniMapCtx);
         });
     }
