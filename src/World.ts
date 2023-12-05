@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages} from "./helpers.js";
+import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages, throwError} from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -54,8 +54,8 @@ export default class World {
     timer: Timer;
     layers: Layers;
     imagesCache: HTMLImageElement[];
-    terrainCachedBgImageData: ImageData;
     terrainCanvasCtx: OffscreenCanvasRenderingContext2D;
+    terrainCachedBgImageData: ImageData;
 
     constructor(
         mapCanvas: HTMLCanvasElement,
@@ -194,8 +194,8 @@ export default class World {
 
             _this.terrainCachedBgImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
-            _this.layers.foreachLayersValues(function (displayCell: null | DisplayCell, x: number, y: number) {
-                if (displayCell !== null && displayCell.drawBackground()) {
+            _this.layers.foreachLayerValues(LAYER_BIOMES, function (displayCell: null | DisplayCell, x: number, y: number) {
+                if (displayCell !== null) {
                     fillCanvasPixel(
                         _this.terrainCachedBgImageData,
                         (x + y * Config.WORLD_SIZE) * 4,
@@ -282,7 +282,7 @@ export default class World {
             renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d'),
             imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
-        _this.layers.foreachLayersValues(function (displayCell: null | DisplayCell, x: number, y: number): void {
+        _this.layers.foreachMiniMapLayersValues(function (displayCell: null | DisplayCell, x: number, y: number): void {
             if (displayCell !== null) {
                 fillCanvasPixel(
                     imageData,

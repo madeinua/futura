@@ -17,7 +17,7 @@ const Config = {
     // Steps
     STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
-    STEPS_LIMIT: 500,
+    STEPS_LIMIT: 50,
     STEPS_BOOST: 5,
     STEPS_BOOST_STEPS: 40,
 

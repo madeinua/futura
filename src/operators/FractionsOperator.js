@@ -9,14 +9,14 @@ export default class FractionsOperator {
             this.occupiedTerritories.fill(position[0], position[1]);
         };
         this.fillFractionsLayer = function (position, fraction) {
-            this.fractionsLayer.setCell(position[0], position[1], new DisplayCell(fraction.getFractionColor(), null, false));
+            this.fractionsLayer.setCell(position[0], position[1], new DisplayCell(fraction.getFractionColor(), null, true));
         };
         this.occupyCell = function (positionX, positionY, fraction, fromPositionX, fromPositionY) {
             fraction.territory.fill(positionX, positionY);
             fraction.borders.fill(positionX, positionY);
             fraction.borders.unfill(fromPositionX, fromPositionY);
             this.occupiedTerritories.fill(positionX, positionY);
-            this.fractionsLayer.setCell(positionX, positionY, new DisplayCell(fraction.getFractionColor(), null, false));
+            this.fractionsLayer.setCell(positionX, positionY, new DisplayCell(fraction.getFractionColor(), null, true));
         };
         this.expandFraction = function (fraction) {
             const _this = this;

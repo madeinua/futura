@@ -8,17 +8,30 @@ export default class Layers {
     constructor(width, height) {
         this.layers = [];
         this.getLayer = function (level) {
-            if (typeof this.layers[level] === 'undefined') {
-                this.layers[level] = new Layer(this.width, this.height);
-            }
             return this.layers[level];
         };
         this.foreachLayersValues = function (callback) {
-            for (let i = 0; i < this.layers.length; i++) {
-                this.layers[i].foreachValues(callback);
+            for (let level = 0; level < this.layers.length; level++) {
+                this.layers[level].foreachValues(callback);
             }
+        };
+        this.foreachLayerValues = function (level, callback) {
+            this.layers[level].foreachValues(callback);
+        };
+        this.getMiniManLayersLevels = function () {
+            return [
+                LAYER_BIOMES,
+                LAYER_FOREST,
+                LAYER_FRACTIONS
+            ];
+        };
+        this.foreachMiniMapLayersValues = function (callback) {
+            this.getMiniManLayersLevels().forEach((level) => this.foreachLayerValues(level, callback));
         };
         this.width = width;
         this.height = height;
+        for (let i = 0; i < 5; i++) {
+            this.layers[i] = new Layer(this.width, this.height);
+        }
     }
 }

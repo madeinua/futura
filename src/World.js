@@ -67,8 +67,8 @@ export default class World {
                 // 1. Create canvas are where 1px = 1 cell
                 const renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d');
                 _this.terrainCachedBgImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
-                _this.layers.foreachLayersValues(function (displayCell, x, y) {
-                    if (displayCell !== null && displayCell.drawBackground()) {
+                _this.layers.foreachLayerValues(LAYER_BIOMES, function (displayCell, x, y) {
+                    if (displayCell !== null) {
                         fillCanvasPixel(_this.terrainCachedBgImageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
                     }
                 });
@@ -113,7 +113,7 @@ export default class World {
         };
         this.drawMiniMap = function () {
             const _this = this, renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d'), imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
-            _this.layers.foreachLayersValues(function (displayCell, x, y) {
+            _this.layers.foreachMiniMapLayersValues(function (displayCell, x, y) {
                 if (displayCell !== null) {
                     fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMapColor());
                 }

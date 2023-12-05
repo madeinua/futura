@@ -9,26 +9,45 @@ export const LAYER_FRACTIONS = 4;
 export default class Layers {
 
     layers: Layer[] = [];
+
     readonly width: number;
     readonly height: number;
 
     constructor(width: number, height: number) {
+
         this.width = width;
         this.height = height;
+
+        for (let i = 0; i < 5; i++) {
+            this.layers[i] = new Layer(this.width, this.height);
+        }
     }
 
     getLayer = function (level: number): Layer {
-
-        if (typeof this.layers[level] === 'undefined') {
-            this.layers[level] = new Layer(this.width, this.height);
-        }
-
         return this.layers[level];
     }
 
     foreachLayersValues = function (callback: Function): void {
-        for (let i = 0; i < this.layers.length; i++) {
-            this.layers[i].foreachValues(callback);
+        for (let level = 0; level < this.layers.length; level++) {
+            this.layers[level].foreachValues(callback);
         }
+    }
+
+    foreachLayerValues = function (level: number, callback: Function): void {
+        this.layers[level].foreachValues(callback);
+    }
+
+    getMiniManLayersLevels = function (): number[] {
+        return [
+            LAYER_BIOMES,
+            LAYER_FOREST,
+            LAYER_FRACTIONS
+        ];
+    }
+
+    foreachMiniMapLayersValues = function (callback: Function): void {
+        this.getMiniManLayersLevels().forEach(
+            (level: number) => this.foreachLayerValues(level, callback)
+        );
     }
 }

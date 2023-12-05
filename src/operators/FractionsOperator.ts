@@ -49,7 +49,7 @@ export default class FractionsOperator {
         this.fractionsLayer.setCell(
             position[0],
             position[1],
-            new DisplayCell(fraction.getFractionColor(), null, false)
+            new DisplayCell(fraction.getFractionColor(), null, true)
         );
     }
 
@@ -63,7 +63,7 @@ export default class FractionsOperator {
         this.fractionsLayer.setCell(
             positionX,
             positionY,
-            new DisplayCell(fraction.getFractionColor(), null, false)
+            new DisplayCell(fraction.getFractionColor(), null, true)
         );
     }
 
