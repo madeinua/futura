@@ -62,30 +62,33 @@ export default class World {
         };
         this.update = function () {
             resetTimeEvent();
-            const _this = this, mapCtx = _this.mapCanvas.getContext('2d'), renderCtx = _this.createRenderCanvasCtx(), renderImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE), mapImages = [];
-            // Step 1: Create canvas. Size = 1px per cell.
-            // Fill only visible cells.
-            // Collect cells where images needed.
+            const _this = this, mapCtx = _this.mapCanvas.getContext('2d');
+            if (_this.terrainCanvasCtx === undefined) {
+                // 1. Create canvas are where 1px = 1 cell
+                const renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d');
+                _this.minimapCanvasImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
+                _this.layers.foreachLayersValues(function (displayCell, x, y) {
+                    if (displayCell !== null && displayCell.drawBackground()) {
+                        fillCanvasPixel(_this.minimapCanvasImageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
+                    }
+                });
+                renderCtx.putImageData(_this.minimapCanvasImageData, 0, 0);
+                // 2. Scale canvas to actual size of cells
+                const scaledImageData = scaleImageData(mapCtx, renderCtx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE), _this.cellWidth, _this.cellHeight);
+                _this.terrainCanvasCtx = (new OffscreenCanvas(_this.worldWidth, _this.worldHeight)).getContext('2d');
+                _this.terrainCanvasCtx.putImageData(scaledImageData, 0, 0);
+            }
+            // 3. Draw scaled canvas
+            mapCtx.putImageData(_this.terrainCanvasCtx.getImageData(_this.cellWidth * _this.cameraPosLeft, _this.cellHeight * _this.cameraPosTop, _this.cellWidth * Config.VISIBLE_COLS, _this.cellHeight * Config.VISIBLE_ROWS), _this.cellWidth * _this.cameraPosLeft, _this.cellHeight * _this.cameraPosTop);
+            // Step 4: add images
             _this.layers.foreachLayersValues(function (displayCell, x, y) {
-                if (displayCell === null || !_this.isCellVisible(x, y)) {
-                    return;
-                }
-                if (displayCell.drawBackground()) {
-                    fillCanvasPixel(renderImageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
-                }
-                if (displayCell.hasImage()) {
-                    mapImages.push([x, y, displayCell.getImage()]);
+                if (displayCell !== null
+                    && displayCell.hasImage()
+                    && _this.isCellVisible(x, y)) {
+                    mapCtx.drawImage(_this.imagesCache[displayCell.getImage()], x * _this.cellWidth, y * _this.cellHeight, _this.cellWidth, _this.cellHeight);
                 }
             });
-            renderCtx.putImageData(renderImageData, 0, 0);
-            // Step 2: scale image (1px => cell size) and render it to map canvas
-            const visibleImageData = renderCtx.getImageData(_this.cameraPosLeft, _this.cameraPosTop, Config.VISIBLE_COLS, Config.VISIBLE_ROWS), scaledData = scaleImageData(mapCtx, visibleImageData, _this.cellWidth, _this.cellHeight);
-            mapCtx.putImageData(scaledData, _this.cameraPosLeft * _this.cellWidth, _this.cameraPosTop * _this.cellHeight);
-            // Step 3: add images
-            for (let i = 0; i < mapImages.length; i++) {
-                mapCtx.drawImage(_this.imagesCache[mapImages[i][2]], mapImages[i][0] * _this.cellWidth, mapImages[i][1] * _this.cellHeight, _this.cellWidth, _this.cellHeight);
-            }
-            // Step 4: add extras
+            // Step 5: add extras
             if (Config.SHOW_RECTANGLES) {
                 _this.drawRectangles();
             }
@@ -98,15 +101,9 @@ export default class World {
             if (Config.SHOW_BIOMES_INFO) {
                 _this.drawBiomesInfo();
             }
-            // Step 5: add minimap
-            _this.drawMiniMap(renderImageData);
+            // Step 6: add minimap
+            _this.drawMiniMap(_this.minimapCanvasImageData);
             logTimeEvent('World rendered');
-        };
-        this.createRenderCanvasCtx = function () {
-            const renderCanvas = document.createElement('canvas');
-            renderCanvas.width = Config.WORLD_SIZE;
-            renderCanvas.height = Config.WORLD_SIZE;
-            return renderCanvas.getContext('2d');
         };
         this.isCellVisible = function (x, y) {
             return x >= this.cameraPosLeft
@@ -114,6 +111,7 @@ export default class World {
                 && y >= this.cameraPosTop
                 && y < this.cameraPosTop + Config.VISIBLE_ROWS;
         };
+        // TODO: refactor this
         this.drawMiniMap = function (imageData) {
             const _this = this;
             _this.layers.foreachLayersValues(function (displayCell, x, y) {

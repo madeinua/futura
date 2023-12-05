@@ -15,9 +15,9 @@ const Config = {
     DRAW_TECHNICAL_MAPS: false,
 
     // Steps
-    STEPS_ENABLED: false,
+    STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
-    STEPS_LIMIT: 40,
+    STEPS_LIMIT: 500,
     STEPS_BOOST: 5,
     STEPS_BOOST_STEPS: 40,
 
