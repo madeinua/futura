@@ -27,14 +27,14 @@ export default class Layers {
         return this.layers[level];
     }
 
-    foreachLayersValues = function (callback: Function): void {
-        for (let level = 0; level < this.layers.length; level++) {
-            this.layers[level].foreachValues(callback);
-        }
-    }
-
     foreachLayerValues = function (level: number, callback: Function): void {
         this.layers[level].foreachValues(callback);
+    }
+
+    foreachLayers(callback: Function): void {
+        for (let level = 0; level < this.layers.length; level++) {
+            callback(level);
+        }
     }
 
     getMiniManLayersLevels = function (): number[] {

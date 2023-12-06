@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages, throwError} from "./helpers.js";
+import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages, throwError, rgbToHex} from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -207,15 +207,16 @@ export default class World {
             renderCtx.putImageData(_this.terrainCachedBgImageData, 0, 0);
 
             // 2. Scale canvas to actual size of cells
-            const scaledImageData = scaleImageData(
-                mapCtx,
-                renderCtx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE),
-                _this.cellWidth,
-                _this.cellHeight
-            );
-
             _this.terrainCanvasCtx = (new OffscreenCanvas(_this.worldWidth, _this.worldHeight)).getContext('2d');
-            _this.terrainCanvasCtx.putImageData(scaledImageData, 0, 0);
+            _this.terrainCanvasCtx.putImageData(
+                scaleImageData(
+                    mapCtx,
+                    renderCtx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE),
+                    _this.cellWidth,
+                    _this.cellHeight
+                ),
+                0, 0
+            );
         }
 
         // 3. Draw scaled canvas
@@ -230,21 +231,31 @@ export default class World {
             _this.cellHeight * _this.cameraPosTop
         );
 
-        // Step 4: add images
-        _this.layers.foreachLayersValues(function (displayCell: null | DisplayCell, x: number, y: number) {
-            if (
-                displayCell !== null
-                && displayCell.hasImage()
-                && _this.isCellVisible(x, y)
-            ) {
-                mapCtx.drawImage(
-                    _this.imagesCache[displayCell.getImage()],
-                    x * _this.cellWidth,
-                    y * _this.cellHeight,
-                    _this.cellWidth,
-                    _this.cellHeight
-                );
-            }
+        // Step 4: render layers
+        _this.layers.foreachLayers(function (level: number) {
+            _this.layers.foreachLayerValues(level, function (displayCell: null | DisplayCell, x: number, y: number) {
+                if (displayCell !== null && _this.isCellVisible(x, y)) {
+                    if (displayCell.hasImage()) {
+                        mapCtx.drawImage(
+                            _this.imagesCache[displayCell.getImage()],
+                            x * _this.cellWidth,
+                            y * _this.cellHeight,
+                            _this.cellWidth,
+                            _this.cellHeight
+                        );
+                    } else if (level !== LAYER_BIOMES) {
+                        mapCtx.imageSmoothingEnabled = false;
+                        mapCtx.strokeStyle = rgbToHex(displayCell.getColor());
+                        mapCtx.lineWidth = 2;
+                        mapCtx.strokeRect(
+                            x * _this.cellWidth,
+                            y * _this.cellHeight,
+                            _this.cellWidth,
+                            _this.cellHeight
+                        );
+                    }
+                }
+            });
         });
 
         // Step 5: add extras

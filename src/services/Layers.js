@@ -10,11 +10,6 @@ export default class Layers {
         this.getLayer = function (level) {
             return this.layers[level];
         };
-        this.foreachLayersValues = function (callback) {
-            for (let level = 0; level < this.layers.length; level++) {
-                this.layers[level].foreachValues(callback);
-            }
-        };
         this.foreachLayerValues = function (level, callback) {
             this.layers[level].foreachValues(callback);
         };
@@ -32,6 +27,11 @@ export default class Layers {
         this.height = height;
         for (let i = 0; i < 5; i++) {
             this.layers[i] = new Layer(this.width, this.height);
+        }
+    }
+    foreachLayers(callback) {
+        for (let level = 0; level < this.layers.length; level++) {
+            callback(level);
         }
     }
 }
