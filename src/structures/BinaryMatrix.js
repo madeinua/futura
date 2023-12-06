@@ -70,10 +70,30 @@ export default class BinaryMatrix extends NumericMatrix {
         return this;
     }
     /**
+     * Fill all unfilled cells
+     */
+    fillAll() {
+        const _this = this;
+        _this.foreachUnfilled(function (x, y) {
+            _this.fill(x, y);
+        });
+        return this;
+    }
+    /**
      * Remove filling the cell with the value
      */
     unfill(x, y) {
         this.setCell(x, y, 0);
+        return this;
+    }
+    /**
+     * Remove filling all filled cells
+     */
+    unfillAll() {
+        const _this = this;
+        _this.foreachFilled(function (x, y) {
+            _this.unfill(x, y);
+        });
         return this;
     }
     /**
@@ -198,6 +218,12 @@ export default class BinaryMatrix extends NumericMatrix {
     }
     hasFilledNeighbors(x, y) {
         return this.getFilledNeighbors(x, y).length > 0;
+    }
+    hasUnfilledNeighbors(x, y) {
+        return this.getFilledNeighbors(x, y).length < 8;
+    }
+    countFilledNeighbors(x, y) {
+        return this.getFilledNeighbors(x, y).length;
     }
     /**
      * Retrieve all unfilled neighbors of the specified cell around a specific radius

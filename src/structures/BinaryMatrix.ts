@@ -1,5 +1,5 @@
 import NumericMatrix from './NumericMatrix.js';
-import {distance, round, getPolygonAreaSize, throwError} from "../helpers.js";
+import {distance, round, getPolygonAreaSize} from "../helpers.js";
 import {Cell, CellsList} from "./Cells.js";
 import {Array2D} from "./Array2D.js";
 
@@ -55,10 +55,36 @@ export default class BinaryMatrix extends NumericMatrix {
     }
 
     /**
+     * Fill all unfilled cells
+     */
+    fillAll(): this {
+        const _this: BinaryMatrix = this;
+
+        _this.foreachUnfilled(function (x: number, y: number): void {
+            _this.fill(x, y);
+        });
+
+        return this;
+    }
+
+    /**
      * Remove filling the cell with the value
      */
     unfill(x: number, y: number): this {
         this.setCell(x, y, 0);
+        return this;
+    }
+
+    /**
+     * Remove filling all filled cells
+     */
+    unfillAll(): this {
+        const _this: BinaryMatrix = this;
+
+        _this.foreachFilled(function (x: number, y: number): void {
+            _this.unfill(x, y);
+        });
+
         return this;
     }
 
@@ -216,6 +242,14 @@ export default class BinaryMatrix extends NumericMatrix {
 
     hasFilledNeighbors(x: number, y: number): boolean {
         return this.getFilledNeighbors(x, y).length > 0;
+    }
+
+    hasUnfilledNeighbors(x: number, y: number): boolean {
+        return this.getFilledNeighbors(x, y).length < 8;
+    }
+
+    countFilledNeighbors(x: number, y: number): number {
+        return this.getFilledNeighbors(x, y).length;
     }
 
     /**

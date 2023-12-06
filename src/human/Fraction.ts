@@ -1,7 +1,7 @@
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import Config from "../../config.js";
 import {Cell} from "../structures/Cells.js";
-import {hexToRgb, RGB} from "../helpers.js";
+import {fractionToRGB, hexToRgb, RGB, RGBa, rgbToRgba} from "../helpers.js";
 
 export interface FractionSettings {
     name: string;
@@ -12,7 +12,7 @@ export default class Fraction {
 
     id: string;
     fractionName: string;
-    fractionColor: string;
+    fractionColor: RGB;
     startPosition: Cell;
     territory: BinaryMatrix;
     borders: BinaryMatrix;
@@ -22,7 +22,7 @@ export default class Fraction {
     constructor(startPointX: number, startPointY: number, fractionSettings: FractionSettings) {
         this.id = this.constructor.name + '-' + Fraction.incrementId();
         this.fractionName = fractionSettings.name;
-        this.fractionColor = fractionSettings.color;
+        this.fractionColor = hexToRgb(fractionSettings.color);
         this.startPosition = [startPointX, startPointY];
         this.territory = (new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE)).fill(startPointX, startPointY);
         this.borders = (new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE)).fill(startPointX, startPointY);
@@ -39,6 +39,20 @@ export default class Fraction {
     }
 
     getFractionColor(): RGB {
-        return hexToRgb(this.fractionColor);
+        return this.fractionColor;
+    }
+
+    getFractionTerritoryColor(): RGBa {
+        return rgbToRgba(
+            this.getFractionColor(),
+            fractionToRGB(0.3)
+        );
+    }
+
+    getFractionBorderColor(): RGBa {
+        return rgbToRgba(
+            this.getFractionColor(),
+            fractionToRGB(0.9)
+        );
     }
 }

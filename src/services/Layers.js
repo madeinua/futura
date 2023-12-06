@@ -5,6 +5,7 @@ export const LAYER_FOREST = 2;
 export const LAYER_HABITAT = 3;
 export const LAYER_ANIMALS = 4;
 export const LAYER_FRACTIONS = 5;
+export const LAYER_FRACTIONS_BORDERS = 6;
 export default class Layers {
     constructor(width, height) {
         this.layers = [];
@@ -15,7 +16,8 @@ export default class Layers {
                 LAYER_FOREST,
                 LAYER_HABITAT,
                 LAYER_ANIMALS,
-                LAYER_FRACTIONS
+                LAYER_FRACTIONS,
+                LAYER_FRACTIONS_BORDERS
             ];
         };
         this.getMaxLevel = function () {
@@ -31,7 +33,7 @@ export default class Layers {
             return [
                 LAYER_BIOMES,
                 LAYER_FOREST,
-                LAYER_FRACTIONS
+                LAYER_FRACTIONS_BORDERS
             ];
         };
         this.foreachMiniMapLayersValues = function (callback) {

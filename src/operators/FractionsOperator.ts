@@ -7,18 +7,21 @@ import Fraction from "../human/Fraction";
 import DisplayCell from "../render/DisplayCell.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import {Cell} from "../structures/Cells.js";
+import Layers from "../services/Layers";
 
 export default class FractionsOperator {
 
     readonly fractionsGenerator: FractionGenerator;
     readonly fractionsLayer: Layer;
+    readonly fractionsBorderLayer: Layer;
     fractions: Fraction[];
     occupiedTerritories: BinaryMatrix;
 
-    constructor(timer: Timer, fractionsLayer: Layer, objects: FractionsGeneratorArgs) {
+    constructor(timer: Timer, fractionsLayer: Layer, fractionsBorderLayer: Layer, objects: FractionsGeneratorArgs) {
         const _this: FractionsOperator = this;
 
         this.fractionsLayer = fractionsLayer;
+        this.fractionsBorderLayer = fractionsBorderLayer;
         this.fractionsGenerator = new FractionGenerator(objects);
         this.fractions = [];
         this.occupiedTerritories = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
@@ -40,7 +43,7 @@ export default class FractionsOperator {
 
         for (let i = 0; i < this.fractions.length; i++) {
             this.fillOccupiedTerritory(this.fractions[i].startPosition);
-            this.fillFractionsLayer(this.fractions[i].startPosition, this.fractions[i]);
+            this.fillFractionsStartPosition(this.fractions[i].startPosition, this.fractions[i]);
         }
 
         if (Config.LOGS) {
@@ -56,40 +59,25 @@ export default class FractionsOperator {
         this.occupiedTerritories.fill(position[0], position[1]);
     }
 
-    private fillFractionsLayer = function (position: Cell, fraction: Fraction): void {
-        this.fractionsLayer.setCell(
-            position[0],
-            position[1],
-            new DisplayCell(fraction.getFractionColor(), null, true)
-        );
-    }
-
-    private occupyCell = function (positionX: number, positionY: number, fraction: Fraction, fromPositionX: number, fromPositionY: number): void {
-
+    private occupyCell = function (positionX: number, positionY: number, fraction: Fraction): void {
         fraction.territory.fill(positionX, positionY);
-        fraction.borders.fill(positionX, positionY);
-        fraction.borders.unfill(fromPositionX, fromPositionY);
-
-        this.occupiedTerritories.fill(positionX, positionY);
-
-        this.fractionsLayer.setCell(
-            positionX,
-            positionY,
-            new DisplayCell(fraction.getFractionColor(), null, true)
-        );
+        this.fillOccupiedTerritory([positionX, positionY]);
     }
 
     private expandFraction = function (fraction: Fraction): void {
         const _this: FractionsOperator = this;
 
-        fraction.borders.foreachFilledAroundRadiusToAllCells(function (nx: number, ny: number, cellX: number, cellY: number) {
+        fraction.borders.foreachFilledAroundRadiusToAllCells(function (nx: number, ny: number, fromCellX: number, fromCellY: number) {
 
             // Skip already filled
             if (_this.occupiedTerritories.filled(nx, ny)) {
                 return;
             }
 
-            _this.occupyCell(nx, ny, fraction, cellX, cellY);
+            // @TODO Logic..
+
+            _this.occupyCell(nx, ny, fraction);
+            _this.fillFractionsLayer([nx, ny], fraction);
         }, 1);
     }
 
@@ -98,6 +86,50 @@ export default class FractionsOperator {
 
         for (let i = 0; i < this.fractions.length; i++) {
             _this.expandFraction(this.fractions[i]);
+            _this.updateFractionBorders(this.fractions[i]);
         }
+
+        _this.fillFractionsBorderLayer();
+    }
+
+    private updateFractionBorders = function (fraction: Fraction): void {
+        fraction.borders.unfillAll();
+        fraction.territory.foreachFilled(function (x: number, y: number): void {
+            if (fraction.territory.countFilledNeighbors(x, y) < 6) {
+                fraction.borders.fill(x, y);
+            }
+        });
+    }
+
+    private fillFractionsStartPosition = function (position: Cell, fraction: Fraction): void {
+        this.fractionsLayer.setCell(
+            position[0],
+            position[1],
+            new DisplayCell(fraction.getFractionColor(), null, true)
+        );
+    }
+
+    private fillFractionsLayer = function (position: Cell, fraction: Fraction): void {
+        this.fractionsLayer.setCell(
+            position[0],
+            position[1],
+            new DisplayCell(fraction.getFractionTerritoryColor(), null, true)
+        );
+    }
+
+    private fillFractionsBorderLayer = function (): void {
+        const _this: FractionsOperator = this;
+
+        _this.fractionsBorderLayer.setAll(null);
+
+        _this.fractions.forEach(function (fraction: Fraction): void {
+            fraction.borders.foreachFilled(function (x: number, y: number): void {
+                _this.fractionsBorderLayer.setCell(
+                    x,
+                    y,
+                    new DisplayCell(fraction.getFractionBorderColor(), null, true)
+                );
+            });
+        });
     }
 }

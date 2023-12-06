@@ -20,19 +20,13 @@ export default class CellsRenderer {
             yield preloadImages(Config, this.imagesCache);
         });
     }
-    renderCell(ctx, displayCell, x, y) {
+    render(ctx, displayCell, x, y) {
         if (displayCell.hasImage()) {
             ctx.drawImage(this.imagesCache[displayCell.getImage()], x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
         }
         else {
-            ctx.imageSmoothingEnabled = false;
-            ctx.strokeStyle = rgbToHex(displayCell.getColor());
-            ctx.lineWidth = 1;
-            ctx.strokeRect(x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
-            ctx.globalAlpha = .2;
             ctx.fillStyle = rgbToHex(displayCell.getColor());
             ctx.fillRect(x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
-            ctx.globalAlpha = 1;
         }
     }
 }

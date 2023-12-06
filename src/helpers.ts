@@ -194,7 +194,14 @@ export function changeRange(value: number, minOld: number, maxOld: number, minNe
  * Convert value in between [0-1] to RGB range [0-255]
  */
 export function fractionToRGB(value: number): number {
-    return value * 255;
+    return Math.round(value * 255);
+}
+
+/**
+ * Convert RGB value in between [0-255] to fraction [0-1]
+ */
+export function RGBToFraction(value: number): number {
+    return value / 255;
 }
 
 /**
@@ -310,8 +317,12 @@ export function hexToRgb(hex: string): RGB {
     return hexStorage[hex];
 }
 
-export function rgbToHex(rgb: RGBa): string {
-    const hex = rgb.map((value) => value.toString(16).padStart(2, '0')).join('');
+export function rgbToRgba(rgb: RGB, alpha: number): RGBa {
+    return [rgb[0], rgb[1], rgb[2], alpha];
+}
+
+export function rgbToHex(rgba: RGBa): string {
+    const hex = rgba.map((value: number) => value.toString(16).padStart(2, '0')).join('');
     return `#${hex}`;
 }
 

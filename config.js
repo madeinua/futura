@@ -263,7 +263,7 @@ const Config = {
 
     // Fractions
     FRACTIONS: {
-        AUTO_CREATE_ON_STEP: 30,
+        AUTO_CREATE_ON_STEP: 25,
         // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
             BIOMES: {
@@ -289,10 +289,10 @@ const Config = {
         COLORS: [
             '#ff0000',
             '#00ff00',
-            '#0000ff',
+            '#0099ff',
             '#ffff00',
             '#ff00ff',
-            '#00ffff',
+            '#00ccaa',
             '#ffffff',
             '#000000',
         ]

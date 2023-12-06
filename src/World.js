@@ -18,7 +18,7 @@ import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
 import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
-import Layers, { LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT } from "./services/Layers.js";
+import Layers, { LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_FRACTIONS_BORDERS, LAYER_HABITAT } from "./services/Layers.js";
 import CellsRenderer from "./render/CellsRenderer.js";
 export default class World {
     constructor(mapCanvas, mapWidth, mapHeight, miniMapCanvas, cameraPos) {
@@ -49,7 +49,7 @@ export default class World {
                     biomesOperator: biomesOperator,
                     timer: this.timer
                 });
-                const fractionsOperator = new FractionsOperator(this.timer, this.layers.getLayer(LAYER_FRACTIONS), {
+                const fractionsOperator = new FractionsOperator(this.timer, this.layers.getLayer(LAYER_FRACTIONS), this.layers.getLayer(LAYER_FRACTIONS_BORDERS), {
                     oceanMap: oceanMap,
                     freshWaterMap: freshWaterMap,
                     temperatureMap: temperatureMap,
@@ -97,7 +97,7 @@ export default class World {
                 }
                 _this.layers.foreachLayerValues(level, function (displayCell, x, y) {
                     if (_this.isCellVisible(x, y)) {
-                        _this.cellsRenderer.renderCell(mapCtx, displayCell, x, y);
+                        _this.cellsRenderer.render(mapCtx, displayCell, x, y);
                     }
                 });
             });

@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent} from "./helpers.js";
+import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, throwError} from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -9,7 +9,7 @@ import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
 import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
-import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT} from "./services/Layers.js";
+import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_FRACTIONS_BORDERS, LAYER_HABITAT} from "./services/Layers.js";
 import AltitudeMap from "./maps/AltitudeMap.js";
 import TemperatureMap from "./maps/TemperatureMap.js";
 import OceanMap from "./maps/OceanMap.js";
@@ -174,6 +174,7 @@ export default class World {
         const fractionsOperator = new FractionsOperator(
             this.timer,
             this.layers.getLayer(LAYER_FRACTIONS),
+            this.layers.getLayer(LAYER_FRACTIONS_BORDERS),
             {
                 oceanMap: oceanMap,
                 freshWaterMap: freshWaterMap,
@@ -256,7 +257,7 @@ export default class World {
 
             _this.layers.foreachLayerValues(level, function (displayCell: null | DisplayCell, x: number, y: number) {
                 if (_this.isCellVisible(x, y)) {
-                    _this.cellsRenderer.renderCell(mapCtx, displayCell, x, y);
+                    _this.cellsRenderer.render(mapCtx, displayCell, x, y);
                 }
             });
         });

@@ -144,7 +144,13 @@ export function changeRange(value, minOld, maxOld, minNew, maxNew) {
  * Convert value in between [0-1] to RGB range [0-255]
  */
 export function fractionToRGB(value) {
-    return value * 255;
+    return Math.round(value * 255);
+}
+/**
+ * Convert RGB value in between [0-255] to fraction [0-1]
+ */
+export function RGBToFraction(value) {
+    return value / 255;
 }
 /**
  * Retrieve distance between two points
@@ -224,8 +230,11 @@ export function hexToRgb(hex) {
     }
     return hexStorage[hex];
 }
-export function rgbToHex(rgb) {
-    const hex = rgb.map((value) => value.toString(16).padStart(2, '0')).join('');
+export function rgbToRgba(rgb, alpha) {
+    return [rgb[0], rgb[1], rgb[2], alpha];
+}
+export function rgbToHex(rgba) {
+    const hex = rgba.map((value) => value.toString(16).padStart(2, '0')).join('');
     return `#${hex}`;
 }
 const colorCache = {};
