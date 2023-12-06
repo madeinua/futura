@@ -4,6 +4,7 @@ import Config from "../../config.js";
 import AltitudeMap from "./AltitudeMap.js";
 import RiversMap from "./RiversMap.js";
 import LakesMap from "./LakesMap.js";
+import {distance, throwError} from "../helpers.js";
 
 export default class HumidityMap extends PointMatrix {
 
@@ -55,13 +56,8 @@ export default class HumidityMap extends PointMatrix {
 
         // rivers increase humidity
         _this.riversMap.foreachFilled(function (x: number, y: number): void {
-
-            _this.addToCell(x, y, 0.2);
-
-            _this.foreachAroundRadius(x, y, 5, function (nx: number, ny: number): void {
-                if (!_this.riversMap.filled(nx, ny)) {
-                    _this.addToCell(nx, ny, 0.02);
-                }
+            _this.foreachAroundRadius(x, y, 4, function (nx: number, ny: number): void {
+                _this.addToCell(nx, ny, 0.015 / distance(x, y, nx, ny));
             });
         });
     }
@@ -72,7 +68,7 @@ export default class HumidityMap extends PointMatrix {
         // lakes increase humidity
         _this.lakesMap.foreachFilled(function (x: number, y: number): void {
             _this.foreachAroundRadius(x, y, 5, function (nx: number, ny: number): void {
-                _this.addToCell(nx, ny, 0.015);
+                _this.addToCell(nx, ny, 0.01 / distance(x, y, nx, ny));
             });
         });
     }

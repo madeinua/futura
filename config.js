@@ -263,6 +263,7 @@ const Config = {
 
     // Fractions
     FRACTIONS: {
+        // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
             BIOMES: {
                 Biome_Tundra: 0.05,
@@ -278,8 +279,9 @@ const Config = {
                 Biome_Rocks: 0.01,
             },
             CLOSE_TO_WATER: 20,
-            IS_FOREST: -2,
+            IS_FOREST: 0.3,
             CLOSE_TO_FOREST: 5,
+            CLOSE_TO_FRACTION: 0.05,
         },
         CREATE_COUNT: 5,
         COLORS: [

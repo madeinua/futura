@@ -1,6 +1,7 @@
 import PointMatrix from "../structures/PointMatrix.js";
 import NoiseMapGenerator from "../generators/NoiseMapGenerator.js";
 import Config from "../../config.js";
+import { distance } from "../helpers.js";
 export default class HumidityMap extends PointMatrix {
     constructor(altitudeMap, riversMap, lakesMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE);
@@ -35,11 +36,8 @@ export default class HumidityMap extends PointMatrix {
         const _this = this;
         // rivers increase humidity
         _this.riversMap.foreachFilled(function (x, y) {
-            _this.addToCell(x, y, 0.2);
-            _this.foreachAroundRadius(x, y, 5, function (nx, ny) {
-                if (!_this.riversMap.filled(nx, ny)) {
-                    _this.addToCell(nx, ny, 0.02);
-                }
+            _this.foreachAroundRadius(x, y, 4, function (nx, ny) {
+                _this.addToCell(nx, ny, 0.015 / distance(x, y, nx, ny));
             });
         });
     }
@@ -48,7 +46,7 @@ export default class HumidityMap extends PointMatrix {
         // lakes increase humidity
         _this.lakesMap.foreachFilled(function (x, y) {
             _this.foreachAroundRadius(x, y, 5, function (nx, ny) {
-                _this.addToCell(nx, ny, 0.015);
+                _this.addToCell(nx, ny, 0.01 / distance(x, y, nx, ny));
             });
         });
     }

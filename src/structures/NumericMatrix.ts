@@ -133,7 +133,7 @@ export default class NumericMatrix<T extends number = number> extends Matrix<T> 
     /**
      * Retrieve a random point based on the values of the matrix
      */
-    getRandomWeightedPoint(): [number, number] {
+    getRandomWeightedPoint(): [number, number] | null {
         const matrix = this.getValues();
 
         // Calculate the total sum of values in each row
@@ -175,6 +175,10 @@ export default class NumericMatrix<T extends number = number> extends Matrix<T> 
                 colIndex = j; // Store the selected column index
                 break;
             }
+        }
+
+        if (matrix[rowIndex][colIndex] === 0) {
+            return null;
         }
 
         // Return the random coordinate as [row, col]
