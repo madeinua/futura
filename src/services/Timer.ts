@@ -56,10 +56,6 @@ export default class Timer {
 
         timerInterval = setInterval(makeStep, minStepInterval);
 
-        if (Config.LOGS) {
-            logTimeEvent('Steps counting started.');
-        }
-
         makeStep();
     }
 

@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages, rgbToHex} from "./helpers.js";
+import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent} from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -20,6 +20,7 @@ import BinaryMatrix from "./structures/BinaryMatrix.js";
 import HumidityMap from "./maps/HumidityMap.js";
 import {Cell} from "./structures/Cells.js";
 import DisplayCell from "./render/DisplayCell.js";
+import CellsRenderer from "./render/CellsRenderer.js";
 
 type WorldType = {
     altitudeMap: AltitudeMap,
@@ -54,9 +55,9 @@ export default class World {
     readonly miniMapCanvas: HTMLCanvasElement;
     timer: Timer;
     layers: Layers;
-    imagesCache: HTMLImageElement[];
     terrainCanvasCtx: OffscreenCanvasRenderingContext2D;
     terrainCachedBgImageData: ImageData;
+    cellsRenderer: CellsRenderer;
 
     constructor(
         mapCanvas: HTMLCanvasElement,
@@ -87,7 +88,7 @@ export default class World {
 
         this.timer = new Timer();
         this.layers = new Layers(Config.WORLD_SIZE, Config.WORLD_SIZE);
-        this.imagesCache = [];
+        this.cellsRenderer = new CellsRenderer(this.cellWidth, this.cellHeight);
 
         if (Config.STORE_DATA) {
 
@@ -109,7 +110,14 @@ export default class World {
     create = function (): void {
         const _this: World = this;
 
-        _this.generateWorld().then(() => {
+        Promise.all([
+            _this.generateWorld(),
+            _this.cellsRenderer.init()
+        ]).then(() => {
+
+            if (Config.LOGS) {
+                logTimeEvent('World generated');
+            }
 
             _this.update();
 
@@ -120,8 +128,6 @@ export default class World {
     }
 
     private generateWorld = async function (): Promise<void> {
-
-        await preloadImages(Config, this.imagesCache);
 
         const surfaceOperator = new SurfaceOperator(),
             weatherOperator = new WeatherOperator(),
@@ -176,10 +182,6 @@ export default class World {
                 biomesMap: biomesOperator.getBiomes(),
             }
         );
-
-        if (Config.LOGS) {
-            logTimeEvent('World generated');
-        }
 
         this.world = {
             'altitudeMap': altitudeMap,
@@ -254,33 +256,7 @@ export default class World {
 
             _this.layers.foreachLayerValues(level, function (displayCell: null | DisplayCell, x: number, y: number) {
                 if (_this.isCellVisible(x, y)) {
-                    if (displayCell.hasImage()) {
-                        mapCtx.drawImage(
-                            _this.imagesCache[displayCell.getImage()],
-                            x * _this.cellWidth,
-                            y * _this.cellHeight,
-                            _this.cellWidth,
-                            _this.cellHeight
-                        );
-                    } else {
-                        mapCtx.imageSmoothingEnabled = false;
-                        mapCtx.strokeStyle = rgbToHex(displayCell.getColor());
-                        mapCtx.lineWidth = 2;
-                        mapCtx.strokeRect(
-                            x * _this.cellWidth,
-                            y * _this.cellHeight,
-                            _this.cellWidth,
-                            _this.cellHeight
-                        );
-
-                        mapCtx.fillStyle = rgbToHex(displayCell.getColor());
-                        mapCtx.fillRect(
-                            x * _this.cellWidth,
-                            y * _this.cellHeight,
-                            _this.cellWidth,
-                            _this.cellHeight
-                        )
-                    }
+                    _this.cellsRenderer.renderCell(mapCtx, displayCell, x, y);
                 }
             });
         });

@@ -4,7 +4,7 @@ import Config from "../../config.js";
 import AltitudeMap from "./AltitudeMap.js";
 import RiversMap from "./RiversMap.js";
 import LakesMap from "./LakesMap.js";
-import {distance, throwError} from "../helpers.js";
+import {distance} from "../helpers.js";
 
 export default class HumidityMap extends PointMatrix {
 

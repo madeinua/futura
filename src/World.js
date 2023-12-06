@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import Config from "../config.js";
-import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages, rgbToHex } from "./helpers.js";
+import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent } from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -19,11 +19,18 @@ import AnimalsOperator from "./operators/AnimalsOperator.js";
 import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
 import Layers, { LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT } from "./services/Layers.js";
+import CellsRenderer from "./render/CellsRenderer.js";
 export default class World {
     constructor(mapCanvas, mapWidth, mapHeight, miniMapCanvas, cameraPos) {
         this.create = function () {
             const _this = this;
-            _this.generateWorld().then(() => {
+            Promise.all([
+                _this.generateWorld(),
+                _this.cellsRenderer.init()
+            ]).then(() => {
+                if (Config.LOGS) {
+                    logTimeEvent('World generated');
+                }
                 _this.update();
                 if (Config.STEPS_ENABLED) {
                     _this.timer.stepsTimer(() => _this.update());
@@ -32,7 +39,6 @@ export default class World {
         };
         this.generateWorld = function () {
             return __awaiter(this, void 0, void 0, function* () {
-                yield preloadImages(Config, this.imagesCache);
                 const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
                 const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES), this.layers.getLayer(LAYER_BIOMES_IMAGES));
                 const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
@@ -50,9 +56,6 @@ export default class World {
                     forestMap: forestsOperator.getForestMap(),
                     biomesMap: biomesOperator.getBiomes(),
                 });
-                if (Config.LOGS) {
-                    logTimeEvent('World generated');
-                }
                 this.world = {
                     'altitudeMap': altitudeMap,
                     'temperatureMap': temperatureMap,
@@ -94,17 +97,7 @@ export default class World {
                 }
                 _this.layers.foreachLayerValues(level, function (displayCell, x, y) {
                     if (_this.isCellVisible(x, y)) {
-                        if (displayCell.hasImage()) {
-                            mapCtx.drawImage(_this.imagesCache[displayCell.getImage()], x * _this.cellWidth, y * _this.cellHeight, _this.cellWidth, _this.cellHeight);
-                        }
-                        else {
-                            mapCtx.imageSmoothingEnabled = false;
-                            mapCtx.strokeStyle = rgbToHex(displayCell.getColor());
-                            mapCtx.lineWidth = 2;
-                            mapCtx.strokeRect(x * _this.cellWidth, y * _this.cellHeight, _this.cellWidth, _this.cellHeight);
-                            mapCtx.fillStyle = rgbToHex(displayCell.getColor());
-                            mapCtx.fillRect(x * _this.cellWidth, y * _this.cellHeight, _this.cellWidth, _this.cellHeight);
-                        }
+                        _this.cellsRenderer.renderCell(mapCtx, displayCell, x, y);
                     }
                 });
             });
@@ -234,7 +227,7 @@ export default class World {
         this.miniMapCanvas.height = Config.WORLD_SIZE;
         this.timer = new Timer();
         this.layers = new Layers(Config.WORLD_SIZE, Config.WORLD_SIZE);
-        this.imagesCache = [];
+        this.cellsRenderer = new CellsRenderer(this.cellWidth, this.cellHeight);
         if (Config.STORE_DATA) {
             const worldSize = localStorage.getItem('worldSize'), actualSize = Config.WORLD_SIZE + 'x' + Config.WORLD_SIZE;
             if (actualSize !== worldSize) {
