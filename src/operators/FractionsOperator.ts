@@ -1,7 +1,7 @@
 import FractionGenerator, {FractionsGeneratorArgs} from "../generators/FractionGenerator.js";
 import {Layer} from "../render/Layer.js";
 import Timer from "../services/Timer.js";
-import {logTimeEvent, resetTimeEvent} from "../helpers.js";
+import {Filters, logTimeEvent, resetTimeEvent} from "../helpers.js";
 import Config from "../../config.js";
 import Fraction from "../human/Fraction";
 import DisplayCell from "../render/DisplayCell.js";
@@ -11,16 +11,25 @@ import {Cell} from "../structures/Cells.js";
 export default class FractionsOperator {
 
     readonly fractionsGenerator: FractionGenerator;
-    readonly timer: Timer;
     readonly fractionsLayer: Layer;
     fractions: Fraction[];
     occupiedTerritories: BinaryMatrix;
 
     constructor(timer: Timer, fractionsLayer: Layer, objects: FractionsGeneratorArgs) {
-        this.timer = timer;
+        const _this: FractionsOperator = this;
+
         this.fractionsLayer = fractionsLayer;
         this.fractionsGenerator = new FractionGenerator(objects);
+        this.fractions = [];
         this.occupiedTerritories = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+
+        timer.addStepsHandler(function (step: number): void {
+            if (_this.fractions.length) {
+                _this.expandFractions();
+            } else if (Config.FRACTIONS.AUTO_CREATE_ON_STEP === step) {
+                _this.createFractions(Config.FRACTIONS.CREATE_COUNT);
+            }
+        });
     }
 
     createFractions(count: number) {
@@ -56,6 +65,7 @@ export default class FractionsOperator {
     }
 
     private occupyCell = function (positionX: number, positionY: number, fraction: Fraction, fromPositionX: number, fromPositionY: number): void {
+
         fraction.territory.fill(positionX, positionY);
         fraction.borders.fill(positionX, positionY);
         fraction.borders.unfill(fromPositionX, fromPositionY);
@@ -72,20 +82,22 @@ export default class FractionsOperator {
     private expandFraction = function (fraction: Fraction): void {
         const _this: FractionsOperator = this;
 
-        fraction.borders.foreachFilledNeighborsToAllCells(function (nx: number, ny: number, cellX: number, cellY: number) {
+        fraction.borders.foreachFilledAroundRadiusToAllCells(function (nx: number, ny: number, cellX: number, cellY: number) {
 
-            // Already filled
+            // Skip already filled
             if (_this.occupiedTerritories.filled(nx, ny)) {
                 return;
             }
 
             _this.occupyCell(nx, ny, fraction, cellX, cellY);
-        });
+        }, 1);
     }
 
-    private explandFractions = function (): void {
+    private expandFractions = function (): void {
+        const _this: FractionsOperator = this;
+
         for (let i = 0; i < this.fractions.length; i++) {
-            this.expandFraction(this.fractions[i]);
+            _this.expandFraction(this.fractions[i]);
         }
     }
 }

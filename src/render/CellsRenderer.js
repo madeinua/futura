@@ -27,7 +27,7 @@ export default class CellsRenderer {
         else {
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = rgbToHex(displayCell.getColor());
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
             ctx.strokeRect(x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
             ctx.globalAlpha = .2;
             ctx.fillStyle = rgbToHex(displayCell.getColor());

@@ -20,23 +20,33 @@ export default class FractionsOperator {
         };
         this.expandFraction = function (fraction) {
             const _this = this;
-            fraction.borders.foreachFilledNeighborsToAllCells(function (nx, ny, cellX, cellY) {
-                // Already filled
+            fraction.borders.foreachFilledAroundRadiusToAllCells(function (nx, ny, cellX, cellY) {
+                // Skip already filled
                 if (_this.occupiedTerritories.filled(nx, ny)) {
                     return;
                 }
                 _this.occupyCell(nx, ny, fraction, cellX, cellY);
-            });
+            }, 1);
         };
-        this.explandFractions = function () {
+        this.expandFractions = function () {
+            const _this = this;
             for (let i = 0; i < this.fractions.length; i++) {
-                this.expandFraction(this.fractions[i]);
+                _this.expandFraction(this.fractions[i]);
             }
         };
-        this.timer = timer;
+        const _this = this;
         this.fractionsLayer = fractionsLayer;
         this.fractionsGenerator = new FractionGenerator(objects);
+        this.fractions = [];
         this.occupiedTerritories = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        timer.addStepsHandler(function (step) {
+            if (_this.fractions.length) {
+                _this.expandFractions();
+            }
+            else if (Config.FRACTIONS.AUTO_CREATE_ON_STEP === step) {
+                _this.createFractions(Config.FRACTIONS.CREATE_COUNT);
+            }
+        });
     }
     createFractions(count) {
         resetTimeEvent();

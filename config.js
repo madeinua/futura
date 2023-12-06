@@ -263,6 +263,7 @@ const Config = {
 
     // Fractions
     FRACTIONS: {
+        AUTO_CREATE_ON_STEP: 30,
         // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
             BIOMES: {

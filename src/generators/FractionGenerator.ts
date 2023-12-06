@@ -31,7 +31,7 @@ export default class FractionGenerator {
     }
 
     createOccurrenceProbabilityMap(): NumericMatrix {
-        const _this = this,
+        const _this: FractionGenerator = this,
             map = new NumericMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
         _this.objects.biomesMap.foreachValues(function (biome: Biome) {
@@ -56,7 +56,7 @@ export default class FractionGenerator {
     }
 
     generateFractions(count: number): Fraction[] {
-        const _this = this;
+        const _this: FractionGenerator = this;
 
         if (typeof _this.probabilitiesMap === 'undefined') {
             _this.probabilitiesMap = _this.createOccurrenceProbabilityMap();

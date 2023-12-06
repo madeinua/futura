@@ -200,13 +200,13 @@ export default class BinaryMatrix extends NumericMatrix {
         return this.getFilledNeighbors(x, y).length > 0;
     }
     /**
-     * Retrieve all unfilled neighbors of the specified cell
+     * Retrieve all unfilled neighbors of the specified cell around a specific radius
      */
-    foreachFilledNeighborsToAllCells(callback) {
-        const _this = this;
-        _this.foreachFilled(function (x, y) {
-            _this.foreachNeighbors(x, y, function (nx, ny) {
-                callback(nx, ny, x, y);
+    foreachFilledAroundRadiusToAllCells(callback, radius) {
+        const _this = this, filledCells = _this.getFilledCells();
+        filledCells.forEach(function (cell) {
+            _this.foreachAroundRadius(cell[0], cell[1], radius, function (nx, ny) {
+                callback(nx, ny, cell[0], cell[1]);
             });
         });
     }

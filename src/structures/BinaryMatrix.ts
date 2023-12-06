@@ -1,5 +1,5 @@
 import NumericMatrix from './NumericMatrix.js';
-import {distance, round, getPolygonAreaSize} from "../helpers.js";
+import {distance, round, getPolygonAreaSize, throwError} from "../helpers.js";
 import {Cell, CellsList} from "./Cells.js";
 import {Array2D} from "./Array2D.js";
 
@@ -219,14 +219,15 @@ export default class BinaryMatrix extends NumericMatrix {
     }
 
     /**
-     * Retrieve all unfilled neighbors of the specified cell
+     * Retrieve all unfilled neighbors of the specified cell around a specific radius
      */
-    foreachFilledNeighborsToAllCells(callback: Function): void {
-        const _this: BinaryMatrix = this;
+    foreachFilledAroundRadiusToAllCells(callback: Function, radius: number): void {
+        const _this: BinaryMatrix = this,
+            filledCells = _this.getFilledCells();
 
-        _this.foreachFilled(function (x: number, y: number): void {
-            _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
-                callback(nx, ny, x, y);
+        filledCells.forEach(function (cell: Cell): void {
+            _this.foreachAroundRadius(cell[0], cell[1], radius, function (nx: number, ny: number) {
+                callback(nx, ny, cell[0], cell[1]);
             });
         });
     }
