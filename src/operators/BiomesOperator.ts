@@ -37,7 +37,8 @@ export default class BiomesOperator {
         freshWaterMap: BinaryMatrix,
         temperatureMap: TemperatureMap,
         humidityMap: HumidityMap,
-        biomesLayer: Layer
+        biomesLayer: Layer,
+        biomesImagesLayer: Layer,
     ) {
 
         this.biomes = new BiomesMap();
@@ -50,7 +51,7 @@ export default class BiomesOperator {
         this.biomesConfig = Config.biomesConfig();
 
         this.createBiomes(altitudeMap);
-        this.addBiomesToLayer(biomesLayer);
+        this.addBiomesToLayer(biomesLayer, biomesImagesLayer);
 
         this.biomes = Filters.apply('biomes', this.biomes);
 
@@ -136,9 +137,13 @@ export default class BiomesOperator {
             : new biomes.Biome_Grass(x, y, args);
     }
 
-    private addBiomesToLayer = function (biomesLayer: Layer): void {
+    private addBiomesToLayer = function (biomesLayer: Layer, biomesImagesLayer: Layer): void {
         this.biomes.foreachValues(function (biome: Biome, x: number, y: number): void {
             biomesLayer.setCell(x, y, biome.getDisplayCell());
+
+            if (biome.hasImage()) {
+                biomesImagesLayer.setCell(x, y, biome.getDisplayCell());
+            }
         });
     }
 

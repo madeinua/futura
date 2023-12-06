@@ -18,7 +18,7 @@ import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
 import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
-import Layers, { LAYER_ANIMALS, LAYER_BIOMES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT } from "./services/Layers.js";
+import Layers, { LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT } from "./services/Layers.js";
 export default class World {
     constructor(mapCanvas, mapWidth, mapHeight, miniMapCanvas, cameraPos) {
         this.create = function () {
@@ -34,7 +34,7 @@ export default class World {
             return __awaiter(this, void 0, void 0, function* () {
                 yield preloadImages(Config, this.imagesCache);
                 const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
-                const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES));
+                const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES), this.layers.getLayer(LAYER_BIOMES_IMAGES));
                 const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
                 new AnimalsOperator(this.layers.getLayer(LAYER_HABITAT), this.layers.getLayer(LAYER_ANIMALS), {
                     freshWaterMap: freshWaterMap,
@@ -63,30 +63,33 @@ export default class World {
         this.update = function () {
             resetTimeEvent();
             const _this = this, mapCtx = _this.mapCanvas.getContext('2d');
+            // Cache terrain layer as it is static
             if (_this.terrainCanvasCtx === undefined) {
                 // 1. Create canvas are where 1px = 1 cell
                 const renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d');
                 _this.terrainCachedBgImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
+                // Fill canvas with terrain colors
                 _this.layers.foreachLayerValues(LAYER_BIOMES, function (displayCell, x, y) {
-                    if (displayCell !== null) {
-                        fillCanvasPixel(_this.terrainCachedBgImageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
-                    }
+                    fillCanvasPixel(_this.terrainCachedBgImageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor());
                 });
                 renderCtx.putImageData(_this.terrainCachedBgImageData, 0, 0);
                 // 2. Scale canvas to actual size of cells
                 _this.terrainCanvasCtx = (new OffscreenCanvas(_this.worldWidth, _this.worldHeight)).getContext('2d');
                 _this.terrainCanvasCtx.putImageData(scaleImageData(mapCtx, renderCtx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE), _this.cellWidth, _this.cellHeight), 0, 0);
             }
-            // 3. Draw scaled canvas
+            // 3. Draw visible part of the canvas
             mapCtx.putImageData(_this.terrainCanvasCtx.getImageData(_this.cellWidth * _this.cameraPosLeft, _this.cellHeight * _this.cameraPosTop, _this.cellWidth * Config.VISIBLE_COLS, _this.cellHeight * Config.VISIBLE_ROWS), _this.cellWidth * _this.cameraPosLeft, _this.cellHeight * _this.cameraPosTop);
-            // Step 4: render layers
+            // Step 4: Render layers except biomes as there were added before
             _this.layers.foreachLayers(function (level) {
+                if (level === LAYER_BIOMES) {
+                    return;
+                }
                 _this.layers.foreachLayerValues(level, function (displayCell, x, y) {
-                    if (displayCell !== null && _this.isCellVisible(x, y)) {
+                    if (_this.isCellVisible(x, y)) {
                         if (displayCell.hasImage()) {
                             mapCtx.drawImage(_this.imagesCache[displayCell.getImage()], x * _this.cellWidth, y * _this.cellHeight, _this.cellWidth, _this.cellHeight);
                         }
-                        else if (level !== LAYER_BIOMES) {
+                        else {
                             mapCtx.imageSmoothingEnabled = false;
                             mapCtx.strokeStyle = rgbToHex(displayCell.getColor());
                             mapCtx.lineWidth = 2;
@@ -95,7 +98,7 @@ export default class World {
                     }
                 });
             });
-            // Step 5: add extras
+            // Step 5: Add extras
             if (Config.SHOW_RECTANGLES) {
                 _this.drawRectangles();
             }
@@ -108,7 +111,7 @@ export default class World {
             if (Config.SHOW_BIOMES_INFO) {
                 _this.drawBiomesInfo();
             }
-            // Step 6: add minimap
+            // Step 6: Add the minimap
             _this.drawMiniMap();
             logTimeEvent('World rendered');
         };
@@ -121,9 +124,7 @@ export default class World {
         this.drawMiniMap = function () {
             const _this = this, renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d'), imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
             _this.layers.foreachMiniMapLayersValues(function (displayCell, x, y) {
-                if (displayCell !== null) {
-                    fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMapColor());
-                }
+                fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMapColor());
             });
             createImageBitmap(imageData).then(function () {
                 const miniMapCtx = _this.miniMapCanvas.getContext('2d');

@@ -141,6 +141,23 @@ export default class Matrix<T extends any = any> {
     }
 
     /**
+     * Applies the callback to the elements of the Matrix but only to the filled cells
+     */
+    foreachFilledValues(callback: Function): void {
+        let v = null;
+
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                v = this.getCell(x, y);
+
+                if (v !== null) {
+                    callback(v, x, y);
+                }
+            }
+        }
+    }
+
+    /**
      * Set all cells of matrix
      */
     setAll(values: Array2D<T>): this {

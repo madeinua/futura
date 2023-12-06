@@ -24,6 +24,9 @@ export default class Biome {
     displayCellWithBackground() {
         return false;
     }
+    hasImage() {
+        return typeof Config.BIOME_IMAGES[this.getName()] !== 'undefined';
+    }
     getImage() {
         return typeof Config.BIOME_IMAGES[this.getName()] === 'undefined'
             ? null

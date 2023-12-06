@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages, throwError, rgbToHex} from "./helpers.js";
+import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, preloadImages, rgbToHex} from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -9,7 +9,7 @@ import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
 import FractionsOperator from "./operators/FractionsOperator.js";
 import Timer from "./services/Timer.js";
-import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT} from "./services/Layers.js";
+import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_HABITAT} from "./services/Layers.js";
 import AltitudeMap from "./maps/AltitudeMap.js";
 import TemperatureMap from "./maps/TemperatureMap.js";
 import OceanMap from "./maps/OceanMap.js";
@@ -142,7 +142,8 @@ export default class World {
             freshWaterMap,
             temperatureMap,
             humidityMap,
-            this.layers.getLayer(LAYER_BIOMES)
+            this.layers.getLayer(LAYER_BIOMES),
+            this.layers.getLayer(LAYER_BIOMES_IMAGES)
         );
 
         const forestsOperator = new ForestsOperator(
@@ -187,21 +188,20 @@ export default class World {
         const _this: World = this,
             mapCtx = _this.mapCanvas.getContext('2d');
 
+        // Cache terrain layer as it is static
         if (_this.terrainCanvasCtx === undefined) {
 
             // 1. Create canvas are where 1px = 1 cell
             const renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d');
-
             _this.terrainCachedBgImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
+            // Fill canvas with terrain colors
             _this.layers.foreachLayerValues(LAYER_BIOMES, function (displayCell: null | DisplayCell, x: number, y: number) {
-                if (displayCell !== null) {
-                    fillCanvasPixel(
-                        _this.terrainCachedBgImageData,
-                        (x + y * Config.WORLD_SIZE) * 4,
-                        displayCell.getColor()
-                    );
-                }
+                fillCanvasPixel(
+                    _this.terrainCachedBgImageData,
+                    (x + y * Config.WORLD_SIZE) * 4,
+                    displayCell.getColor()
+                );
             });
 
             renderCtx.putImageData(_this.terrainCachedBgImageData, 0, 0);
@@ -219,7 +219,7 @@ export default class World {
             );
         }
 
-        // 3. Draw scaled canvas
+        // 3. Draw visible part of the canvas
         mapCtx.putImageData(
             _this.terrainCanvasCtx.getImageData(
                 _this.cellWidth * _this.cameraPosLeft,
@@ -231,10 +231,15 @@ export default class World {
             _this.cellHeight * _this.cameraPosTop
         );
 
-        // Step 4: render layers
+        // Step 4: Render layers except biomes as there were added before
         _this.layers.foreachLayers(function (level: number) {
+
+            if (level === LAYER_BIOMES) {
+                return;
+            }
+
             _this.layers.foreachLayerValues(level, function (displayCell: null | DisplayCell, x: number, y: number) {
-                if (displayCell !== null && _this.isCellVisible(x, y)) {
+                if (_this.isCellVisible(x, y)) {
                     if (displayCell.hasImage()) {
                         mapCtx.drawImage(
                             _this.imagesCache[displayCell.getImage()],
@@ -243,7 +248,7 @@ export default class World {
                             _this.cellWidth,
                             _this.cellHeight
                         );
-                    } else if (level !== LAYER_BIOMES) {
+                    } else {
                         mapCtx.imageSmoothingEnabled = false;
                         mapCtx.strokeStyle = rgbToHex(displayCell.getColor());
                         mapCtx.lineWidth = 2;
@@ -258,7 +263,7 @@ export default class World {
             });
         });
 
-        // Step 5: add extras
+        // Step 5: Add extras
         if (Config.SHOW_RECTANGLES) {
             _this.drawRectangles();
         }
@@ -275,7 +280,7 @@ export default class World {
             _this.drawBiomesInfo();
         }
 
-        // Step 6: add minimap
+        // Step 6: Add the minimap
         _this.drawMiniMap();
 
         logTimeEvent('World rendered');
@@ -294,13 +299,11 @@ export default class World {
             imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
         _this.layers.foreachMiniMapLayersValues(function (displayCell: null | DisplayCell, x: number, y: number): void {
-            if (displayCell !== null) {
-                fillCanvasPixel(
-                    imageData,
-                    (x + y * Config.WORLD_SIZE) * 4,
-                    displayCell.getMapColor()
-                );
-            }
+            fillCanvasPixel(
+                imageData,
+                (x + y * Config.WORLD_SIZE) * 4,
+                displayCell.getMapColor()
+            );
         });
 
         createImageBitmap(imageData).then(function () {

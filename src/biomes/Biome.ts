@@ -45,6 +45,11 @@ export default class Biome {
         return false;
     }
 
+    hasImage(): boolean
+    {
+        return typeof Config.BIOME_IMAGES[this.getName()] !== 'undefined';
+    }
+
     getImage(): null | string {
         return typeof Config.BIOME_IMAGES[this.getName()] === 'undefined'
             ? null

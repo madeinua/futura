@@ -4,7 +4,7 @@ import { fromFraction, throwError, logTimeEvent, Filters } from "../helpers.js";
 import Config from "../../config.js";
 import BiomesMap from "../maps/BiomesMap.js";
 export default class BiomesOperator {
-    constructor(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, biomesLayer) {
+    constructor(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, biomesLayer, biomesImagesLayer) {
         this.createBiomes = function (altitudeMap) {
             const _this = this;
             altitudeMap.foreach(function (x, y) {
@@ -20,9 +20,12 @@ export default class BiomesOperator {
             }
             return false;
         };
-        this.addBiomesToLayer = function (biomesLayer) {
+        this.addBiomesToLayer = function (biomesLayer, biomesImagesLayer) {
             this.biomes.foreachValues(function (biome, x, y) {
                 biomesLayer.setCell(x, y, biome.getDisplayCell());
+                if (biome.hasImage()) {
+                    biomesImagesLayer.setCell(x, y, biome.getDisplayCell());
+                }
             });
         };
         this.biomes = new BiomesMap();
@@ -34,7 +37,7 @@ export default class BiomesOperator {
         this.humidityMap = humidityMap;
         this.biomesConfig = Config.biomesConfig();
         this.createBiomes(altitudeMap);
-        this.addBiomesToLayer(biomesLayer);
+        this.addBiomesToLayer(biomesLayer, biomesImagesLayer);
         this.biomes = Filters.apply('biomes', this.biomes);
         if (Config.LOGS) {
             logTimeEvent('Biomes added');
