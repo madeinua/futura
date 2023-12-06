@@ -1,5 +1,5 @@
 import FractionGenerator from "../generators/FractionGenerator.js";
-import { logTimeEvent } from "../helpers.js";
+import { logTimeEvent, resetTimeEvent } from "../helpers.js";
 import Config from "../../config.js";
 import DisplayCell from "../render/DisplayCell.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
@@ -39,6 +39,7 @@ export default class FractionsOperator {
         this.occupiedTerritories = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
     }
     createFractions(count) {
+        resetTimeEvent();
         this.fractions = this.fractionsGenerator.generateFractions(count);
         for (let i = 0; i < this.fractions.length; i++) {
             this.fillOccupiedTerritory(this.fractions[i].startPosition);

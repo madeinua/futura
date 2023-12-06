@@ -1,7 +1,7 @@
 import FractionGenerator, {FractionsGeneratorArgs} from "../generators/FractionGenerator.js";
 import {Layer} from "../render/Layer.js";
 import Timer from "../services/Timer.js";
-import {logTimeEvent} from "../helpers.js";
+import {logTimeEvent, resetTimeEvent} from "../helpers.js";
 import Config from "../../config.js";
 import Fraction from "../human/Fraction";
 import DisplayCell from "../render/DisplayCell.js";
@@ -24,6 +24,8 @@ export default class FractionsOperator {
     }
 
     createFractions(count: number) {
+
+        resetTimeEvent();
 
         this.fractions = this.fractionsGenerator.generateFractions(count);
 

@@ -258,6 +258,14 @@ export default class World {
                             _this.cellWidth,
                             _this.cellHeight
                         );
+
+                        mapCtx.fillStyle = rgbToHex(displayCell.getColor());
+                        mapCtx.fillRect(
+                            x * _this.cellWidth,
+                            y * _this.cellHeight,
+                            _this.cellWidth,
+                            _this.cellHeight
+                        )
                     }
                 }
             });

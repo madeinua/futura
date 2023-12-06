@@ -1,5 +1,5 @@
 import Config from "../../config.js";
-import {fromMiddleFractionValue} from "../helpers.js";
+import {fromMiddleFractionValue, throwError} from "../helpers.js";
 import Biome from "../biomes/Biome.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import NumericMatrix from "../structures/NumericMatrix.js";
@@ -54,22 +54,29 @@ export default class FractionGenerator {
     generateFractions(count: number): Fraction[] {
         const probabilitiesMap = this.createOccurrenceProbabilityMap();
 
-        let list = [],
+        let fractions = [],
             point: [x: number, y: number];
 
-        for (let i = 0; i < count; i++) {
-            do {
-                point = probabilitiesMap.getRandomWeightedPoint();
-            } while (list.includes(point));
+        for (let i = 0; i < 500; i++) {
+            point = probabilitiesMap.getRandomWeightedPoint();
 
-            list.push(
+            if (point === null) {
+                continue;
+            }
+
+            fractions.push(
                 new Fraction(point[0], point[1], {
                     name: 'Fraction #' + (i + 1),
                     color: Config.FRACTIONS.COLORS[i]
                 })
             );
+
+            probabilitiesMap.setCell(point[0], point[1], 0);
+            probabilitiesMap.foreachAroundRadius(point[0], point[1], 3, function (x: number, y: number) {
+                probabilitiesMap.setCell(x, y, 0);
+            });
         }
 
-        return list;
+        return fractions;
     }
 }

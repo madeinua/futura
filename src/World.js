@@ -94,6 +94,8 @@ export default class World {
                             mapCtx.strokeStyle = rgbToHex(displayCell.getColor());
                             mapCtx.lineWidth = 2;
                             mapCtx.strokeRect(x * _this.cellWidth, y * _this.cellHeight, _this.cellWidth, _this.cellHeight);
+                            mapCtx.fillStyle = rgbToHex(displayCell.getColor());
+                            mapCtx.fillRect(x * _this.cellWidth, y * _this.cellHeight, _this.cellWidth, _this.cellHeight);
                         }
                     }
                 });
