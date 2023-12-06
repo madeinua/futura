@@ -43,6 +43,13 @@ export default class World {
                     biomesOperator: biomesOperator,
                     timer: this.timer
                 });
+                const fractionsOperator = new FractionsOperator(this.timer, this.layers.getLayer(LAYER_FRACTIONS), {
+                    oceanMap: oceanMap,
+                    freshWaterMap: freshWaterMap,
+                    temperatureMap: temperatureMap,
+                    forestMap: forestsOperator.getForestMap(),
+                    biomesMap: biomesOperator.getBiomes(),
+                });
                 if (Config.LOGS) {
                     logTimeEvent('World generated');
                 }
@@ -57,6 +64,7 @@ export default class World {
                     'humidityMap': humidityMap,
                     'biomesOperator': biomesOperator,
                     'forestOperator': forestsOperator,
+                    'fractionsOperator': fractionsOperator,
                 };
             });
         };
@@ -206,15 +214,8 @@ export default class World {
             ];
         };
         this.generateFractions = function () {
-            const _this = this;
-            const fractionsOperator = new FractionsOperator(_this.timer, _this.layers.getLayer(LAYER_FRACTIONS), {
-                freshWaterMap: _this.world.freshWaterMap,
-                temperatureMap: _this.world.temperatureMap,
-                forestMap: _this.world.forestOperator.getForestMap(),
-                biomesMap: _this.world.biomesOperator.getBiomes(),
-            });
-            fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
-            _this.update();
+            this.world.fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
+            this.update();
         };
         this.cameraPosLeft = cameraPos[0];
         this.cameraPosTop = cameraPos[1];

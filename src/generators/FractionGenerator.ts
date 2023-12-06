@@ -1,5 +1,5 @@
 import Config from "../../config.js";
-import {fromMiddleFractionValue, throwError} from "../helpers.js";
+import {fromMiddleFractionValue} from "../helpers.js";
 import Biome from "../biomes/Biome.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import NumericMatrix from "../structures/NumericMatrix.js";
@@ -9,6 +9,7 @@ import BiomesMap from "../maps/BiomesMap.js";
 import TemperatureMap from "../maps/TemperatureMap.js";
 
 export type FractionsGeneratorArgs = {
+    oceanMap: BinaryMatrix,
     freshWaterMap: BinaryMatrix,
     temperatureMap: TemperatureMap,
     forestMap: ForestMap,
@@ -18,6 +19,8 @@ export type FractionsGeneratorArgs = {
 export default class FractionGenerator {
 
     readonly objects: FractionsGeneratorArgs;
+
+    probabilitiesMap: NumericMatrix<number>;
 
     constructor(objects: FractionsGeneratorArgs) {
         this.objects = objects;
@@ -38,27 +41,32 @@ export default class FractionGenerator {
                 return;
             }
 
-            const waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 0,
+            const oceanFactor = _this.objects.oceanMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_OCEAN : 1,
+                waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 1,
                 temperatureFactor = fromMiddleFractionValue(_this.objects.temperatureMap.getCell(biome.x, biome.y)),
                 isForest = _this.objects.forestMap.filled(biome.x, biome.y),
                 forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (
                     _this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1
                 );
 
-            map.setCell(biome.x, biome.y, biomeProbability * waterFactor * temperatureFactor * forestFactor);
+            map.setCell(biome.x, biome.y, biomeProbability * oceanFactor * waterFactor * temperatureFactor * forestFactor);
         });
 
         return map;
     }
 
     generateFractions(count: number): Fraction[] {
-        const probabilitiesMap = this.createOccurrenceProbabilityMap();
+        const _this = this;
+
+        if (typeof _this.probabilitiesMap === 'undefined') {
+            _this.probabilitiesMap = _this.createOccurrenceProbabilityMap();
+        }
 
         let fractions = [],
             point: [x: number, y: number];
 
-        for (let i = 0; i < 500; i++) {
-            point = probabilitiesMap.getRandomWeightedPoint();
+        for (let i = 0; i < count; i++) {
+            point = _this.probabilitiesMap.getRandomWeightedPoint();
 
             if (point === null) {
                 continue;
@@ -71,9 +79,9 @@ export default class FractionGenerator {
                 })
             );
 
-            probabilitiesMap.setCell(point[0], point[1], 0);
-            probabilitiesMap.foreachAroundRadius(point[0], point[1], 3, function (x: number, y: number) {
-                probabilitiesMap.setCell(x, y, 0);
+            _this.probabilitiesMap.setCell(point[0], point[1], 0);
+            _this.probabilitiesMap.foreachAroundRadius(point[0], point[1], 3, function (x: number, y: number) {
+                _this.probabilitiesMap.setCell(x, y, 0);
             });
         }
 

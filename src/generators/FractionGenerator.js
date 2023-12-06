@@ -17,16 +17,19 @@ export default class FractionGenerator {
             if (biomeProbability === 0) {
                 return;
             }
-            const waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 0, temperatureFactor = fromMiddleFractionValue(_this.objects.temperatureMap.getCell(biome.x, biome.y)), isForest = _this.objects.forestMap.filled(biome.x, biome.y), forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (_this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1);
-            map.setCell(biome.x, biome.y, biomeProbability * waterFactor * temperatureFactor * forestFactor);
+            const oceanFactor = _this.objects.oceanMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_OCEAN : 1, waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 1, temperatureFactor = fromMiddleFractionValue(_this.objects.temperatureMap.getCell(biome.x, biome.y)), isForest = _this.objects.forestMap.filled(biome.x, biome.y), forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (_this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1);
+            map.setCell(biome.x, biome.y, biomeProbability * oceanFactor * waterFactor * temperatureFactor * forestFactor);
         });
         return map;
     }
     generateFractions(count) {
-        const probabilitiesMap = this.createOccurrenceProbabilityMap();
+        const _this = this;
+        if (typeof _this.probabilitiesMap === 'undefined') {
+            _this.probabilitiesMap = _this.createOccurrenceProbabilityMap();
+        }
         let fractions = [], point;
-        for (let i = 0; i < 500; i++) {
-            point = probabilitiesMap.getRandomWeightedPoint();
+        for (let i = 0; i < count; i++) {
+            point = _this.probabilitiesMap.getRandomWeightedPoint();
             if (point === null) {
                 continue;
             }
@@ -34,9 +37,9 @@ export default class FractionGenerator {
                 name: 'Fraction #' + (i + 1),
                 color: Config.FRACTIONS.COLORS[i]
             }));
-            probabilitiesMap.setCell(point[0], point[1], 0);
-            probabilitiesMap.foreachAroundRadius(point[0], point[1], 3, function (x, y) {
-                probabilitiesMap.setCell(x, y, 0);
+            _this.probabilitiesMap.setCell(point[0], point[1], 0);
+            _this.probabilitiesMap.foreachAroundRadius(point[0], point[1], 3, function (x, y) {
+                _this.probabilitiesMap.setCell(x, y, 0);
             });
         }
         return fractions;
