@@ -289,10 +289,11 @@ const Config = {
         COLORS: [
             '#ff0000',
             '#00ff00',
-            '#0099ff',
             '#ffff00',
             '#ff00ff',
             '#00ccaa',
+            '#c8ff00',
+            '#ff0059',
             '#ffffff',
             '#000000',
         ]

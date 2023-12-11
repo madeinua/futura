@@ -29,11 +29,24 @@ export default class Layers {
         this.foreachLayerValues = function (level, callback) {
             this.layers[level].foreachFilledValues(callback);
         };
+        this.getMainMapLayersLevels = function () {
+            return [
+                LAYER_BIOMES_IMAGES,
+                LAYER_FOREST,
+                LAYER_HABITAT,
+                LAYER_ANIMALS,
+                LAYER_FRACTIONS_BORDERS
+            ];
+        };
+        this.foreachMainMapLayersValues = function (callback) {
+            this.getMainMapLayersLevels().forEach((level) => this.foreachLayerValues(level, callback));
+        };
         this.getMiniManLayersLevels = function () {
             return [
                 LAYER_BIOMES,
                 LAYER_FOREST,
-                LAYER_FRACTIONS_BORDERS
+                LAYER_FRACTIONS,
+                LAYER_FRACTIONS_BORDERS,
             ];
         };
         this.foreachMiniMapLayersValues = function (callback) {

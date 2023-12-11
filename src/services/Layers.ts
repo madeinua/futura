@@ -55,11 +55,28 @@ export default class Layers {
         }
     }
 
+    getMainMapLayersLevels = function (): number[] {
+        return [
+            LAYER_BIOMES_IMAGES,
+            LAYER_FOREST,
+            LAYER_HABITAT,
+            LAYER_ANIMALS,
+            LAYER_FRACTIONS_BORDERS
+        ];
+    }
+
+    foreachMainMapLayersValues = function (callback: Function): void {
+        this.getMainMapLayersLevels().forEach(
+            (level: number) => this.foreachLayerValues(level, callback)
+        );
+    }
+
     getMiniManLayersLevels = function (): number[] {
         return [
             LAYER_BIOMES,
             LAYER_FOREST,
-            LAYER_FRACTIONS_BORDERS
+            LAYER_FRACTIONS,
+            LAYER_FRACTIONS_BORDERS,
         ];
     }
 

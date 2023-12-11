@@ -45,14 +45,14 @@ export default class Fraction {
     getFractionTerritoryColor(): RGBa {
         return rgbToRgba(
             this.getFractionColor(),
-            fractionToRGB(0.3)
+            fractionToRGB(0.5)
         );
     }
 
     getFractionBorderColor(): RGBa {
         return rgbToRgba(
             this.getFractionColor(),
-            fractionToRGB(0.9)
+            fractionToRGB(0.5)
         );
     }
 }

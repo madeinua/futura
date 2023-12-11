@@ -232,11 +232,18 @@ export function create2DArray(width: number, height: number, value: any): Array2
     return [...Array(height)].map(() => [...Array(width)].map(() => value));
 }
 
-export function fillCanvasPixel(image: ImageData, point: number, RGBa: RGBa): void {
-    image.data[point] = RGBa[0];
-    image.data[point + 1] = RGBa[1];
-    image.data[point + 2] = RGBa[2];
-    image.data[point + 3] = typeof RGBa[3] === 'undefined' ? 255 : RGBa[3];
+export function fillCanvasPixel(image: ImageData, point: number, RGBa: RGBa, blendFactor: number = 0.5): void {
+    if (image.data[point] === 0 && image.data[point + 1] === 0 && image.data[point + 2] === 0) {
+        image.data[point] = RGBa[0];
+        image.data[point + 1] = RGBa[1];
+        image.data[point + 2] = RGBa[2];
+        image.data[point + 3] = typeof RGBa[3] === 'undefined' ? 255 : RGBa[3];
+    } else {
+        image.data[point] = image.data[point] * blendFactor + RGBa[0] * (1 - blendFactor);
+        image.data[point + 1] = image.data[point + 1] * blendFactor + RGBa[1] * (1 - blendFactor);
+        image.data[point + 2] = image.data[point + 2] * blendFactor + RGBa[2] * (1 - blendFactor);
+        image.data[point + 3] = 255;
+    }
 }
 
 /**

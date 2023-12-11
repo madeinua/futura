@@ -91,15 +91,10 @@ export default class World {
             // 3. Draw visible part of the canvas
             mapCtx.putImageData(_this.terrainCanvasCtx.getImageData(_this.cellWidth * _this.cameraPosLeft, _this.cellHeight * _this.cameraPosTop, _this.cellWidth * Config.VISIBLE_COLS, _this.cellHeight * Config.VISIBLE_ROWS), _this.cellWidth * _this.cameraPosLeft, _this.cellHeight * _this.cameraPosTop);
             // Step 4: Render layers except biomes as there were added before
-            _this.layers.foreachLayers(function (level) {
-                if (level === LAYER_BIOMES) {
-                    return;
+            _this.layers.foreachMainMapLayersValues(function (displayCell, x, y) {
+                if (_this.isCellVisible(x, y)) {
+                    _this.cellsRenderer.render(mapCtx, displayCell, x, y);
                 }
-                _this.layers.foreachLayerValues(level, function (displayCell, x, y) {
-                    if (_this.isCellVisible(x, y)) {
-                        _this.cellsRenderer.render(mapCtx, displayCell, x, y);
-                    }
-                });
             });
             // Step 5: Add extras
             if (Config.SHOW_RECTANGLES) {
@@ -127,7 +122,7 @@ export default class World {
         this.drawMiniMap = function () {
             const _this = this, renderCtx = (new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE)).getContext('2d'), imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
             _this.layers.foreachMiniMapLayersValues(function (displayCell, x, y) {
-                fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getMapColor());
+                fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor(), 0.7);
             });
             createImageBitmap(imageData).then(function () {
                 const miniMapCtx = _this.miniMapCanvas.getContext('2d');

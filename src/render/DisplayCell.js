@@ -17,7 +17,4 @@ export default class DisplayCell {
     drawBackground() {
         return this.withBg || !this.hasImage();
     }
-    getMapColor() {
-        return this.color;
-    }
 }

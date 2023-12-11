@@ -249,17 +249,10 @@ export default class World {
         );
 
         // Step 4: Render layers except biomes as there were added before
-        _this.layers.foreachLayers(function (level: number) {
-
-            if (level === LAYER_BIOMES) {
-                return;
+        _this.layers.foreachMainMapLayersValues(function (displayCell: null | DisplayCell, x: number, y: number) {
+            if (_this.isCellVisible(x, y)) {
+                _this.cellsRenderer.render(mapCtx, displayCell, x, y);
             }
-
-            _this.layers.foreachLayerValues(level, function (displayCell: null | DisplayCell, x: number, y: number) {
-                if (_this.isCellVisible(x, y)) {
-                    _this.cellsRenderer.render(mapCtx, displayCell, x, y);
-                }
-            });
         });
 
         // Step 5: Add extras
@@ -301,7 +294,8 @@ export default class World {
             fillCanvasPixel(
                 imageData,
                 (x + y * Config.WORLD_SIZE) * 4,
-                displayCell.getMapColor()
+                displayCell.getColor(),
+                0.7
             );
         });
 

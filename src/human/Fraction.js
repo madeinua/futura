@@ -23,9 +23,9 @@ export default class Fraction {
         return this.fractionColor;
     }
     getFractionTerritoryColor() {
-        return rgbToRgba(this.getFractionColor(), fractionToRGB(0.3));
+        return rgbToRgba(this.getFractionColor(), fractionToRGB(0.5));
     }
     getFractionBorderColor() {
-        return rgbToRgba(this.getFractionColor(), fractionToRGB(0.9));
+        return rgbToRgba(this.getFractionColor(), fractionToRGB(0.5));
     }
 }

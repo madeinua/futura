@@ -28,8 +28,4 @@ export default class DisplayCell {
     drawBackground(): boolean {
         return this.withBg || !this.hasImage();
     }
-
-    getMapColor(): RGBa {
-        return this.color;
-    }
 }
