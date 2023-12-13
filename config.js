@@ -8,8 +8,8 @@ const Config = {
 
     // Maps
     WORLD_SIZE: 250,
-    VISIBLE_COLS: 60,
-    VISIBLE_ROWS: 30,
+    VISIBLE_COLS: 80,
+    VISIBLE_ROWS: 40,
     SHOW_RECTANGLES: false,
     SHOW_COORDINATES: false,
     DRAW_TECHNICAL_MAPS: false,
@@ -17,9 +17,9 @@ const Config = {
     // Steps
     STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
-    STEPS_LIMIT: 40,
+    STEPS_LIMIT: 80,
     STEPS_BOOST: 5,
-    STEPS_BOOST_STEPS: 40,
+    STEPS_BOOST_STEPS: 80,
 
     // Altitude
     WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
@@ -212,6 +212,7 @@ const Config = {
         Biome_Desert_Hills: 1.5,
         Biome_Swamp: 2,
         Biome_Rocks: 0.8,
+        Biome_Ice_Rocks: 0,
         Biome_Savanna: 2.5,
         Biome_Savanna_Hills: 4,
         Biome_Tropic: 6
@@ -263,10 +264,12 @@ const Config = {
 
     // Fractions
     FRACTIONS: {
+        COUNT: 5,
         AUTO_CREATE_ON_STEP: 25,
         // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
             BIOMES: {
+                Biome_Beach: 0.2,
                 Biome_Tundra: 0.05,
                 Biome_Tundra_Hills: 0.01,
                 Biome_Grass: 0.3,
@@ -278,14 +281,32 @@ const Config = {
                 Biome_Swamp: 0.1,
                 Biome_Tropic: 0.25,
                 Biome_Rocks: 0.01,
+                Biome_Ice_Rocks: 0.01,
             },
-            CLOSE_TO_OCEAN: 3,
+            CLOSE_TO_OCEAN: 2,
             CLOSE_TO_WATER: 5,
             IS_FOREST: 0.3,
             CLOSE_TO_FOREST: 2,
-            CLOSE_TO_FRACTION: 0.05,
         },
-        CREATE_COUNT: 5,
+        INFLUENCE: {
+            FOREST: 0.5,
+            Biome_Ocean: 0.1,
+            Biome_Coast: 0.25,
+            Biome_Water: 0.25,
+            Biome_Beach: 0.8,
+            Biome_Tundra: 0.5,
+            Biome_Tundra_Hills: 0.4,
+            Biome_Grass: 1,
+            Biome_Grass_Hills: 0.8,
+            Biome_Savanna: 0.9,
+            Biome_Savanna_Hills: 0.8,
+            Biome_Desert: 0.2,
+            Biome_Desert_Hills: 0.3,
+            Biome_Swamp: 0.6,
+            Biome_Tropic: 0.9,
+            Biome_Rocks: 0.15,
+            Biome_Ice_Rocks: 0.1,
+        },
         COLORS: [
             '#ff0000',
             '#00ff00',

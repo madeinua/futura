@@ -2,6 +2,7 @@ import { changeRange, iAmLucky } from "../helpers.js";
 import Config from "../../config.js";
 export default class ForestGenerator {
     constructor(altitudeMap, humidityMap) {
+        var _a, _b;
         this.groundCreateMults = {};
         this.notAllowedCells = [];
         this.altitudeMap = altitudeMap;
@@ -10,10 +11,10 @@ export default class ForestGenerator {
         this.minCreateIntensity = Math.ceil(this.maxForestCells / 10);
         let maxGroundMult = 0;
         for (let i in Config.FOREST_GROUNDS_MULTS) {
-            maxGroundMult = Math.max(maxGroundMult, Config.FOREST_GROUNDS_MULTS[i]);
+            maxGroundMult = Math.max(maxGroundMult, (_a = Config.FOREST_GROUNDS_MULTS[i]) !== null && _a !== void 0 ? _a : 0);
         }
         for (let i in Config.FOREST_GROUNDS_MULTS) {
-            this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
+            this.groundCreateMults[i] = changeRange((_b = Config.FOREST_GROUNDS_MULTS[i]) !== null && _b !== void 0 ? _b : 0, 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
         }
         const _this = this;
         altitudeMap.foreachValues(function (altitude, x, y) {

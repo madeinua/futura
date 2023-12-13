@@ -28,11 +28,11 @@ export default class ForestGenerator {
         let maxGroundMult = 0;
 
         for (let i in Config.FOREST_GROUNDS_MULTS) {
-            maxGroundMult = Math.max(maxGroundMult, Config.FOREST_GROUNDS_MULTS[i]);
+            maxGroundMult = Math.max(maxGroundMult, Config.FOREST_GROUNDS_MULTS[i] ?? 0);
         }
 
         for (let i in Config.FOREST_GROUNDS_MULTS) {
-            this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i], 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
+            this.groundCreateMults[i] = changeRange(Config.FOREST_GROUNDS_MULTS[i] ?? 0, 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
         }
 
         const _this: ForestGenerator = this;

@@ -42,14 +42,19 @@ export default class World {
                 const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
                 const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES), this.layers.getLayer(LAYER_BIOMES_IMAGES));
                 const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
-                new AnimalsOperator(this.layers.getLayer(LAYER_HABITAT), this.layers.getLayer(LAYER_ANIMALS), {
+                new AnimalsOperator({
+                    habitatLayer: this.layers.getLayer(LAYER_HABITAT),
+                    animalsLayer: this.layers.getLayer(LAYER_ANIMALS),
                     freshWaterMap: freshWaterMap,
                     coastMap: coastMap,
                     forestsOperator: forestsOperator,
                     biomesOperator: biomesOperator,
                     timer: this.timer
                 });
-                const fractionsOperator = new FractionsOperator(this.timer, this.layers.getLayer(LAYER_FRACTIONS), this.layers.getLayer(LAYER_FRACTIONS_BORDERS), {
+                const fractionsOperator = new FractionsOperator({
+                    timer: this.timer,
+                    fractionsLayer: this.layers.getLayer(LAYER_FRACTIONS),
+                    fractionsBorderLayer: this.layers.getLayer(LAYER_FRACTIONS_BORDERS),
                     oceanMap: oceanMap,
                     freshWaterMap: freshWaterMap,
                     temperatureMap: temperatureMap,
@@ -139,7 +144,7 @@ export default class World {
         this.drawRectangles = function () {
             const _this = this, ctx = _this.mapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosLeft * _this.cellWidth, worldOffsetTop = _this.cameraPosTop * _this.cellHeight;
             ctx.imageSmoothingEnabled = false;
-            ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
             for (let x = 0; x < Config.VISIBLE_COLS; x++) {
                 for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
                     const lx = x * _this.cellWidth + worldOffsetLeft, ly = y * _this.cellHeight + worldOffsetTop;
@@ -151,10 +156,11 @@ export default class World {
             const _this = this, ctx = _this.mapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosLeft * _this.cellWidth, worldOffsetTop = _this.cameraPosTop * _this.cellHeight;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+            ctx.font = '7px senf';
+            ctx.fillStyle = '#000000';
             for (let x = 0; x < Config.VISIBLE_COLS; x++) {
                 for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
                     const lx = x * _this.cellWidth + worldOffsetLeft, ly = y * _this.cellHeight + worldOffsetTop;
-                    ctx.font = '7px senf';
                     ctx.fillText((_this.cameraPosLeft + x).toString(), lx + 2, ly + 10);
                     ctx.fillText((_this.cameraPosTop + y).toString(), lx + 2, ly + 20);
                 }
@@ -164,10 +170,10 @@ export default class World {
             const _this = this, ctx = _this.mapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosLeft * _this.cellWidth, worldOffsetTop = _this.cameraPosTop * _this.cellHeight, temperatureMap = this.world.temperatureMap;
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+            ctx.font = '7px senf';
             for (let x = 0; x < Config.VISIBLE_COLS; x++) {
                 for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
                     const lx = x * _this.cellWidth + worldOffsetLeft, ly = y * _this.cellHeight + worldOffsetTop;
-                    ctx.font = '7px senf';
                     ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPosLeft + x, _this.cameraPosTop + y) * 450) / 10).toString(), lx + 2, ly + 10);
                 }
             }
@@ -176,10 +182,10 @@ export default class World {
             const _this = this, ctx = _this.mapCanvas.getContext('2d'), worldOffsetLeft = _this.cameraPosLeft * _this.cellWidth, worldOffsetTop = _this.cameraPosTop * _this.cellHeight, biomes = this.world.biomesOperator.getBiomes();
             ctx.imageSmoothingEnabled = false;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+            ctx.font = '7px senf';
             for (let x = 0; x < Config.VISIBLE_COLS; x++) {
                 for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
                     const lx = x * _this.cellWidth + worldOffsetLeft, ly = y * _this.cellHeight + worldOffsetTop;
-                    ctx.font = '7px senf';
                     ctx.fillText(biomes.getCell(_this.cameraPosLeft + x, _this.cameraPosTop + y).getName().substring(6, 12), lx + 2, ly + 10);
                 }
             }
@@ -202,7 +208,7 @@ export default class World {
             ];
         };
         this.generateFractions = function () {
-            this.world.fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
+            this.world.fractionsOperator.createFractions(Config.FRACTIONS.COUNT);
             this.update();
         };
         this.cameraPosLeft = cameraPos[0];

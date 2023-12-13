@@ -1,5 +1,5 @@
 import Config from "../config.js";
-import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, throwError} from "./helpers.js";
+import {logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent} from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -159,30 +159,26 @@ export default class World {
             this.layers.getLayer(LAYER_FOREST)
         );
 
-        new AnimalsOperator(
-            this.layers.getLayer(LAYER_HABITAT),
-            this.layers.getLayer(LAYER_ANIMALS),
-            {
-                freshWaterMap: freshWaterMap,
-                coastMap: coastMap,
-                forestsOperator: forestsOperator,
-                biomesOperator: biomesOperator,
-                timer: this.timer
-            }
-        );
+        new AnimalsOperator({
+            habitatLayer: this.layers.getLayer(LAYER_HABITAT),
+            animalsLayer: this.layers.getLayer(LAYER_ANIMALS),
+            freshWaterMap: freshWaterMap,
+            coastMap: coastMap,
+            forestsOperator: forestsOperator,
+            biomesOperator: biomesOperator,
+            timer: this.timer
+        });
 
-        const fractionsOperator = new FractionsOperator(
-            this.timer,
-            this.layers.getLayer(LAYER_FRACTIONS),
-            this.layers.getLayer(LAYER_FRACTIONS_BORDERS),
-            {
-                oceanMap: oceanMap,
-                freshWaterMap: freshWaterMap,
-                temperatureMap: temperatureMap,
-                forestMap: forestsOperator.getForestMap(),
-                biomesMap: biomesOperator.getBiomes(),
-            }
-        );
+        const fractionsOperator = new FractionsOperator({
+            timer: this.timer,
+            fractionsLayer: this.layers.getLayer(LAYER_FRACTIONS),
+            fractionsBorderLayer: this.layers.getLayer(LAYER_FRACTIONS_BORDERS),
+            oceanMap: oceanMap,
+            freshWaterMap: freshWaterMap,
+            temperatureMap: temperatureMap,
+            forestMap: forestsOperator.getForestMap(),
+            biomesMap: biomesOperator.getBiomes(),
+        });
 
         this.world = {
             'altitudeMap': altitudeMap,
@@ -325,7 +321,7 @@ export default class World {
             worldOffsetTop = _this.cameraPosTop * _this.cellHeight;
 
         ctx.imageSmoothingEnabled = false;
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
 
         for (let x = 0; x < Config.VISIBLE_COLS; x++) {
             for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
@@ -345,13 +341,14 @@ export default class World {
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.font = '7px senf';
+        ctx.fillStyle = '#000000';
 
         for (let x = 0; x < Config.VISIBLE_COLS; x++) {
             for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
                 const lx = x * _this.cellWidth + worldOffsetLeft,
                     ly = y * _this.cellHeight + worldOffsetTop;
 
-                ctx.font = '7px senf';
                 ctx.fillText((_this.cameraPosLeft + x).toString(), lx + 2, ly + 10);
                 ctx.fillText((_this.cameraPosTop + y).toString(), lx + 2, ly + 20);
             }
@@ -367,6 +364,7 @@ export default class World {
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.font = '7px senf';
 
         for (let x = 0; x < Config.VISIBLE_COLS; x++) {
             for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
@@ -374,7 +372,6 @@ export default class World {
                 const lx = x * _this.cellWidth + worldOffsetLeft,
                     ly = y * _this.cellHeight + worldOffsetTop;
 
-                ctx.font = '7px senf';
                 ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPosLeft + x, _this.cameraPosTop + y) * 450) / 10).toString(), lx + 2, ly + 10);
             }
         }
@@ -389,13 +386,13 @@ export default class World {
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.font = '7px senf';
 
         for (let x = 0; x < Config.VISIBLE_COLS; x++) {
             for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
                 const lx = x * _this.cellWidth + worldOffsetLeft,
                     ly = y * _this.cellHeight + worldOffsetTop;
 
-                ctx.font = '7px senf';
                 ctx.fillText(biomes.getCell(_this.cameraPosLeft + x, _this.cameraPosTop + y).getName().substring(6, 12), lx + 2, ly + 10);
             }
         }
@@ -427,7 +424,7 @@ export default class World {
     }
 
     generateFractions = function (): void {
-        this.world.fractionsOperator.createFractions(Config.FRACTIONS.CREATE_COUNT);
+        this.world.fractionsOperator.createFractions(Config.FRACTIONS.COUNT);
         this.update();
     }
 }

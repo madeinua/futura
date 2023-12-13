@@ -13,6 +13,11 @@ type AnimalsTypesCounter = {
     [key: string]: number;
 }
 
+type AnimalsOperatorArgs = AnimalsGeneratorArgs & {
+    habitatLayer: Layer,
+    animalsLayer: Layer
+};
+
 export default class AnimalsOperator {
 
     animals: Animal[] = [];
@@ -21,7 +26,7 @@ export default class AnimalsOperator {
     animalsGenerators: AnimalGenerator[] = [];
     animalImagesCache: DisplayCell[] = [];
 
-    constructor(habitatLayer: Layer, animalsLayer: Layer, objects: AnimalsGeneratorArgs) {
+    constructor(args: AnimalsOperatorArgs) {
 
         this.animalImagesCache = [];
 
@@ -30,7 +35,7 @@ export default class AnimalsOperator {
 
         for (let i = 0; i < animalGenerators.length; i++) {
             _this.registerAnimalsGenerator(
-                new animalGenerators[i](objects)
+                new animalGenerators[i](args)
             );
         }
 
@@ -38,16 +43,16 @@ export default class AnimalsOperator {
             logTimeEvent('Animals initialized.');
         }
 
-        objects.timer.addStepsHandler(function (): void {
+        args.timer.addStepsHandler(function (): void {
 
-            habitatLayer.reset();
+            args.habitatLayer.reset();
             _this.updateHabitats();
             //_this.showHabitatsOnLayer(habitatLayer, Fish);
 
-            animalsLayer.reset();
+            args.animalsLayer.reset();
 
             _this.maybeCreateAnimals();
-            _this.moveAnimals(animalsLayer);
+            _this.moveAnimals(args.animalsLayer);
 
             Filters.apply('animalsSteps', _this.animals);
         });

@@ -1,27 +1,52 @@
 import FractionGenerator from "../generators/FractionGenerator.js";
-import { logTimeEvent, resetTimeEvent } from "../helpers.js";
+import { logTimeEvent, resetTimeEvent, throwError } from "../helpers.js";
 import Config from "../../config.js";
 import DisplayCell from "../render/DisplayCell.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 export default class FractionsOperator {
-    constructor(timer, fractionsLayer, fractionsBorderLayer, objects) {
-        this.fillOccupiedTerritory = function (position) {
-            this.occupiedTerritories.fill(position[0], position[1]);
+    constructor(args) {
+        this.canIncreaseCellInfluence = function (positionX, positionY) {
+            return !this.occupiedTerritories.filled(positionX, positionY);
+        };
+        this.increaseCellInfluence = function (positionX, positionY, fraction) {
+            let _this = this, influenceOriginal = fraction.influenceTerritory.getCell(positionX, positionY), influence = 0;
+            // Influence depends on a biome
+            if (_this.forestMap.filled(positionX, positionY)) {
+                influence *= Config.FRACTIONS.INFLUENCE.FOREST;
+            }
+            else {
+                let infName = _this.biomesMap.getCell(positionX, positionY).getName();
+                if (typeof Config.FRACTIONS.INFLUENCE[infName] === 'undefined') {
+                    throwError('Unknown influence name: ' + infName, 10, true);
+                }
+                else {
+                    influence *= Config.FRACTIONS.INFLUENCE[infName];
+                }
+            }
+            // 1 is the maximum influence
+            influence = Math.min(1, influenceOriginal + influence);
+            // @TODO Logic..
+            fraction.influenceTerritory.setCell(positionX, positionY, influence);
         };
         this.occupyCell = function (positionX, positionY, fraction) {
             fraction.territory.fill(positionX, positionY);
-            this.fillOccupiedTerritory([positionX, positionY]);
+            fraction.influenceTerritory.setCell(positionX, positionY, 1);
+            this.occupiedTerritories.fill(positionX, positionY);
+        };
+        this.canOccupyCell = function (positionX, positionY, fraction) {
+            return !this.occupiedTerritories.filled(positionX, positionY)
+                && fraction.influenceTerritory.getCell(positionX, positionY) === 1;
         };
         this.expandFraction = function (fraction) {
             const _this = this;
             fraction.borders.foreachFilledAroundRadiusToAllCells(function (nx, ny, fromCellX, fromCellY) {
-                // Skip already filled
-                if (_this.occupiedTerritories.filled(nx, ny)) {
-                    return;
+                if (_this.canIncreaseCellInfluence(nx, ny)) {
+                    _this.increaseCellInfluence(nx, ny, fraction);
                 }
-                // @TODO Logic..
-                _this.occupyCell(nx, ny, fraction);
-                _this.fillFractionsLayer([nx, ny], fraction);
+                if (_this.canOccupyCell(nx, ny, fraction)) {
+                    _this.occupyCell(nx, ny, fraction);
+                    _this.fillFractionsLayer([nx, ny], fraction);
+                }
             }, 1);
         };
         this.expandFractions = function () {
@@ -35,7 +60,7 @@ export default class FractionsOperator {
         this.updateFractionBorders = function (fraction) {
             fraction.borders.unfillAll();
             fraction.territory.foreachFilled(function (x, y) {
-                if (fraction.territory.countFilledNeighbors(x, y) < 6) {
+                if (fraction.territory.hasUnfilledNeighbors(x, y)) {
                     fraction.borders.fill(x, y);
                 }
             });
@@ -56,17 +81,19 @@ export default class FractionsOperator {
             });
         };
         const _this = this;
-        this.fractionsLayer = fractionsLayer;
-        this.fractionsBorderLayer = fractionsBorderLayer;
-        this.fractionsGenerator = new FractionGenerator(objects);
+        this.fractionsGenerator = new FractionGenerator(args);
+        this.forestMap = args.forestMap;
+        this.biomesMap = args.biomesMap;
+        this.fractionsLayer = args.fractionsLayer;
+        this.fractionsBorderLayer = args.fractionsBorderLayer;
         this.fractions = [];
         this.occupiedTerritories = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
-        timer.addStepsHandler(function (step) {
+        args.timer.addStepsHandler(function (step) {
             if (_this.fractions.length) {
                 _this.expandFractions();
             }
             else if (Config.FRACTIONS.AUTO_CREATE_ON_STEP === step) {
-                _this.createFractions(Config.FRACTIONS.CREATE_COUNT);
+                _this.createFractions(Config.FRACTIONS.COUNT);
             }
         });
     }
@@ -74,14 +101,11 @@ export default class FractionsOperator {
         resetTimeEvent();
         this.fractions = this.fractionsGenerator.generateFractions(count);
         for (let i = 0; i < this.fractions.length; i++) {
-            this.fillOccupiedTerritory(this.fractions[i].startPosition);
+            this.occupyCell(this.fractions[i].startPosition[0], this.fractions[i].startPosition[1], this.fractions[i]);
             this.fillFractionsStartPosition(this.fractions[i].startPosition, this.fractions[i]);
         }
         if (Config.LOGS) {
             logTimeEvent('Fractions created.');
         }
-    }
-    hasFractions() {
-        return this.fractions.length > 0;
     }
 }

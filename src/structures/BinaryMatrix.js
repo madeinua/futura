@@ -222,9 +222,6 @@ export default class BinaryMatrix extends NumericMatrix {
     hasUnfilledNeighbors(x, y) {
         return this.getFilledNeighbors(x, y).length < 8;
     }
-    countFilledNeighbors(x, y) {
-        return this.getFilledNeighbors(x, y).length;
-    }
     /**
      * Retrieve all unfilled neighbors of the specified cell around a specific radius
      */

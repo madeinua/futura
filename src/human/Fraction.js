@@ -1,4 +1,5 @@
 import BinaryMatrix from "../structures/BinaryMatrix.js";
+import NumericMatrix from "../structures/NumericMatrix.js";
 import Config from "../../config.js";
 import { fractionToRGB, hexToRgb, rgbToRgba } from "../helpers.js";
 export default class Fraction {
@@ -9,6 +10,7 @@ export default class Fraction {
         this.startPosition = [startPointX, startPointY];
         this.territory = (new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE)).fill(startPointX, startPointY);
         this.borders = (new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE)).fill(startPointX, startPointY);
+        this.influenceTerritory = new NumericMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
     }
     static incrementId() {
         if (!this.latestId) {
