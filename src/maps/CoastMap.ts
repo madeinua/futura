@@ -19,9 +19,10 @@ export default class CoastMap extends BinaryMatrix {
     }
 
     isCoast(altitude: number, temperature: number): boolean {
-        return altitude > Config.MAX_OCEAN_LEVEL
-            - (temperature * Config.COAST_TEMPERATURE_RATIO * 2 - Config.COAST_TEMPERATURE_RATIO)
-            && altitude <= Config.MAX_COAST_LEVEL;
+        let adjustedAltitude = altitude - (temperature * Config.COAST_TEMPERATURE_RATIO * 2 - Config.COAST_TEMPERATURE_RATIO);
+        adjustedAltitude = Math.max(adjustedAltitude, Config.MAX_OCEAN_LEVEL); // Ensures altitude is not below MAX_OCEAN_LEVEL
+
+        return adjustedAltitude > Config.MAX_OCEAN_LEVEL && adjustedAltitude <= Config.MAX_COAST_LEVEL;
     }
 
     generateMap(): CoastMap {
