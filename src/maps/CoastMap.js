@@ -2,7 +2,7 @@ import BinaryMatrix from "../structures/BinaryMatrix.js";
 import Config from "../../config.js";
 export default class CoastMap extends BinaryMatrix {
     constructor(oceanMap, altitudeMap, temperatureMap) {
-        super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
         this.oceanMap = oceanMap;
         this.altitudeMap = altitudeMap;
         this.temperatureMap = temperatureMap;

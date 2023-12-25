@@ -7,7 +7,7 @@ export default class ForestMap extends BinaryMatrix {
     readonly biomes: BiomesMap;
 
     constructor(biomes: BiomesMap) {
-        super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
         this.biomes = biomes;
     }

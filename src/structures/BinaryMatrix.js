@@ -1,7 +1,7 @@
 import NumericMatrix from './NumericMatrix.js';
 import { distance, round, getPolygonAreaSize } from "../helpers.js";
 export default class BinaryMatrix extends NumericMatrix {
-    constructor(fill, width, height) {
+    constructor(width, height, fill) {
         super(width, height);
         /**
          * Retrieve size of the array compared to the total number size of the map
@@ -38,7 +38,7 @@ export default class BinaryMatrix extends NumericMatrix {
         this.map(typeof fill === 'undefined' ? 0 : fill);
     }
     clone() {
-        const matrix = new BinaryMatrix(0, this.width, this.height);
+        const matrix = new BinaryMatrix(this.width, this.height, 0);
         matrix.__values = JSON.parse(JSON.stringify(this.__values));
         return matrix;
     }
@@ -221,6 +221,17 @@ export default class BinaryMatrix extends NumericMatrix {
     }
     hasUnfilledNeighbors(x, y) {
         return this.getFilledNeighbors(x, y).length < 8;
+    }
+    /**
+     * Apply callback to all filled neighbors
+     */
+    foreachFilledAround(x, y, callback) {
+        const neighbors = this.getNeighbors(x, y);
+        for (let i = 0; i < neighbors.length; i++) {
+            if (this.filled(neighbors[i][0], neighbors[i][1])) {
+                callback(neighbors[i][0], neighbors[i][1]);
+            }
+        }
     }
     /**
      * Retrieve all unfilled neighbors of the specified cell around a specific radius

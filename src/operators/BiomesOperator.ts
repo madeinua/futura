@@ -158,7 +158,7 @@ export default class BiomesOperator {
     getSurfaceByBiomeName(biomeName: string): BinaryMatrix {
 
         const biomes = this.biomes,
-            surface = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+            surface = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
         this.altitudeMap.foreach(function (x: number, y: number): void {
             if (biomes.getCell(x, y).getName() === biomeName) {

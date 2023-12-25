@@ -1,4 +1,4 @@
-import {changeRange, iAmLucky} from "../helpers.js";
+import {arrayHasPoint, changeRange, iAmLucky} from "../helpers.js";
 import Config from "../../config.js";
 import {Cell, CellsList} from "../structures/Cells.js";
 import ForestMap from "../maps/ForestMap.js";
@@ -82,7 +82,7 @@ export default class ForestGenerator {
 
         filledCells.forEach(function (cell: Cell): void {
             forestMap.foreachNeighbors(cell[0], cell[1], function (x: number, y: number): boolean {
-                if (!filledCells.includes([x, y])) {
+                if (!arrayHasPoint(filledCells, x, y)) {
 
                     const growsChance = _this.getCreateChance(
                         forestMap,

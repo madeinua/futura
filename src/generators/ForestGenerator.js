@@ -1,4 +1,4 @@
-import { changeRange, iAmLucky } from "../helpers.js";
+import { arrayHasPoint, changeRange, iAmLucky } from "../helpers.js";
 import Config from "../../config.js";
 export default class ForestGenerator {
     constructor(altitudeMap, humidityMap) {
@@ -49,7 +49,7 @@ export default class ForestGenerator {
         }
         filledCells.forEach(function (cell) {
             forestMap.foreachNeighbors(cell[0], cell[1], function (x, y) {
-                if (!filledCells.includes([x, y])) {
+                if (!arrayHasPoint(filledCells, x, y)) {
                     const growsChance = _this.getCreateChance(forestMap, _this.humidityMap.getCell(x, y), x, y, speed);
                     if (iAmLucky(growsChance)) {
                         forestMap.fill(x, y);

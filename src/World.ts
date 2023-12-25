@@ -140,6 +140,7 @@ export default class World {
             lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap),
             riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap),
             freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap),
+            islandsMap = waterOperator.getIslandsMap(oceanMap),
             humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
 
         const biomesOperator = new BiomesOperator(
@@ -178,6 +179,7 @@ export default class World {
             temperatureMap: temperatureMap,
             forestMap: forestsOperator.getForestMap(),
             biomesMap: biomesOperator.getBiomes(),
+            islandsMap: islandsMap,
         });
 
         this.world = {

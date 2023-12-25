@@ -5,8 +5,9 @@ import CoastMap from "../maps/CoastMap.js";
 import OceanMap from '../maps/OceanMap.js';
 import {Filters, logTimeEvent} from "../helpers.js";
 import Config from "../../config.js";
-import AltitudeMap from "../maps/AltitudeMap";
-import TemperatureMap from "../maps/TemperatureMap";
+import AltitudeMap from "../maps/AltitudeMap.js";
+import TemperatureMap from "../maps/TemperatureMap.js";
+import IslandsMap from "../maps/IslandsMap.js";
 
 export default class WaterOperator {
 
@@ -112,11 +113,36 @@ export default class WaterOperator {
 
     getFreshWaterMap = function (lakesMap: LakesMap, riversMap: RiversMap): BinaryMatrix {
 
-        const freshWaterMap = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        const freshWaterMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
         freshWaterMap.combineWith(lakesMap);
         freshWaterMap.combineWith(riversMap);
 
         return freshWaterMap;
+    }
+
+    getIslandsMap = function (oceanMap: OceanMap): IslandsMap {
+
+        let islandsMap = new IslandsMap(oceanMap),
+            storage = Config.STORE_DATA ? localStorage.getItem('islandsMap') : null;
+
+        if (typeof storage !== 'undefined' && storage !== null) {
+            islandsMap.fromString(storage);
+        } else {
+
+            islandsMap.generateMap();
+
+            if (Config.STORE_DATA) {
+                localStorage.setItem('islandsMap', islandsMap.toString());
+            }
+        }
+
+        islandsMap = Filters.apply('islandsMap', islandsMap);
+
+        if (Config.LOGS) {
+            logTimeEvent('Islands map generated.');
+        }
+
+        return islandsMap;
     }
 }

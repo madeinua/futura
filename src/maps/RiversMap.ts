@@ -1,9 +1,9 @@
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import {fromFraction, distance, randBetweenNumbers, arrayHasPoint} from "../helpers.js";
 import Config from "../../config.js";
-import AltitudeMap from "./AltitudeMap";
-import LakesMap from "./LakesMap";
-import {Cell, CellsArray, CellsList} from "../structures/Cells";
+import AltitudeMap from "./AltitudeMap.js";
+import LakesMap from "./LakesMap.js";
+import {Cell, CellsArray, CellsList} from "../structures/Cells.js";
 
 export default class RiversMap extends BinaryMatrix {
 
@@ -12,7 +12,7 @@ export default class RiversMap extends BinaryMatrix {
     readonly lakesMap: LakesMap;
 
     constructor(altitudeMap: AltitudeMap, lakesMap: LakesMap) {
-        super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
         this.altitudeMap = altitudeMap;
         this.lakesMap = lakesMap;
@@ -169,7 +169,7 @@ export default class RiversMap extends BinaryMatrix {
         for (let p = 0; p < river.length; p++) {
             if (p > notDeltaLength) {
                 _this.foreachAroundRadius(river[p][0], river[p][1], 1, function (nx: number, ny: number): void {
-                    if ([0, 1].randomElement() === 0 && !river.includes([nx, ny])) {
+                    if ([0, 1].randomElement() === 0 && !arrayHasPoint(river, nx, ny)) {
                         delta.push([nx, ny]);
                     }
                 });

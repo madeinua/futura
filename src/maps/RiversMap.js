@@ -3,7 +3,7 @@ import { fromFraction, distance, randBetweenNumbers, arrayHasPoint } from "../he
 import Config from "../../config.js";
 export default class RiversMap extends BinaryMatrix {
     constructor(altitudeMap, lakesMap) {
-        super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
         this.generateMap = function () {
             const riverSources = this.getRiverSources(this.altitudeMap), rivers = this.generateRiversCells(riverSources);
             //rivers = _this.addRiverDeltaToRiversMaps(rivers);
@@ -95,7 +95,7 @@ export default class RiversMap extends BinaryMatrix {
             for (let p = 0; p < river.length; p++) {
                 if (p > notDeltaLength) {
                     _this.foreachAroundRadius(river[p][0], river[p][1], 1, function (nx, ny) {
-                        if ([0, 1].randomElement() === 0 && !river.includes([nx, ny])) {
+                        if ([0, 1].randomElement() === 0 && !arrayHasPoint(river, nx, ny)) {
                             delta.push([nx, ny]);
                         }
                     });

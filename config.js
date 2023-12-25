@@ -264,8 +264,8 @@ const Config = {
 
     // Fractions
     FRACTIONS: {
-        COUNT: 5,
-        AUTO_CREATE_ON_STEP: 25,
+        COUNT: 6,
+        AUTO_CREATE_ON_STEP: 20,
         // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
             BIOMES: {
@@ -283,12 +283,14 @@ const Config = {
                 Biome_Rocks: 0.01,
                 Biome_Ice_Rocks: 0.01,
             },
+            MIN_ISLAND_SIZE: 50,
             CLOSE_TO_OCEAN: 2,
             CLOSE_TO_WATER: 5,
             IS_FOREST: 0.3,
             CLOSE_TO_FOREST: 2,
         },
         INFLUENCE: {
+            BASE: 1.0,
             FOREST: 0.5,
             Biome_Ocean: 0.1,
             Biome_Coast: 0.25,
@@ -296,27 +298,29 @@ const Config = {
             Biome_Beach: 0.8,
             Biome_Tundra: 0.5,
             Biome_Tundra_Hills: 0.4,
-            Biome_Grass: 1,
+            Biome_Grass: 1.0,
             Biome_Grass_Hills: 0.8,
             Biome_Savanna: 0.9,
-            Biome_Savanna_Hills: 0.8,
+            Biome_Savanna_Hills: 0.75,
             Biome_Desert: 0.2,
             Biome_Desert_Hills: 0.3,
-            Biome_Swamp: 0.6,
-            Biome_Tropic: 0.9,
-            Biome_Rocks: 0.15,
-            Biome_Ice_Rocks: 0.1,
+            Biome_Swamp: 0.25,
+            Biome_Tropic: 0.33,
+            Biome_Rocks: 0.1,
+            Biome_Ice_Rocks: 0.05,
         },
         COLORS: [
             '#ff0000',
             '#00ff00',
             '#ffff00',
-            '#ff00ff',
-            '#00ccaa',
-            '#c8ff00',
-            '#ff0059',
-            '#ffffff',
+            '#c62ce0',
+            '#00f7ff',
+            '#290c59',
+            '#ff4b89',
+            '#ff9100',
             '#000000',
+            '#00ff80',
+            '#641841',
         ]
     }
 }

@@ -5,7 +5,7 @@ import {Array2D} from "./Array2D.js";
 
 export default class BinaryMatrix extends NumericMatrix {
 
-    constructor(fill: 0 | 1, width: number, height: number) {
+    constructor(width: number, height: number, fill: 0 | 1) {
         super(width, height);
 
         this.map(
@@ -14,7 +14,7 @@ export default class BinaryMatrix extends NumericMatrix {
     }
 
     clone(): BinaryMatrix {
-        const matrix = new BinaryMatrix(0, this.width, this.height);
+        const matrix = new BinaryMatrix(this.width, this.height, 0);
         matrix.__values = JSON.parse(JSON.stringify(this.__values));
 
         return matrix;
@@ -246,6 +246,19 @@ export default class BinaryMatrix extends NumericMatrix {
 
     hasUnfilledNeighbors(x: number, y: number): boolean {
         return this.getFilledNeighbors(x, y).length < 8;
+    }
+
+    /**
+     * Apply callback to all filled neighbors
+     */
+    foreachFilledAround(x: number, y: number, callback: Function): void {
+        const neighbors = this.getNeighbors(x, y);
+
+        for (let i = 0; i < neighbors.length; i++) {
+            if (this.filled(neighbors[i][0], neighbors[i][1])) {
+                callback(neighbors[i][0], neighbors[i][1]);
+            }
+        }
     }
 
     /**

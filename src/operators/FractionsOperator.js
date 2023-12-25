@@ -1,5 +1,5 @@
 import FractionGenerator from "../generators/FractionGenerator.js";
-import { logTimeEvent, resetTimeEvent, throwError } from "../helpers.js";
+import { Filters, logTimeEvent, resetTimeEvent, throwError } from "../helpers.js";
 import Config from "../../config.js";
 import DisplayCell from "../render/DisplayCell.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
@@ -9,7 +9,7 @@ export default class FractionsOperator {
             return !this.occupiedTerritories.filled(positionX, positionY);
         };
         this.increaseCellInfluence = function (positionX, positionY, fraction) {
-            let _this = this, influenceOriginal = fraction.influenceTerritory.getCell(positionX, positionY), influence = 0;
+            let _this = this, influenceOriginal = fraction.influenceTerritory.getCell(positionX, positionY), influence = Config.FRACTIONS.INFLUENCE.BASE;
             // Influence depends on a biome
             if (_this.forestMap.filled(positionX, positionY)) {
                 influence *= Config.FRACTIONS.INFLUENCE.FOREST;
@@ -87,10 +87,11 @@ export default class FractionsOperator {
         this.fractionsLayer = args.fractionsLayer;
         this.fractionsBorderLayer = args.fractionsBorderLayer;
         this.fractions = [];
-        this.occupiedTerritories = new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        this.occupiedTerritories = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
         args.timer.addStepsHandler(function (step) {
             if (_this.fractions.length) {
                 _this.expandFractions();
+                Filters.apply('fractionsUpdated', _this.fractions);
             }
             else if (Config.FRACTIONS.AUTO_CREATE_ON_STEP === step) {
                 _this.createFractions(Config.FRACTIONS.COUNT);

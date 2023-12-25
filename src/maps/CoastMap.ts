@@ -11,7 +11,7 @@ export default class CoastMap extends BinaryMatrix {
     readonly temperatureMap: TemperatureMap;
 
     constructor(oceanMap: OceanMap, altitudeMap: AltitudeMap, temperatureMap: TemperatureMap) {
-        super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
         this.oceanMap = oceanMap;
         this.altitudeMap = altitudeMap;

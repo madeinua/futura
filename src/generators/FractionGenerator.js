@@ -10,11 +10,15 @@ export default class FractionGenerator {
         var _a;
         return (_a = Config.FRACTIONS.CREATE_PROBABILITIES.BIOMES[biomeName]) !== null && _a !== void 0 ? _a : 0;
     }
+    isTooSmallIsland(x, y) {
+        return this.objects.islandsMap.getCell(x, y) < Config.FRACTIONS.CREATE_PROBABILITIES.MIN_ISLAND_SIZE;
+    }
     createOccurrenceProbabilityMap() {
         const _this = this, map = new NumericMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
         _this.objects.biomesMap.foreachValues(function (biome) {
             const biomeProbability = _this.getBiomeProbability(biome.getName());
-            if (biomeProbability === 0) {
+            if (biomeProbability === 0 || _this.isTooSmallIsland(biome.x, biome.y)) {
+                map.setCell(biome.x, biome.y, 0);
                 return;
             }
             const oceanFactor = _this.objects.oceanMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_OCEAN : 1, waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 1, temperatureFactor = fromMiddleFractionValue(_this.objects.temperatureMap.getCell(biome.x, biome.y)), isForest = _this.objects.forestMap.filled(biome.x, biome.y), forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (_this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1);

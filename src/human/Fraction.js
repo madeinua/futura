@@ -8,8 +8,8 @@ export default class Fraction {
         this.fractionName = fractionSettings.name;
         this.fractionColor = hexToRgb(fractionSettings.color);
         this.startPosition = [startPointX, startPointY];
-        this.territory = (new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE)).fill(startPointX, startPointY);
-        this.borders = (new BinaryMatrix(0, Config.WORLD_SIZE, Config.WORLD_SIZE)).fill(startPointX, startPointY);
+        this.territory = (new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0)).fill(startPointX, startPointY);
+        this.borders = (new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0)).fill(startPointX, startPointY);
         this.influenceTerritory = new NumericMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
     }
     static incrementId() {
@@ -29,5 +29,11 @@ export default class Fraction {
     }
     getFractionBorderColor() {
         return rgbToRgba(this.getFractionColor(), fractionToRGB(0.5));
+    }
+    getName() {
+        return this.fractionName;
+    }
+    getSize() {
+        return this.territory.getFilledCells().length;
     }
 }

@@ -3,10 +3,10 @@ import {throwError} from "../helpers.js";
 import Config from "../../config.js";
 import Animal from "../animals/Animal.js";
 import {CellsList} from "../structures/Cells.js";
-import CoastMap from "../maps/CoastMap";
-import ForestsOperator from "../operators/ForestsOperator";
-import BiomesOperator from "../operators/BiomesOperator";
-import Timer from "../services/Timer";
+import CoastMap from "../maps/CoastMap.js";
+import ForestsOperator from "../operators/ForestsOperator.js";
+import BiomesOperator from "../operators/BiomesOperator.js";
+import Timer from "../services/Timer.js";
 
 type AnimalType = {
     intensity: number;
@@ -58,7 +58,7 @@ export default class AnimalGenerator {
     updateHabitat(): this {
 
         if (typeof this.habitat === 'undefined') {
-            this.setHabitat(new BinaryMatrix(1, Config.WORLD_SIZE, Config.WORLD_SIZE));
+            this.setHabitat(new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 1));
         }
 
         return this;

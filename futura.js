@@ -1,5 +1,5 @@
 import Config from './config.js';
-import { Filters, fillCanvasPixel } from "./src/helpers.js";
+import { Filters, fillCanvasPixel, rgbToHex } from "./src/helpers.js";
 import World from './src/World.js';
 const coordinatesField = document.getElementById('coordinates'), displayMapVisibleRange = document.getElementById('displayMapVisibleRange'), displayMapWrapper = document.getElementById('displayMapWrapper'), displayMap = document.getElementById('displayMap'), miniMapCanvas = document.getElementById('miniMap'), technicalMaps = document.getElementById('technicalMaps');
 const world = new World(displayMap, displayMapWrapper.offsetWidth, displayMapWrapper.offsetHeight, miniMapCanvas, getCenteredCameraPosition());
@@ -140,6 +140,11 @@ if (Config.DRAW_TECHNICAL_MAPS) {
     });
     technicalMaps.style.display = 'block';
 }
+Filters.add('fractionsUpdated', function (fractions) {
+    document.getElementById('fractionsList').innerHTML = fractions.map(function (fraction) {
+        return '<li>' + fraction.getName() + ': <span style="background-color:' + rgbToHex(fraction.getFractionColor()) + '"></span> (' + fraction.getSize() + ' cells)</li>';
+    }).join('');
+});
 coordinatesField.addEventListener("change", function () {
     world.moveMapTo(getCenteredCameraPosition());
     scrollIntoToView();

@@ -25,7 +25,7 @@ export default class AnimalGenerator {
     }
     updateHabitat() {
         if (typeof this.habitat === 'undefined') {
-            this.setHabitat(new BinaryMatrix(1, Config.WORLD_SIZE, Config.WORLD_SIZE));
+            this.setHabitat(new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 1));
         }
         return this;
     }

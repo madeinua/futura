@@ -9,7 +9,7 @@ export default class LakesMap extends BinaryMatrix {
     readonly oceanMap: OceanMap;
 
     constructor(altitudeMap: AltitudeMap, oceanMap: OceanMap) {
-        super(0, Config.WORLD_SIZE, Config.WORLD_SIZE);
+        super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;

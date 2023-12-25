@@ -1,5 +1,5 @@
 import Config from './config.js';
-import {Filters, fillCanvasPixel} from "./src/helpers.js";
+import {Filters, fillCanvasPixel, rgbToHex} from "./src/helpers.js";
 import World from './src/World.js';
 import {Cell} from "./src/structures/Cells.js";
 import Matrix from "./src/structures/Matrix.js";
@@ -14,6 +14,7 @@ import RiversMap from "./src/maps/RiversMap.js";
 import ForestMap from "./src/maps/ForestMap.js";
 import Animal from "./src/animals/Animal.js";
 import Biome from "./src/biomes/Biome.js";
+import Fraction from "./src/human/Fraction.js";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     displayMapVisibleRange = document.getElementById('displayMapVisibleRange') as HTMLInputElement,
@@ -230,6 +231,12 @@ if (Config.DRAW_TECHNICAL_MAPS) {
 
     technicalMaps.style.display = 'block';
 }
+
+Filters.add('fractionsUpdated', function (fractions: Fraction[]) {
+    document.getElementById('fractionsList').innerHTML = fractions.map(function (fraction: Fraction) {
+        return '<li>' + fraction.getName() + ': <span style="background-color:' + rgbToHex(fraction.getFractionColor()) + '"></span> (' + fraction.getSize() + ' cells)</li>';
+    }).join('');
+});
 
 coordinatesField.addEventListener("change", function () {
 

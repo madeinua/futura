@@ -1,5 +1,5 @@
 import Config from "../../config.js";
-import {fromMiddleFractionValue} from "../helpers.js";
+import {fromMiddleFractionValue, throwError} from "../helpers.js";
 import Biome from "../biomes/Biome.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import NumericMatrix from "../structures/NumericMatrix.js";
@@ -7,13 +7,15 @@ import Fraction from "../human/Fraction.js";
 import ForestMap from "../maps/ForestMap.js";
 import BiomesMap from "../maps/BiomesMap.js";
 import TemperatureMap from "../maps/TemperatureMap.js";
+import IslandsMap from "../maps/IslandsMap";
 
 export type FractionsGeneratorArgs = {
     oceanMap: BinaryMatrix,
     freshWaterMap: BinaryMatrix,
     temperatureMap: TemperatureMap,
     forestMap: ForestMap,
-    biomesMap: BiomesMap
+    biomesMap: BiomesMap,
+    islandsMap: IslandsMap,
 };
 
 export default class FractionGenerator {
@@ -30,6 +32,10 @@ export default class FractionGenerator {
         return Config.FRACTIONS.CREATE_PROBABILITIES.BIOMES[biomeName] ?? 0;
     }
 
+    isTooSmallIsland(x: number, y: number): boolean {
+        return this.objects.islandsMap.getCell(x, y) < Config.FRACTIONS.CREATE_PROBABILITIES.MIN_ISLAND_SIZE;
+    }
+
     createOccurrenceProbabilityMap(): NumericMatrix {
         const _this: FractionGenerator = this,
             map = new NumericMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
@@ -37,7 +43,8 @@ export default class FractionGenerator {
         _this.objects.biomesMap.foreachValues(function (biome: Biome) {
             const biomeProbability = _this.getBiomeProbability(biome.getName());
 
-            if (biomeProbability === 0) {
+            if (biomeProbability === 0 || _this.isTooSmallIsland(biome.x, biome.y)) {
+                map.setCell(biome.x, biome.y, 0);
                 return;
             }
 
