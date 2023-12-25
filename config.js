@@ -80,30 +80,9 @@ const Config = {
         });
 
         biomesConfig.push({
-            class: 'Biome_Swamp',
-            h: [this.HIGH_HUMIDITY, this.MAX_HUMIDITY],
-            t: [this.MIN_TEMPERATURE, this.NORMAL_TEMPERATURE],
-            a: [this.MIN_LEVEL, this.MAX_LOWLAND_LEVEL]
-        });
-
-        biomesConfig.push({
             class: 'Biome_Grass',
-            h: [this.LOW_HUMIDITY, this.MAX_HUMIDITY],
+            h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
             t: [this.LOW_TEMPERATURE, this.HIGH_TEMPERATURE],
-            a: [this.MIN_LEVEL, this.MAX_LOWLAND_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Savanna',
-            h: [this.MIN_HUMIDITY, this.NORMAL_HUMIDITY],
-            t: [this.NORMAL_TEMPERATURE, this.HIGH_TEMPERATURE],
-            a: [this.MIN_LEVEL, this.MAX_LOWLAND_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Savanna',
-            h: [this.MIN_HUMIDITY, this.LOW_HUMIDITY],
-            t: [this.LOW_TEMPERATURE, this.NORMAL_TEMPERATURE],
             a: [this.MIN_LEVEL, this.MAX_LOWLAND_LEVEL]
         });
 
@@ -129,6 +108,13 @@ const Config = {
         });
 
         biomesConfig.push({
+            class: 'Biome_Tundra_Hills',
+            h: [this.MIN_HUMIDITY, this.LOW_HUMIDITY],
+            t: [this.LOW_TEMPERATURE, this.NORMAL_TEMPERATURE],
+            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
+        });
+
+        biomesConfig.push({
             class: 'Biome_Grass_Hills',
             h: [this.LOW_HUMIDITY, this.MAX_HUMIDITY],
             t: [this.LOW_TEMPERATURE, this.MAX_TEMPERATURE],
@@ -136,16 +122,9 @@ const Config = {
         });
 
         biomesConfig.push({
-            class: 'Biome_Savanna_Hills',
+            class: 'Biome_Grass_Hills',
             h: [this.MIN_HUMIDITY, this.NORMAL_HUMIDITY],
             t: [this.NORMAL_TEMPERATURE, this.HIGH_TEMPERATURE],
-            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Savanna_Hills',
-            h: [this.MIN_HUMIDITY, this.LOW_HUMIDITY],
-            t: [this.LOW_TEMPERATURE, this.NORMAL_TEMPERATURE],
             a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
         });
 
@@ -183,9 +162,6 @@ const Config = {
         Biome_Rocks: '#818f71',
         Biome_Ice_Rocks: '#a6a6a6',
         Biome_Ocean: '#003eb2',
-        Biome_Savanna: '#9b9e3f',
-        Biome_Savanna_Hills: '#7f7946',
-        Biome_Swamp: '#20a894',
         Biome_Tropic: '#3c8045',
         Biome_Tundra: '#d5d7b7',
         Biome_Tundra_Hills: '#a8a996',
@@ -210,11 +186,8 @@ const Config = {
         Biome_Grass_Hills: 5,
         Biome_Desert: 0.5,
         Biome_Desert_Hills: 1.5,
-        Biome_Swamp: 2,
         Biome_Rocks: 0.8,
         Biome_Ice_Rocks: 0,
-        Biome_Savanna: 2.5,
-        Biome_Savanna_Hills: 4,
         Biome_Tropic: 6
     },
     FOREST_CREATE_MULTS: { // Must be 100 in the total
@@ -274,11 +247,8 @@ const Config = {
                 Biome_Tundra_Hills: 0.01,
                 Biome_Grass: 0.3,
                 Biome_Grass_Hills: 0.2,
-                Biome_Savanna: 0.2,
-                Biome_Savanna_Hills: 0.15,
                 Biome_Desert: 0.01,
                 Biome_Desert_Hills: 0.05,
-                Biome_Swamp: 0.1,
                 Biome_Tropic: 0.25,
                 Biome_Rocks: 0.01,
                 Biome_Ice_Rocks: 0.01,
@@ -300,11 +270,8 @@ const Config = {
             Biome_Tundra_Hills: 0.4,
             Biome_Grass: 1.0,
             Biome_Grass_Hills: 0.8,
-            Biome_Savanna: 0.9,
-            Biome_Savanna_Hills: 0.75,
             Biome_Desert: 0.2,
             Biome_Desert_Hills: 0.3,
-            Biome_Swamp: 0.25,
             Biome_Tropic: 0.33,
             Biome_Rocks: 0.1,
             Biome_Ice_Rocks: 0.05,
