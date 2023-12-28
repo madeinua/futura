@@ -36,9 +36,9 @@ export default class WaterOperator {
         return oceanMap;
     }
 
-    getCoastMap = function (oceanMap: OceanMap, altitudeMap: AltitudeMap, temperatureMap: TemperatureMap): CoastMap {
+    getCoastMap = function (oceanMap: OceanMap, altitudeMap: AltitudeMap): CoastMap {
 
-        let coastMap = new CoastMap(oceanMap, altitudeMap, temperatureMap),
+        let coastMap = new CoastMap(oceanMap, altitudeMap),
             storage = Config.STORE_DATA ? localStorage.getItem('coastMap') : null;
 
         if (typeof storage !== 'undefined' && storage !== null) {

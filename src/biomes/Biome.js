@@ -14,9 +14,10 @@ export default class Biome {
         return this.constructor.name;
     }
     getColor() {
-        return typeof Config.BIOME_COLORS[this.getName()] === 'undefined'
+        const color = typeof Config.BIOME_COLORS[this.getName()] === 'undefined'
             ? '#FFFFFF'
             : Config.BIOME_COLORS[this.getName()];
+        return Array.isArray(color) ? color[0] : color;
     }
     getHexColor() {
         return hexToRgb(this.getColor());

@@ -20,7 +20,7 @@ export default class TemperatureMap extends PointMatrix {
             });
         };
         this.considerAltitude = function () {
-            const _this = this, minLevel = Config.MAX_COAST_LEVEL;
+            const _this = this, minLevel = Config.MAX_OCEAN_LEVEL;
             _this.foreach(function (x, y) {
                 let altitude = _this.altitudeMap.getCell(x, y);
                 altitude = altitude >= minLevel ? (altitude - minLevel) * (altitude - minLevel) : 0;

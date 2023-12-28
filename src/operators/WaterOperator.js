@@ -25,8 +25,8 @@ export default class WaterOperator {
             }
             return oceanMap;
         };
-        this.getCoastMap = function (oceanMap, altitudeMap, temperatureMap) {
-            let coastMap = new CoastMap(oceanMap, altitudeMap, temperatureMap), storage = Config.STORE_DATA ? localStorage.getItem('coastMap') : null;
+        this.getCoastMap = function (oceanMap, altitudeMap) {
+            let coastMap = new CoastMap(oceanMap, altitudeMap), storage = Config.STORE_DATA ? localStorage.getItem('coastMap') : null;
             if (typeof storage !== 'undefined' && storage !== null) {
                 coastMap.fromString(storage);
             }

@@ -141,6 +141,28 @@ export function changeRange(value, minOld, maxOld, minNew, maxNew) {
     return (((value - minOld) * (maxNew - minNew)) / (maxOld - minOld)) + minNew;
 }
 /**
+ * Round the number to the next slice
+ * Sample: roundToNextSlice(0.45, 0, 1, 10) => 0.4
+ */
+export function roundToNextSlice(number, rangeStart, rangeEnd, N) {
+    // Check if the number is out of the specified range
+    if (number > rangeEnd || number < rangeStart) {
+        throwError('Number ' + number + ' is out of range [' + rangeStart + ', ' + rangeEnd + ']', 1, true);
+    }
+    // Calculate the slice size
+    let sliceSize = (rangeEnd - rangeStart) / N;
+    // Adjust the number based on the slice size
+    let adjustedNumber = (number - rangeStart) / sliceSize;
+    // Round the adjusted number to the next integer
+    let roundedNumber = Math.ceil(adjustedNumber);
+    // If the adjusted number was exactly on a slice boundary, round down instead
+    if (adjustedNumber === Math.floor(adjustedNumber)) {
+        roundedNumber = Math.floor(adjustedNumber);
+    }
+    // Return the corresponding slice value
+    return roundedNumber * sliceSize + rangeStart;
+}
+/**
  * Convert value in between [0-1] to RGB range [0-255]
  */
 export function fractionToRGB(value) {

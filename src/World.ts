@@ -136,7 +136,7 @@ export default class World {
             altitudeMap = surfaceOperator.generateAltitudeMap(),
             temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap),
             oceanMap = waterOperator.generateOceanMap(altitudeMap),
-            coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap, temperatureMap),
+            coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap),
             lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap),
             riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap),
             freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap),

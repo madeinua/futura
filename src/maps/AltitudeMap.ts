@@ -34,7 +34,7 @@ export default class AltitudeMap extends PointMatrix {
             val /= size;
 
             // stretch map
-            val = Math.min(1, Math.pow(val, Config.WORLD_MAP_OCEAN_LEVEL + 1));
+            val = Math.min(1, Math.pow(val, Config.WORLD_MAP_OCEAN_INTENSITY + 1));
 
             // make island
             val = _this.makeIsland(x, y, Config.WORLD_SIZE, val);
@@ -76,11 +76,11 @@ export default class AltitudeMap extends PointMatrix {
     }
 
     isGround = function (level: number): boolean {
-        return level > Config.MAX_WATER_LEVEL;
+        return level > Config.MAX_OCEAN_LEVEL;
     }
 
     isWater = function (level: number): boolean {
-        return Config.MAX_WATER_LEVEL >= level;
+        return Config.MAX_OCEAN_LEVEL >= level;
     }
 
     getLandCellsCount = function (): number {

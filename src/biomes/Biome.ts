@@ -32,9 +32,11 @@ export default class Biome {
     }
 
     getColor(): string {
-        return typeof Config.BIOME_COLORS[this.getName()] === 'undefined'
+        const color = typeof Config.BIOME_COLORS[this.getName()] === 'undefined'
             ? '#FFFFFF'
             : Config.BIOME_COLORS[this.getName()];
+
+        return Array.isArray(color) ? color[0] : color;
     }
 
     getHexColor(): RGB {
@@ -45,8 +47,7 @@ export default class Biome {
         return false;
     }
 
-    hasImage(): boolean
-    {
+    hasImage(): boolean {
         return typeof Config.BIOME_IMAGES[this.getName()] !== 'undefined';
     }
 

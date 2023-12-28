@@ -22,7 +22,7 @@ export default class AltitudeMap extends PointMatrix {
                 }
                 val /= size;
                 // stretch map
-                val = Math.min(1, Math.pow(val, Config.WORLD_MAP_OCEAN_LEVEL + 1));
+                val = Math.min(1, Math.pow(val, Config.WORLD_MAP_OCEAN_INTENSITY + 1));
                 // make island
                 val = _this.makeIsland(x, y, Config.WORLD_SIZE, val);
                 // round to 2 decimals
@@ -41,10 +41,10 @@ export default class AltitudeMap extends PointMatrix {
             return Math.min(altitude, altitude * Math.max(0, 1 - gradient));
         };
         this.isGround = function (level) {
-            return level > Config.MAX_WATER_LEVEL;
+            return level > Config.MAX_OCEAN_LEVEL;
         };
         this.isWater = function (level) {
-            return Config.MAX_WATER_LEVEL >= level;
+            return Config.MAX_OCEAN_LEVEL >= level;
         };
         this.getLandCellsCount = function () {
             return this.landSize;

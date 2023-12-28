@@ -15,15 +15,14 @@ const Config = {
     DRAW_TECHNICAL_MAPS: false,
 
     // Steps
-    STEPS_ENABLED: true,
+    STEPS_ENABLED: false,
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 80,
     STEPS_BOOST: 5,
     STEPS_BOOST_STEPS: 80,
 
     // Altitude
-    WORLD_MAP_OCEAN_LEVEL: 0.5, // [0-1]
-    MAX_WATER_LEVEL: 0.3,
+    WORLD_MAP_OCEAN_INTENSITY: 0.5, // [0-1]
 
     // Rivers
     RIVERS_DENSITY: 0.5, // [0-1]
@@ -52,14 +51,13 @@ const Config = {
     // Biomes
     SHOW_BIOMES_INFO: false,
     MIN_LEVEL: 0,
-    MAX_OCEAN_LEVEL: 0.25,
-    MAX_COAST_LEVEL: 0.3,
+    MIN_COAST_LEVEL: 0.2,
+    MAX_OCEAN_LEVEL: 0.3,
     MAX_BEACH_LEVEL: 0.32,
     MAX_LOWLAND_LEVEL: 0.5,
     MAX_HILLS_LEVEL: 0.7,
     MAX_MOUNTAINS_LEVEL: 1,
 
-    COAST_TEMPERATURE_RATIO: 0.05,
     BEACH_TEMPERATURE_RATIO: -0.02,
     BEACH_HUMIDITY_RATIO: 0.01,
     MAX_BEACH_DISTANCE_FROM_OCEAN: 3,
@@ -153,19 +151,19 @@ const Config = {
     },
 
     BIOME_COLORS: {
-        Biome_Beach: '#c2b281',
-        Biome_Coast: '#003eb2',
-        Biome_Desert: '#e8c57e',
-        Biome_Desert_Hills: '#c4a37e',
-        Biome_Grass: '#659c29',
-        Biome_Grass_Hills: '#778e5d',
-        Biome_Rocks: '#818f71',
-        Biome_Ice_Rocks: '#a6a6a6',
-        Biome_Ocean: '#003eb2',
-        Biome_Tropic: '#3c8045',
-        Biome_Tundra: '#d5d7b7',
-        Biome_Tundra_Hills: '#a8a996',
-        Biome_Water: '#74aece',
+        Biome_Ocean: ['#0652a2', '#1f67b4', '#4087d2'],
+        Biome_Coast: ['#549ae3', '#78baff'],
+        Biome_Water: '#3592c5',
+        Biome_Beach: '#fff1ac',
+        Biome_Desert: ['#eebe62', '#ecc26f', '#e8c57e'],
+        Biome_Desert_Hills: ['#af8f6b', '#c4a37e'],
+        Biome_Grass: ['#74af54', '#70b649', '#6ec03f'],
+        Biome_Grass_Hills: ['#6a963b', '#6a9f31'],
+        Biome_Rocks: '#5d7742',
+        Biome_Ice_Rocks: '#e7e7e7',
+        Biome_Tropic: ['#418869', '#3f9871', '#3da678'],
+        Biome_Tundra: ['#b2b498', '#c2c59f', '#d5d9a6'],
+        Biome_Tundra_Hills: ['#cfd0cc', '#c0c0b9'],
     },
 
     BIOME_IMAGES: {

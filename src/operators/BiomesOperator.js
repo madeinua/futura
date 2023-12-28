@@ -44,7 +44,7 @@ export default class BiomesOperator {
         }
     }
     isBeach(x, y, altitude, temperature, humidity) {
-        return altitude > Config.MAX_COAST_LEVEL
+        return altitude > Config.MAX_OCEAN_LEVEL
             && altitude <= Config.MAX_BEACH_LEVEL
                 - (temperature * Config.BEACH_TEMPERATURE_RATIO * 2 - Config.BEACH_TEMPERATURE_RATIO)
                 - (humidity * Config.BEACH_HUMIDITY_RATIO * 2 - Config.BEACH_HUMIDITY_RATIO)
@@ -63,7 +63,7 @@ export default class BiomesOperator {
             return new biomes.Biome_Water(x, y, args);
         }
         if (this.oceanMap.filled(x, y)) {
-            return this.coastMap.isCoast(args.altitude, args.temperature)
+            return this.coastMap.isCoast(args.altitude)
                 ? new biomes.Biome_Coast(x, y, args)
                 : new biomes.Biome_Ocean(x, y, args);
         }
