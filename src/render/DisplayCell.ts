@@ -3,22 +3,25 @@ import {RGBa} from "../helpers.js";
 export default class DisplayCell {
 
     readonly color: RGBa;
-    readonly image: null | string;
+    readonly images: string[];
 
-    constructor(color: RGBa, image: null | string) {
+    constructor(color: RGBa, image: null | string | string[]) {
         this.color = color;
-        this.image = image;
+
+        if (Array.isArray(image)) {
+            this.images = image.filter((image: string | null) => image !== null);
+        } else if (image === null) {
+            this.images = [];
+        } else {
+            this.images = [image];
+        }
     }
 
     getColor(): RGBa {
         return this.color;
     }
 
-    hasImage(): boolean {
-        return this.image !== null;
-    }
-
-    getImage(): null | string {
-        return this.image;
+    getImages(): string[] {
+        return this.images;
     }
 }

@@ -3,7 +3,7 @@ import Config from "../../config.js";
 export default class OceanMap extends BinaryMatrix {
     constructor(altitudeMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-        this.includeAllWatterCellsAround = function (startX, startY) {
+        this.includeAllWaterCellsAround = function (startX, startY) {
             const _this = this, activeCells = [];
             _this.fill(startX, startY);
             activeCells.push([startX, startY]);
@@ -29,7 +29,7 @@ export default class OceanMap extends BinaryMatrix {
             tempMap.foreachFilled(function (x, y) {
                 if (!_this.filled(x, y)
                     && tempMap.getSizeFromPoint(x, y) > Config.WORLD_SIZE) {
-                    _this.includeAllWatterCellsAround(x, y);
+                    _this.includeAllWaterCellsAround(x, y);
                 }
             });
         };
@@ -38,7 +38,7 @@ export default class OceanMap extends BinaryMatrix {
             if (!_this.altitudeMap.isWater(_this.altitudeMap.getCell(startX, startY))) {
                 return _this;
             }
-            _this.includeAllWatterCellsAround(startX, startY);
+            _this.includeAllWaterCellsAround(startX, startY);
             _this.bigLakesToSeas();
             return _this;
         };

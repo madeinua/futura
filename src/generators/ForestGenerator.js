@@ -80,7 +80,7 @@ export default class ForestGenerator {
         if (!this.groundCreateMults.hasOwnProperty(biome.getName())) {
             return 0;
         }
-        const waterRatio = Math.max(1, Config.FOREST_CREATE_MULTS.WATTER / biome.getDistanceToWater()), humidityRatio = changeRange(humidity, 0, 1, 0, Config.FOREST_CREATE_MULTS.HUMIDITY), groundRatio = this.groundCreateMults[biome.getName()];
+        const waterRatio = Math.max(1, Config.FOREST_CREATE_MULTS.WATER / biome.getDistanceToWater()), humidityRatio = changeRange(humidity, 0, 1, 0, Config.FOREST_CREATE_MULTS.HUMIDITY), groundRatio = this.groundCreateMults[biome.getName()];
         return speed * (groundRatio + humidityRatio + waterRatio) * biome.altitude;
     }
 }

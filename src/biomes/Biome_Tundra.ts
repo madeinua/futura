@@ -18,4 +18,8 @@ export default class Biome_Tundra extends Biome {
 
         return super.getImage();
     }
+
+    getBackground(): string | null {
+        return Config.BIOME_IMAGES.Tundra;
+    }
 }

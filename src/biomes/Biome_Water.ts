@@ -1,3 +1,4 @@
+import Config from "../../config.js";
 import Biome from "./Biome.js";
 import {LightenDarkenColor} from "../helpers.js";
 
@@ -7,7 +8,11 @@ export default class Biome_Water extends Biome {
         return LightenDarkenColor(super.getColor(), this.altitude * 150);
     }
 
-    hasImage(): boolean {
-        return false;
+    getImage(): string | null {
+        return null;
+    }
+
+    getBackground(): string | null {
+        return Config.BIOME_IMAGES.Water;
     }
 }

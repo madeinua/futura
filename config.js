@@ -17,7 +17,7 @@ const Config = {
     // Steps
     STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
-    STEPS_LIMIT: 80,
+    STEPS_LIMIT: 100,
     STEPS_BOOST: 5,
     STEPS_BOOST_STEPS: 80,
 
@@ -102,14 +102,21 @@ const Config = {
         Biome_Water: ['#3592c5'],
         Biome_Beach: ['#fff1ac'],
         Biome_Desert: ['#e8c57e', '#ecc26f', '#eebe62'],
-        Biome_Grass: ['#6ec03f', '#70b649', '#74af54'],
-        Biome_Tropic: ['#3da678', '#3f9871', '#418869'],
-        Biome_Tundra: ['#d5d9a6', '#c3c5a5', '#afb09e'],
+        Biome_Grass: ['#78d741', '#6fbb43', '#649d43', '#57803f'],
+        Biome_Tropic: ['#3da678', '#3f9871', '#418869', '#396c56'],
+        Biome_Tundra: ['#d5d9a6', '#c3c5a5', '#afb09e', '#9d9d95'],
     },
 
 
     BIOME_IMAGES: {
+        Ocean: 'public/images/ocean-1.png',
+        Water: 'public/images/water-1.png',
         Rocks: ['public/images/mountains-1.png', 'public/images/mountains-2.png'],
+        Desert: 'public/images/desert-1.png',
+        Beach: 'public/images/beach-1.png',
+        Grass: 'public/images/grass-1.png',
+        Tundra: 'public/images/tundra-1.png',
+        Tropic: 'public/images/tropic-1.png',
     },
 
     // Forests
@@ -125,14 +132,13 @@ const Config = {
         Biome_Tropic: 6
     },
     FOREST_CREATE_MULTS: { // Must be 100 in the total
-        WATTER: 35,
+        WATER: 35,
         HUMIDITY: 35,
         GROUND: 30
     },
     FOREST_COLOR: '#3c5626',
     FOREST_IMAGES: {
         'forest_1': 'public/images/forest-1.png',
-        'forest_2': 'public/images/forest-2.png',
     },
     FOREST_PALM_IMAGE: 'public/images/palm-1.png',
     FOREST_TUNDRA_IMAGE: 'public/images/forest-3.png',
@@ -171,12 +177,12 @@ const Config = {
 
     // Fractions
     FRACTIONS: {
-        COUNT: 6,
+        COUNT: 0,
         AUTO_CREATE_ON_STEP: 20,
         // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
             BIOMES: {
-                Biome_Beach: 0.2,
+                Biome_Beach: 0.1,
                 Biome_Tundra: 0.05,
                 Biome_Grass: 0.3,
                 Biome_Desert: 0.01,
@@ -209,7 +215,7 @@ const Config = {
             '#ffff00',
             '#c62ce0',
             '#00f7ff',
-            '#290c59',
+            '#31057a',
             '#ff4b89',
             '#ff9100',
             '#000000',

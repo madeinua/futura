@@ -12,7 +12,7 @@ export default class OceanMap extends BinaryMatrix {
         this.altitudeMap = altitudeMap;
     }
 
-    private includeAllWatterCellsAround = function (startX: number, startY: number): void {
+    private includeAllWaterCellsAround = function (startX: number, startY: number): void {
 
         const _this: OceanMap = this,
             activeCells = [];
@@ -54,7 +54,7 @@ export default class OceanMap extends BinaryMatrix {
                 !_this.filled(x, y)
                 && tempMap.getSizeFromPoint(x, y) > Config.WORLD_SIZE
             ) {
-                _this.includeAllWatterCellsAround(x, y);
+                _this.includeAllWaterCellsAround(x, y);
             }
         });
     }
@@ -69,7 +69,7 @@ export default class OceanMap extends BinaryMatrix {
             return _this;
         }
 
-        _this.includeAllWatterCellsAround(startX, startY);
+        _this.includeAllWaterCellsAround(startX, startY);
         _this.bigLakesToSeas();
 
         return _this;

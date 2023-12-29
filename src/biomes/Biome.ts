@@ -50,11 +50,11 @@ export default class Biome {
     }
 
     protected getHillsBoostColor(): number {
-        return -25;
+        return -30;
     }
 
     protected getMountainsBoostColor(): number {
-        return -50;
+        return -60;
     }
 
     getColor(): string {
@@ -83,10 +83,6 @@ export default class Biome {
         return hexToRgb(this.getColor());
     }
 
-    hasImage(): boolean {
-        return this.isMountains;
-    }
-
     getImage(): null | string {
 
         if (this.isMountains) {
@@ -96,10 +92,14 @@ export default class Biome {
         return null;
     }
 
+    getBackground(): string | null {
+        return null;
+    }
+
     getDisplayCell(): DisplayCell {
         return new DisplayCell(
             this.getHexColor(),
-            this.getImage(),
+            [this.getBackground(), this.getImage()],
         );
     }
 

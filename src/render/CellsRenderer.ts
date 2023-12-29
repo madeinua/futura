@@ -19,14 +19,18 @@ export default class CellsRenderer {
     }
 
     render(ctx: CanvasRenderingContext2D, displayCell: DisplayCell, x: number, y: number): void {
-        if (displayCell.hasImage()) {
-            ctx.drawImage(
-                this.imagesCache[displayCell.getImage()],
-                x * this.cellWidth,
-                y * this.cellHeight,
-                this.cellWidth,
-                this.cellHeight
-            );
+        const images: string[] = displayCell.getImages();
+
+        if (images.length) {
+            for (let i = 0; i < images.length; i++) {
+                ctx.drawImage(
+                    this.imagesCache[images[i]],
+                    x * this.cellWidth,
+                    y * this.cellHeight,
+                    this.cellWidth,
+                    this.cellHeight
+                );
+            }
         } else {
             ctx.fillStyle = rgbToHex(displayCell.getColor());
             ctx.fillRect(

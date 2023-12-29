@@ -141,10 +141,7 @@ export default class BiomesOperator {
     private addBiomesToLayer = function (biomesLayer: Layer, biomesImagesLayer: Layer): void {
         this.biomes.foreachValues(function (biome: Biome, x: number, y: number): void {
             biomesLayer.setCell(x, y, biome.getDisplayCell());
-
-            if (biome.hasImage()) {
-                biomesImagesLayer.setCell(x, y, biome.getDisplayCell());
-            }
+            biomesImagesLayer.setCell(x, y, biome.getDisplayCell());
         });
     }
 

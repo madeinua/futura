@@ -7,4 +7,7 @@ export default class Biome_Coast extends Biome {
             max: Config.MIN_GROUND_LEVEL,
         };
     }
+    getBackground() {
+        return Config.BIOME_IMAGES.Ocean;
+    }
 }

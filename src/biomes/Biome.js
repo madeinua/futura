@@ -22,10 +22,10 @@ export default class Biome {
         };
     }
     getHillsBoostColor() {
-        return -25;
+        return -30;
     }
     getMountainsBoostColor() {
-        return -50;
+        return -60;
     }
     getColor() {
         const minmax = this.getColorsMinMax(), colors = Config.BIOME_COLORS[this.getName()];
@@ -48,17 +48,17 @@ export default class Biome {
     getHexColor() {
         return hexToRgb(this.getColor());
     }
-    hasImage() {
-        return this.isMountains;
-    }
     getImage() {
         if (this.isMountains) {
             return Config.BIOME_IMAGES.Rocks[0];
         }
         return null;
     }
+    getBackground() {
+        return null;
+    }
     getDisplayCell() {
-        return new DisplayCell(this.getHexColor(), this.getImage());
+        return new DisplayCell(this.getHexColor(), [this.getBackground(), this.getImage()]);
     }
     getDistanceToWater() {
         return this.distanceToWater;

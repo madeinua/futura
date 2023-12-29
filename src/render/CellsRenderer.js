@@ -21,8 +21,11 @@ export default class CellsRenderer {
         });
     }
     render(ctx, displayCell, x, y) {
-        if (displayCell.hasImage()) {
-            ctx.drawImage(this.imagesCache[displayCell.getImage()], x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
+        const images = displayCell.getImages();
+        if (images.length) {
+            for (let i = 0; i < images.length; i++) {
+                ctx.drawImage(this.imagesCache[images[i]], x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
+            }
         }
         else {
             ctx.fillStyle = rgbToHex(displayCell.getColor());

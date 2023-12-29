@@ -7,4 +7,7 @@ export default class Biome_Grass extends Biome {
             max: Config.MAX_LEVEL,
         };
     }
+    getBackground() {
+        return Config.BIOME_IMAGES.Grass;
+    }
 }
