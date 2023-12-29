@@ -16,7 +16,7 @@ export default class CoastMap extends BinaryMatrix {
     }
 
     isCoast(altitude: number): boolean {
-        return altitude >= Config.MIN_COAST_LEVEL && altitude <= Config.MAX_OCEAN_LEVEL;
+        return altitude >= Config.MIN_COAST_LEVEL && altitude <= Config.MIN_GROUND_LEVEL;
     }
 
     generateMap(): CoastMap {

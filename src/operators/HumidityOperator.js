@@ -1,6 +1,6 @@
+import Config from "../../config.js";
 import HumidityMap from '../maps/HumidityMap.js';
 import { Filters, logTimeEvent } from "../helpers.js";
-import Config from "../../config.js";
 export default class HumidityOperator {
     constructor() {
         this.generateHumidityMap = function (altitudeMap, riversMap, lakesMap) {

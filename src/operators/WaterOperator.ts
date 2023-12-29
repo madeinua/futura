@@ -6,7 +6,6 @@ import OceanMap from '../maps/OceanMap.js';
 import {Filters, logTimeEvent} from "../helpers.js";
 import Config from "../../config.js";
 import AltitudeMap from "../maps/AltitudeMap.js";
-import TemperatureMap from "../maps/TemperatureMap.js";
 import IslandsMap from "../maps/IslandsMap.js";
 
 export default class WaterOperator {

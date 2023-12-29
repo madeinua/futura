@@ -1,6 +1,6 @@
-import DisplayCell from "./DisplayCell.js";
-import {preloadImages, rgbToHex, throwError} from "../helpers.js";
 import Config from "../../config.js";
+import DisplayCell from "./DisplayCell.js";
+import {preloadImages, rgbToHex} from "../helpers.js";
 
 export default class CellsRenderer {
 

@@ -21,8 +21,8 @@ export default class FractionGenerator {
                 map.setCell(biome.x, biome.y, 0);
                 return;
             }
-            const oceanFactor = _this.objects.oceanMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_OCEAN : 1, waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 1, temperatureFactor = fromMiddleFractionValue(_this.objects.temperatureMap.getCell(biome.x, biome.y)), isForest = _this.objects.forestMap.filled(biome.x, biome.y), forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (_this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1);
-            map.setCell(biome.x, biome.y, biomeProbability * oceanFactor * waterFactor * temperatureFactor * forestFactor);
+            const oceanFactor = _this.objects.oceanMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_OCEAN : 1, waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 1, altitudeFactor = Math.max(1 - biome.altitude, Config.MAX_HILLS_LEVEL), temperatureFactor = fromMiddleFractionValue(_this.objects.temperatureMap.getCell(biome.x, biome.y)), isForest = _this.objects.forestMap.filled(biome.x, biome.y), forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (_this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1);
+            map.setCell(biome.x, biome.y, biomeProbability * oceanFactor * waterFactor * altitudeFactor * temperatureFactor * forestFactor);
         });
         return map;
     }

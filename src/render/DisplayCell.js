@@ -1,8 +1,7 @@
 export default class DisplayCell {
-    constructor(color, image, withBackground) {
+    constructor(color, image) {
         this.color = color;
         this.image = image;
-        this.withBg = withBackground;
     }
     getColor() {
         return this.color;
@@ -12,9 +11,5 @@ export default class DisplayCell {
     }
     getImage() {
         return this.image;
-    }
-    // @TODO Add logic to display image + bg for the same cell
-    drawBackground() {
-        return this.withBg || !this.hasImage();
     }
 }

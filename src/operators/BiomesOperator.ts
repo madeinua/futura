@@ -16,7 +16,6 @@ type biomesConfig = {
     class: string,
     h: [number, number],
     t: [number, number],
-    a: [number, number]
 }[];
 
 export default class BiomesOperator {
@@ -69,7 +68,7 @@ export default class BiomesOperator {
     }
 
     isBeach(x: number, y: number, altitude: number, temperature: number, humidity: number): boolean {
-        return altitude > Config.MAX_OCEAN_LEVEL
+        return altitude > Config.MIN_GROUND_LEVEL
             && altitude <= Config.MAX_BEACH_LEVEL
             - (temperature * Config.BEACH_TEMPERATURE_RATIO * 2 - Config.BEACH_TEMPERATURE_RATIO)
             - (humidity * Config.BEACH_HUMIDITY_RATIO * 2 - Config.BEACH_HUMIDITY_RATIO)
@@ -92,12 +91,15 @@ export default class BiomesOperator {
         let distanceToWater = this.freshWaterMap.distanceTo(x, y, 5);
         distanceToWater = distanceToWater > 100 ? 100 : distanceToWater;
 
-        const args: BiomeArgs = {
-            altitude: this.altitudeMap.getCell(x, y),
-            temperature: this.temperatureMap.getCell(x, y),
-            humidity: this.humidityMap.getCell(x, y),
-            distanceToWater: distanceToWater
-        }
+        const altitude = this.altitudeMap.getCell(x, y),
+            args: BiomeArgs = {
+                altitude: altitude,
+                temperature: this.temperatureMap.getCell(x, y),
+                humidity: this.humidityMap.getCell(x, y),
+                distanceToWater: distanceToWater,
+                isHills: this.altitudeMap.isHills(altitude),
+                isMountains: this.altitudeMap.isMountains(altitude),
+            }
 
         if (this.freshWaterMap.filled(x, y)) {
             return new biomes.Biome_Water(x, y, args);
@@ -121,7 +123,6 @@ export default class BiomesOperator {
             if (
                 this._checkBiomeIndex(cfg.h, fromFraction(args.humidity, Config.MIN_HUMIDITY, Config.MAX_HUMIDITY))
                 && this._checkBiomeIndex(cfg.t, fromFraction(args.temperature, Config.MIN_TEMPERATURE, Config.MAX_TEMPERATURE))
-                && this._checkBiomeIndex(cfg.a, args.altitude)
             ) {
                 matchedBiomes.push(cfg.class);
             }

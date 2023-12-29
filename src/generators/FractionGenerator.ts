@@ -1,5 +1,5 @@
 import Config from "../../config.js";
-import {fromMiddleFractionValue, throwError} from "../helpers.js";
+import {fromMiddleFractionValue} from "../helpers.js";
 import Biome from "../biomes/Biome.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import NumericMatrix from "../structures/NumericMatrix.js";
@@ -50,13 +50,18 @@ export default class FractionGenerator {
 
             const oceanFactor = _this.objects.oceanMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_OCEAN : 1,
                 waterFactor = _this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER : 1,
+                altitudeFactor = Math.max(1 - biome.altitude, Config.MAX_HILLS_LEVEL),
                 temperatureFactor = fromMiddleFractionValue(_this.objects.temperatureMap.getCell(biome.x, biome.y)),
                 isForest = _this.objects.forestMap.filled(biome.x, biome.y),
                 forestFactor = isForest ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST : (
                     _this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y) ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST : 1
                 );
 
-            map.setCell(biome.x, biome.y, biomeProbability * oceanFactor * waterFactor * temperatureFactor * forestFactor);
+            map.setCell(
+                biome.x,
+                biome.y,
+                biomeProbability * oceanFactor * waterFactor * altitudeFactor * temperatureFactor * forestFactor
+            );
         });
 
         return map;

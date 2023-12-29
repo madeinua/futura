@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { preloadImages, rgbToHex } from "../helpers.js";
 import Config from "../../config.js";
+import { preloadImages, rgbToHex } from "../helpers.js";
 export default class CellsRenderer {
     constructor(cellWidth, cellHeight) {
         this.cellWidth = cellWidth;

@@ -1,6 +1,6 @@
-import DisplayCell from "../render/DisplayCell.js";
-import { hexToRgb } from "../helpers.js";
 import Config from "../../config.js";
+import DisplayCell from "../render/DisplayCell.js";
+import { hexToRgb, LightenDarkenColor } from "../helpers.js";
 export default class Biome {
     constructor(x, y, args) {
         this.x = x;
@@ -9,32 +9,56 @@ export default class Biome {
         this.temperature = args.temperature;
         this.humidity = args.humidity;
         this.distanceToWater = args.distanceToWater;
+        this.isHills = args.isHills;
+        this.isMountains = args.isMountains;
     }
     getName() {
         return this.constructor.name;
     }
+    getColorsMinMax() {
+        return {
+            min: Config.MIN_LEVEL,
+            max: Config.MAX_LEVEL,
+        };
+    }
+    getHillsBoostColor() {
+        return -25;
+    }
+    getMountainsBoostColor() {
+        return -50;
+    }
     getColor() {
-        const color = typeof Config.BIOME_COLORS[this.getName()] === 'undefined'
-            ? '#FFFFFF'
-            : Config.BIOME_COLORS[this.getName()];
-        return Array.isArray(color) ? color[0] : color;
+        const minmax = this.getColorsMinMax(), colors = Config.BIOME_COLORS[this.getName()];
+        let slice = 0;
+        if (this.altitude >= minmax.max) {
+            slice = colors.length - 1;
+        }
+        else if (this.altitude > minmax.min) {
+            slice = Math.floor((this.altitude - minmax.min) / (minmax.max - minmax.min) * colors.length);
+        }
+        let color = colors[slice];
+        if (this.isHills) {
+            color = LightenDarkenColor(color, this.getHillsBoostColor());
+        }
+        else if (this.isMountains) {
+            color = LightenDarkenColor(color, this.getMountainsBoostColor());
+        }
+        return color;
     }
     getHexColor() {
         return hexToRgb(this.getColor());
     }
-    displayCellWithBackground() {
-        return false;
-    }
     hasImage() {
-        return typeof Config.BIOME_IMAGES[this.getName()] !== 'undefined';
+        return this.isMountains;
     }
     getImage() {
-        return typeof Config.BIOME_IMAGES[this.getName()] === 'undefined'
-            ? null
-            : Config.BIOME_IMAGES[this.getName()];
+        if (this.isMountains) {
+            return Config.BIOME_IMAGES.Rocks[0];
+        }
+        return null;
     }
     getDisplayCell() {
-        return new DisplayCell(this.getHexColor(), this.getImage(), this.displayCellWithBackground());
+        return new DisplayCell(this.getHexColor(), this.getImage());
     }
     getDistanceToWater() {
         return this.distanceToWater;

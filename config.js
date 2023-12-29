@@ -15,7 +15,7 @@ const Config = {
     DRAW_TECHNICAL_MAPS: false,
 
     // Steps
-    STEPS_ENABLED: false,
+    STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 80,
     STEPS_BOOST: 5,
@@ -52,11 +52,11 @@ const Config = {
     SHOW_BIOMES_INFO: false,
     MIN_LEVEL: 0,
     MIN_COAST_LEVEL: 0.2,
-    MAX_OCEAN_LEVEL: 0.3,
+    MIN_GROUND_LEVEL: 0.3,
     MAX_BEACH_LEVEL: 0.32,
-    MAX_LOWLAND_LEVEL: 0.5,
+    MAX_LOWLAND_LEVEL: 0.42,
     MAX_HILLS_LEVEL: 0.7,
-    MAX_MOUNTAINS_LEVEL: 1,
+    MAX_LEVEL: 1,
 
     BEACH_TEMPERATURE_RATIO: -0.02,
     BEACH_HUMIDITY_RATIO: 0.01,
@@ -67,84 +67,30 @@ const Config = {
      * @return {[]}
      */
     biomesConfig: function() {
-
         const biomesConfig = [];
-
-        biomesConfig.push({
-            class: 'Biome_Tundra',
-            h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
-            t: [this.MIN_TEMPERATURE, this.LOW_TEMPERATURE],
-            a: [this.MIN_LEVEL, this.MAX_LOWLAND_LEVEL]
-        });
 
         biomesConfig.push({
             class: 'Biome_Grass',
             h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
             t: [this.LOW_TEMPERATURE, this.HIGH_TEMPERATURE],
-            a: [this.MIN_LEVEL, this.MAX_LOWLAND_LEVEL]
+        });
+
+        biomesConfig.push({
+            class: 'Biome_Tundra',
+            h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
+            t: [this.MIN_TEMPERATURE, this.LOW_TEMPERATURE],
         });
 
         biomesConfig.push({
             class: 'Biome_Tropic',
             h: [this.NORMAL_HUMIDITY, this.MAX_HUMIDITY],
             t: [this.HIGH_TEMPERATURE, this.MAX_TEMPERATURE],
-            a: [this.MIN_LEVEL, this.MAX_LOWLAND_LEVEL]
         });
 
         biomesConfig.push({
             class: 'Biome_Desert',
             h: [this.MIN_HUMIDITY, this.NORMAL_HUMIDITY],
             t: [this.HIGH_TEMPERATURE, this.MAX_TEMPERATURE],
-            a: [this.MIN_LEVEL, this.MAX_LOWLAND_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Tundra_Hills',
-            h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
-            t: [this.MIN_TEMPERATURE, this.LOW_TEMPERATURE],
-            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Tundra_Hills',
-            h: [this.MIN_HUMIDITY, this.LOW_HUMIDITY],
-            t: [this.LOW_TEMPERATURE, this.NORMAL_TEMPERATURE],
-            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Grass_Hills',
-            h: [this.LOW_HUMIDITY, this.MAX_HUMIDITY],
-            t: [this.LOW_TEMPERATURE, this.MAX_TEMPERATURE],
-            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Grass_Hills',
-            h: [this.MIN_HUMIDITY, this.NORMAL_HUMIDITY],
-            t: [this.NORMAL_TEMPERATURE, this.HIGH_TEMPERATURE],
-            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Desert_Hills',
-            h: [this.MIN_HUMIDITY, this.NORMAL_HUMIDITY],
-            t: [this.HIGH_TEMPERATURE, this.MAX_TEMPERATURE],
-            a: [this.MAX_LOWLAND_LEVEL, this.MAX_HILLS_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Ice_Rocks',
-            h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
-            t: [this.MIN_TEMPERATURE, this.LOW_TEMPERATURE],
-            a: [this.MAX_HILLS_LEVEL, this.MAX_MOUNTAINS_LEVEL]
-        });
-
-        biomesConfig.push({
-            class: 'Biome_Rocks',
-            h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
-            t: [this.LOW_TEMPERATURE, this.MAX_TEMPERATURE],
-            a: [this.MAX_HILLS_LEVEL, this.MAX_MOUNTAINS_LEVEL]
         });
 
         return biomesConfig;
@@ -153,22 +99,17 @@ const Config = {
     BIOME_COLORS: {
         Biome_Ocean: ['#0652a2', '#1f67b4', '#4087d2'],
         Biome_Coast: ['#549ae3', '#78baff'],
-        Biome_Water: '#3592c5',
-        Biome_Beach: '#fff1ac',
-        Biome_Desert: ['#eebe62', '#ecc26f', '#e8c57e'],
-        Biome_Desert_Hills: ['#af8f6b', '#c4a37e'],
-        Biome_Grass: ['#74af54', '#70b649', '#6ec03f'],
-        Biome_Grass_Hills: ['#6a963b', '#6a9f31'],
-        Biome_Rocks: '#5d7742',
-        Biome_Ice_Rocks: '#e7e7e7',
-        Biome_Tropic: ['#418869', '#3f9871', '#3da678'],
-        Biome_Tundra: ['#b2b498', '#c2c59f', '#d5d9a6'],
-        Biome_Tundra_Hills: ['#cfd0cc', '#c0c0b9'],
+        Biome_Water: ['#3592c5'],
+        Biome_Beach: ['#fff1ac'],
+        Biome_Desert: ['#e8c57e', '#ecc26f', '#eebe62'],
+        Biome_Grass: ['#6ec03f', '#70b649', '#74af54'],
+        Biome_Tropic: ['#3da678', '#3f9871', '#418869'],
+        Biome_Tundra: ['#d5d9a6', '#c3c5a5', '#afb09e'],
     },
 
+
     BIOME_IMAGES: {
-        Biome_Rocks: 'public/images/mountains-1.png',
-        Biome_Ice_Rocks: 'public/images/mountains-2.png',
+        Rocks: ['public/images/mountains-1.png', 'public/images/mountains-2.png'],
     },
 
     // Forests
@@ -179,13 +120,8 @@ const Config = {
     FOREST_DIE_CHANCE: 0.001, // %
     FOREST_GROUNDS_MULTS: {
         Biome_Tundra: 1.2,
-        Biome_Tundra_Hills: 0.8,
         Biome_Grass: 2,
-        Biome_Grass_Hills: 5,
         Biome_Desert: 0.5,
-        Biome_Desert_Hills: 1.5,
-        Biome_Rocks: 0.8,
-        Biome_Ice_Rocks: 0,
         Biome_Tropic: 6
     },
     FOREST_CREATE_MULTS: { // Must be 100 in the total
@@ -242,14 +178,9 @@ const Config = {
             BIOMES: {
                 Biome_Beach: 0.2,
                 Biome_Tundra: 0.05,
-                Biome_Tundra_Hills: 0.01,
                 Biome_Grass: 0.3,
-                Biome_Grass_Hills: 0.2,
                 Biome_Desert: 0.01,
-                Biome_Desert_Hills: 0.05,
                 Biome_Tropic: 0.25,
-                Biome_Rocks: 0.01,
-                Biome_Ice_Rocks: 0.01,
             },
             MIN_ISLAND_SIZE: 50,
             CLOSE_TO_OCEAN: 2,
@@ -258,21 +189,19 @@ const Config = {
             CLOSE_TO_FOREST: 2,
         },
         INFLUENCE: {
-            BASE: 1.0,
-            FOREST: 0.5,
+            // Boosts
+            HILLS_BOOST: 0.5,
+            MOUNTAINS_BOOST: 0.1,
+            FOREST_BOOST: 0.5,
+            // Biomes
             Biome_Ocean: 0.1,
             Biome_Coast: 0.25,
             Biome_Water: 0.25,
             Biome_Beach: 0.8,
             Biome_Tundra: 0.5,
-            Biome_Tundra_Hills: 0.4,
             Biome_Grass: 1.0,
-            Biome_Grass_Hills: 0.8,
             Biome_Desert: 0.2,
-            Biome_Desert_Hills: 0.3,
             Biome_Tropic: 0.33,
-            Biome_Rocks: 0.1,
-            Biome_Ice_Rocks: 0.05,
         },
         COLORS: [
             '#ff0000',

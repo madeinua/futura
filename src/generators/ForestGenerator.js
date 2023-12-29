@@ -81,6 +81,6 @@ export default class ForestGenerator {
             return 0;
         }
         const waterRatio = Math.max(1, Config.FOREST_CREATE_MULTS.WATTER / biome.getDistanceToWater()), humidityRatio = changeRange(humidity, 0, 1, 0, Config.FOREST_CREATE_MULTS.HUMIDITY), groundRatio = this.groundCreateMults[biome.getName()];
-        return speed * (groundRatio + humidityRatio + waterRatio);
+        return speed * (groundRatio + humidityRatio + waterRatio) * biome.altitude;
     }
 }

@@ -68,15 +68,17 @@ export default class FractionsOperator {
     }
 
     private increaseCellInfluence = function (positionX: number, positionY: number, fraction: Fraction): void {
-        let _this: FractionsOperator = this,
+        let influence = 1;
+
+        const _this: FractionsOperator = this,
             influenceOriginal = fraction.influenceTerritory.getCell(positionX, positionY),
-            influence = Config.FRACTIONS.INFLUENCE.BASE;
+            biome = _this.biomesMap.getCell(positionX, positionY);
 
         // Influence depends on a biome
         if (_this.forestMap.filled(positionX, positionY)) {
-            influence *= Config.FRACTIONS.INFLUENCE.FOREST;
+            influence *= Config.FRACTIONS.INFLUENCE.FOREST_BOOST;
         } else {
-            let infName: string = _this.biomesMap.getCell(positionX, positionY).getName();
+            let infName: string = biome.getName();
 
             if (typeof Config.FRACTIONS.INFLUENCE[infName] === 'undefined') {
                 throwError('Unknown influence name: ' + infName, 10, true);
@@ -85,10 +87,16 @@ export default class FractionsOperator {
             }
         }
 
+        // Influence depends on the altitude
+        if (biome.isHills) {
+            influence *= Config.FRACTIONS.INFLUENCE.HILLS_BOOST;
+        } else if (biome.isMountains) {
+            influence *= Config.FRACTIONS.INFLUENCE.MOUNTAINS_BOOST;
+        }
+
         // 1 is the maximum influence
         influence = Math.min(1, influenceOriginal + influence);
 
-        // @TODO Logic..
         fraction.influenceTerritory.setCell(positionX, positionY, influence);
     }
 
@@ -143,7 +151,7 @@ export default class FractionsOperator {
         this.fractionsLayer.setCell(
             position[0],
             position[1],
-            new DisplayCell(fraction.getFractionColor(), null, true)
+            new DisplayCell(fraction.getFractionColor(), null)
         );
     }
 
@@ -151,7 +159,7 @@ export default class FractionsOperator {
         this.fractionsLayer.setCell(
             position[0],
             position[1],
-            new DisplayCell(fraction.getFractionTerritoryColor(), null, true)
+            new DisplayCell(fraction.getFractionTerritoryColor(), null)
         );
     }
 
@@ -165,7 +173,7 @@ export default class FractionsOperator {
                 _this.fractionsBorderLayer.setCell(
                     x,
                     y,
-                    new DisplayCell(fraction.getFractionBorderColor(), null, true)
+                    new DisplayCell(fraction.getFractionBorderColor(), null)
                 );
             });
         });

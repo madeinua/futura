@@ -4,6 +4,7 @@ import {Cell, CellsList} from "../structures/Cells.js";
 import ForestMap from "../maps/ForestMap.js";
 import AltitudeMap from "../maps/AltitudeMap.js";
 import HumidityMap from "../maps/HumidityMap.js";
+import Biome from "../biomes/Biome.js";
 
 type ForestGeneratorMults = {
     [key: string]: number;
@@ -135,7 +136,7 @@ export default class ForestGenerator {
             return 0;
         }
 
-        const biome = forestMap.biomes.getCell(x, y);
+        const biome: Biome = forestMap.biomes.getCell(x, y);
 
         if (!this.groundCreateMults.hasOwnProperty(biome.getName())) {
             return 0;
@@ -145,6 +146,6 @@ export default class ForestGenerator {
             humidityRatio = changeRange(humidity, 0, 1, 0, Config.FOREST_CREATE_MULTS.HUMIDITY),
             groundRatio = this.groundCreateMults[biome.getName()];
 
-        return speed * (groundRatio + humidityRatio + waterRatio);
+        return speed * (groundRatio + humidityRatio + waterRatio) * biome.altitude;
     }
 }

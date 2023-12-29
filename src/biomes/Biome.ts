@@ -1,12 +1,19 @@
-import DisplayCell from "../render/DisplayCell.js"
-import {RGB, hexToRgb} from "../helpers.js";
 import Config from "../../config.js";
+import DisplayCell from "../render/DisplayCell.js"
+import {RGB, hexToRgb, LightenDarkenColor} from "../helpers.js";
 
 export type BiomeArgs = {
     altitude: number;
     temperature: number;
     humidity: number;
     distanceToWater: number;
+    isHills: boolean,
+    isMountains: boolean,
+}
+
+export type ColorsMinMax = {
+    min: number;
+    max: number;
 }
 
 export default class Biome {
@@ -17,6 +24,8 @@ export default class Biome {
     readonly temperature: number;
     readonly humidity: number;
     readonly distanceToWater: number;
+    readonly isHills: boolean;
+    readonly isMountains: boolean;
 
     constructor(x: number, y: number, args: BiomeArgs) {
         this.x = x;
@@ -25,43 +34,72 @@ export default class Biome {
         this.temperature = args.temperature;
         this.humidity = args.humidity;
         this.distanceToWater = args.distanceToWater;
+        this.isHills = args.isHills;
+        this.isMountains = args.isMountains;
     }
 
     getName(): string {
         return this.constructor.name;
     }
 
-    getColor(): string {
-        const color = typeof Config.BIOME_COLORS[this.getName()] === 'undefined'
-            ? '#FFFFFF'
-            : Config.BIOME_COLORS[this.getName()];
+    protected getColorsMinMax(): ColorsMinMax {
+        return {
+            min: Config.MIN_LEVEL,
+            max: Config.MAX_LEVEL,
+        }
+    }
 
-        return Array.isArray(color) ? color[0] : color;
+    protected getHillsBoostColor(): number {
+        return -25;
+    }
+
+    protected getMountainsBoostColor(): number {
+        return -50;
+    }
+
+    getColor(): string {
+        const minmax = this.getColorsMinMax(),
+            colors = Config.BIOME_COLORS[this.getName()];
+        let slice = 0;
+
+        if (this.altitude >= minmax.max) {
+            slice = colors.length - 1;
+        } else if (this.altitude > minmax.min) {
+            slice = Math.floor((this.altitude - minmax.min) / (minmax.max - minmax.min) * colors.length);
+        }
+
+        let color = colors[slice];
+
+        if (this.isHills) {
+            color = LightenDarkenColor(color, this.getHillsBoostColor());
+        } else if (this.isMountains) {
+            color = LightenDarkenColor(color, this.getMountainsBoostColor());
+        }
+
+        return color;
     }
 
     getHexColor(): RGB {
         return hexToRgb(this.getColor());
     }
 
-    displayCellWithBackground(): boolean {
-        return false;
-    }
-
     hasImage(): boolean {
-        return typeof Config.BIOME_IMAGES[this.getName()] !== 'undefined';
+        return this.isMountains;
     }
 
     getImage(): null | string {
-        return typeof Config.BIOME_IMAGES[this.getName()] === 'undefined'
-            ? null
-            : Config.BIOME_IMAGES[this.getName()];
+
+        if (this.isMountains) {
+            return Config.BIOME_IMAGES.Rocks[0];
+        }
+
+        return null;
     }
 
     getDisplayCell(): DisplayCell {
         return new DisplayCell(
             this.getHexColor(),
             this.getImage(),
-            this.displayCellWithBackground()
         );
     }
 

@@ -260,8 +260,7 @@ export default class AnimalsOperator {
         if (typeof this.animalImagesCache[animal.getName()] === 'undefined') {
             this.animalImagesCache[animal.getName()] = new DisplayCell(
                 hexToRgb(animal.getColor()),
-                animal.getImage(),
-                false
+                animal.getImage()
             );
         }
 
@@ -272,7 +271,7 @@ export default class AnimalsOperator {
         for (let i = 0; i < this.animalsGenerators.length; i++) {
             if (this.animalsGenerators[i].getName() === animal.getName()) {
                 this.animalsGenerators[i].getHabitat().foreachFilled(function (x: number, y: number): void {
-                    habitatLayer.setCell(x, y, new DisplayCell([100, 100, 200, 255], null, false));
+                    habitatLayer.setCell(x, y, new DisplayCell([100, 100, 200, 255], null));
                 });
             }
         }

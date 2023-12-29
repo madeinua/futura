@@ -44,7 +44,7 @@ export default class BiomesOperator {
         }
     }
     isBeach(x, y, altitude, temperature, humidity) {
-        return altitude > Config.MAX_OCEAN_LEVEL
+        return altitude > Config.MIN_GROUND_LEVEL
             && altitude <= Config.MAX_BEACH_LEVEL
                 - (temperature * Config.BEACH_TEMPERATURE_RATIO * 2 - Config.BEACH_TEMPERATURE_RATIO)
                 - (humidity * Config.BEACH_HUMIDITY_RATIO * 2 - Config.BEACH_HUMIDITY_RATIO)
@@ -53,11 +53,13 @@ export default class BiomesOperator {
     _getBiome(x, y) {
         let distanceToWater = this.freshWaterMap.distanceTo(x, y, 5);
         distanceToWater = distanceToWater > 100 ? 100 : distanceToWater;
-        const args = {
-            altitude: this.altitudeMap.getCell(x, y),
+        const altitude = this.altitudeMap.getCell(x, y), args = {
+            altitude: altitude,
             temperature: this.temperatureMap.getCell(x, y),
             humidity: this.humidityMap.getCell(x, y),
-            distanceToWater: distanceToWater
+            distanceToWater: distanceToWater,
+            isHills: this.altitudeMap.isHills(altitude),
+            isMountains: this.altitudeMap.isMountains(altitude),
         };
         if (this.freshWaterMap.filled(x, y)) {
             return new biomes.Biome_Water(x, y, args);
@@ -74,8 +76,7 @@ export default class BiomesOperator {
         for (let i = 0; i < this.biomesConfig.length; i++) {
             const cfg = this.biomesConfig[i];
             if (this._checkBiomeIndex(cfg.h, fromFraction(args.humidity, Config.MIN_HUMIDITY, Config.MAX_HUMIDITY))
-                && this._checkBiomeIndex(cfg.t, fromFraction(args.temperature, Config.MIN_TEMPERATURE, Config.MAX_TEMPERATURE))
-                && this._checkBiomeIndex(cfg.a, args.altitude)) {
+                && this._checkBiomeIndex(cfg.t, fromFraction(args.temperature, Config.MIN_TEMPERATURE, Config.MAX_TEMPERATURE))) {
                 matchedBiomes.push(cfg.class);
             }
         }

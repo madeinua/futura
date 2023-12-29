@@ -75,12 +75,24 @@ export default class AltitudeMap extends PointMatrix {
         return Math.min(altitude, altitude * Math.max(0, 1 - gradient));
     }
 
-    isGround = function (level: number): boolean {
-        return level > Config.MAX_OCEAN_LEVEL;
+    isWater = function (level: number): boolean {
+        return Config.MIN_GROUND_LEVEL >= level;
     }
 
-    isWater = function (level: number): boolean {
-        return Config.MAX_OCEAN_LEVEL >= level;
+    isGround = function (level: number): boolean {
+        return level > Config.MIN_GROUND_LEVEL;
+    }
+
+    isLowLand = function (level: number): boolean {
+        return level > Config.MIN_GROUND_LEVEL && level <= Config.MAX_LOWLAND_LEVEL;
+    }
+
+    isHills = function (level: number): boolean {
+        return level > Config.MAX_LOWLAND_LEVEL && level <= Config.MAX_HILLS_LEVEL;
+    }
+
+    isMountains = function (level: number): boolean {
+        return level > Config.MAX_HILLS_LEVEL;
     }
 
     getLandCellsCount = function (): number {

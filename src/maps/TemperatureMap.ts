@@ -38,7 +38,7 @@ export default class TemperatureMap extends PointMatrix {
 
     private considerAltitude = function (): void {
         const _this: TemperatureMap = this,
-            minLevel = Config.MAX_OCEAN_LEVEL;
+            minLevel = Config.MIN_GROUND_LEVEL;
 
         _this.foreach(function (x: number, y: number): void {
             let altitude = _this.altitudeMap.getCell(x, y);

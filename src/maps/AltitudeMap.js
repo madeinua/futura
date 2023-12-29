@@ -40,11 +40,20 @@ export default class AltitudeMap extends PointMatrix {
             const dx = Math.abs(x - islandSize * 0.5), dy = Math.abs(y - islandSize * 0.5), distance = Math.sqrt(dx * dx + dy * dy), delta = distance / (islandSize * 0.42), gradient = delta * delta - 0.2;
             return Math.min(altitude, altitude * Math.max(0, 1 - gradient));
         };
-        this.isGround = function (level) {
-            return level > Config.MAX_OCEAN_LEVEL;
-        };
         this.isWater = function (level) {
-            return Config.MAX_OCEAN_LEVEL >= level;
+            return Config.MIN_GROUND_LEVEL >= level;
+        };
+        this.isGround = function (level) {
+            return level > Config.MIN_GROUND_LEVEL;
+        };
+        this.isLowLand = function (level) {
+            return level > Config.MIN_GROUND_LEVEL && level <= Config.MAX_LOWLAND_LEVEL;
+        };
+        this.isHills = function (level) {
+            return level > Config.MAX_LOWLAND_LEVEL && level <= Config.MAX_HILLS_LEVEL;
+        };
+        this.isMountains = function (level) {
+            return level > Config.MAX_HILLS_LEVEL;
         };
         this.getLandCellsCount = function () {
             return this.landSize;

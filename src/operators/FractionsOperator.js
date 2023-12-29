@@ -9,13 +9,14 @@ export default class FractionsOperator {
             return !this.occupiedTerritories.filled(positionX, positionY);
         };
         this.increaseCellInfluence = function (positionX, positionY, fraction) {
-            let _this = this, influenceOriginal = fraction.influenceTerritory.getCell(positionX, positionY), influence = Config.FRACTIONS.INFLUENCE.BASE;
+            let influence = 1;
+            const _this = this, influenceOriginal = fraction.influenceTerritory.getCell(positionX, positionY), biome = _this.biomesMap.getCell(positionX, positionY);
             // Influence depends on a biome
             if (_this.forestMap.filled(positionX, positionY)) {
-                influence *= Config.FRACTIONS.INFLUENCE.FOREST;
+                influence *= Config.FRACTIONS.INFLUENCE.FOREST_BOOST;
             }
             else {
-                let infName = _this.biomesMap.getCell(positionX, positionY).getName();
+                let infName = biome.getName();
                 if (typeof Config.FRACTIONS.INFLUENCE[infName] === 'undefined') {
                     throwError('Unknown influence name: ' + infName, 10, true);
                 }
@@ -23,9 +24,15 @@ export default class FractionsOperator {
                     influence *= Config.FRACTIONS.INFLUENCE[infName];
                 }
             }
+            // Influence depends on the altitude
+            if (biome.isHills) {
+                influence *= Config.FRACTIONS.INFLUENCE.HILLS_BOOST;
+            }
+            else if (biome.isMountains) {
+                influence *= Config.FRACTIONS.INFLUENCE.MOUNTAINS_BOOST;
+            }
             // 1 is the maximum influence
             influence = Math.min(1, influenceOriginal + influence);
-            // @TODO Logic..
             fraction.influenceTerritory.setCell(positionX, positionY, influence);
         };
         this.occupyCell = function (positionX, positionY, fraction) {
@@ -66,17 +73,17 @@ export default class FractionsOperator {
             });
         };
         this.fillFractionsStartPosition = function (position, fraction) {
-            this.fractionsLayer.setCell(position[0], position[1], new DisplayCell(fraction.getFractionColor(), null, true));
+            this.fractionsLayer.setCell(position[0], position[1], new DisplayCell(fraction.getFractionColor(), null));
         };
         this.fillFractionsLayer = function (position, fraction) {
-            this.fractionsLayer.setCell(position[0], position[1], new DisplayCell(fraction.getFractionTerritoryColor(), null, true));
+            this.fractionsLayer.setCell(position[0], position[1], new DisplayCell(fraction.getFractionTerritoryColor(), null));
         };
         this.fillFractionsBorderLayer = function () {
             const _this = this;
             _this.fractionsBorderLayer.setAll(null);
             _this.fractions.forEach(function (fraction) {
                 fraction.borders.foreachFilled(function (x, y) {
-                    _this.fractionsBorderLayer.setCell(x, y, new DisplayCell(fraction.getFractionBorderColor(), null, true));
+                    _this.fractionsBorderLayer.setCell(x, y, new DisplayCell(fraction.getFractionBorderColor(), null));
                 });
             });
         };
