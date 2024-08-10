@@ -243,14 +243,7 @@ export function distance(x1: number, y1: number, x2: number, y2: number): number
  * Check if the cell is available in the array
  */
 export function arrayHasPoint(arr: Array2D, x: number, y: number): boolean {
-
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i][0] === x && arr[i][1] === y) {
-            return true;
-        }
-    }
-
-    return false;
+    return arr.some(([px, py]) => px === x && py === y);
 }
 
 /**
@@ -417,12 +410,16 @@ export function getPolygonAreaSize(coords: Array2D): number {
     return area / 2;
 }
 
-export async function preloadImages(obj: any, container: HTMLImageElement[]): Promise<void> {
+export async function preloadImages(obj: Record<string, any>, container: HTMLImageElement[]): Promise<void> {
     for (let key in obj) {
         if (typeof obj[key] === 'object') {
             await preloadImages(obj[key], container);
-        } else if (typeof obj[key] === 'string' && obj[key].indexOf('.png') !== -1) {
-            container[obj[key]] = await createImage(obj[key]);
+        } else if (typeof obj[key] === 'string' && obj[key].endsWith('.png')) {
+            try {
+                container[obj[key]] = await createImage(obj[key]);
+            } catch (error) {
+                console.error(`Failed to preload image: ${obj[key]}`, error);
+            }
         }
     }
 }

@@ -3,17 +3,15 @@ import Config from "../../config.js";
 export default class LakesMap extends BinaryMatrix {
     constructor(altitudeMap, oceanMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-        this.generateMap = function () {
-            const _this = this;
-            _this.altitudeMap.foreachValues(function (altitude, x, y) {
-                if (_this.altitudeMap.isWater(altitude)
-                    && !_this.oceanMap.filled(x, y)) {
-                    _this.fill(x, y);
-                }
-            });
-            return _this;
-        };
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;
+    }
+    generateMap() {
+        this.altitudeMap.foreachValues((altitude, x, y) => {
+            if (this.altitudeMap.isWater(altitude) && !this.oceanMap.filled(x, y)) {
+                this.fill(x, y);
+            }
+        });
+        return this;
     }
 }

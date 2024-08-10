@@ -184,12 +184,7 @@ export function distance(x1, y1, x2, y2) {
  * Check if the cell is available in the array
  */
 export function arrayHasPoint(arr, x, y) {
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i][0] === x && arr[i][1] === y) {
-            return true;
-        }
-    }
-    return false;
+    return arr.some(([px, py]) => px === x && py === y);
 }
 /**
  * Create 2D array
@@ -315,8 +310,13 @@ export function preloadImages(obj, container) {
             if (typeof obj[key] === 'object') {
                 yield preloadImages(obj[key], container);
             }
-            else if (typeof obj[key] === 'string' && obj[key].indexOf('.png') !== -1) {
-                container[obj[key]] = yield createImage(obj[key]);
+            else if (typeof obj[key] === 'string' && obj[key].endsWith('.png')) {
+                try {
+                    container[obj[key]] = yield createImage(obj[key]);
+                }
+                catch (error) {
+                    console.error(`Failed to preload image: ${obj[key]}`, error);
+                }
             }
         }
     });

@@ -10,12 +10,11 @@ export default class CoastMap extends BinaryMatrix {
         return altitude >= Config.MIN_COAST_LEVEL && altitude <= Config.MIN_GROUND_LEVEL;
     }
     generateMap() {
-        const _this = this;
-        _this.oceanMap.foreachFilled(function (x, y) {
-            if (_this.isCoast(_this.altitudeMap.getCell(x, y))) {
-                _this.fill(x, y);
+        this.oceanMap.foreachFilled((x, y) => {
+            if (this.isCoast(this.altitudeMap.getCell(x, y))) {
+                this.fill(x, y);
             }
         });
-        return _this;
+        return this;
     }
 }

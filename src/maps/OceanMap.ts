@@ -8,78 +8,58 @@ export default class OceanMap extends BinaryMatrix {
 
     constructor(altitudeMap: AltitudeMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-
         this.altitudeMap = altitudeMap;
     }
 
-    private includeAllWaterCellsAround = function (startX: number, startY: number): void {
-
-        const _this: OceanMap = this,
-            activeCells = [];
-
-        _this.fill(startX, startY);
-
-        activeCells.push([startX, startY]);
+    private includeAllWaterCellsAround(startX: number, startY: number): void {
+        this.fill(startX, startY);
+        const activeCells = [[startX, startY]];
 
         while (activeCells.length) {
-            let cell = activeCells.pop();
-
-            _this.altitudeMap.foreachAroundRadius(cell[0], cell[1], 1, function (x: number, y: number): void {
-                const altitude = _this.altitudeMap.getCell(x, y);
-
-                if (_this.altitudeMap.isWater(altitude) && !_this.filled(x, y)) {
-                    _this.fill(x, y);
-                    activeCells.push([x, y]);
+            const [x, y] = activeCells.pop()!;
+            this.altitudeMap.foreachAroundRadius(x, y, 1, (nx: number, ny: number): void => {
+                const altitude = this.altitudeMap.getCell(nx, ny);
+                if (this.altitudeMap.isWater(altitude) && !this.filled(nx, ny)) {
+                    this.fill(nx, ny);
+                    activeCells.push([nx, ny]);
                 }
             });
         }
     }
 
-    private bigLakesToSeas = function (): void {
+    private bigLakesToSeas(): void {
+        const tempMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
-        const _this: OceanMap = this,
-            tempMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-
-        _this.altitudeMap.foreachValues(function (altitude: number, x: number, y: number): void {
-            if (
-                _this.altitudeMap.isWater(altitude)
-                && !_this.filled(x, y)
-            ) {
+        this.altitudeMap.foreachValues((altitude: number, x: number, y: number): void => {
+            if (this.altitudeMap.isWater(altitude) && !this.filled(x, y)) {
                 tempMap.fill(x, y);
             }
         });
 
-        tempMap.foreachFilled(function (x: number, y: number): void {
-            if (
-                !_this.filled(x, y)
-                && tempMap.getSizeFromPoint(x, y) > Config.WORLD_SIZE
-            ) {
-                _this.includeAllWaterCellsAround(x, y);
+        tempMap.foreachFilled((x: number, y: number): void => {
+            if (!this.filled(x, y) && tempMap.getSizeFromPoint(x, y) > Config.WORLD_SIZE) {
+                this.includeAllWaterCellsAround(x, y);
             }
         });
     }
 
-    generateMap = function (): OceanMap {
+    generateMap(): OceanMap {
+        const startX = 0, startY = 0;
 
-        const _this: OceanMap = this,
-            startX = 0,
-            startY = 0;
-
-        if (!_this.altitudeMap.isWater(_this.altitudeMap.getCell(startX, startY))) {
-            return _this;
+        if (!this.altitudeMap.isWater(this.altitudeMap.getCell(startX, startY))) {
+            return this;
         }
 
-        _this.includeAllWaterCellsAround(startX, startY);
-        _this.bigLakesToSeas();
+        this.includeAllWaterCellsAround(startX, startY);
+        this.bigLakesToSeas();
 
-        return _this;
+        return this;
     }
 
-    getNotOceanMap = function (): BinaryMatrix {
-        const _this: OceanMap = this,
-            notOceanMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
+    getNotOceanMap(): BinaryMatrix {
+        const notOceanMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
-        _this.foreachUnfilled(function (x: number, y: number): void {
+        this.foreachUnfilled((x: number, y: number): void => {
             notOceanMap.fill(x, y);
         });
 

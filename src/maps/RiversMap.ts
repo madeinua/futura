@@ -13,18 +13,17 @@ export default class RiversMap extends BinaryMatrix {
 
     constructor(altitudeMap: AltitudeMap, lakesMap: LakesMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-
         this.altitudeMap = altitudeMap;
         this.lakesMap = lakesMap;
         this.riversCount = 0;
     }
 
-    generateMap = function (): RiversMap {
+    generateMap(): RiversMap {
+        const riverSources = this.getRiverSources(this.altitudeMap);
+        let rivers = this.generateRiversCells(riverSources);
 
-        const riverSources = this.getRiverSources(this.altitudeMap),
-            rivers = this.generateRiversCells(riverSources);
-
-        //rivers = _this.addRiverDeltaToRiversMaps(rivers);
+        // Optionally add river delta
+        // rivers = this.addRiverDeltaToRiversMaps(rivers);
 
         this.createRiverMapFromRiversPoints(rivers);
 
@@ -33,15 +32,14 @@ export default class RiversMap extends BinaryMatrix {
         return this;
     }
 
-    protected getRiverSources = function (altitudeMap: AltitudeMap): CellsList {
+    protected getRiverSources(altitudeMap: AltitudeMap): CellsList {
+        const spawns: CellsList = [];
 
-        const spawns = [];
-
-        altitudeMap.foreachValues(function (altitude: number, x: number, y: number): void {
+        altitudeMap.foreachValues((altitude: number, x: number, y: number): void => {
             if (
-                altitudeMap.isGround(altitude)
-                && altitude >= Config.RIVER_SOURCE_MIN_ALTITUDE
-                && Config.RIVER_SOURCE_MAX_ALTITUDE >= altitude
+                altitudeMap.isGround(altitude) &&
+                altitude >= Config.RIVER_SOURCE_MIN_ALTITUDE &&
+                altitude <= Config.RIVER_SOURCE_MAX_ALTITUDE
             ) {
                 spawns.push([x, y]);
             }
@@ -50,48 +48,37 @@ export default class RiversMap extends BinaryMatrix {
         return spawns.shuffle();
     }
 
-    protected generateRiversCells = function (riverSources: CellsList): CellsArray {
+    protected generateRiversCells(riverSources: CellsList): CellsArray {
+        const rivers: CellsArray = [];
+        const riversLimit = Math.floor(fromFraction(Config.RIVERS_DENSITY, 1, Config.WORLD_SIZE));
+        const startCloseness = Math.max(Config.RIVER_MIN_LENGTH, Config.RIVER_START_CLOSENESS);
 
-        const _this: RiversMap = this,
-            rivers = [],
-            riversLimit = Math.floor(fromFraction(Config.RIVERS_DENSITY, 1, Config.WORLD_SIZE)),
-            startCloseness = Math.max(Config.RIVER_MIN_LENGTH, Config.RIVER_START_CLOSENESS);
-
-        let allRiversPoints = [];
+        let allRiversPoints: CellsList = [];
 
         for (let i = 0; i < riverSources.length; i++) {
-
-            // Start point is too close to the other river -> skip
-            if (i > 0 && startCloseness >= allRiversPoints.getClosestDistanceTo(riverSources[i][0], riverSources[i][1])) {
+            if (
+                i > 0 &&
+                startCloseness >= allRiversPoints.getClosestDistanceTo(riverSources[i][0], riverSources[i][1])
+            ) {
                 continue;
             }
 
-            let river = [],
-                finished = false;
+            let river: CellsList = [];
+            let finished = false;
 
-            // source = starting point of each river
             river.push(riverSources[i]);
 
-            // max river length = worldSize
             for (let j = 0; j < Config.WORLD_SIZE; j++) {
+                const nextRiverPoint = this.getRiverDirection(river, this.altitudeMap);
 
-                const nextRiverPoint = _this.getRiverDirection(river, _this.altitudeMap);
+                if (!nextRiverPoint) break;
 
-                if (!nextRiverPoint) {
-                    break;
-                }
+                const [x, y] = nextRiverPoint;
+                const altitude = this.altitudeMap.getCell(x, y);
 
-                const x = nextRiverPoint[0],
-                    y = nextRiverPoint[1],
-                    altitude = _this.altitudeMap.getCell(x, y);
-
-                // lake/ocean or another river found. means river ending point found.
-                if (_this.altitudeMap.isWater(altitude) || arrayHasPoint(allRiversPoints, x, y)) {
-
-                    if (_this.lakesMap.filled(x, y)) {
-                        const lakeSize = _this.lakesMap.getSizeFromPoint(x, y);
-
-                        // finish only when the lake size is bigger than the river length
+                if (this.altitudeMap.isWater(altitude) || arrayHasPoint(allRiversPoints, x, y)) {
+                    if (this.lakesMap.filled(x, y)) {
+                        const lakeSize = this.lakesMap.getSizeFromPoint(x, y);
                         if (lakeSize > river.length * Config.LAKE_TO_RIVER_RATIO) {
                             finished = true;
                             break;
@@ -108,67 +95,45 @@ export default class RiversMap extends BinaryMatrix {
             }
 
             if (finished && river.length >= Config.RIVER_MIN_LENGTH) {
-
                 rivers.push(river);
-                allRiversPoints = allRiversPoints.concat(river);
-                allRiversPoints.unique();
+                allRiversPoints = allRiversPoints.concat(river).unique();
 
-                if (rivers.length === riversLimit) {
-                    break;
-                }
+                if (rivers.length === riversLimit) break;
             }
         }
 
         return rivers;
     }
 
-    private getRiverDirection = function (river: CellsList, altitudeMap: AltitudeMap): Cell | null {
+    private getRiverDirection(river: CellsList, altitudeMap: AltitudeMap): Cell | null {
+        const currentPoint = river[river.length - 1];
+        const prevPoint = river.length > 1 ? river[river.length - 2] : null;
+        const [cx, cy] = currentPoint;
+        const currentAltitude = altitudeMap.getCell(cx, cy);
+        const neighbors = altitudeMap.getNeighbors(cx, cy).shuffle();
 
-        const currentPoint = river[river.length - 1],
-            prevPoint = river.length > 1 ? river[river.length - 2] : false,
-            cx = currentPoint[0],
-            cy = currentPoint[1],
-            currentAltitude = altitudeMap.getCell(cx, cy),
-            neighbors = altitudeMap.getNeighbors(cx, cy).shuffle();
+        for (const [nx, ny] of neighbors) {
+            const altitude = altitudeMap.getCell(nx, ny);
 
-        let lowerPoint = null;
+            if (altitude > currentAltitude) continue;
 
-        for (let i = 0; i < neighbors.length; i++) {
+            if (prevPoint && distance(nx, ny, prevPoint[0], prevPoint[1]) === 1) continue;
 
-            const nx = neighbors[i][0],
-                ny = neighbors[i][1],
-                altitude = altitudeMap.getCell(nx, ny);
-
-            if (altitude > currentAltitude) {
-                continue;
-            }
-
-            // prevent river being "too wide"
-            if (prevPoint && distance(nx, ny, prevPoint[0], prevPoint[1]) === 1) {
-                continue;
-            }
-
-            lowerPoint = [nx, ny];
-            break;
+            return [nx, ny];
         }
 
-        return lowerPoint;
+        return null;
     }
 
-    /**
-     * Add river delta
-     */
-    protected addRiverDeltaToRiverMap = function (river: CellsList): CellsList {
-
-        const _this: RiversMap = this,
-            ratio = randBetweenNumbers(0.01, Config.RIVER_DELTA_MAX_LENGTH),
-            deltaLength = river.length * ratio,
-            notDeltaLength = river.length - deltaLength,
-            delta = [];
+    protected addRiverDeltaToRiverMap(river: CellsList): CellsList {
+        const delta: CellsList = [];
+        const ratio = randBetweenNumbers(0.01, Config.RIVER_DELTA_MAX_LENGTH);
+        const deltaLength = Math.floor(river.length * ratio);
+        const notDeltaLength = river.length - deltaLength;
 
         for (let p = 0; p < river.length; p++) {
             if (p > notDeltaLength) {
-                _this.foreachAroundRadius(river[p][0], river[p][1], 1, function (nx: number, ny: number): void {
+                this.foreachAroundRadius(river[p][0], river[p][1], 1, (nx: number, ny: number): void => {
                     if ([0, 1].randomElement() === 0 && !arrayHasPoint(river, nx, ny)) {
                         delta.push([nx, ny]);
                     }
@@ -179,24 +144,19 @@ export default class RiversMap extends BinaryMatrix {
         return river.concat(delta);
     }
 
-    protected createRiverMapFromRiversPoints = function (rivers: CellsArray): void {
-        for (let i = 0; i < rivers.length; i++) {
-            for (let p = 0; p < rivers[i].length; p++) {
-                this.fill(rivers[i][p][0], rivers[i][p][1]);
+    protected createRiverMapFromRiversPoints(rivers: CellsArray): void {
+        for (const river of rivers) {
+            for (const [x, y] of river) {
+                this.fill(x, y);
             }
         }
     }
 
-    getGeneratedRiversCount = function (): number {
+    getGeneratedRiversCount(): number {
         return this.riversCount;
     }
 
-    protected addRiverDeltaToRiversMaps = function (rivers: CellsArray): CellsArray {
-
-        for (let i = 0; i < rivers.length; i++) {
-            rivers[i] = this.addRiverDeltaToRiverMap(rivers[i]);
-        }
-
-        return rivers;
+    protected addRiverDeltaToRiversMaps(rivers: CellsArray): CellsArray {
+        return rivers.map(river => this.addRiverDeltaToRiverMap(river));
     }
 }

@@ -54,7 +54,7 @@ function drawInfoMap(id: string, map: NumericMatrix, reverse: boolean) {
     const ctx = canvas.getContext('2d'),
         image = ctx.createImageData(canvas.width, canvas.height);
 
-    map.foreach(function (x: number, y: number) {
+    map.foreach((x: number, y: number) => {
 
         let point = (x + y * canvas.width) * 4,
             gray = reverse ? 255 - map.getGrayscale(x, y) : map.getGrayscale(x, y);
@@ -85,7 +85,7 @@ new World(
     displayMapWrapper.offsetHeight,
     miniMapCanvas,
     getCameraPosition(),
-    function (world: World) {
+    (world: World) => {
 
         function getCameraPointByStartPoint(point: Cell): Cell {
 
@@ -109,7 +109,7 @@ new World(
                 : world.timer.pauseTimer();
         }
 
-        Filters.add('mapMoved', function (point: Cell) {
+        Filters.add('mapMoved', (point: Cell) => {
             point = getCameraPointByStartPoint(point);
             coordinatesField.value = point[0] + ',' + point[1];
             displayMapVisibleRange.innerHTML = '[' + world.cameraPos[0] + '-' + (world.cameraPos[1] + world.visibleCellCols) + ' | ' + world.cameraPos[1] + '-' + (world.cameraPos[1] + world.visibleCellRows) + ']';
@@ -117,47 +117,47 @@ new World(
 
         if (Config.DRAW_TECHNICAL_MAPS) {
 
-            Filters.add('altitudeMap', function (map: AltitudeMap) {
+            Filters.add('altitudeMap', (map: AltitudeMap) => {
                 drawInfoMap('altitudeMapCanvas', map, false);
                 return map;
             });
 
-            Filters.add('temperatureMap', function (map: TemperatureMap) {
+            Filters.add('temperatureMap', (map: TemperatureMap) => {
                 drawInfoMap('temperatureMapCanvas', map, false);
                 return map;
             });
 
-            Filters.add('humidityMap', function (map: HumidityMap) {
+            Filters.add('humidityMap', (map: HumidityMap) => {
                 drawInfoMap('humidityMapCanvas', map, true);
                 return map;
             });
 
-            Filters.add('oceanMap', function (map: OceanMap) {
+            Filters.add('oceanMap', (map: OceanMap) => {
                 drawInfoMap('oceanMapCanvas', map, true);
                 return map;
             });
 
-            Filters.add('coastMap', function (map: CoastMap) {
+            Filters.add('coastMap', (map: CoastMap) => {
                 drawInfoMap('coastMapCanvas', map, true);
                 return map;
             });
 
-            Filters.add('lakesMap', function (map: LakesMap) {
+            Filters.add('lakesMap', (map: LakesMap) => {
                 drawInfoMap('lakesMapCanvas', map, true);
                 return map;
             });
 
-            Filters.add('riversMap', function (map: RiversMap) {
+            Filters.add('riversMap', (map: RiversMap) => {
                 drawInfoMap('riversMapCanvas', map, false);
                 return map;
             });
 
-            Filters.add('biomes', function (biomes: Matrix) {
+            Filters.add('biomes', (biomes: Matrix) => {
                 drawColorMap('biomesCanvas', biomes);
 
                 let biomesTypesCounter: { [key: string]: number } = {};
 
-                biomes.foreachValues(function (biome: Biome) {
+                biomes.foreachValues((biome: Biome) => {
                     if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
                         biomesTypesCounter[biome.getName()] = 0;
                     }
@@ -166,9 +166,9 @@ new World(
                 });
 
                 // Sort by value
-                biomesTypesCounter = Object.keys(biomesTypesCounter).sort(function (a, b) {
+                biomesTypesCounter = Object.keys(biomesTypesCounter).sort((a, b) => {
                     return biomesTypesCounter[b] - biomesTypesCounter[a];
-                }).reduce(function (result, key) {
+                }).reduce((result, key) => {
                     result[key] = biomesTypesCounter[key];
                     return result;
                 }, {});
@@ -185,13 +185,13 @@ new World(
                 return biomes;
             });
 
-            Filters.add('forestMap', function (map: ForestMap) {
+            Filters.add('forestMap', (map: ForestMap) => {
                 drawInfoMap('forestMapCanvas', map, true);
                 document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
                 return map;
             });
 
-            Filters.add('animalsSteps', function (animals: Animal[]) {
+            Filters.add('animalsSteps', (animals: Animal[]) => {
 
                 let text: string = '',
                     groups = {};
@@ -215,13 +215,13 @@ new World(
             technicalMaps.style.display = 'block';
         }
 
-        Filters.add('fractionsUpdated', function (fractions: Fraction[]) {
-            document.getElementById('fractionsList').innerHTML = fractions.map(function (fraction: Fraction) {
+        Filters.add('fractionsUpdated', (fractions: Fraction[]) => {
+            document.getElementById('fractionsList').innerHTML = fractions.map((fraction: Fraction) => {
                 return '<li>' + fraction.getName() + ': <span style="background-color:' + rgbToHex(fraction.getFractionColor()) + '"></span> (' + fraction.getSize() + ' cells)</li>';
             }).join('');
         });
 
-        coordinatesField.addEventListener("change", function () {
+        coordinatesField.addEventListener("change", () => {
             world.moveMapTo(getCameraPosition());
             scrollIntoToView()
         });
@@ -240,21 +240,21 @@ new World(
             scrollIntoToView();
         });
 
-        document.getElementById('pauseSteps').addEventListener("click", function () {
+        document.getElementById('pauseSteps').addEventListener("click", () => {
             pauseTimer();
         });
 
-        world.timer.addStepsHandler(function (step: string) {
-            document.getElementById('stepsCounter').innerHTML = step;
+        world.timer.addStepsHandler((step: number): void => {
+            document.getElementById('stepsCounter').innerHTML = String(step);
         });
 
-        document.getElementById('generateFractions').addEventListener("click", function () {
+        document.getElementById('generateFractions').addEventListener("click", () => {
             world.generateFractions();
         });
 
         // Timeout is needed to wait for the map to be generated (the process resizes the canvas and triggers scroll event)
-        setTimeout(function () {
-            displayMapWrapper.addEventListener("scroll", function () {
+        setTimeout(() => {
+            displayMapWrapper.addEventListener("scroll", () => {
                 world.moveMapTo(getCameraPointByStartPoint([
                     Math.floor(displayMapWrapper.scrollLeft / Config.CELL_SIZE),
                     Math.floor(displayMapWrapper.scrollTop / Config.CELL_SIZE)

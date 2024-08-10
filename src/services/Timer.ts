@@ -2,86 +2,76 @@ import {logTimeEvent} from "../helpers.js";
 import Config from "../../config.js";
 
 export default class Timer {
+    private timerStep: number = 0;
+    private stepsHandlers: Array<(step: number) => void> = [];
+    private timerPaused: boolean = false;
+    private timerInterval: NodeJS.Timer | null = null;
 
-    timerStep: number = 0;
-    stepsHandlers: any[] = [];
-    timerPaused: boolean = false;
-
-    addStepsHandler(handler: Function): void {
+    addStepsHandler(handler: (step: number) => void): void {
         this.stepsHandlers.push(handler);
     }
 
-    stepsTimer = function (callback: Function): void {
+    stepsTimer(callback: () => void): void {
+        const timerStart = Date.now();
+        let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST;
+        let boosted = false;
 
-        const _this: Timer = this,
-            timerStart = Date.now();
+        this.timerStep = 0;
 
-        let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST,
-            timerInterval: NodeJS.Timer,
-            boosted = false;
-
-        _this.timerStep = 0;
-
-        const makeStep = function (): void {
-
-            if (_this.timerPaused) {
+        const makeStep = (): void => {
+            if (this.timerPaused) {
                 return;
             }
 
-            for (let i = 0; i < _this.stepsHandlers.length; i++) {
-                _this.stepsHandlers[i](_this.timerStep);
-            }
-
-            _this.timerStep++;
+            this.stepsHandlers.forEach(handler => handler(this.timerStep));
+            this.timerStep++;
 
             callback();
 
-            if (_this.timerStep > Config.STEPS_LIMIT) {
-
+            if (this.timerStep > Config.STEPS_LIMIT) {
                 if (Config.LOGS) {
-                    logTimeEvent('Steps running has been ended. Avg. time per step: ' + Math.round((Date.now() - timerStart) / Config.STEPS_LIMIT) + 'ms');
+                    logTimeEvent(`Steps running has ended. Avg. time per step: ${Math.round((Date.now() - timerStart) / Config.STEPS_LIMIT)}ms`);
                 }
-
-                clearInterval(timerInterval);
+                this.clearTimerInterval();
                 return;
             }
 
-            if (!boosted && _this.timerStep > Config.STEPS_BOOST_STEPS) {
-                clearInterval(timerInterval);
+            if (!boosted && this.timerStep > Config.STEPS_BOOST_STEPS) {
+                this.clearTimerInterval();
                 minStepInterval *= Config.STEPS_BOOST;
-                timerInterval = setInterval(makeStep, minStepInterval);
+                this.timerInterval = setInterval(makeStep, minStepInterval);
                 boosted = true;
             }
-        }
+        };
 
-        timerInterval = setInterval(makeStep, minStepInterval);
-
+        this.timerInterval = setInterval(makeStep, minStepInterval);
         makeStep();
     }
 
-    isTimerPaused = function (): boolean {
+    private clearTimerInterval(): void {
+        if (this.timerInterval !== null) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+
+    isTimerPaused(): boolean {
         return this.timerPaused;
     }
 
-    pauseTimer = function (): boolean {
-
+    pauseTimer(): boolean {
         if (this.isTimerPaused()) {
             return false;
         }
-
         this.timerPaused = true;
-
         return true;
     }
 
-    unpauseTimer = function (): boolean {
-
+    unpauseTimer(): boolean {
         if (!this.isTimerPaused()) {
             return false;
         }
-
         this.timerPaused = false;
-
         return true;
     }
 }

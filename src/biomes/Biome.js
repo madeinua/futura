@@ -28,15 +28,16 @@ export default class Biome {
         return -60;
     }
     getColor() {
-        const minmax = this.getColorsMinMax(), colors = Config.BIOME_COLORS[this.getName()];
-        let slice = 0;
-        if (this.altitude >= minmax.max) {
-            slice = colors.length - 1;
+        const { min, max } = this.getColorsMinMax();
+        const colors = Config.BIOME_COLORS[this.getName()];
+        let sliceIndex = 0;
+        if (this.altitude >= max) {
+            sliceIndex = colors.length - 1;
         }
-        else if (this.altitude > minmax.min) {
-            slice = Math.floor((this.altitude - minmax.min) / (minmax.max - minmax.min) * colors.length);
+        else if (this.altitude > min) {
+            sliceIndex = Math.floor(((this.altitude - min) / (max - min)) * colors.length);
         }
-        let color = colors[slice];
+        let color = colors[sliceIndex];
         if (this.isHills) {
             color = LightenDarkenColor(color, this.getHillsBoostColor());
         }

@@ -13,12 +13,11 @@ export default class DeerGenerator extends AnimalGenerator {
     }
 
     updateHabitat(): this {
+        const forestsOperator = this.objects.forestsOperator;
+        const habitat = forestsOperator.getForestMap().clone();
 
-        const forestsOperator = this.objects.forestsOperator,
-            habitat = forestsOperator.getForestMap().clone();
-
-        // Remove palms
-        habitat.foreachFilled(function (x: number, y: number): void {
+        // Remove palms from the habitat
+        habitat.foreachFilled((x: number, y: number): void => {
             if (forestsOperator.isDesertForest(x, y)) {
                 habitat.unfill(x, y);
             }

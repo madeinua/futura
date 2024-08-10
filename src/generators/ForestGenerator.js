@@ -2,24 +2,25 @@ import { arrayHasPoint, changeRange, iAmLucky } from "../helpers.js";
 import Config from "../../config.js";
 export default class ForestGenerator {
     constructor(altitudeMap, humidityMap) {
-        var _a, _b;
         this.groundCreateMults = {};
         this.notAllowedCells = [];
         this.altitudeMap = altitudeMap;
         this.humidityMap = humidityMap;
         this.maxForestCells = Math.ceil(altitudeMap.getLandCellsCount() * Config.FOREST_LIMIT / 100);
         this.minCreateIntensity = Math.ceil(this.maxForestCells / 10);
-        let maxGroundMult = 0;
-        for (let i in Config.FOREST_GROUNDS_MULTS) {
-            maxGroundMult = Math.max(maxGroundMult, (_a = Config.FOREST_GROUNDS_MULTS[i]) !== null && _a !== void 0 ? _a : 0);
+        this.initializeGroundCreateMults();
+        this.setNotAllowedCells();
+    }
+    initializeGroundCreateMults() {
+        const maxGroundMult = Math.max(...Object.values(Config.FOREST_GROUNDS_MULTS).map(v => v !== null && v !== void 0 ? v : 0));
+        for (const [key, value] of Object.entries(Config.FOREST_GROUNDS_MULTS)) {
+            this.groundCreateMults[key] = changeRange(value !== null && value !== void 0 ? value : 0, 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
         }
-        for (let i in Config.FOREST_GROUNDS_MULTS) {
-            this.groundCreateMults[i] = changeRange((_b = Config.FOREST_GROUNDS_MULTS[i]) !== null && _b !== void 0 ? _b : 0, 0, maxGroundMult, 0, Config.FOREST_CREATE_MULTS.GROUND);
-        }
-        const _this = this;
-        altitudeMap.foreachValues(function (altitude, x, y) {
+    }
+    setNotAllowedCells() {
+        this.altitudeMap.foreachValues((altitude, x, y) => {
             if (altitude > Config.MAX_HILLS_LEVEL) {
-                _this.notAllowedCells.push([x, y]);
+                this.notAllowedCells.push([x, y]);
             }
         });
     }
@@ -33,24 +34,24 @@ export default class ForestGenerator {
         this.expandTrees(forestMap, filledCells, step);
     }
     cutTrees(forestMap, filledCells) {
-        if (!filledCells.length) {
+        if (filledCells.length === 0)
             return;
-        }
         filledCells
-            .slice(0, filledCells.length * Config.FOREST_DIE_CHANCE)
-            .forEach(function (cell) {
-            forestMap.unfill(cell[0], cell[1]);
-        });
+            .slice(0, Math.floor(filledCells.length * Config.FOREST_DIE_CHANCE))
+            .forEach(cell => forestMap.unfill(cell[0], cell[1]));
     }
     expandTrees(forestMap, filledCells, step) {
-        const _this = this, usedSpace = filledCells.length / this.maxForestCells, chance = step <= Config.STEPS_BOOST_STEPS ? Config.FOREST_GROWTH_CHANCE * 3 : Config.FOREST_GROWTH_CHANCE, speed = chance * (1 - usedSpace);
-        if (speed === 0) {
+        const usedSpaceRatio = filledCells.length / this.maxForestCells;
+        const growthChance = step <= Config.STEPS_BOOST_STEPS
+            ? Config.FOREST_GROWTH_CHANCE * 3
+            : Config.FOREST_GROWTH_CHANCE;
+        const growthSpeed = growthChance * (1 - usedSpaceRatio);
+        if (growthSpeed === 0)
             return;
-        }
-        filledCells.forEach(function (cell) {
-            forestMap.foreachNeighbors(cell[0], cell[1], function (x, y) {
+        filledCells.forEach(cell => {
+            forestMap.foreachNeighbors(cell[0], cell[1], (x, y) => {
                 if (!arrayHasPoint(filledCells, x, y)) {
-                    const growsChance = _this.getCreateChance(forestMap, _this.humidityMap.getCell(x, y), x, y, speed);
+                    const growsChance = this.getCreateChance(forestMap, this.humidityMap.getCell(x, y), x, y, growthSpeed);
                     if (iAmLucky(growsChance)) {
                         forestMap.fill(x, y);
                         return true;
@@ -61,26 +62,28 @@ export default class ForestGenerator {
         });
     }
     createTrees(forestMap, filledCells, step) {
-        const _this = this, createIntensity = Math.ceil(Math.max(_this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length))), potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity);
-        for (let i = 0; i < potentialCells.length; i++) {
-            const x = potentialCells[i][0], y = potentialCells[i][1];
-            const createChance = _this.getCreateChance(forestMap, _this.humidityMap.getCell(x, y), x, y, step <= Config.STEPS_BOOST_STEPS
+        const createIntensity = Math.ceil(Math.max(this.minCreateIntensity, this.maxForestCells / Math.max(1, filledCells.length)));
+        const potentialCells = forestMap.getUnfilledCells().shuffle().slice(0, createIntensity);
+        potentialCells.forEach(([x, y]) => {
+            const createChance = this.getCreateChance(forestMap, this.humidityMap.getCell(x, y), x, y, step <= Config.STEPS_BOOST_STEPS
                 ? Config.FOREST_BORN_CHANCE * Config.FOREST_BORN_BOOST
                 : Config.FOREST_BORN_CHANCE);
             if (iAmLucky(createChance)) {
                 forestMap.fill(x, y);
             }
-        }
+        });
     }
     getCreateChance(forestMap, humidity, x, y, speed) {
         if (humidity === 0 || this.notAllowedCells.includesCell([x, y])) {
             return 0;
         }
         const biome = forestMap.biomes.getCell(x, y);
-        if (!this.groundCreateMults.hasOwnProperty(biome.getName())) {
+        if (!biome || !this.groundCreateMults.hasOwnProperty(biome.getName())) {
             return 0;
         }
-        const waterRatio = Math.max(1, Config.FOREST_CREATE_MULTS.WATER / biome.getDistanceToWater()), humidityRatio = changeRange(humidity, 0, 1, 0, Config.FOREST_CREATE_MULTS.HUMIDITY), groundRatio = this.groundCreateMults[biome.getName()];
+        const waterRatio = Math.max(1, Config.FOREST_CREATE_MULTS.WATER / biome.getDistanceToWater());
+        const humidityRatio = changeRange(humidity, 0, 1, 0, Config.FOREST_CREATE_MULTS.HUMIDITY);
+        const groundRatio = this.groundCreateMults[biome.getName()];
         return speed * (groundRatio + humidityRatio + waterRatio) * biome.altitude;
     }
 }

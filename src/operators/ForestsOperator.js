@@ -6,60 +6,71 @@ import { hexToRgb, Filters, logTimeEvent } from "../helpers.js";
 import Config from "../../config.js";
 export default class ForestsOperator {
     constructor(biomesOperator, timer, forestLayer) {
-        /**
-         * Whether the cell is a palm or a normal forest
-         */
-        this.isDesertForest = function (x, y) {
-            return [biomes.Biome_Desert.name, biomes.Biome_Tropic.name].includes(this.biomesOperator.getBiome(x, y).getName());
-        };
-        /**
-         * Whether the cell is a palm or a normal forest
-         */
-        this.isTundraForest = function (x, y) {
-            return this.biomesOperator.getBiome(x, y).getName() === biomes.Biome_Tundra.name;
-        };
-        this.getForestImage = function (x, y) {
-            if (this.isDesertForest(x, y)) {
-                return this.forestPalmImage;
-            }
-            if (this.isTundraForest(x, y)) {
-                return this.forestTundraImage;
-            }
-            return this.forestImages.randomElement();
-        };
-        this.addForestMapToLayer = function (forestLayer, forestMap) {
-            const _this = this;
-            forestMap.foreach(function (x, y) {
-                forestLayer.setCell(x, y, forestMap.filled(x, y) ? _this.getDisplayCell(x, y) : null);
-            });
-        };
-        this.getDisplayCell = function (x, y) {
-            if (typeof this.forestImagesCache[x + ',' + y] === 'undefined') {
-                this.forestImagesCache[x + ',' + y] = new DisplayCell(this.forestColor, this.getForestImage(x, y));
-            }
-            return this.forestImagesCache[x + ',' + y];
-        };
         this.biomesOperator = biomesOperator;
         this.forestColor = hexToRgb(Config.FOREST_COLOR);
         this.forestPalmImage = Config.FOREST_PALM_IMAGE;
         this.forestTundraImage = Config.FOREST_TUNDRA_IMAGE;
-        const _this = this, forestGenerator = new ForestGenerator(biomesOperator.altitudeMap, biomesOperator.humidityMap);
-        _this.forestImages = [];
-        _this.forestImagesCache = [];
-        for (let i in Config.FOREST_IMAGES) {
-            _this.forestImages.push(Config.FOREST_IMAGES[i]);
-        }
-        _this.forestMap = new ForestMap(biomesOperator.getBiomes());
-        timer.addStepsHandler(function (step) {
-            forestGenerator.generate(_this.forestMap, step);
-            _this.addForestMapToLayer(forestLayer, _this.forestMap);
-            _this.forestMap = Filters.apply('forestMap', _this.forestMap);
+        const forestImageKeys = Object.keys(Config.FOREST_IMAGES);
+        this.forestImages = forestImageKeys.map(key => Config.FOREST_IMAGES[key]);
+        this.forestImagesCache = {};
+        this.forestMap = new ForestMap(biomesOperator.getBiomes());
+        const forestGenerator = new ForestGenerator(biomesOperator.altitudeMap, biomesOperator.humidityMap);
+        timer.addStepsHandler((step) => {
+            forestGenerator.generate(this.forestMap, step);
+            this.addForestMapToLayer(forestLayer, this.forestMap);
+            this.forestMap = Filters.apply('forestMap', this.forestMap);
         });
         if (Config.LOGS) {
             logTimeEvent('Forests initialized.');
         }
     }
+    /**
+     * Determines whether the cell belongs to a desert or tropical biome
+     */
+    isDesertForest(x, y) {
+        var _a;
+        const biomeName = (_a = this.biomesOperator.getBiome(x, y)) === null || _a === void 0 ? void 0 : _a.getName();
+        return biomeName === biomes.Biome_Desert.name || biomeName === biomes.Biome_Tropic.name;
+    }
+    /**
+     * Determines whether the cell belongs to a tundra biome
+     */
+    isTundraForest(x, y) {
+        var _a;
+        return ((_a = this.biomesOperator.getBiome(x, y)) === null || _a === void 0 ? void 0 : _a.getName()) === biomes.Biome_Tundra.name;
+    }
+    /**
+     * Returns the appropriate forest image based on the biome
+     */
+    getForestImage(x, y) {
+        if (this.isDesertForest(x, y)) {
+            return this.forestPalmImage;
+        }
+        if (this.isTundraForest(x, y)) {
+            return this.forestTundraImage;
+        }
+        return this.forestImages.randomElement();
+    }
     getForestMap() {
         return this.forestMap;
+    }
+    /**
+     * Adds the forest map cells to the layer
+     */
+    addForestMapToLayer(forestLayer, forestMap) {
+        forestMap.foreach((x, y) => {
+            const displayCell = forestMap.filled(x, y) ? this.getDisplayCell(x, y) : null;
+            forestLayer.setCell(x, y, displayCell);
+        });
+    }
+    /**
+     * Returns the DisplayCell for a given position, caching results for performance
+     */
+    getDisplayCell(x, y) {
+        const key = `${x},${y}`;
+        if (!this.forestImagesCache[key]) {
+            this.forestImagesCache[key] = new DisplayCell(this.forestColor, this.getForestImage(x, y));
+        }
+        return this.forestImagesCache[key];
     }
 }

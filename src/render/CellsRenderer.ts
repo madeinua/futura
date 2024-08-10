@@ -19,26 +19,22 @@ export default class CellsRenderer {
     }
 
     render(ctx: CanvasRenderingContext2D, displayCell: DisplayCell, x: number, y: number): void {
-        const images: string[] = displayCell.getImages();
+        const images = displayCell.getImages();
+        const pixelX = x * this.cellWidth;
+        const pixelY = y * this.cellHeight;
 
         if (images.length) {
-            for (let i = 0; i < images.length; i++) {
-                ctx.drawImage(
-                    this.imagesCache[images[i]],
-                    x * this.cellWidth,
-                    y * this.cellHeight,
-                    this.cellWidth,
-                    this.cellHeight
-                );
-            }
+            images.forEach(imageKey => {
+                const image = this.imagesCache[imageKey];
+                if (image) {
+                    ctx.drawImage(image, pixelX, pixelY, this.cellWidth, this.cellHeight);
+                } else {
+                    console.warn(`Image with key ${imageKey} not found in cache.`);
+                }
+            });
         } else {
             ctx.fillStyle = rgbToHex(displayCell.getColor());
-            ctx.fillRect(
-                x * this.cellWidth,
-                y * this.cellHeight,
-                this.cellWidth,
-                this.cellHeight
-            );
+            ctx.fillRect(pixelX, pixelY, this.cellWidth, this.cellHeight);
         }
     }
 }

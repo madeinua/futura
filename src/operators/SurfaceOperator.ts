@@ -4,17 +4,14 @@ import Config from "../../config.js";
 
 export default class SurfaceOperator {
 
-    generateAltitudeMap = function(): AltitudeMap {
+    generateAltitudeMap(): AltitudeMap {
+        let altitudeMap = new AltitudeMap(Config.WORLD_SIZE, Config.WORLD_SIZE);
+        const storage = Config.STORE_DATA ? localStorage.getItem('altitudeMap') : null;
 
-        let altitudeMap = new AltitudeMap(Config.WORLD_SIZE, Config.WORLD_SIZE),
-            storage = Config.STORE_DATA ? localStorage.getItem('altitudeMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
+        if (storage) {
             altitudeMap.loadMap(storage);
         } else {
-
             altitudeMap.generateMap();
-
             if (Config.STORE_DATA) {
                 localStorage.setItem('altitudeMap', altitudeMap.toString());
             }
@@ -23,7 +20,7 @@ export default class SurfaceOperator {
         altitudeMap = Filters.apply('altitudeMap', altitudeMap);
 
         if (Config.LOGS) {
-            logTimeEvent('Altitude map generated. Min: ' + altitudeMap.getMin() + ' Max: ' + altitudeMap.getMax() + ' Avg: ' + altitudeMap.getAvgValue());
+            logTimeEvent(`Altitude map generated. Min: ${altitudeMap.getMin()} Max: ${altitudeMap.getMax()} Avg: ${altitudeMap.getAvgValue()}`);
         }
 
         return altitudeMap;

@@ -1,20 +1,14 @@
 import {RGBa} from "../helpers.js";
 
 export default class DisplayCell {
-
     readonly color: RGBa;
     readonly images: string[];
 
     constructor(color: RGBa, image: null | string | string[]) {
         this.color = color;
-
-        if (Array.isArray(image)) {
-            this.images = image.filter((image: string | null) => image !== null);
-        } else if (image === null) {
-            this.images = [];
-        } else {
-            this.images = [image];
-        }
+        this.images = Array.isArray(image)
+            ? image.filter((img): img is string => img !== null)
+            : (image ? [image] : []);
     }
 
     getColor(): RGBa {

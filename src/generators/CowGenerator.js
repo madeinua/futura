@@ -9,7 +9,7 @@ export default class CowGenerator extends AnimalGenerator {
         return Cow;
     }
     updateHabitat() {
-        if (typeof this.grassMap === 'undefined') {
+        if (!this.grassMap) {
             this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.name);
         }
         const habitat = this.grassMap.clone();

@@ -8,8 +8,9 @@ export default class FishGenerator extends AnimalGenerator {
         return Fish;
     }
     updateHabitat() {
-        if (typeof this.habitat === 'undefined') {
-            this.setHabitat(this.objects.freshWaterMap.clone().combineWith(this.objects.coastMap));
+        if (!this.habitat) {
+            const combinedHabitat = this.objects.freshWaterMap.clone().combineWith(this.objects.coastMap);
+            this.setHabitat(combinedHabitat);
         }
         return this;
     }

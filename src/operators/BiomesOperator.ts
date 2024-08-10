@@ -9,13 +9,13 @@ import TemperatureMap from "../maps/TemperatureMap.js";
 import HumidityMap from "../maps/HumidityMap.js";
 import OceanMap from "../maps/OceanMap.js";
 import {Layer} from "../render/Layer.js";
-import Biome, {BiomeArgs} from "../biomes/Biome.js"
+import Biome, {BiomeArgs} from "../biomes/Biome.js";
 import BiomesMap from "../maps/BiomesMap.js";
 
-type biomesConfig = {
-    class: string,
-    h: [number, number],
-    t: [number, number],
+type BiomesConfig = {
+    class: string;
+    h: [number, number];
+    t: [number, number];
 }[];
 
 export default class BiomesOperator {
@@ -27,7 +27,7 @@ export default class BiomesOperator {
     readonly freshWaterMap: BinaryMatrix;
     readonly temperatureMap: TemperatureMap;
     readonly humidityMap: HumidityMap;
-    readonly biomesConfig: biomesConfig;
+    readonly biomesConfig: BiomesConfig;
 
     constructor(
         altitudeMap: AltitudeMap,
@@ -39,7 +39,6 @@ export default class BiomesOperator {
         biomesLayer: Layer,
         biomesImagesLayer: Layer,
     ) {
-
         this.biomes = new BiomesMap();
         this.altitudeMap = altitudeMap;
         this.oceanMap = oceanMap;
@@ -49,7 +48,7 @@ export default class BiomesOperator {
         this.humidityMap = humidityMap;
         this.biomesConfig = Config.biomesConfig();
 
-        this.createBiomes(altitudeMap);
+        this.createBiomes();
         this.addBiomesToLayer(biomesLayer, biomesImagesLayer);
 
         this.biomes = Filters.apply('biomes', this.biomes);
@@ -59,47 +58,37 @@ export default class BiomesOperator {
         }
     }
 
-    private createBiomes = function (altitudeMap: AltitudeMap): void {
-        const _this: BiomesOperator = this;
-
-        altitudeMap.foreach(function (x: number, y: number): void {
-            _this.biomes.setCell(x, y, _this._getBiome(x, y));
+    private createBiomes(): void {
+        this.altitudeMap.foreach((x: number, y: number): void => {
+            this.biomes.setCell(x, y, this._getBiome(x, y));
         });
     }
 
-    isBeach(x: number, y: number, altitude: number, temperature: number, humidity: number): boolean {
-        return altitude > Config.MIN_GROUND_LEVEL
-            && altitude <= Config.MAX_BEACH_LEVEL
-            - (temperature * Config.BEACH_TEMPERATURE_RATIO * 2 - Config.BEACH_TEMPERATURE_RATIO)
-            - (humidity * Config.BEACH_HUMIDITY_RATIO * 2 - Config.BEACH_HUMIDITY_RATIO)
-            && this.oceanMap.aroundFilled(x, y, Config.MAX_BEACH_DISTANCE_FROM_OCEAN);
+    private isBeach(x: number, y: number, altitude: number, temperature: number, humidity: number): boolean {
+        return altitude > Config.MIN_GROUND_LEVEL &&
+            altitude <= Config.MAX_BEACH_LEVEL -
+            (temperature * Config.BEACH_TEMPERATURE_RATIO * 2 - Config.BEACH_TEMPERATURE_RATIO) -
+            (humidity * Config.BEACH_HUMIDITY_RATIO * 2 - Config.BEACH_HUMIDITY_RATIO) &&
+            this.oceanMap.aroundFilled(x, y, Config.MAX_BEACH_DISTANCE_FROM_OCEAN);
     }
 
-    private _checkBiomeIndex = function (fig: Cell, index: number): boolean {
-
-        if (fig[0] === 0 && index === 0) {
-            return true;
-        } else if (index > fig[0] && index <= fig[1]) {
-            return true;
-        }
-
-        return false;
+    private _checkBiomeIndex(fig: Cell, index: number): boolean {
+        return (fig[0] === 0 && index === 0) || (index > fig[0] && index <= fig[1]);
     }
 
     private _getBiome(x: number, y: number): Biome {
-
         let distanceToWater = this.freshWaterMap.distanceTo(x, y, 5);
-        distanceToWater = distanceToWater > 100 ? 100 : distanceToWater;
+        distanceToWater = Math.min(distanceToWater, 100);
 
-        const altitude = this.altitudeMap.getCell(x, y),
-            args: BiomeArgs = {
-                altitude: altitude,
-                temperature: this.temperatureMap.getCell(x, y),
-                humidity: this.humidityMap.getCell(x, y),
-                distanceToWater: distanceToWater,
-                isHills: this.altitudeMap.isHills(altitude),
-                isMountains: this.altitudeMap.isMountains(altitude),
-            }
+        const altitude = this.altitudeMap.getCell(x, y);
+        const args: BiomeArgs = {
+            altitude,
+            temperature: this.temperatureMap.getCell(x, y),
+            humidity: this.humidityMap.getCell(x, y),
+            distanceToWater,
+            isHills: this.altitudeMap.isHills(altitude),
+            isMountains: this.altitudeMap.isMountains(altitude),
+        };
 
         if (this.freshWaterMap.filled(x, y)) {
             return new biomes.Biome_Water(x, y, args);
@@ -115,33 +104,27 @@ export default class BiomesOperator {
             return new biomes.Biome_Beach(x, y, args);
         }
 
-        const matchedBiomes: string[] = [];
-
-        for (let i = 0; i < this.biomesConfig.length; i++) {
-            const cfg = this.biomesConfig[i];
-
-            if (
-                this._checkBiomeIndex(cfg.h, fromFraction(args.humidity, Config.MIN_HUMIDITY, Config.MAX_HUMIDITY))
-                && this._checkBiomeIndex(cfg.t, fromFraction(args.temperature, Config.MIN_TEMPERATURE, Config.MAX_TEMPERATURE))
-            ) {
-                matchedBiomes.push(cfg.class);
-            }
-        }
+        const matchedBiomes = this.biomesConfig
+            .filter(cfg =>
+                this._checkBiomeIndex(cfg.h, fromFraction(args.humidity, Config.MIN_HUMIDITY, Config.MAX_HUMIDITY)) &&
+                this._checkBiomeIndex(cfg.t, fromFraction(args.temperature, Config.MIN_TEMPERATURE, Config.MAX_TEMPERATURE))
+            )
+            .map(cfg => cfg.class);
 
         if (!matchedBiomes.length) {
-            throwError('No biome matched for ' + x + ', ' + y, 2, true);
+            throwError(`No biome matched for ${x}, ${y}`, 2, true);
             throwError(args, 2, true);
+            return new biomes.Biome_Grass(x, y, args);
         }
 
-        return matchedBiomes.length
-            ? new biomes[matchedBiomes.randomElement()](x, y, args)
-            : new biomes.Biome_Grass(x, y, args);
+        return new biomes[matchedBiomes[Math.floor(Math.random() * matchedBiomes.length)]](x, y, args);
     }
 
-    private addBiomesToLayer = function (biomesLayer: Layer, biomesImagesLayer: Layer): void {
-        this.biomes.foreachValues(function (biome: Biome, x: number, y: number): void {
-            biomesLayer.setCell(x, y, biome.getDisplayCell());
-            biomesImagesLayer.setCell(x, y, biome.getDisplayCell());
+    private addBiomesToLayer(biomesLayer: Layer, biomesImagesLayer: Layer): void {
+        this.biomes.foreachValues((biome: Biome, x: number, y: number): void => {
+            const displayCell = biome.getDisplayCell();
+            biomesLayer.setCell(x, y, displayCell);
+            biomesImagesLayer.setCell(x, y, displayCell);
         });
     }
 
@@ -149,21 +132,17 @@ export default class BiomesOperator {
         return this.biomes;
     }
 
-    getBiome(x: number, y: number): null | Biome {
+    getBiome(x: number, y: number): Biome | null {
         return this.biomes.getCell(x, y);
     }
 
     getSurfaceByBiomeName(biomeName: string): BinaryMatrix {
-
-        const biomes = this.biomes,
-            surface = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-
-        this.altitudeMap.foreach(function (x: number, y: number): void {
-            if (biomes.getCell(x, y).getName() === biomeName) {
+        const surface = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
+        this.altitudeMap.foreach((x: number, y: number): void => {
+            if (this.biomes.getCell(x, y)?.getName() === biomeName) {
                 surface.fill(x, y);
             }
         });
-
         return surface;
     }
 }

@@ -8,42 +8,35 @@ export default class TemperatureMap extends PointMatrix {
 
     constructor(altitudeMap: AltitudeMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE);
-
         this.altitudeMap = altitudeMap;
     }
 
-    generateMap = function (): TemperatureMap {
-        let _this: TemperatureMap = this;
-
-        _this.addGradient();
-        _this.considerAltitude();
-        _this.normalize();
-
-        return _this;
+    generateMap(): TemperatureMap {
+        this.addGradient();
+        this.considerAltitude();
+        this.normalize();
+        return this;
     }
 
-    private addGradient = function (): void {
-
-        const _this: TemperatureMap = this,
-            gradient = [];
+    private addGradient(): void {
+        const gradient: number[] = [];
 
         for (let i = 0; i < Config.WORLD_SIZE; i++) {
             gradient[i] = i / Config.WORLD_SIZE;
         }
 
-        _this.foreach(function (x: number, y: number): void {
-            _this.addToCell(x, y, gradient[y]);
+        this.foreach((x: number, y: number): void => {
+            this.addToCell(x, y, gradient[y]);
         });
     }
 
-    private considerAltitude = function (): void {
-        const _this: TemperatureMap = this,
-            minLevel = Config.MIN_GROUND_LEVEL;
+    private considerAltitude(): void {
+        const minLevel = Config.MIN_GROUND_LEVEL;
 
-        _this.foreach(function (x: number, y: number): void {
-            let altitude = _this.altitudeMap.getCell(x, y);
+        this.foreach((x: number, y: number): void => {
+            let altitude = this.altitudeMap.getCell(x, y);
             altitude = altitude >= minLevel ? (altitude - minLevel) * (altitude - minLevel) : 0;
-            _this.subtractFromCell(x, y, altitude);
+            this.subtractFromCell(x, y, altitude);
         });
     }
 }

@@ -1,5 +1,5 @@
 import Config from "../../config.js";
-import DisplayCell from "../render/DisplayCell.js"
+import DisplayCell from "../render/DisplayCell.js";
 import {RGB, hexToRgb, LightenDarkenColor} from "../helpers.js";
 
 export type BiomeArgs = {
@@ -7,14 +7,14 @@ export type BiomeArgs = {
     temperature: number;
     humidity: number;
     distanceToWater: number;
-    isHills: boolean,
-    isMountains: boolean,
-}
+    isHills: boolean;
+    isMountains: boolean;
+};
 
 export type ColorsMinMax = {
     min: number;
     max: number;
-}
+};
 
 export default class Biome {
 
@@ -46,7 +46,7 @@ export default class Biome {
         return {
             min: Config.MIN_LEVEL,
             max: Config.MAX_LEVEL,
-        }
+        };
     }
 
     protected getHillsBoostColor(): number {
@@ -58,17 +58,17 @@ export default class Biome {
     }
 
     getColor(): string {
-        const minmax = this.getColorsMinMax(),
-            colors = Config.BIOME_COLORS[this.getName()];
-        let slice = 0;
+        const {min, max} = this.getColorsMinMax();
+        const colors = Config.BIOME_COLORS[this.getName()];
+        let sliceIndex = 0;
 
-        if (this.altitude >= minmax.max) {
-            slice = colors.length - 1;
-        } else if (this.altitude > minmax.min) {
-            slice = Math.floor((this.altitude - minmax.min) / (minmax.max - minmax.min) * colors.length);
+        if (this.altitude >= max) {
+            sliceIndex = colors.length - 1;
+        } else if (this.altitude > min) {
+            sliceIndex = Math.floor(((this.altitude - min) / (max - min)) * colors.length);
         }
 
-        let color = colors[slice];
+        let color = colors[sliceIndex];
 
         if (this.isHills) {
             color = LightenDarkenColor(color, this.getHillsBoostColor());
@@ -83,12 +83,10 @@ export default class Biome {
         return hexToRgb(this.getColor());
     }
 
-    getImage(): null | string {
-
+    getImage(): string | null {
         if (this.isMountains) {
             return Config.BIOME_IMAGES.Rocks[0];
         }
-
         return null;
     }
 
@@ -97,10 +95,7 @@ export default class Biome {
     }
 
     getDisplayCell(): DisplayCell {
-        return new DisplayCell(
-            this.getHexColor(),
-            [this.getBackground(), this.getImage()],
-        );
+        return new DisplayCell(this.getHexColor(), [this.getBackground(), this.getImage()]);
     }
 
     getDistanceToWater(): number {

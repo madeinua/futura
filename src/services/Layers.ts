@@ -9,23 +9,19 @@ export const LAYER_FRACTIONS = 5;
 export const LAYER_FRACTIONS_BORDERS = 6;
 
 export default class Layers {
-
     layers: Layer[] = [];
-
     readonly width: number;
     readonly height: number;
 
     constructor(width: number, height: number) {
-
         this.width = width;
         this.height = height;
 
-        for (let level = 0; level <= this.getMaxLevel(); level++) {
-            this.layers[level] = new Layer(this.width, this.height);
-        }
+        // Initialize layers array with Layer instances
+        this.layers = Array.from({length: this.getMaxLevel() + 1}, () => new Layer(this.width, this.height));
     }
 
-    getLayersLevels = function (): number[] {
+    getLayersLevels(): number[] {
         return [
             LAYER_BIOMES,
             LAYER_BIOMES_IMAGES,
@@ -33,45 +29,41 @@ export default class Layers {
             LAYER_HABITAT,
             LAYER_ANIMALS,
             LAYER_FRACTIONS,
-            LAYER_FRACTIONS_BORDERS
+            LAYER_FRACTIONS_BORDERS,
         ];
     }
 
-    getMaxLevel = function (): number {
-        return this.getLayersLevels().map((level: number) => level).reduce((a: number, b: number) => Math.max(a, b));
+    getMaxLevel(): number {
+        return Math.max(...this.getLayersLevels());
     }
 
-    getLayer = function (level: number): Layer {
+    getLayer(level: number): Layer {
         return this.layers[level];
     }
 
-    foreachLayerValues = function (level: number, callback: Function): void {
+    foreachLayerValues(level: number, callback: (value: any, x: number, y: number) => void): void {
         this.layers[level].foreachFilledValues(callback);
     }
 
-    foreachLayers(callback: Function): void {
-        for (let level = 0; level < this.layers.length; level++) {
-            callback(level);
-        }
+    foreachLayers(callback: (level: number) => void): void {
+        this.layers.forEach((_, level) => callback(level));
     }
 
-    getMainMapLayersLevels = function (): number[] {
+    getMainMapLayersLevels(): number[] {
         return [
             LAYER_BIOMES_IMAGES,
             LAYER_FOREST,
             LAYER_HABITAT,
             LAYER_ANIMALS,
-            LAYER_FRACTIONS_BORDERS
+            LAYER_FRACTIONS_BORDERS,
         ];
     }
 
-    foreachMainMapLayersValues = function (callback: Function): void {
-        this.getMainMapLayersLevels().forEach(
-            (level: number) => this.foreachLayerValues(level, callback)
-        );
+    foreachMainMapLayersValues(callback: (value: any, x: number, y: number) => void): void {
+        this.getMainMapLayersLevels().forEach(level => this.foreachLayerValues(level, callback));
     }
 
-    getMiniManLayersLevels = function (): number[] {
+    getMiniMapLayersLevels(): number[] {
         return [
             LAYER_BIOMES,
             LAYER_FOREST,
@@ -80,9 +72,7 @@ export default class Layers {
         ];
     }
 
-    foreachMiniMapLayersValues = function (callback: Function): void {
-        this.getMiniManLayersLevels().forEach(
-            (level: number) => this.foreachLayerValues(level, callback)
-        );
+    foreachMiniMapLayersValues(callback: (value: any, x: number, y: number) => void): void {
+        this.getMiniMapLayersLevels().forEach(level => this.foreachLayerValues(level, callback));
     }
 }

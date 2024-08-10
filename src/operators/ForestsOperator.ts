@@ -1,6 +1,6 @@
 import ForestMap from "../maps/ForestMap.js";
 import ForestGenerator from "../generators/ForestGenerator.js";
-import DisplayCell from "../render/DisplayCell.js"
+import DisplayCell from "../render/DisplayCell.js";
 import Timer from "../services/Timer.js";
 import biomes from "../biomes/Biomes.js";
 import {hexToRgb, Filters, logTimeEvent, RGB} from "../helpers.js";
@@ -10,39 +10,32 @@ import {Layer} from "../render/Layer.js";
 
 export default class ForestsOperator {
 
-    readonly forestColor: RGB;
-    readonly biomesOperator: BiomesOperator;
-    readonly forestPalmImage: null | string;
-    readonly forestTundraImage: null | string;
-    forestImages: string[];
-    forestImagesCache: string[];
-    forestMap: ForestMap;
+    private readonly forestColor: RGB;
+    private readonly biomesOperator: BiomesOperator;
+    private readonly forestPalmImage: string | null;
+    private readonly forestTundraImage: string | null;
+    private forestImages: string[];
+    private readonly forestImagesCache: { [key: string]: DisplayCell };
+    private forestMap: ForestMap;
 
     constructor(biomesOperator: BiomesOperator, timer: Timer, forestLayer: Layer) {
-
         this.biomesOperator = biomesOperator;
         this.forestColor = hexToRgb(Config.FOREST_COLOR);
         this.forestPalmImage = Config.FOREST_PALM_IMAGE;
         this.forestTundraImage = Config.FOREST_TUNDRA_IMAGE;
 
-        const _this: ForestsOperator = this,
-            forestGenerator = new ForestGenerator(biomesOperator.altitudeMap, biomesOperator.humidityMap);
+        const forestImageKeys = Object.keys(Config.FOREST_IMAGES);
+        this.forestImages = forestImageKeys.map(key => Config.FOREST_IMAGES[key]);
 
-        _this.forestImages = [];
-        _this.forestImagesCache = [];
+        this.forestImagesCache = {};
+        this.forestMap = new ForestMap(biomesOperator.getBiomes());
 
-        for (let i in Config.FOREST_IMAGES) {
-            _this.forestImages.push(Config.FOREST_IMAGES[i]);
-        }
+        const forestGenerator = new ForestGenerator(biomesOperator.altitudeMap, biomesOperator.humidityMap);
 
-        _this.forestMap = new ForestMap(
-            biomesOperator.getBiomes()
-        );
-
-        timer.addStepsHandler(function (step: number): void {
-            forestGenerator.generate(_this.forestMap, step);
-            _this.addForestMapToLayer(forestLayer, _this.forestMap);
-            _this.forestMap = Filters.apply('forestMap', _this.forestMap);
+        timer.addStepsHandler((step: number): void => {
+            forestGenerator.generate(this.forestMap, step);
+            this.addForestMapToLayer(forestLayer, this.forestMap);
+            this.forestMap = Filters.apply('forestMap', this.forestMap);
         });
 
         if (Config.LOGS) {
@@ -51,23 +44,24 @@ export default class ForestsOperator {
     }
 
     /**
-     * Whether the cell is a palm or a normal forest
+     * Determines whether the cell belongs to a desert or tropical biome
      */
-    isDesertForest = function (x: number, y: number): boolean {
-        return [biomes.Biome_Desert.name, biomes.Biome_Tropic.name].includes(
-            this.biomesOperator.getBiome(x, y).getName()
-        );
+    isDesertForest(x: number, y: number): boolean {
+        const biomeName = this.biomesOperator.getBiome(x, y)?.getName();
+        return biomeName === biomes.Biome_Desert.name || biomeName === biomes.Biome_Tropic.name;
     }
 
     /**
-     * Whether the cell is a palm or a normal forest
+     * Determines whether the cell belongs to a tundra biome
      */
-    isTundraForest = function (x: number, y: number): boolean {
-        return this.biomesOperator.getBiome(x, y).getName() === biomes.Biome_Tundra.name;
+    isTundraForest(x: number, y: number): boolean {
+        return this.biomesOperator.getBiome(x, y)?.getName() === biomes.Biome_Tundra.name;
     }
 
-    protected getForestImage = function (x: number, y: number): HTMLImageElement {
-
+    /**
+     * Returns the appropriate forest image based on the biome
+     */
+    protected getForestImage(x: number, y: number): string | null {
         if (this.isDesertForest(x, y)) {
             return this.forestPalmImage;
         }
@@ -83,26 +77,26 @@ export default class ForestsOperator {
         return this.forestMap;
     }
 
-    private addForestMapToLayer = function (forestLayer: Layer, forestMap: ForestMap): void {
-        const _this: ForestsOperator = this;
-
-        forestMap.foreach(function (x: number, y: number): void {
-            forestLayer.setCell(
-                x, y,
-                forestMap.filled(x, y) ? _this.getDisplayCell(x, y) : null
-            );
+    /**
+     * Adds the forest map cells to the layer
+     */
+    private addForestMapToLayer(forestLayer: Layer, forestMap: ForestMap): void {
+        forestMap.foreach((x: number, y: number): void => {
+            const displayCell = forestMap.filled(x, y) ? this.getDisplayCell(x, y) : null;
+            forestLayer.setCell(x, y, displayCell);
         });
     }
 
-    private getDisplayCell = function (x: number, y: number): DisplayCell {
+    /**
+     * Returns the DisplayCell for a given position, caching results for performance
+     */
+    private getDisplayCell(x: number, y: number): DisplayCell {
+        const key = `${x},${y}`;
 
-        if (typeof this.forestImagesCache[x + ',' + y] === 'undefined') {
-            this.forestImagesCache[x + ',' + y] = new DisplayCell(
-                this.forestColor,
-                this.getForestImage(x, y),
-            );
+        if (!this.forestImagesCache[key]) {
+            this.forestImagesCache[key] = new DisplayCell(this.forestColor, this.getForestImage(x, y));
         }
 
-        return this.forestImagesCache[x + ',' + y];
+        return this.forestImagesCache[key];
     }
 }

@@ -10,7 +10,6 @@ export default class CoastMap extends BinaryMatrix {
 
     constructor(oceanMap: OceanMap, altitudeMap: AltitudeMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-
         this.oceanMap = oceanMap;
         this.altitudeMap = altitudeMap;
     }
@@ -20,14 +19,11 @@ export default class CoastMap extends BinaryMatrix {
     }
 
     generateMap(): CoastMap {
-        const _this: CoastMap = this;
-
-        _this.oceanMap.foreachFilled(function (x: number, y: number): void {
-            if (_this.isCoast(_this.altitudeMap.getCell(x, y))) {
-                _this.fill(x, y);
+        this.oceanMap.foreachFilled((x: number, y: number): void => {
+            if (this.isCoast(this.altitudeMap.getCell(x, y))) {
+                this.fill(x, y);
             }
         });
-
-        return _this;
+        return this;
     }
 }

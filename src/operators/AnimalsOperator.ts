@@ -1,13 +1,20 @@
-import {getAroundRadius, getRectangleAround, iAmLucky, hexToRgb, logTimeEvent, Filters} from '../helpers.js';
+import {
+    getAroundRadius,
+    getRectangleAround,
+    iAmLucky,
+    hexToRgb,
+    logTimeEvent,
+    Filters,
+} from '../helpers.js';
 import Config from "../../config.js";
 import CowGenerator from "../generators/CowGenerator.js";
 import DeerGenerator from "../generators/DeerGenerator.js";
+import FishGenerator from "../generators/FishGenerator.js";
 import DisplayCell from "../render/DisplayCell.js";
 import {Cell, CellsList} from "../structures/Cells.js";
 import Animal from "../animals/Animal.js";
 import AnimalGenerator, {AnimalsGeneratorArgs} from "../generators/AnimalGenerator.js";
 import {Layer} from "../render/Layer.js";
-import FishGenerator from "../generators/FishGenerator.js";
 
 type AnimalsTypesCounter = {
     [key: string]: number;
@@ -27,195 +34,138 @@ export default class AnimalsOperator {
     animalImagesCache: DisplayCell[] = [];
 
     constructor(args: AnimalsOperatorArgs) {
-
-        this.animalImagesCache = [];
-
-        const _this: AnimalsOperator = this,
-            animalGenerators = this.getAvailableGenerators();
-
-        for (let i = 0; i < animalGenerators.length; i++) {
-            _this.registerAnimalsGenerator(
-                new animalGenerators[i](args)
-            );
-        }
+        this.initializeAnimalGenerators(args);
 
         if (Config.LOGS) {
             logTimeEvent('Animals initialized.');
         }
 
-        args.timer.addStepsHandler(function (): void {
-
-            args.habitatLayer.reset();
-            _this.updateHabitats();
-            //_this.showHabitatsOnLayer(habitatLayer, Fish);
-
-            args.animalsLayer.reset();
-
-            _this.maybeCreateAnimals();
-            _this.moveAnimals(args.animalsLayer);
-
-            Filters.apply('animalsSteps', _this.animals);
+        args.timer.addStepsHandler((): void => {
+            this.step(args.habitatLayer, args.animalsLayer);
         });
     }
 
-    private updateHabitats() {
-        for (let i = 0; i < this.animalsGenerators.length; i++) {
-            this.animalsGenerators[i].updateHabitat();
-        }
+    private initializeAnimalGenerators(args: AnimalsOperatorArgs): void {
+        const animalGenerators = this.getAvailableGenerators();
+
+        animalGenerators.forEach((Generator) => {
+            const generatorInstance = new Generator(args);
+            this.registerAnimalsGenerator(generatorInstance);
+        });
     }
 
-    private addAnimalToLayer = function (animalsLayer: Layer, animal: Animal): void {
-        const _this: AnimalsOperator = this;
+    private step(habitatLayer: Layer, animalsLayer: Layer): void {
+        habitatLayer.reset();
+        this.updateHabitats();
 
-        animalsLayer.setCell(
-            animal.x,
-            animal.y,
-            _this.getDisplayCell(animal)
-        );
+        animalsLayer.reset();
+        this.maybeCreateAnimals();
+        this.moveAnimals(animalsLayer);
+
+        Filters.apply('animalsSteps', this.animals);
     }
 
-    private getAvailableGenerators = function (): typeof AnimalGenerator[] {
-        return [
-            //AnimalGenerator,
-            FishGenerator,
-            DeerGenerator,
-            CowGenerator
-        ];
+    private updateHabitats(): void {
+        this.animalsGenerators.forEach(generator => generator.updateHabitat());
+    }
+
+    private addAnimalToLayer(animalsLayer: Layer, animal: Animal): void {
+        animalsLayer.setCell(animal.x, animal.y, this.getDisplayCell(animal));
+    }
+
+    private getAvailableGenerators(): typeof AnimalGenerator[] {
+        return [FishGenerator, DeerGenerator, CowGenerator];
     }
 
     private getCellsAvailableToMove(animal: Animal): CellsList {
+        const habitat = this.getAnimalGeneratorByAnimal(animal).getHabitat();
+        const cellsAround = getRectangleAround(animal.x, animal.y, Config.WORLD_SIZE, Config.WORLD_SIZE);
 
-        const result: CellsList = [],
-            habitat = this.getAnimalGeneratorByAnimal(animal).getHabitat(),
-            cellsAround = getRectangleAround(
-                animal.x,
-                animal.y,
-                Config.WORLD_SIZE,
-                Config.WORLD_SIZE
-            );
-
-        for (let i = 0; i < cellsAround.length; i++) {
-            if (habitat.filled(cellsAround[i][0], cellsAround[i][1])) {
-                result.push(cellsAround[i]);
-            }
-        }
-
-        return result;
+        return cellsAround.filter(([x, y]) => habitat.filled(x, y));
     }
 
-    private isAnimalsAroundPoint = function (cell: Cell, animalToExcept: Animal): boolean {
-
+    private isAnimalsAroundPoint(cell: Cell, animalToExcept: Animal): boolean {
         const availableCells = getAroundRadius(cell[0], cell[1], Config.WORLD_SIZE, Config.WORLD_SIZE, 2);
 
-        for (let j = 0; j < availableCells.length; j++) {
-            for (let i = 0; i < this.animals.length; i++) {
-                if (
-                    this.animals[i].id !== animalToExcept.id
-                    && this.animals[i].x === availableCells[j][0]
-                    && this.animals[i].y === availableCells[j][1]
-                ) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return availableCells.some(([x, y]) =>
+            this.animals.some(animal =>
+                animal.id !== animalToExcept.id && animal.x === x && animal.y === y
+            )
+        );
     }
 
     private isAnimalsGeneratorRegistered(generator: AnimalGenerator): boolean {
-
-        for (let i = 0; i < this.animalsGenerators.length; i++) {
-            if (this.animalsGenerators[i].getName() === generator.getName()) {
-                return true;
-            }
-        }
-
-        return false;
+        return this.animalsGenerators.some(registeredGenerator => registeredGenerator.getName() === generator.getName());
     }
 
-    private registerAnimalsGenerator(generator: AnimalGenerator) {
+    private registerAnimalsGenerator(generator: AnimalGenerator): void {
         if (!this.isAnimalsGeneratorRegistered(generator)) {
-
             this.animalsGenerators.push(generator);
 
             if (Config.LOGS) {
-                console.log('Generator "' + generator.getName() + '" registered');
+                console.log(`Generator "${generator.getName()}" registered`);
             }
         }
     }
 
-    private incAnimalsCount(name: string) {
+    private incAnimalsCount(name: string): void {
+        if (this.animalsTypesCounter[name] === undefined) {
+            this.animalsTypesCounter[name] = 0;
+        }
         this.animalsTypesCounter[name]++;
     }
 
-    private decAnimalsCount(name: string) {
+    private decAnimalsCount(name: string): void {
         this.animalsTypesCounter[name]--;
     }
 
     private getAnimalsCountByName(name: string): number {
-
-        if (typeof this.animalsTypesCounter[name] === 'undefined') {
+        if (this.animalsTypesCounter[name] === undefined) {
             this.animalsTypesCounter[name] = 0;
         }
-
         return this.animalsTypesCounter[name];
     }
 
-    private maybeCreateAnimals() {
+    private maybeCreateAnimals(): void {
+        this.animalsGenerators.forEach(generator => {
+            const animalsCount = this.getAnimalsCountByName(generator.getName());
 
-        for (let i = 0; i < this.animalsGenerators.length; i++) {
-            const generator = this.animalsGenerators[i],
-                animalsCount = this.getAnimalsCountByName(generator.getName());
-
-            if (animalsCount > generator.getMaxAnimals()) {
-                continue;
-            }
-
-            if (!iAmLucky(generator.getCreateIntensity())) {
-                continue;
+            if (animalsCount > generator.getMaxAnimals() || !iAmLucky(generator.getCreateIntensity())) {
+                return;
             }
 
             generator.checkRespawns(animalsCount);
-
             const animal = generator.createAnimal(this.animalsPositions);
 
             if (animal) {
                 this.animals.push(animal);
                 this.incAnimalsCount(animal.getName());
             }
-        }
+        });
     }
 
-    private getAnimalGeneratorByAnimal(animal: Animal): null | AnimalGenerator {
-
-        for (let i = 0; i < this.animalsGenerators.length; i++) {
-            if (this.animalsGenerators[i].getName() === animal.getName()) {
-                return this.animalsGenerators[i];
-            }
-        }
-
-        return null;
+    private getAnimalGeneratorByAnimal(animal: Animal): AnimalGenerator | null {
+        return this.animalsGenerators.find(generator => generator.getName() === animal.getName()) || null;
     }
 
-    private killAnimal(animal: Animal) {
-        this.animals = this.animals.removeElementByValue(animal);
+    private killAnimal(animal: Animal): void {
+        this.animals = this.animals.filter(a => a !== animal);
         this.decAnimalsCount(animal.getName());
     }
 
-    private getNextMove(animal: Animal): null | Cell {
-
+    private getNextMove(animal: Animal): Cell | null {
         if (!iAmLucky(animal.getMoveChance())) {
             return null;
         }
 
-        let nextPoint: null | Cell = null,
-            availableCells = this.getCellsAvailableToMove(animal);
+        let availableCells = this.getCellsAvailableToMove(animal);
+        let nextPoint: Cell | null = null;
 
         while (!nextPoint && availableCells.length) {
             nextPoint = availableCells.randomElement();
 
             if (this.isAnimalsAroundPoint(nextPoint, animal)) {
-                availableCells = availableCells.removeElementByValue(nextPoint);
+                availableCells = availableCells.filter(cell => cell !== nextPoint);
                 nextPoint = null;
             }
         }
@@ -223,41 +173,31 @@ export default class AnimalsOperator {
         return nextPoint;
     }
 
-    private moveAnimals(animalsLayer: Layer) {
-
-        let animal: Animal,
-            nextPoint: Cell;
-
+    private moveAnimals(animalsLayer: Layer): void {
         this.animalsPositions = [];
 
-        for (let i = 0; i < this.animals.length; i++) {
-
-            animal = this.animals[i];
-            nextPoint = this.getNextMove(animal);
+        this.animals.forEach(animal => {
+            const nextPoint = this.getNextMove(animal);
 
             if (nextPoint) {
                 animal.moveTo(nextPoint[0], nextPoint[1]);
                 this.addAnimalToLayer(animalsLayer, animal);
             } else {
-
                 const generator = this.getAnimalGeneratorByAnimal(animal);
 
-                if (generator.isCellInHabitat(animal.x, animal.y)) {
+                if (generator?.isCellInHabitat(animal.x, animal.y)) {
                     this.addAnimalToLayer(animalsLayer, animal);
-                } else { // if animal can't move & it's not in habitat - it must be killed
+                } else {
                     this.killAnimal(animal);
                 }
             }
 
-            this.animalsPositions.push(
-                animal.getPosition()
-            );
-        }
+            this.animalsPositions.push(animal.getPosition());
+        });
     }
 
-    private getDisplayCell = function (animal: Animal): DisplayCell {
-
-        if (typeof this.animalImagesCache[animal.getName()] === 'undefined') {
+    private getDisplayCell(animal: Animal): DisplayCell {
+        if (!this.animalImagesCache[animal.getName()]) {
             this.animalImagesCache[animal.getName()] = new DisplayCell(
                 hexToRgb(animal.getColor()),
                 animal.getImage()
@@ -267,13 +207,10 @@ export default class AnimalsOperator {
         return this.animalImagesCache[animal.getName()];
     }
 
-    private showHabitatsOnLayer(habitatLayer: Layer, animal: Animal) {
-        for (let i = 0; i < this.animalsGenerators.length; i++) {
-            if (this.animalsGenerators[i].getName() === animal.getName()) {
-                this.animalsGenerators[i].getHabitat().foreachFilled(function (x: number, y: number): void {
-                    habitatLayer.setCell(x, y, new DisplayCell([100, 100, 200, 255], null));
-                });
-            }
-        }
+    private showHabitatsOnLayer(habitatLayer: Layer, animal: Animal): void {
+        const generator = this.getAnimalGeneratorByAnimal(animal);
+        generator?.getHabitat().foreachFilled((x: number, y: number): void => {
+            habitatLayer.setCell(x, y, new DisplayCell([100, 100, 200, 255], null));
+        });
     }
 }

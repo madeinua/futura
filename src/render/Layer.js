@@ -1,12 +1,9 @@
 import Matrix from "../structures/Matrix.js";
 export class Layer extends Matrix {
-    getCell(x, y) {
-        return super.getCell(x, y);
-    }
-    setCell(x, y, value) {
-        return super.setCell(x, y, value);
-    }
+    /**
+     * Resets all cells in the layer to null.
+     */
     reset() {
-        this.map(null);
+        this.map(() => null);
     }
 }

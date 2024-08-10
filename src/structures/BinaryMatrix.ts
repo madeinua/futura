@@ -1,6 +1,6 @@
 import NumericMatrix from './NumericMatrix.js';
 import {distance, round, getPolygonAreaSize} from "../helpers.js";
-import {Cell, CellsList} from "./Cells.js";
+import {CellsList} from "./Cells.js";
 import {Array2D} from "./Array2D.js";
 
 export default class BinaryMatrix extends NumericMatrix {
@@ -15,97 +15,49 @@ export default class BinaryMatrix extends NumericMatrix {
 
     clone(): BinaryMatrix {
         const matrix = new BinaryMatrix(this.width, this.height, 0);
-        matrix.__values = JSON.parse(JSON.stringify(this.__values));
-
+        matrix.__values = this.__values.map(row => [...row]) as Array2D<0 | 1>;
         return matrix;
     }
 
-    /**
-     * Retrieve all cells that are filled
-     */
     getFilledCells(): CellsList {
-        const cells = [];
-
-        this.foreachFilled(function (x: number, y: number): void {
-            cells.push([x, y]);
-        });
-
+        const cells: CellsList = [];
+        this.foreachFilled((x, y) => cells.push([x, y]));
         return cells;
     }
 
-    /**
-     * Retrieve all cells that are not filled
-     */
     getUnfilledCells(): CellsList {
-        const cells = [];
-
-        this.foreachUnfilled(function (x: number, y: number): void {
-            cells.push([x, y]);
-        });
-
+        const cells: CellsList = [];
+        this.foreachUnfilled((x, y) => cells.push([x, y]));
         return cells;
     }
 
-    /**
-     * Fill the cell with the value
-     */
     fill(x: number, y: number): this {
         this.setCell(x, y, 1);
         return this;
     }
 
-    /**
-     * Fill all unfilled cells
-     */
     fillAll(): this {
-        const _this: BinaryMatrix = this;
-
-        _this.foreachUnfilled(function (x: number, y: number): void {
-            _this.fill(x, y);
-        });
-
+        this.foreachUnfilled((x, y) => this.fill(x, y));
         return this;
     }
 
-    /**
-     * Remove filling the cell with the value
-     */
     unfill(x: number, y: number): this {
         this.setCell(x, y, 0);
         return this;
     }
 
-    /**
-     * Remove filling all filled cells
-     */
     unfillAll(): this {
-        const _this: BinaryMatrix = this;
-
-        _this.foreachFilled(function (x: number, y: number): void {
-            _this.unfill(x, y);
-        });
-
+        this.foreachFilled((x, y) => this.unfill(x, y));
         return this;
     }
 
-    /**
-     * Count the number of filled cells
-     */
     countFilled(): number {
         let count = 0;
-
-        this.foreachFilled(function (): void {
-            count++;
-        });
-
+        this.foreachFilled(() => count++);
         return count;
     }
 
-    /**
-     * Check if matrix has filled cells
-     */
     hasFilled(): boolean {
-
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 if (this.filled(x, y)) {
@@ -113,21 +65,14 @@ export default class BinaryMatrix extends NumericMatrix {
                 }
             }
         }
-
         return false;
     }
 
-    /**
-     * Check if the cell is filled
-     */
     filled(x: number, y: number): boolean {
         return this.getCell(x, y) === 1;
     }
 
-    /**
-     * Applies the callback to the filled elements of the Matrix
-     */
-    foreachFilled(callback: Function): void {
+    foreachFilled(callback: (x: number, y: number) => void): void {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 if (this.filled(x, y)) {
@@ -137,10 +82,7 @@ export default class BinaryMatrix extends NumericMatrix {
         }
     }
 
-    /**
-     * Applies the callback to the unfilled elements of the Matrix
-     */
-    foreachUnfilled(callback: Function): void {
+    foreachUnfilled(callback: (x: number, y: number) => void): void {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 if (!this.filled(x, y)) {
@@ -150,18 +92,12 @@ export default class BinaryMatrix extends NumericMatrix {
         }
     }
 
-    /**
-     * Get the closest distance to the specified coordinates.
-     * Note: max affect the performance dramatically!
-     */
     distanceTo(x: number, y: number, max: number): number {
-
         let result = Number.MAX_SAFE_INTEGER;
-
-        const minX = Math.max(0, x - max),
-            maxX = Math.min(this.width - 1, x + max),
-            minY = Math.max(0, y - max),
-            maxY = Math.min(this.height - 1, y + max);
+        const minX = Math.max(0, x - max);
+        const maxX = Math.min(this.width - 1, x + max);
+        const minY = Math.max(0, y - max);
+        const maxY = Math.min(this.height - 1, y + max);
 
         for (let nx = minX; nx <= maxX; nx++) {
             for (let ny = minY; ny <= maxY; ny++) {
@@ -170,73 +106,43 @@ export default class BinaryMatrix extends NumericMatrix {
                 }
             }
         }
-
         return result;
     }
 
-    /**
-     * Whether is any filled point around the specified coordinates.
-     * Note: max affect the performance dramatically!
-     */
     aroundFilled(x: number, y: number, max: number): boolean {
         return max >= this.distanceTo(x, y, max);
     }
 
-    /**
-     * Apply binary "OR" between two binary matrix
-     */
     combineWith(matrix: BinaryMatrix): this {
-
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 this.__values[x][y] = this.__values[x][y] || matrix.__values[x][y];
             }
         }
-
         return this;
     }
 
-    /**
-     * Unfill cells which are filled in the specified matrix
-     */
     diff(matrix: BinaryMatrix): BinaryMatrix {
-        const _this: BinaryMatrix = this;
-
-        matrix.foreachFilled(function (x: number, y: number): void {
-            _this.unfill(x, y);
-        });
-
-        return _this;
+        matrix.foreachFilled((x, y) => this.unfill(x, y));
+        return this;
     }
 
-    /**
-     * Unfill cells which are filled in the specified array of cells
-     */
-    diffCells(cells: Array2D): BinaryMatrix {
-
-        for (let i = 0; i < cells.length; i++) {
-            if (this.filled(cells[i][0], cells[i][1])) {
-                this.unfill(cells[i][0], cells[i][1]);
+    diffCells(cells: CellsList): BinaryMatrix {
+        for (let [cx, cy] of cells) {
+            if (this.filled(cx, cy)) {
+                this.unfill(cx, cy);
             }
         }
-
         return this;
     }
 
-    /**
-     * Retrieve all filled neighbors of the specified cell
-     */
     getFilledNeighbors(x: number, y: number): CellsList {
-
-        const result: CellsList = [],
-            _this: BinaryMatrix = this;
-
-        _this.foreachNeighbors(x, y, function (nx: number, ny: number) {
-            if (_this.filled(nx, ny)) {
+        const result: CellsList = [];
+        this.foreachNeighbors(x, y, (nx, ny) => {
+            if (this.filled(nx, ny)) {
                 result.push([nx, ny]);
             }
         });
-
         return result;
     }
 
@@ -248,45 +154,29 @@ export default class BinaryMatrix extends NumericMatrix {
         return this.getFilledNeighbors(x, y).length < 8;
     }
 
-    /**
-     * Apply callback to all filled neighbors
-     */
-    foreachFilledAround(x: number, y: number, callback: Function): void {
+    foreachFilledAround(x: number, y: number, callback: (x: number, y: number) => void): void {
         const neighbors = this.getNeighbors(x, y);
-
-        for (let i = 0; i < neighbors.length; i++) {
-            if (this.filled(neighbors[i][0], neighbors[i][1])) {
-                callback(neighbors[i][0], neighbors[i][1]);
+        for (const [nx, ny] of neighbors) {
+            if (this.filled(nx, ny)) {
+                callback(nx, ny);
             }
         }
     }
 
-    /**
-     * Retrieve all unfilled neighbors of the specified cell around a specific radius
-     */
-    foreachFilledAroundRadiusToAllCells(callback: Function, radius: number): void {
-        const _this: BinaryMatrix = this,
-            filledCells = _this.getFilledCells();
-
-        filledCells.forEach(function (cell: Cell): void {
-            _this.foreachAroundRadius(cell[0], cell[1], radius, function (nx: number, ny: number) {
-                callback(nx, ny, cell[0], cell[1]);
+    foreachFilledAroundRadiusToAllCells(callback: (nx: number, ny: number, cx: number, cy: number) => void, radius: number): void {
+        const filledCells = this.getFilledCells();
+        filledCells.forEach(([cx, cy]) => {
+            this.foreachAroundRadius(cx, cy, radius, (nx, ny) => {
+                callback(nx, ny, cx, cy);
             });
         });
     }
 
-    /**
-     * Retrieve size of the array compared to the total number size of the map
-     */
     getSize(): number {
         return round(this.getFilledCells().length / (this.width * this.height), 2) * 100;
     }
 
-    /**
-     * Retrieve size of the array compared to the total number size of the map
-     */
-    getSizeFromPoint = function (startX: number, startY: number): number {
-
+    getSizeFromPoint(startX: number, startY: number): number {
         if (!this.filled(startX, startY)) {
             return 0;
         }
@@ -294,21 +184,14 @@ export default class BinaryMatrix extends NumericMatrix {
         const coords: CellsList = [];
 
         for (let d = 0; d < 4; d++) {
-
             let sx = startX;
             let sy = startY;
 
             while (true) {
-
-                if (d === 0) {
-                    sx++;
-                } else if (d === 1) {
-                    sy++;
-                } else if (d === 2) {
-                    sx--;
-                } else if (d === 3) {
-                    sy--;
-                }
+                if (d === 0) sx++;
+                else if (d === 1) sy++;
+                else if (d === 2) sx--;
+                else if (d === 3) sy--;
 
                 if (!this.filled(sx, sy)) {
                     coords.push([sx, sy]);
@@ -317,8 +200,6 @@ export default class BinaryMatrix extends NumericMatrix {
             }
         }
 
-        return Math.abs(
-            getPolygonAreaSize(coords)
-        );
+        return Math.abs(getPolygonAreaSize(coords));
     }
 }

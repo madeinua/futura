@@ -24,14 +24,14 @@ export default class AnimalGenerator {
         return this.getSettings().rarity;
     }
     updateHabitat() {
-        if (typeof this.habitat === 'undefined') {
+        if (!this.habitat) {
             this.setHabitat(new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 1));
         }
         return this;
     }
     setHabitat(habitat) {
         this.habitat = habitat;
-        this.maxAnimals = -1;
+        this.maxAnimals = -1; // Reset maxAnimals to force recalculation
     }
     getHabitat() {
         return this.habitat;
@@ -40,19 +40,20 @@ export default class AnimalGenerator {
         return this.getHabitat().filled(x, y);
     }
     createRespawnPoint() {
-        const habitat = this.getHabitat().clone();
-        habitat.diffCells(this.getRespawnPoints());
-        if (!habitat.hasFilled()) {
+        const habitatClone = this.getHabitat().clone();
+        habitatClone.diffCells(this.getRespawnPoints());
+        if (!habitatClone.hasFilled()) {
             return false;
         }
-        this.respawnPoints.push(habitat.getFilledCells().randomElement());
+        this.respawnPoints.push(habitatClone.getFilledCells().randomElement());
         return true;
     }
     getRespawnPoints() {
         return this.respawnPoints;
     }
     checkRespawns(animalsCount) {
-        for (let i = 0; i < Math.ceil(animalsCount / 3) + 1; i++) { // @TODO 3 - bigger value = less respawn points
+        const respawnChecks = Math.ceil(animalsCount / 3) + 1; // @TODO 3 - bigger value = less respawn points
+        for (let i = 0; i < respawnChecks; i++) {
             this.createRespawnPoint();
         }
     }
@@ -63,25 +64,18 @@ export default class AnimalGenerator {
         return this.maxAnimals;
     }
     createAnimal(anotherAnimalsPositions) {
-        let respawnPoints = this.getRespawnPoints();
-        for (let i = 0; i < respawnPoints.length; i++) {
-            if (anotherAnimalsPositions.getClosestDistanceTo(respawnPoints[i][0], respawnPoints[i][1]) < 3) {
-                respawnPoints = respawnPoints.removeElementByIndex(i);
-            }
-        }
-        for (let i = 0; i < respawnPoints.length; i++) {
-            if (!this.isCellInHabitat(respawnPoints[i][0], respawnPoints[i][1])) {
-                respawnPoints = respawnPoints.removeElementByIndex(i);
-            }
-        }
+        let respawnPoints = this.getRespawnPoints().filter((cell) => {
+            return (anotherAnimalsPositions.getClosestDistanceTo(cell[0], cell[1]) >= 3 &&
+                this.isCellInHabitat(cell[0], cell[1]));
+        });
         if (!respawnPoints.length) {
             return null;
         }
         const cell = respawnPoints.randomElement();
         if (!cell) {
-            throwError('Can not create animal', 1, true);
+            throwError('Cannot create animal', 1, true);
             return null;
         }
-        return new (this.getAnimalClass())(cell[0], cell[1], Config.ANIMALS[this.getName()]);
+        return new (this.getAnimalClass())(cell[0], cell[1], this.getSettings());
     }
 }

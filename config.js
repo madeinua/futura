@@ -11,7 +11,7 @@ const Config = {
     CELL_SIZE: 25, // WORLD_SIZE * CELL_SIZE * 2 < 23.000!
     SHOW_RECTANGLES: false,
     SHOW_COORDINATES: false,
-    DRAW_TECHNICAL_MAPS: false,
+    DRAW_TECHNICAL_MAPS: true,
 
     // Steps
     STEPS_ENABLED: true,
@@ -177,7 +177,7 @@ const Config = {
     // Fractions
     FRACTIONS: {
         COUNT: 5,
-        AUTO_CREATE_ON_STEP: 20,
+        AUTO_CREATE_ON_STEP: -1,
         // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
             BIOMES: {

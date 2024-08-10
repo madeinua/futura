@@ -1,7 +1,7 @@
 import { getStep, throwError } from "../helpers.js";
 class Animal {
     constructor(x, y, settings) {
-        this.id = this.getName() + '-' + getStep();
+        this.id = `${this.getName()}-${getStep()}`;
         this.x = x;
         this.y = y;
         this.settings = settings;
@@ -14,19 +14,19 @@ class Animal {
         return this.settings;
     }
     getMoveChance() {
-        return this.getSettings().moveChance;
+        return this.settings.moveChance;
     }
     getImage() {
-        return this.getSettings().image;
+        return this.settings.image;
     }
     getColor() {
-        return this.getSettings().color;
+        return this.settings.color;
     }
     getPosition() {
         return [this.x, this.y];
     }
     getHistoryAt(pos) {
-        return this.history.length >= pos && pos > 0
+        return pos > 0 && pos <= this.history.length
             ? this.history[this.history.length - pos]
             : false;
     }
@@ -35,7 +35,7 @@ class Animal {
     }
     moveTo(x, y) {
         if (x === this.x && y === this.y) {
-            throwError('Can not move to itself', 1, true);
+            throwError('Cannot move to the same position', 1, true);
             return;
         }
         this.history.push([this.x, this.y]);

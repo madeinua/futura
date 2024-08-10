@@ -2,7 +2,6 @@ import {Cell} from "../structures/Cells.js";
 import {getStep, throwError} from "../helpers.js";
 
 export interface AnimalSettings {
-
     /**
      * @minimum 0
      * @maximum 100
@@ -22,7 +21,6 @@ export interface AnimalSettings {
     rarity: number;
 
     color: string;
-
     image: string | null;
 }
 
@@ -36,7 +34,7 @@ export default class Animal {
     history: Cell[];
 
     constructor(x: number, y: number, settings: AnimalSettings) {
-        this.id = this.getName() + '-' + getStep();
+        this.id = `${this.getName()}-${getStep()}`;
         this.x = x;
         this.y = y;
         this.settings = settings;
@@ -52,35 +50,34 @@ export default class Animal {
     }
 
     getMoveChance(): number {
-        return this.getSettings().moveChance;
+        return this.settings.moveChance;
     }
 
     getImage(): string | null {
-        return this.getSettings().image;
+        return this.settings.image;
     }
 
     getColor(): string {
-        return this.getSettings().color;
+        return this.settings.color;
     }
 
     getPosition(): Cell {
         return [this.x, this.y];
     }
 
-    getHistoryAt(pos: number): Cell | boolean {
-        return this.history.length >= pos && pos > 0
+    getHistoryAt(pos: number): Cell | false {
+        return pos > 0 && pos <= this.history.length
             ? this.history[this.history.length - pos]
             : false;
     }
 
-    getPrevPosition(): Cell | boolean {
+    getPrevPosition(): Cell | false {
         return this.getHistoryAt(1);
     }
 
-    moveTo(x: number, y: number) {
-
+    moveTo(x: number, y: number): void {
         if (x === this.x && y === this.y) {
-            throwError('Can not move to itself', 1, true);
+            throwError('Cannot move to the same position', 1, true);
             return;
         }
 

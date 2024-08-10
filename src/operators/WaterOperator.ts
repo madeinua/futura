@@ -10,17 +10,14 @@ import IslandsMap from "../maps/IslandsMap.js";
 
 export default class WaterOperator {
 
-    generateOceanMap = function (altitudeMap: AltitudeMap): OceanMap {
+    generateOceanMap(altitudeMap: AltitudeMap): OceanMap {
+        let oceanMap = new OceanMap(altitudeMap);
+        const storage = Config.STORE_DATA ? localStorage.getItem('oceanMap') : null;
 
-        let oceanMap = new OceanMap(altitudeMap),
-            storage = Config.STORE_DATA ? localStorage.getItem('oceanMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
+        if (storage) {
             oceanMap.fromString(storage);
         } else {
-
             oceanMap.generateMap();
-
             if (Config.STORE_DATA) {
                 localStorage.setItem('oceanMap', oceanMap.toString());
             }
@@ -29,23 +26,20 @@ export default class WaterOperator {
         oceanMap = Filters.apply('oceanMap', oceanMap);
 
         if (Config.LOGS) {
-            logTimeEvent('Ocean map calculated. Size: ' + oceanMap.getSize() + '%');
+            logTimeEvent(`Ocean map calculated. Size: ${oceanMap.getSize()}%`);
         }
 
         return oceanMap;
     }
 
-    getCoastMap = function (oceanMap: OceanMap, altitudeMap: AltitudeMap): CoastMap {
+    getCoastMap(oceanMap: OceanMap, altitudeMap: AltitudeMap): CoastMap {
+        let coastMap = new CoastMap(oceanMap, altitudeMap);
+        const storage = Config.STORE_DATA ? localStorage.getItem('coastMap') : null;
 
-        let coastMap = new CoastMap(oceanMap, altitudeMap),
-            storage = Config.STORE_DATA ? localStorage.getItem('coastMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
+        if (storage) {
             coastMap.fromString(storage);
         } else {
-
             coastMap.generateMap();
-
             if (Config.STORE_DATA) {
                 localStorage.setItem('coastMap', coastMap.toString());
             }
@@ -60,17 +54,14 @@ export default class WaterOperator {
         return coastMap;
     }
 
-    generateLakesMap = function (altitudeMap: AltitudeMap, oceanMap: OceanMap): LakesMap {
+    generateLakesMap(altitudeMap: AltitudeMap, oceanMap: OceanMap): LakesMap {
+        let lakesMap = new LakesMap(altitudeMap, oceanMap);
+        const storage = Config.STORE_DATA ? localStorage.getItem('lakesMap') : null;
 
-        let lakesMap = new LakesMap(altitudeMap, oceanMap),
-            storage = Config.STORE_DATA ? localStorage.getItem('lakesMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
+        if (storage) {
             lakesMap.fromString(storage);
         } else {
-
             lakesMap.generateMap();
-
             if (Config.STORE_DATA) {
                 localStorage.setItem('lakesMap', lakesMap.toString());
             }
@@ -79,23 +70,20 @@ export default class WaterOperator {
         lakesMap = Filters.apply('lakesMap', lakesMap);
 
         if (Config.LOGS) {
-            logTimeEvent('Lakes map calculated. Size: ' + lakesMap.getSize() + '%');
+            logTimeEvent(`Lakes map calculated. Size: ${lakesMap.getSize()}%`);
         }
 
         return lakesMap;
     }
 
-    generateRiversMap = function (altitudeMap: AltitudeMap, lakesMap: LakesMap): RiversMap {
+    generateRiversMap(altitudeMap: AltitudeMap, lakesMap: LakesMap): RiversMap {
+        let riversMap = new RiversMap(altitudeMap, lakesMap);
+        const storage = Config.STORE_DATA ? localStorage.getItem('riversMap') : null;
 
-        let riversMap = new RiversMap(altitudeMap, lakesMap),
-            storage = Config.STORE_DATA ? localStorage.getItem('riversMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
+        if (storage) {
             riversMap.fromString(storage);
         } else {
-
             riversMap.generateMap();
-
             if (Config.STORE_DATA) {
                 localStorage.setItem('riversMap', riversMap.toString());
             }
@@ -104,33 +92,27 @@ export default class WaterOperator {
         riversMap = Filters.apply('riversMap', riversMap);
 
         if (Config.LOGS) {
-            logTimeEvent('Rivers generated. Rivers: ' + riversMap.getGeneratedRiversCount());
+            logTimeEvent(`Rivers generated. Rivers: ${riversMap.getGeneratedRiversCount()}`);
         }
 
         return riversMap;
     }
 
-    getFreshWaterMap = function (lakesMap: LakesMap, riversMap: RiversMap): BinaryMatrix {
-
+    getFreshWaterMap(lakesMap: LakesMap, riversMap: RiversMap): BinaryMatrix {
         const freshWaterMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-
         freshWaterMap.combineWith(lakesMap);
         freshWaterMap.combineWith(riversMap);
-
         return freshWaterMap;
     }
 
-    getIslandsMap = function (oceanMap: OceanMap): IslandsMap {
+    getIslandsMap(oceanMap: OceanMap): IslandsMap {
+        let islandsMap = new IslandsMap(oceanMap);
+        const storage = Config.STORE_DATA ? localStorage.getItem('islandsMap') : null;
 
-        let islandsMap = new IslandsMap(oceanMap),
-            storage = Config.STORE_DATA ? localStorage.getItem('islandsMap') : null;
-
-        if (typeof storage !== 'undefined' && storage !== null) {
+        if (storage) {
             islandsMap.fromString(storage);
         } else {
-
             islandsMap.generateMap();
-
             if (Config.STORE_DATA) {
                 localStorage.setItem('islandsMap', islandsMap.toString());
             }

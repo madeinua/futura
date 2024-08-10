@@ -5,55 +5,61 @@ export default class Timer {
         this.timerStep = 0;
         this.stepsHandlers = [];
         this.timerPaused = false;
-        this.stepsTimer = function (callback) {
-            const _this = this, timerStart = Date.now();
-            let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST, timerInterval, boosted = false;
-            _this.timerStep = 0;
-            const makeStep = function () {
-                if (_this.timerPaused) {
-                    return;
-                }
-                for (let i = 0; i < _this.stepsHandlers.length; i++) {
-                    _this.stepsHandlers[i](_this.timerStep);
-                }
-                _this.timerStep++;
-                callback();
-                if (_this.timerStep > Config.STEPS_LIMIT) {
-                    if (Config.LOGS) {
-                        logTimeEvent('Steps running has been ended. Avg. time per step: ' + Math.round((Date.now() - timerStart) / Config.STEPS_LIMIT) + 'ms');
-                    }
-                    clearInterval(timerInterval);
-                    return;
-                }
-                if (!boosted && _this.timerStep > Config.STEPS_BOOST_STEPS) {
-                    clearInterval(timerInterval);
-                    minStepInterval *= Config.STEPS_BOOST;
-                    timerInterval = setInterval(makeStep, minStepInterval);
-                    boosted = true;
-                }
-            };
-            timerInterval = setInterval(makeStep, minStepInterval);
-            makeStep();
-        };
-        this.isTimerPaused = function () {
-            return this.timerPaused;
-        };
-        this.pauseTimer = function () {
-            if (this.isTimerPaused()) {
-                return false;
-            }
-            this.timerPaused = true;
-            return true;
-        };
-        this.unpauseTimer = function () {
-            if (!this.isTimerPaused()) {
-                return false;
-            }
-            this.timerPaused = false;
-            return true;
-        };
+        this.timerInterval = null;
     }
     addStepsHandler(handler) {
         this.stepsHandlers.push(handler);
+    }
+    stepsTimer(callback) {
+        const timerStart = Date.now();
+        let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST;
+        let boosted = false;
+        this.timerStep = 0;
+        const makeStep = () => {
+            if (this.timerPaused) {
+                return;
+            }
+            this.stepsHandlers.forEach(handler => handler(this.timerStep));
+            this.timerStep++;
+            callback();
+            if (this.timerStep > Config.STEPS_LIMIT) {
+                if (Config.LOGS) {
+                    logTimeEvent(`Steps running has ended. Avg. time per step: ${Math.round((Date.now() - timerStart) / Config.STEPS_LIMIT)}ms`);
+                }
+                this.clearTimerInterval();
+                return;
+            }
+            if (!boosted && this.timerStep > Config.STEPS_BOOST_STEPS) {
+                this.clearTimerInterval();
+                minStepInterval *= Config.STEPS_BOOST;
+                this.timerInterval = setInterval(makeStep, minStepInterval);
+                boosted = true;
+            }
+        };
+        this.timerInterval = setInterval(makeStep, minStepInterval);
+        makeStep();
+    }
+    clearTimerInterval() {
+        if (this.timerInterval !== null) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+    isTimerPaused() {
+        return this.timerPaused;
+    }
+    pauseTimer() {
+        if (this.isTimerPaused()) {
+            return false;
+        }
+        this.timerPaused = true;
+        return true;
+    }
+    unpauseTimer() {
+        if (!this.isTimerPaused()) {
+            return false;
+        }
+        this.timerPaused = false;
+        return true;
     }
 }

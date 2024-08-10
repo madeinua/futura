@@ -1,15 +1,9 @@
 export default class DisplayCell {
     constructor(color, image) {
         this.color = color;
-        if (Array.isArray(image)) {
-            this.images = image.filter((image) => image !== null);
-        }
-        else if (image === null) {
-            this.images = [];
-        }
-        else {
-            this.images = [image];
-        }
+        this.images = Array.isArray(image)
+            ? image.filter((img) => img !== null)
+            : (image ? [image] : []);
     }
     getColor() {
         return this.color;

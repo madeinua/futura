@@ -1,33 +1,22 @@
-/**
- * Retrieve random element of array
- */
 Array.prototype.randomElement = function () {
-    return this[Math.floor(Math.random() * this.length)];
+    return this.length ? this[Math.floor(Math.random() * this.length)] : undefined;
 };
-/**
- * Remove/delete an element from the array by the index
- */
 Array.prototype.removeElementByIndex = function (index) {
-    return this.filter((e, i) => i !== index);
+    return this.filter((_, i) => i !== index);
 };
-/**
- * Remove/delete an element from the array by the value
- */
 Array.prototype.removeElementByValue = function (value) {
-    return this.filter((e) => e !== value);
+    return this.filter(e => e !== value);
 };
-/**
- * Shuffles array
- */
 Array.prototype.shuffle = function () {
+    const arrayCopy = [...this];
     let j, x;
-    for (let i = this.length - 1; i > 0; i--) {
+    for (let i = arrayCopy.length - 1; i > 0; i--) {
         j = Math.floor(Math.random() * (i + 1));
-        x = this[i];
-        this[i] = this[j];
-        this[j] = x;
+        x = arrayCopy[i];
+        arrayCopy[i] = arrayCopy[j];
+        arrayCopy[j] = x;
     }
-    return this;
+    return arrayCopy;
 };
 Array.prototype.intersect = function (array) {
     return this.filter(value => array.includes(value));
@@ -35,42 +24,26 @@ Array.prototype.intersect = function (array) {
 Array.prototype.diff = function (array) {
     return this.filter(value => !array.includes(value));
 };
-Array.prototype.includesCell = function (xy) {
-    return this.some(e => ((e[0] === xy[0]) && (e[1] === xy[1])));
+Array.prototype.includesCell = function (cell) {
+    return this.some(([x, y]) => x === cell[0] && y === cell[1]);
 };
 Array.prototype.intersectCells = function (array) {
-    return this.filter(value => array.includesCell(value));
+    return this.filter(cell => array.includesCell(cell));
 };
 Array.prototype.diffCells = function (array) {
-    return this.filter(value => !array.includesCell(value));
+    return this.filter(cell => !array.includesCell(cell));
 };
-/**
- * Retrieve array of unique values
- */
 Array.prototype.unique = function () {
-    const a = this.concat(), isArray = a.length > 0 && a[0] instanceof Array;
-    for (let i = 0; i < a.length; ++i) {
-        for (let j = i + 1; j < a.length; ++j) {
-            if (isArray
-                ? a[i][0] === a[j][0] && a[i][1] === a[j][1]
-                : a[i] === a[j]) {
-                a.splice(j--, 1);
-            }
-        }
-    }
-    return a;
+    return this.filter((value, index, self) => index === self.findIndex((t) => (Array.isArray(value) && Array.isArray(t)
+        ? value.length === t.length && value.every((val, i) => val === t[i])
+        : t === value)));
 };
-/**
- * Retrieve the closest distance to the cell
- */
 Array.prototype.getClosestDistanceTo = function (x, y) {
-    let closeness = Number.MAX_SAFE_INTEGER;
-    const distance = function (x1, y1, x2, y2) {
-        return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
-    };
-    for (let i = 0; i < this.length; i++) {
-        closeness = Math.min(closeness, distance(x, y, this[i][0], this[i][1]));
-    }
-    return closeness;
+    let closestDistance = Number.MAX_SAFE_INTEGER;
+    const distance = (x1, y1, x2, y2) => Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+    this.forEach(([cx, cy]) => {
+        closestDistance = Math.min(closestDistance, distance(x, y, cx, cy));
+    });
+    return closestDistance;
 };
 export {};

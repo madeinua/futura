@@ -3,9 +3,8 @@ import PointMatrix from "../structures/PointMatrix.js";
 declare const noise: any;
 
 export default class NoiseMapGenerator {
-
-    readonly size: number;
-    readonly power: number;
+    private readonly size: number;
+    private readonly power: number;
 
     constructor(size: number, power: number) {
         this.size = size;
@@ -13,14 +12,12 @@ export default class NoiseMapGenerator {
     }
 
     generate(): PointMatrix {
-
         noise.seed(Math.random());
 
-        const _this: NoiseMapGenerator = this,
-            map = new PointMatrix(_this.size, _this.size);
+        const map = new PointMatrix(this.size, this.size);
 
-        map.map(function (x: number, y: number): number {
-            return (noise.simplex2(x / _this.power, y / _this.power) + 1) * 0.5; // [0, 1] blurred height map
+        map.map((x: number, y: number): number => {
+            return (noise.simplex2(x / this.power, y / this.power) + 1) * 0.5; // [0, 1] blurred height map
         });
 
         return map;

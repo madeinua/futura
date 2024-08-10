@@ -15,25 +15,27 @@ export default class List {
         return this.items[this.items.length - 1];
     }
     previous() {
-        return this.items.length > 1 ? [this.items.length - 2] : false;
+        return this.items.length > 1 ? this.items[this.items.length - 2] : false;
     }
     get(i) {
-        return this.items.length >= i ? false : this.items[i];
+        return i < this.items.length ? this.items[i] : false;
     }
-    length() {
+    get length() {
         return this.items.length;
     }
     includes(item) {
         return this.items.includes(item);
     }
     foreach(callable) {
-        for (let i = 0; i < this.items.length; i++) {
-            callable(this.items[i]);
+        for (const item of this.items) {
+            callable(item);
         }
     }
     foreachCell(callable) {
-        for (let i = 0; i < this.items.length; i++) {
-            callable(this.items[i][0], this.items[i][1]);
+        for (const item of this.items) {
+            if (item.length >= 2) {
+                callable(item[0], item[1]);
+            }
         }
     }
 }
