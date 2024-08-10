@@ -8,14 +8,13 @@ const Config = {
 
     // Maps
     WORLD_SIZE: 250,
-    VISIBLE_COLS: 80,
-    VISIBLE_ROWS: 40,
+    CELL_SIZE: 25, // WORLD_SIZE * CELL_SIZE * 2 < 23.000!
     SHOW_RECTANGLES: false,
     SHOW_COORDINATES: false,
     DRAW_TECHNICAL_MAPS: false,
 
     // Steps
-    STEPS_ENABLED: true,
+    STEPS_ENABLED: false,
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 100,
     STEPS_BOOST: 5,

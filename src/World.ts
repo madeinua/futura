@@ -43,12 +43,10 @@ declare global {
 }
 
 export default class World {
-
-    cameraPosLeft: number;
-    cameraPosTop: number;
     world: WorldType;
-    readonly cellWidth: number;
-    readonly cellHeight: number;
+    cameraPos: Cell;
+    readonly visibleCellCols: number;
+    readonly visibleCellRows: number;
     readonly worldWidth: number;
     readonly worldHeight: number;
     readonly mapCanvas: HTMLCanvasElement;
@@ -64,19 +62,25 @@ export default class World {
         mapWidth: number,
         mapHeight: number,
         miniMapCanvas: HTMLCanvasElement,
-        cameraPos: Cell
+        startPoint: Cell,
+        onReady: Function
     ) {
-        this.cameraPosLeft = cameraPos[0];
-        this.cameraPosTop = cameraPos[1];
+        this.visibleCellCols = Math.ceil(mapWidth / Config.CELL_SIZE) + 1;
+        this.visibleCellRows = Math.ceil(mapHeight / Config.CELL_SIZE) + 1;
+
+        this.cameraPos = this.getCameraPointByCenteredPoint(startPoint);
 
         if (!Config.RANDOM_WORLD) {
             Math.seedrandom(Config.SEED);
         }
 
-        this.cellWidth = Math.ceil(mapWidth / Config.VISIBLE_COLS);
-        this.cellHeight = Math.ceil(mapHeight / Config.VISIBLE_ROWS);
-        this.worldWidth = this.cellWidth * Config.WORLD_SIZE;
-        this.worldHeight = this.cellHeight * Config.WORLD_SIZE;
+        this.worldWidth = Config.CELL_SIZE * Config.WORLD_SIZE;
+        this.worldHeight = Config.CELL_SIZE * Config.WORLD_SIZE;
+
+        if (this.worldWidth * this.worldHeight > 536756224) {
+            console.error('World is too big. Maximum size is 23184x23184');
+            return;
+        }
 
         this.mapCanvas = mapCanvas;
         this.mapCanvas.width = this.worldWidth;
@@ -88,7 +92,7 @@ export default class World {
 
         this.timer = new Timer();
         this.layers = new Layers(Config.WORLD_SIZE, Config.WORLD_SIZE);
-        this.cellsRenderer = new CellsRenderer(this.cellWidth, this.cellHeight);
+        this.cellsRenderer = new CellsRenderer(Config.CELL_SIZE, Config.CELL_SIZE);
 
         if (Config.STORE_DATA) {
 
@@ -105,6 +109,8 @@ export default class World {
         if (Config.LOGS) {
             logTimeEvent('Initialized');
         }
+
+        onReady(this);
     }
 
     create = function (): void {
@@ -227,8 +233,8 @@ export default class World {
                 scaleImageData(
                     mapCtx,
                     renderCtx.getImageData(0, 0, Config.WORLD_SIZE, Config.WORLD_SIZE),
-                    _this.cellWidth,
-                    _this.cellHeight
+                    Config.CELL_SIZE,
+                    Config.CELL_SIZE
                 ),
                 0, 0
             );
@@ -237,13 +243,13 @@ export default class World {
         // 3. Draw visible part of the canvas
         mapCtx.putImageData(
             _this.terrainCanvasCtx.getImageData(
-                _this.cellWidth * _this.cameraPosLeft,
-                _this.cellHeight * _this.cameraPosTop,
-                _this.cellWidth * Config.VISIBLE_COLS,
-                _this.cellHeight * Config.VISIBLE_ROWS
+                Config.CELL_SIZE * _this.cameraPos[0],
+                Config.CELL_SIZE * _this.cameraPos[1],
+                Config.CELL_SIZE * this.visibleCellCols,
+                Config.CELL_SIZE * this.visibleCellRows
             ),
-            _this.cellWidth * _this.cameraPosLeft,
-            _this.cellHeight * _this.cameraPosTop
+            Config.CELL_SIZE * _this.cameraPos[0],
+            Config.CELL_SIZE * _this.cameraPos[1]
         );
 
         // Step 4: Render layers except biomes as there were added before
@@ -277,10 +283,10 @@ export default class World {
     }
 
     private isCellVisible = function (x: number, y: number): boolean {
-        return x >= this.cameraPosLeft
-            && x < this.cameraPosLeft + Config.VISIBLE_COLS
-            && y >= this.cameraPosTop
-            && y < this.cameraPosTop + Config.VISIBLE_ROWS;
+        return x >= this.cameraPos[0]
+            && x < this.cameraPos[0] + this.visibleCellCols
+            && y >= this.cameraPos[1]
+            && y < this.cameraPos[1] + this.visibleCellRows;
     }
 
     private drawMiniMap = function (): void {
@@ -309,28 +315,28 @@ export default class World {
         ctx.strokeStyle = '#FFFFFF';
         ctx.lineWidth = 2;
         ctx.strokeRect(
-            this.cameraPosLeft,
-            this.cameraPosTop,
-            Config.VISIBLE_COLS,
-            Config.VISIBLE_ROWS
+            this.cameraPos[0],
+            this.cameraPos[1],
+            this.visibleCellCols,
+            this.visibleCellRows
         );
     }
 
     private drawRectangles = function (): void {
         const _this: World = this,
             ctx = _this.mapCanvas.getContext('2d'),
-            worldOffsetLeft = _this.cameraPosLeft * _this.cellWidth,
-            worldOffsetTop = _this.cameraPosTop * _this.cellHeight;
+            worldOffsetLeft = _this.cameraPos[0] * Config.CELL_SIZE,
+            worldOffsetTop = _this.cameraPos[1] * Config.CELL_SIZE;
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(255,255,255,0.2)';
 
-        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
-            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
-                const lx = x * _this.cellWidth + worldOffsetLeft,
-                    ly = y * _this.cellHeight + worldOffsetTop;
+        for (let x = 0; x < this.visibleCellCols; x++) {
+            for (let y = 0; y < this.visibleCellRows; y++) {
+                const lx = x * Config.CELL_SIZE + worldOffsetLeft,
+                    ly = y * Config.CELL_SIZE + worldOffsetTop;
 
-                ctx.strokeRect(lx, ly, _this.cellWidth, _this.cellHeight);
+                ctx.strokeRect(lx, ly, Config.CELL_SIZE, Config.CELL_SIZE);
             }
         }
     }
@@ -338,21 +344,21 @@ export default class World {
     private drawCoordinates = function (): void {
         const _this: World = this,
             ctx = _this.mapCanvas.getContext('2d'),
-            worldOffsetLeft = _this.cameraPosLeft * _this.cellWidth,
-            worldOffsetTop = _this.cameraPosTop * _this.cellHeight;
+            worldOffsetLeft = _this.cameraPos[0] * Config.CELL_SIZE,
+            worldOffsetTop = _this.cameraPos[1] * Config.CELL_SIZE;
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
         ctx.font = '7px senf';
         ctx.fillStyle = '#000000';
 
-        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
-            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
-                const lx = x * _this.cellWidth + worldOffsetLeft,
-                    ly = y * _this.cellHeight + worldOffsetTop;
+        for (let x = 0; x < this.visibleCellCols; x++) {
+            for (let y = 0; y < this.visibleCellRows; y++) {
+                const lx = x * Config.CELL_SIZE + worldOffsetLeft,
+                    ly = y * Config.CELL_SIZE + worldOffsetTop;
 
-                ctx.fillText((_this.cameraPosLeft + x).toString(), lx + 2, ly + 10);
-                ctx.fillText((_this.cameraPosTop + y).toString(), lx + 2, ly + 20);
+                ctx.fillText((_this.cameraPos[0] + x).toString(), lx + 2, ly + 10);
+                ctx.fillText((_this.cameraPos[1] + y).toString(), lx + 2, ly + 20);
             }
         }
     }
@@ -360,21 +366,21 @@ export default class World {
     private drawTemperatures = function (): void {
         const _this: World = this,
             ctx = _this.mapCanvas.getContext('2d'),
-            worldOffsetLeft = _this.cameraPosLeft * _this.cellWidth,
-            worldOffsetTop = _this.cameraPosTop * _this.cellHeight,
+            worldOffsetLeft = _this.cameraPos[0] * Config.CELL_SIZE,
+            worldOffsetTop = _this.cameraPos[1] * Config.CELL_SIZE,
             temperatureMap = this.world.temperatureMap;
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
         ctx.font = '7px senf';
 
-        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
-            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
+        for (let x = 0; x < this.visibleCellCols; x++) {
+            for (let y = 0; y < this.visibleCellRows; y++) {
 
-                const lx = x * _this.cellWidth + worldOffsetLeft,
-                    ly = y * _this.cellHeight + worldOffsetTop;
+                const lx = x * Config.CELL_SIZE + worldOffsetLeft,
+                    ly = y * Config.CELL_SIZE + worldOffsetTop;
 
-                ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPosLeft + x, _this.cameraPosTop + y) * 450) / 10).toString(), lx + 2, ly + 10);
+                ctx.fillText((Math.round(temperatureMap.getCell(_this.cameraPos[0] + x, _this.cameraPos[1] + y) * 450) / 10).toString(), lx + 2, ly + 10);
             }
         }
     }
@@ -382,46 +388,56 @@ export default class World {
     private drawBiomesInfo = function (): void {
         const _this: World = this,
             ctx = _this.mapCanvas.getContext('2d'),
-            worldOffsetLeft = _this.cameraPosLeft * _this.cellWidth,
-            worldOffsetTop = _this.cameraPosTop * _this.cellHeight,
+            worldOffsetLeft = _this.cameraPos[0] * Config.CELL_SIZE,
+            worldOffsetTop = _this.cameraPos[1] * Config.CELL_SIZE,
             biomes = this.world.biomesOperator.getBiomes();
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
         ctx.font = '7px senf';
 
-        for (let x = 0; x < Config.VISIBLE_COLS; x++) {
-            for (let y = 0; y < Config.VISIBLE_ROWS; y++) {
-                const lx = x * _this.cellWidth + worldOffsetLeft,
-                    ly = y * _this.cellHeight + worldOffsetTop;
+        for (let x = 0; x < this.visibleCellCols; x++) {
+            for (let y = 0; y < this.visibleCellRows; y++) {
+                const lx = x * Config.CELL_SIZE + worldOffsetLeft,
+                    ly = y * Config.CELL_SIZE + worldOffsetTop;
 
-                ctx.fillText(biomes.getCell(_this.cameraPosLeft + x, _this.cameraPosTop + y).getName().substring(6, 12), lx + 2, ly + 10);
+                ctx.fillText(biomes.getCell(_this.cameraPos[0] + x, _this.cameraPos[1] + y).getName().substring(6, 12), lx + 2, ly + 10);
             }
         }
     }
 
     moveMapTo = function (point: Cell, silent: boolean = false): void {
+        const cameraPos = this.getCameraPointByCenteredPoint(point);
+
+        if (cameraPos[0] === this.cameraPos[0] && cameraPos[1] === this.cameraPos[1]) {
+            return;
+        }
+
         const _this: World = this,
-            maxWidth = Config.WORLD_SIZE - Config.VISIBLE_COLS,
-            maxHeight = Config.WORLD_SIZE - Config.VISIBLE_ROWS;
+            maxWidth = Config.WORLD_SIZE - this.visibleCellCols,
+            maxHeight = Config.WORLD_SIZE - this.visibleCellRows;
 
-        point[0] = Math.max(0, Math.min(point[0], maxWidth));
-        point[1] = Math.max(0, Math.min(point[1], maxHeight));
+        cameraPos[0] = Math.max(0, Math.min(cameraPos[0], maxWidth));
+        cameraPos[1] = Math.max(0, Math.min(cameraPos[1], maxHeight));
 
-        _this.cameraPosLeft = point[0];
-        _this.cameraPosTop = point[1];
+        _this.cameraPos[0] = cameraPos[0];
+        _this.cameraPos[1] = cameraPos[1];
 
         _this.update();
 
         if (!silent) {
-            Filters.apply('mapMoved', point);
+            Filters.apply('mapMoved', cameraPos);
         }
     }
 
-    getCellByXY = function (x: number, y: number): Cell {
+    getCameraPointByCenteredPoint = function (point: Cell): Cell {
+
+        const cw = Math.floor(this.visibleCellCols / 2),
+            ch = Math.floor(this.visibleCellRows / 2);
+
         return [
-            Math.floor(x / this.cellWidth),
-            Math.floor(y / this.cellHeight)
+            Math.max(0, point[0] - cw),
+            Math.max(0, point[1] - ch)
         ];
     }
 

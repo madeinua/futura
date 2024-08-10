@@ -2,7 +2,6 @@ import Config from './config.js';
 import { Filters, fillCanvasPixel, rgbToHex } from "./src/helpers.js";
 import World from './src/World.js';
 const coordinatesField = document.getElementById('coordinates'), displayMapVisibleRange = document.getElementById('displayMapVisibleRange'), displayMapWrapper = document.getElementById('displayMapWrapper'), displayMap = document.getElementById('displayMap'), miniMapCanvas = document.getElementById('miniMap'), technicalMaps = document.getElementById('technicalMaps');
-const world = new World(displayMap, displayMapWrapper.offsetWidth, displayMapWrapper.offsetHeight, miniMapCanvas, getCenteredCameraPosition());
 function drawColorMap(id, map) {
     const canvas = document.getElementById(id);
     canvas.width = map.getWidth();
@@ -34,142 +33,137 @@ function getCameraPosition() {
     }
     return [x, y];
 }
-function centerCameraPoint(point) {
-    const cw = Math.floor(Config.VISIBLE_COLS / 2), ch = Math.floor(Config.VISIBLE_ROWS / 2);
-    return [
-        Math.max(0, point[0] - cw),
-        Math.max(0, point[1] - ch)
-    ];
-}
-function getCenteredCameraPosition() {
-    return centerCameraPoint(getCameraPosition());
-}
-function centeredCameraPointToXY(point) {
-    const cw = Math.floor(Config.VISIBLE_COLS / 2), ch = Math.floor(Config.VISIBLE_ROWS / 2);
-    return [
-        Math.max(0, point[0] + cw),
-        Math.max(0, point[1] + ch)
-    ];
-}
-function scrollIntoToView() {
-    displayMapWrapper.scrollLeft = world.cameraPosLeft * world.cellWidth;
-    displayMapWrapper.scrollTop = world.cameraPosTop * world.cellHeight;
-}
-function pauseTimer() {
-    return world.timer.isTimerPaused()
-        ? world.timer.unpauseTimer()
-        : world.timer.pauseTimer();
-}
-Filters.add('mapMoved', function (point) {
-    point = centeredCameraPointToXY(point);
-    coordinatesField.value = point[0] + ',' + point[1];
-    displayMapVisibleRange.innerHTML = '[' + world.cameraPosLeft + '-' + (world.cameraPosTop + Config.VISIBLE_COLS) + ' | ' + world.cameraPosTop + '-' + (world.cameraPosTop + Config.VISIBLE_ROWS) + ']';
-});
-if (Config.DRAW_TECHNICAL_MAPS) {
-    Filters.add('altitudeMap', function (map) {
-        drawInfoMap('altitudeMapCanvas', map, false);
-        return map;
+new World(displayMap, displayMapWrapper.offsetWidth, displayMapWrapper.offsetHeight, miniMapCanvas, getCameraPosition(), function (world) {
+    function getCameraPointByStartPoint(point) {
+        const cw = Math.floor(world.visibleCellCols / 2), ch = Math.floor(world.visibleCellRows / 2);
+        return [
+            Math.max(0, point[0] + cw),
+            Math.max(0, point[1] + ch)
+        ];
+    }
+    function scrollIntoToView() {
+        displayMapWrapper.scrollLeft = world.cameraPos[0] * Config.CELL_SIZE;
+        displayMapWrapper.scrollTop = world.cameraPos[1] * Config.CELL_SIZE;
+    }
+    function pauseTimer() {
+        return world.timer.isTimerPaused()
+            ? world.timer.unpauseTimer()
+            : world.timer.pauseTimer();
+    }
+    Filters.add('mapMoved', function (point) {
+        point = getCameraPointByStartPoint(point);
+        coordinatesField.value = point[0] + ',' + point[1];
+        displayMapVisibleRange.innerHTML = '[' + world.cameraPos[0] + '-' + (world.cameraPos[1] + world.visibleCellCols) + ' | ' + world.cameraPos[1] + '-' + (world.cameraPos[1] + world.visibleCellRows) + ']';
     });
-    Filters.add('temperatureMap', function (map) {
-        drawInfoMap('temperatureMapCanvas', map, false);
-        return map;
-    });
-    Filters.add('humidityMap', function (map) {
-        drawInfoMap('humidityMapCanvas', map, true);
-        return map;
-    });
-    Filters.add('oceanMap', function (map) {
-        drawInfoMap('oceanMapCanvas', map, true);
-        return map;
-    });
-    Filters.add('coastMap', function (map) {
-        drawInfoMap('coastMapCanvas', map, true);
-        return map;
-    });
-    Filters.add('lakesMap', function (map) {
-        drawInfoMap('lakesMapCanvas', map, true);
-        return map;
-    });
-    Filters.add('riversMap', function (map) {
-        drawInfoMap('riversMapCanvas', map, false);
-        return map;
-    });
-    Filters.add('biomes', function (biomes) {
-        drawColorMap('biomesCanvas', biomes);
-        let biomesTypesCounter = {};
-        biomes.foreachValues(function (biome) {
-            if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
-                biomesTypesCounter[biome.getName()] = 0;
-            }
-            biomesTypesCounter[biome.getName()]++;
+    if (Config.DRAW_TECHNICAL_MAPS) {
+        Filters.add('altitudeMap', function (map) {
+            drawInfoMap('altitudeMapCanvas', map, false);
+            return map;
         });
-        // Sort by value
-        biomesTypesCounter = Object.keys(biomesTypesCounter).sort(function (a, b) {
-            return biomesTypesCounter[b] - biomesTypesCounter[a];
-        }).reduce(function (result, key) {
-            result[key] = biomesTypesCounter[key];
-            return result;
-        }, {});
-        // Add counters as list to <ul> element
-        let list = document.getElementById('biomesTypesCounter');
-        for (let i in biomesTypesCounter) {
-            let item = document.createElement('li');
-            item.innerHTML = i.substring(6) + ': ' + biomesTypesCounter[i];
-            list.appendChild(item);
-        }
-        return biomes;
-    });
-    Filters.add('forestMap', function (map) {
-        drawInfoMap('forestMapCanvas', map, true);
-        document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
-        return map;
-    });
-    Filters.add('animalsSteps', function (animals) {
-        let text = '', groups = {};
-        for (let i = 0; i < animals.length; i++) {
-            if (typeof groups[animals[i].getName()] === 'undefined') {
-                groups[animals[i].getName()] = 0;
+        Filters.add('temperatureMap', function (map) {
+            drawInfoMap('temperatureMapCanvas', map, false);
+            return map;
+        });
+        Filters.add('humidityMap', function (map) {
+            drawInfoMap('humidityMapCanvas', map, true);
+            return map;
+        });
+        Filters.add('oceanMap', function (map) {
+            drawInfoMap('oceanMapCanvas', map, true);
+            return map;
+        });
+        Filters.add('coastMap', function (map) {
+            drawInfoMap('coastMapCanvas', map, true);
+            return map;
+        });
+        Filters.add('lakesMap', function (map) {
+            drawInfoMap('lakesMapCanvas', map, true);
+            return map;
+        });
+        Filters.add('riversMap', function (map) {
+            drawInfoMap('riversMapCanvas', map, false);
+            return map;
+        });
+        Filters.add('biomes', function (biomes) {
+            drawColorMap('biomesCanvas', biomes);
+            let biomesTypesCounter = {};
+            biomes.foreachValues(function (biome) {
+                if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
+                    biomesTypesCounter[biome.getName()] = 0;
+                }
+                biomesTypesCounter[biome.getName()]++;
+            });
+            // Sort by value
+            biomesTypesCounter = Object.keys(biomesTypesCounter).sort(function (a, b) {
+                return biomesTypesCounter[b] - biomesTypesCounter[a];
+            }).reduce(function (result, key) {
+                result[key] = biomesTypesCounter[key];
+                return result;
+            }, {});
+            // Add counters as list to <ul> element
+            let list = document.getElementById('biomesTypesCounter');
+            for (let i in biomesTypesCounter) {
+                let item = document.createElement('li');
+                item.innerHTML = i.substring(6) + ': ' + biomesTypesCounter[i];
+                list.appendChild(item);
             }
-            groups[animals[i].getName()]++;
-        }
-        for (let i in groups) {
-            text += i + ': ' + groups[i] + '<br />';
-        }
-        document.getElementById('animalsList').innerHTML = text;
-        document.getElementById('animalsCounter').innerHTML = animals.length.toString();
+            return biomes;
+        });
+        Filters.add('forestMap', function (map) {
+            drawInfoMap('forestMapCanvas', map, true);
+            document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
+            return map;
+        });
+        Filters.add('animalsSteps', function (animals) {
+            let text = '', groups = {};
+            for (let i = 0; i < animals.length; i++) {
+                if (typeof groups[animals[i].getName()] === 'undefined') {
+                    groups[animals[i].getName()] = 0;
+                }
+                groups[animals[i].getName()]++;
+            }
+            for (let i in groups) {
+                text += i + ': ' + groups[i] + '<br />';
+            }
+            document.getElementById('animalsList').innerHTML = text;
+            document.getElementById('animalsCounter').innerHTML = animals.length.toString();
+        });
+        technicalMaps.style.display = 'block';
+    }
+    Filters.add('fractionsUpdated', function (fractions) {
+        document.getElementById('fractionsList').innerHTML = fractions.map(function (fraction) {
+            return '<li>' + fraction.getName() + ': <span style="background-color:' + rgbToHex(fraction.getFractionColor()) + '"></span> (' + fraction.getSize() + ' cells)</li>';
+        }).join('');
     });
-    technicalMaps.style.display = 'block';
-}
-Filters.add('fractionsUpdated', function (fractions) {
-    document.getElementById('fractionsList').innerHTML = fractions.map(function (fraction) {
-        return '<li>' + fraction.getName() + ': <span style="background-color:' + rgbToHex(fraction.getFractionColor()) + '"></span> (' + fraction.getSize() + ' cells)</li>';
-    }).join('');
-});
-coordinatesField.addEventListener("change", function () {
-    world.moveMapTo(getCenteredCameraPosition());
-    scrollIntoToView();
-});
-miniMapCanvas.addEventListener("click", function (e) {
-    const rect = this.getBoundingClientRect(), scale = Config.WORLD_SIZE / miniMapCanvas.offsetWidth;
-    world.moveMapTo(centerCameraPoint([
-        Math.floor(e.clientX - rect.left * scale),
-        Math.floor(e.clientY - rect.top * scale)
-    ]));
-    scrollIntoToView();
-});
-document.getElementById('pauseSteps').addEventListener("click", function () {
-    pauseTimer();
-});
-world.timer.addStepsHandler(function (step) {
-    document.getElementById('stepsCounter').innerHTML = step;
-});
-document.getElementById('generateFractions').addEventListener("click", function () {
-    world.generateFractions();
-});
-// Timeout is needed to wait for the map to be generated (the process resizes the canvas and triggers scroll event)
-setTimeout(function () {
-    displayMapWrapper.addEventListener("scroll", function () {
-        world.moveMapTo(world.getCellByXY(displayMapWrapper.scrollLeft, displayMapWrapper.scrollTop));
+    coordinatesField.addEventListener("change", function () {
+        world.moveMapTo(getCameraPosition());
+        scrollIntoToView();
     });
-}, 1000);
-world.create();
+    miniMapCanvas.addEventListener("click", function (e) {
+        const rect = this.getBoundingClientRect(), scale = Config.WORLD_SIZE / miniMapCanvas.offsetWidth;
+        world.moveMapTo([
+            Math.floor(e.clientX - rect.left * scale),
+            Math.floor(e.clientY - rect.top * scale)
+        ]);
+        scrollIntoToView();
+    });
+    document.getElementById('pauseSteps').addEventListener("click", function () {
+        pauseTimer();
+    });
+    world.timer.addStepsHandler(function (step) {
+        document.getElementById('stepsCounter').innerHTML = step;
+    });
+    document.getElementById('generateFractions').addEventListener("click", function () {
+        world.generateFractions();
+    });
+    // Timeout is needed to wait for the map to be generated (the process resizes the canvas and triggers scroll event)
+    setTimeout(function () {
+        displayMapWrapper.addEventListener("scroll", function () {
+            world.moveMapTo(getCameraPointByStartPoint([
+                Math.floor(displayMapWrapper.scrollLeft / Config.CELL_SIZE),
+                Math.floor(displayMapWrapper.scrollTop / Config.CELL_SIZE)
+            ]));
+        });
+    }, 1000);
+    world.create();
+});
