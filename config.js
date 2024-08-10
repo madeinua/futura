@@ -14,7 +14,7 @@ const Config = {
     DRAW_TECHNICAL_MAPS: false,
 
     // Steps
-    STEPS_ENABLED: false,
+    STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 100,
     STEPS_BOOST: 5,
@@ -176,7 +176,7 @@ const Config = {
 
     // Fractions
     FRACTIONS: {
-        COUNT: 0,
+        COUNT: 5,
         AUTO_CREATE_ON_STEP: 20,
         // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
