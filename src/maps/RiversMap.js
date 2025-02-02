@@ -32,7 +32,9 @@ export default class RiversMap extends BinaryMatrix {
         const rivers = [];
         const riversLimit = Math.floor(fromFraction(Config.RIVERS_DENSITY, 1, Config.WORLD_SIZE));
         const startCloseness = Math.max(Config.RIVER_MIN_LENGTH, Config.RIVER_START_CLOSENESS);
+        // Use an array for distance calculations and a Set for fast membership tests.
         let allRiversPoints = [];
+        const allRiversPointsSet = new Set();
         for (let i = 0; i < riverSources.length; i++) {
             if (i > 0 &&
                 startCloseness >= allRiversPoints.getClosestDistanceTo(riverSources[i][0], riverSources[i][1])) {
@@ -47,7 +49,8 @@ export default class RiversMap extends BinaryMatrix {
                     break;
                 const [x, y] = nextRiverPoint;
                 const altitude = this.altitudeMap.getCell(x, y);
-                if (this.altitudeMap.isWater(altitude) || arrayHasPoint(allRiversPoints, x, y)) {
+                // Instead of calling arrayHasPoint (a linear search), we use our Set.
+                if (this.altitudeMap.isWater(altitude) || allRiversPointsSet.has(`${x},${y}`)) {
                     if (this.lakesMap.filled(x, y)) {
                         const lakeSize = this.lakesMap.getSizeFromPoint(x, y);
                         if (lakeSize > river.length * Config.LAKE_TO_RIVER_RATIO) {
@@ -66,7 +69,14 @@ export default class RiversMap extends BinaryMatrix {
             }
             if (finished && river.length >= Config.RIVER_MIN_LENGTH) {
                 rivers.push(river);
-                allRiversPoints = allRiversPoints.concat(river).unique();
+                // Update both the array and the Set.
+                for (const point of river) {
+                    const key = `${point[0]},${point[1]}`;
+                    if (!allRiversPointsSet.has(key)) {
+                        allRiversPoints.push(point);
+                        allRiversPointsSet.add(key);
+                    }
+                }
                 if (rivers.length === riversLimit)
                     break;
             }

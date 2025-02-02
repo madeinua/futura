@@ -8,11 +8,13 @@ export default class OceanMap extends BinaryMatrix {
     includeAllWaterCellsAround(startX, startY) {
         this.fill(startX, startY);
         const activeCells = [[startX, startY]];
+        // Cache altitudeMap locally for faster access.
+        const altMap = this.altitudeMap;
         while (activeCells.length) {
             const [x, y] = activeCells.pop();
-            this.altitudeMap.foreachAroundRadius(x, y, 1, (nx, ny) => {
-                const altitude = this.altitudeMap.getCell(nx, ny);
-                if (this.altitudeMap.isWater(altitude) && !this.filled(nx, ny)) {
+            altMap.foreachAroundRadius(x, y, 1, (nx, ny) => {
+                const altitude = altMap.getCell(nx, ny);
+                if (altMap.isWater(altitude) && !this.filled(nx, ny)) {
                     this.fill(nx, ny);
                     activeCells.push([nx, ny]);
                 }
@@ -20,21 +22,27 @@ export default class OceanMap extends BinaryMatrix {
         }
     }
     bigLakesToSeas() {
-        const tempMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
-        this.altitudeMap.foreachValues((altitude, x, y) => {
-            if (this.altitudeMap.isWater(altitude) && !this.filled(x, y)) {
+        const worldSize = Config.WORLD_SIZE;
+        const altMap = this.altitudeMap;
+        // Create a temporary BinaryMatrix to mark water that is not yet ocean.
+        const tempMap = new BinaryMatrix(worldSize, worldSize, 0);
+        altMap.foreachValues((altitude, x, y) => {
+            if (altMap.isWater(altitude) && !this.filled(x, y)) {
                 tempMap.fill(x, y);
             }
         });
         tempMap.foreachFilled((x, y) => {
-            if (!this.filled(x, y) && tempMap.getSizeFromPoint(x, y) > Config.WORLD_SIZE) {
+            // If this water body in tempMap is large enough (exceeds worldSize), include it.
+            if (!this.filled(x, y) && tempMap.getSizeFromPoint(x, y) > worldSize) {
                 this.includeAllWaterCellsAround(x, y);
             }
         });
     }
     generateMap() {
         const startX = 0, startY = 0;
-        if (!this.altitudeMap.isWater(this.altitudeMap.getCell(startX, startY))) {
+        const altMap = this.altitudeMap;
+        // If the top-left cell is not water, return immediately.
+        if (!altMap.isWater(altMap.getCell(startX, startY))) {
             return this;
         }
         this.includeAllWaterCellsAround(startX, startY);

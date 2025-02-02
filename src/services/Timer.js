@@ -11,32 +11,41 @@ export default class Timer {
         this.stepsHandlers.push(handler);
     }
     stepsTimer(callback) {
+        const { STEPS_MIN_INTERVAL, STEPS_BOOST, STEPS_LIMIT, STEPS_BOOST_STEPS, LOGS } = Config;
         const timerStart = Date.now();
-        let minStepInterval = Config.STEPS_MIN_INTERVAL / Config.STEPS_BOOST;
+        let minStepInterval = STEPS_MIN_INTERVAL / STEPS_BOOST;
         let boosted = false;
         this.timerStep = 0;
         const makeStep = () => {
             if (this.timerPaused) {
                 return;
             }
-            this.stepsHandlers.forEach(handler => handler(this.timerStep));
+            // Call all step handlers
+            for (const handler of this.stepsHandlers) {
+                handler(this.timerStep);
+            }
             this.timerStep++;
+            // Execute the provided callback each step
             callback();
-            if (this.timerStep > Config.STEPS_LIMIT) {
-                if (Config.LOGS) {
-                    logTimeEvent(`Steps running has ended. Avg. time per step: ${Math.round((Date.now() - timerStart) / Config.STEPS_LIMIT)}ms`);
+            // Check if we reached the steps limit
+            if (this.timerStep > STEPS_LIMIT) {
+                if (LOGS) {
+                    const avgTime = Math.round((Date.now() - timerStart) / STEPS_LIMIT);
+                    logTimeEvent(`Steps running has ended. Avg. time per step: ${avgTime}ms`);
                 }
                 this.clearTimerInterval();
                 return;
             }
-            if (!boosted && this.timerStep > Config.STEPS_BOOST_STEPS) {
+            // Boost the timer interval after a given number of steps
+            if (!boosted && this.timerStep > STEPS_BOOST_STEPS) {
                 this.clearTimerInterval();
-                minStepInterval *= Config.STEPS_BOOST;
+                minStepInterval *= STEPS_BOOST;
                 this.timerInterval = setInterval(makeStep, minStepInterval);
                 boosted = true;
             }
         };
         this.timerInterval = setInterval(makeStep, minStepInterval);
+        // Start immediately.
         makeStep();
     }
     clearTimerInterval() {
@@ -49,14 +58,14 @@ export default class Timer {
         return this.timerPaused;
     }
     pauseTimer() {
-        if (this.isTimerPaused()) {
+        if (this.timerPaused) {
             return false;
         }
         this.timerPaused = true;
         return true;
     }
     unpauseTimer() {
-        if (!this.isTimerPaused()) {
+        if (!this.timerPaused) {
             return false;
         }
         this.timerPaused = false;

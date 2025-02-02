@@ -35,7 +35,7 @@ class Animal {
     }
     moveTo(x, y) {
         if (x === this.x && y === this.y) {
-            throwError('Cannot move to the same position', 1, true);
+            throwError("Cannot move to the same position", 1, true);
             return;
         }
         this.history.push([this.x, this.y]);
@@ -43,5 +43,5 @@ class Animal {
         this.y = y;
     }
 }
-Animal.ANIMAL_NAME = 'Animal';
+Animal.ANIMAL_NAME = "Animal";
 export default Animal;

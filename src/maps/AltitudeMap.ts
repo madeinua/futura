@@ -2,13 +2,16 @@ import PointMatrix from "../structures/PointMatrix.js";
 import NoiseMapGenerator from "../generators/NoiseMapGenerator.js";
 import Config from "../../config.js";
 
+declare const noise: any;
+
 export default class AltitudeMap extends PointMatrix {
 
     waterSize: number = 0;
     landSize: number = 0;
 
     generateMap(): void {
-        const octaves = [3, 5, 20]; // [12, 20, 80]
+        // Generate several noise maps and blend them.
+        const octaves = [3, 5, 20];
         const maps = octaves.map(octave =>
             new NoiseMapGenerator(
                 Config.WORLD_SIZE,
@@ -20,24 +23,27 @@ export default class AltitudeMap extends PointMatrix {
             let val = 0;
             let size = 0;
 
-            // Blend maps
+            // Blend maps using a weighted sum.
             maps.forEach((map, i) => {
                 const s = Math.pow(2, i);
                 size += s;
                 val += map.getCell(x, y) * s;
             });
-
             val /= size;
 
-            // Stretch map
-            val = Math.min(1, Math.pow(val, Config.WORLD_MAP_OCEAN_INTENSITY + 1));
+            // Stretch the noise to adjust ocean vs. land ratio.
+            val = Math.min(1, Math.pow(val, Config.WORLD_MAP_OCEAN_INTENSITY + 0.95)); // Note 1.0 adds too much ocean, so I reduced it
 
-            // Make island
+            // Apply island shaping with a non‑symmetric mask.
             val = this.makeIsland(x, y, Config.WORLD_SIZE, val);
+            val = Math.min(1, val);
 
-            // Round to 2 decimals
+            // Return the value rounded to 2 decimals.
             return Math.round(val * 100) / 100;
         });
+
+        // Optionally, apply erosion to simulate thermal erosion.
+        this.applyErosion(Config.EROSION_ITERATIONS || 3);
 
         this.initVariables();
     }
@@ -50,20 +56,76 @@ export default class AltitudeMap extends PointMatrix {
     protected initVariables(): void {
         this.waterSize = 0;
         this.landSize = 0;
-
         this.foreachValues((altitude: number): void => {
             this.isWater(altitude) ? this.waterSize++ : this.landSize++;
         });
     }
 
+    /**
+     * Applies a non-symmetric island mask.
+     * Instead of a simple radial falloff, we add a noise offset to vary the edge.
+     *
+     * @param x - the x coordinate.
+     * @param y - the y coordinate.
+     * @param islandSize - the overall size of the island (assumed square).
+     * @param altitude - the computed altitude from noise.
+     * @returns The modified altitude after applying the island mask.
+     */
     private makeIsland(x: number, y: number, islandSize: number, altitude: number): number {
-        const dx = Math.abs(x - islandSize * 0.5);
-        const dy = Math.abs(y - islandSize * 0.5);
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const delta = distance / (islandSize * 0.42);
+        const cx = islandSize * 0.5;
+        const cy = islandSize * 0.5;
+        // Compute normalized distances from center.
+        const dx = (x - cx) / cx;
+        const dy = (y - cy) / cy;
+        const baseDistance = Math.sqrt(dx * dx + dy * dy);
+
+        // Introduce non-symmetric variation with additional noise.
+        const noiseScale = islandSize * 0.1;
+        const noiseVal = (noise.simplex2(x / noiseScale, y / noiseScale) + 1) / 2; // in [0,1]
+        // Increase the threshold to enlarge the island.
+        // For instance, changing the base from 0.42 to 0.7.
+        const threshold = 0.7 + (noiseVal - 0.5) * 0.1;
+
+        // Compute a modified distance factor.
+        const delta = baseDistance / threshold;
         const gradient = delta * delta - 0.2;
 
+        // Reduce altitude near edges. (Clamp to [0, altitude])
         return Math.min(altitude, altitude * Math.max(0, 1 - gradient));
+    }
+
+    /**
+     * Applies a simple thermal erosion simulation.
+     * For each cell, if its altitude is significantly higher than its neighbors,
+     * a fraction of the difference is transferred, smoothing out sharp features.
+     *
+     * @param iterations - number of erosion passes.
+     */
+    private applyErosion(iterations: number): void {
+        for (let iter = 0; iter < iterations; iter++) {
+            // Create a deep copy of the current map data.
+            const newMap: number[][] = this.toArray().map(row => [...row]);
+
+            for (let x = 0; x < this.width; x++) {
+                for (let y = 0; y < this.height; y++) {
+                    const currentAltitude = this.getCell(x, y);
+                    const neighbors = this.getNeighbors(x, y);
+
+                    // Transfer a fraction of the altitude difference to each lower neighbor.
+                    neighbors.forEach(([nx, ny]) => {
+                        const neighborAltitude = this.getCell(nx, ny);
+                        const diff = currentAltitude - neighborAltitude;
+                        if (diff > 0.01) {  // Only transfer if the difference is significant.
+                            const transfer = 0.05 * diff;
+                            newMap[x][y] -= transfer;
+                            newMap[nx][ny] += transfer;
+                        }
+                    });
+                }
+            }
+
+            this.setAll(newMap);
+        }
     }
 
     isWater(level: number): boolean {

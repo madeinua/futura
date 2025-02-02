@@ -16,7 +16,7 @@ export default class DeerGenerator extends AnimalGenerator {
         const forestsOperator = this.objects.forestsOperator;
         const habitat = forestsOperator.getForestMap().clone();
 
-        // Remove palms from the habitat
+        // Remove desert areas (e.g., palm groves) from the habitat.
         habitat.foreachFilled((x: number, y: number): void => {
             if (forestsOperator.isDesertForest(x, y)) {
                 habitat.unfill(x, y);

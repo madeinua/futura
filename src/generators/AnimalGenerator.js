@@ -6,6 +6,7 @@ export default class AnimalGenerator {
     constructor(objects) {
         this.respawnPoints = [];
         this.maxAnimals = -1;
+        this.staticHabitat = false;
         this.objects = objects;
     }
     getName() {
@@ -23,6 +24,9 @@ export default class AnimalGenerator {
     getRarity() {
         return this.getSettings().rarity;
     }
+    isHabitatStatic() {
+        return this.staticHabitat;
+    }
     updateHabitat() {
         if (!this.habitat) {
             this.setHabitat(new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 1));
@@ -31,7 +35,7 @@ export default class AnimalGenerator {
     }
     setHabitat(habitat) {
         this.habitat = habitat;
-        this.maxAnimals = -1; // Reset maxAnimals to force recalculation
+        this.maxAnimals = -1; // Force recalculation
     }
     getHabitat() {
         return this.habitat;
@@ -45,14 +49,19 @@ export default class AnimalGenerator {
         if (!habitatClone.hasFilled()) {
             return false;
         }
-        this.respawnPoints.push(habitatClone.getFilledCells().randomElement());
+        const point = habitatClone.getFilledCells().randomElement();
+        if (!point) {
+            throwError("Cannot create animal", 1, true);
+            return false;
+        }
+        this.respawnPoints.push(point);
         return true;
     }
     getRespawnPoints() {
         return this.respawnPoints;
     }
     checkRespawns(animalsCount) {
-        const respawnChecks = Math.ceil(animalsCount / 3) + 1; // @TODO 3 - bigger value = less respawn points
+        const respawnChecks = Math.ceil(animalsCount / 3) + 1;
         for (let i = 0; i < respawnChecks; i++) {
             this.createRespawnPoint();
         }
@@ -64,16 +73,17 @@ export default class AnimalGenerator {
         return this.maxAnimals;
     }
     createAnimal(anotherAnimalsPositions) {
-        let respawnPoints = this.getRespawnPoints().filter((cell) => {
+        // Filter respawn points that are sufficiently far from existing animals and inside the habitat.
+        const availableRespawns = this.getRespawnPoints().filter((cell) => {
             return (anotherAnimalsPositions.getClosestDistanceTo(cell[0], cell[1]) >= 3 &&
                 this.isCellInHabitat(cell[0], cell[1]));
         });
-        if (!respawnPoints.length) {
+        if (!availableRespawns.length) {
             return null;
         }
-        const cell = respawnPoints.randomElement();
+        const cell = availableRespawns.randomElement();
         if (!cell) {
-            throwError('Cannot create animal', 1, true);
+            throwError("Cannot create animal", 1, true);
             return null;
         }
         return new (this.getAnimalClass())(cell[0], cell[1], this.getSettings());

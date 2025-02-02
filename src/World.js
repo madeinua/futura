@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import Config from "../config.js";
-import { logTimeEvent, Filters, fillCanvasPixel, scaleImageData, resetTimeEvent, } from "./helpers.js";
+import { fillCanvasPixel, Filters, logTimeEvent, resetTimeEvent, scaleImageData, } from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
 import WeatherOperator from "./operators/WeatherOperator.js";
 import WaterOperator from "./operators/WaterOperator.js";
@@ -22,6 +22,7 @@ import Layers, { LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST,
 import CellsRenderer from "./render/CellsRenderer.js";
 export default class World {
     constructor(mapCanvas, mapWidth, mapHeight, miniMapCanvas, startPoint, onReady) {
+        this.miniMapBitmap = null;
         this.visibleCellCols = Math.ceil(mapWidth / Config.CELL_SIZE) + 1;
         this.visibleCellRows = Math.ceil(mapHeight / Config.CELL_SIZE) + 1;
         this.cameraPos = this.getCameraPointByCenteredPoint(startPoint);
@@ -68,7 +69,7 @@ export default class World {
     }
     generateWorld() {
         return __awaiter(this, void 0, void 0, function* () {
-            const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), islandsMap = waterOperator.getIslandsMap(oceanMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
+            const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), islandsMap = waterOperator.getIslandsMap(oceanMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
             const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES), this.layers.getLayer(LAYER_BIOMES_IMAGES));
             const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
             new AnimalsOperator({
@@ -107,7 +108,6 @@ export default class World {
         });
     }
     update() {
-        resetTimeEvent();
         const mapCtx = this.mapCanvas.getContext('2d');
         // Cache terrain layer as it is static
         if (!this.terrainCanvasCtx) {
@@ -163,16 +163,26 @@ export default class World {
             y < this.cameraPos[1] + this.visibleCellRows);
     }
     drawMiniMap() {
-        const renderCtx = new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE).getContext('2d');
-        const imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
-        this.layers.foreachMiniMapLayersValues((displayCell, x, y) => {
-            fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor(), 0.7);
-        });
-        createImageBitmap(imageData).then(() => {
-            const miniMapCtx = this.miniMapCanvas.getContext('2d');
-            miniMapCtx.putImageData(imageData, 0, 0);
+        const miniMapCtx = this.miniMapCanvas.getContext('2d');
+        if (!this.miniMapBitmap) {
+            const offscreen = new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE);
+            const renderCtx = offscreen.getContext('2d');
+            const imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
+            this.layers.foreachMiniMapLayersValues((displayCell, x, y) => {
+                fillCanvasPixel(imageData, (x + y * Config.WORLD_SIZE) * 4, displayCell.getColor(), 0.7);
+            });
+            // Create bitmap and cache it.
+            createImageBitmap(imageData).then((bitmap) => {
+                this.miniMapBitmap = bitmap;
+                miniMapCtx.drawImage(bitmap, 0, 0);
+                this.drawRectangleAroundMiniMap(miniMapCtx);
+            });
+        }
+        else {
+            // If cached, just redraw it.
+            miniMapCtx.drawImage(this.miniMapBitmap, 0, 0);
             this.drawRectangleAroundMiniMap(miniMapCtx);
-        });
+        }
     }
     drawRectangleAroundMiniMap(ctx) {
         ctx.imageSmoothingEnabled = false;
@@ -181,13 +191,15 @@ export default class World {
         ctx.strokeRect(this.cameraPos[0], this.cameraPos[1], this.visibleCellCols, this.visibleCellRows);
     }
     drawRectangles() {
-        const ctx = this.mapCanvas.getContext('2d'), worldOffsetLeft = this.cameraPos[0] * Config.CELL_SIZE, worldOffsetTop = this.cameraPos[1] * Config.CELL_SIZE;
+        const ctx = this.mapCanvas.getContext('2d');
+        const cellSize = Config.CELL_SIZE;
+        const offsetX = this.cameraPos[0] * cellSize;
+        const offsetY = this.cameraPos[1] * cellSize;
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(255,255,255,0.2)';
         for (let x = 0; x < this.visibleCellCols; x++) {
             for (let y = 0; y < this.visibleCellRows; y++) {
-                const lx = x * Config.CELL_SIZE + worldOffsetLeft, ly = y * Config.CELL_SIZE + worldOffsetTop;
-                ctx.strokeRect(lx, ly, Config.CELL_SIZE, Config.CELL_SIZE);
+                ctx.strokeRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize, cellSize);
             }
         }
     }
@@ -232,6 +244,7 @@ export default class World {
         }
     }
     moveMapTo(point, silent = false) {
+        resetTimeEvent();
         const cameraPos = this.getCameraPointByCenteredPoint(point);
         if (cameraPos[0] === this.cameraPos[0] && cameraPos[1] === this.cameraPos[1]) {
             return;

@@ -3,10 +3,10 @@ import {CellsList} from "./Cells.js";
 import {Array2D} from "./Array2D.js";
 
 /**
- * Generate 2D matrix from the array
+ * Matrix<T>
+ * A generic 2D matrix wrapper.
  */
 export default class Matrix<T = any> {
-
     readonly width: number;
     readonly height: number;
     protected __values: Array2D<T>;
@@ -14,25 +14,28 @@ export default class Matrix<T = any> {
     constructor(width: number, height: number, defaultValue?: T) {
         this.width = width;
         this.height = height;
-        this.__values = create2DArray(this.width, this.height, defaultValue ?? null);
+        this.__values = create2DArray(width, height, defaultValue ?? null);
     }
 
     /**
-     * Get all cells of matrix
+     * Returns the underlying 2D array.
      */
     getValues(): T[][] {
         return this.__values;
     }
 
     /**
-     * Retrieve all cells' values of the matrix as a list
+     * Returns all cell values as a flat array.
      */
     getValuesList(): T[] {
-        const values: T[] = [];
+        const total = this.width * this.height;
+        const values: T[] = new Array(total);
+        let index = 0;
+        const {width, height, __values} = this;
 
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                values.push(this.__values[x][y]);
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                values[index++] = __values[x][y];
             }
         }
 
@@ -40,16 +43,22 @@ export default class Matrix<T = any> {
     }
 
     /**
-     * Set all cells of matrix to the specified value
-     * @param value
+     * Sets all cells to the specified value.
      */
     set(value: T): this {
-        this.foreach((x, y) => this.setCell(x, y, value));
+        const {width, height, __values} = this;
+
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                __values[x][y] = value;
+            }
+        }
+
         return this;
     }
 
     /**
-     * Set cell value
+     * Sets a single cell value.
      */
     setCell(x: number, y: number, value: T): this {
         this.__values[x][y] = value;
@@ -57,51 +66,39 @@ export default class Matrix<T = any> {
     }
 
     /**
-     * Retrieve cell value
+     * Retrieves a cell value.
      */
     getCell(x: number, y: number): T {
         return this.__values[x][y];
     }
 
     /**
-     * Get matrix width
+     * Returns the matrix width.
      */
     getWidth(): number {
         return this.width;
     }
 
     /**
-     * Get matrix height
+     * Returns the matrix height.
      */
     getHeight(): number {
         return this.height;
     }
 
     /**
-     * Convert Matrix to list
+     * Applies the callback to each cell and stores the result.
+     * If a non‑function value is provided, that value is used to set every cell.
      */
-    toList(): T[] {
-        const arr: T[] = [];
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                arr.push(this.getCell(x, y));
-            }
-        }
-        return arr;
-    }
+    map(callbackOrValue: T | ((x: number, y: number) => T)): this {
+        const isFunc = typeof callbackOrValue === "function";
+        const {width, height, __values} = this;
 
-    /**
-     * Applies the callback to the elements of the Matrix and accepts return value as the Matrix cell value
-     */
-    map(value: T | Function): this {
-        const isFunc = typeof value === 'function';
-
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                this.setCell(
-                    x, y,
-                    isFunc ? (value as Function)(x, y) : value
-                );
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                __values[x][y] = isFunc
+                    ? (callbackOrValue as (x: number, y: number) => T)(x, y)
+                    : callbackOrValue;
             }
         }
 
@@ -109,34 +106,40 @@ export default class Matrix<T = any> {
     }
 
     /**
-     * Applies the callback to the elements of the Matrix
+     * Executes the callback for each cell.
      */
     foreach(callback: (x: number, y: number) => void): void {
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
+        const {width, height} = this;
+
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
                 callback(x, y);
             }
         }
     }
 
     /**
-     * Applies the callback to the elements of the Matrix
+     * Executes the callback for each cell, passing in the cell’s value.
      */
     foreachValues(callback: (value: T, x: number, y: number) => void): void {
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                callback(this.getCell(x, y), x, y);
+        const {width, height, __values} = this;
+
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                callback(__values[x][y], x, y);
             }
         }
     }
 
     /**
-     * Applies the callback to the elements of the Matrix but only to the filled cells
+     * Executes the callback for each non-null cell.
      */
     foreachFilledValues(callback: (value: T, x: number, y: number) => void): void {
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                const v = this.getCell(x, y);
+        const {width, height, __values} = this;
+
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                const v = __values[x][y];
                 if (v !== null) {
                     callback(v, x, y);
                 }
@@ -145,34 +148,44 @@ export default class Matrix<T = any> {
     }
 
     /**
-     * Set all cells of matrix
+     * Replaces the entire underlying 2D array.
      */
     setAll(values: Array2D<T>): this {
         this.__values = values;
-        return this;
-    }
 
-    unsetAll(): this {
-        this.__values = create2DArray(this.width, this.height, null);
         return this;
     }
 
     /**
-     * Retrieve cell neighbors around the cell
+     * Resets the matrix to a new array with all cells set to null.
+     */
+    unsetAll(): this {
+        this.__values = create2DArray(this.width, this.height, null);
+
+        return this;
+    }
+
+    /**
+     * Returns the neighbors around a cell using a rectangular pattern.
      */
     getNeighbors(x: number, y: number): CellsList {
         return getRectangleAround(x, y, this.width, this.height);
     }
 
     /**
-     * Apply callback to all neighbors
+     * Executes the callback for each neighbor.
      */
-    foreachNeighbors(x: number, y: number, callback: (x: number, y: number) => boolean | void, stopOnTrue: boolean = false): this {
+    foreachNeighbors(
+        x: number,
+        y: number,
+        callback: (x: number, y: number) => boolean | void,
+        stopOnTrue: boolean = false
+    ): this {
         const neighbors = this.getNeighbors(x, y);
 
         for (const [nx, ny] of neighbors) {
             if (callback(nx, ny) && stopOnTrue) {
-                return this;
+                break;
             }
         }
 
@@ -180,21 +193,27 @@ export default class Matrix<T = any> {
     }
 
     /**
-     * Retrieve cells around a specified cell in a specified radius
+     * Returns the cells around a given cell within the specified radius.
      */
     getAroundRadius(x: number, y: number, radius: number): CellsList {
         return getAroundRadius(x, y, this.width, this.height, radius);
     }
 
     /**
-     * Apply callback to all neighbors
+     * Executes the callback for each cell within a given radius.
      */
-    foreachAroundRadius(x: number, y: number, radius: number, callback: (x: number, y: number) => boolean | void, stopOnTrue: boolean = false): this {
+    foreachAroundRadius(
+        x: number,
+        y: number,
+        radius: number,
+        callback: (x: number, y: number) => boolean | void,
+        stopOnTrue: boolean = false
+    ): this {
         const neighbors = this.getAroundRadius(x, y, radius);
 
         for (const [nx, ny] of neighbors) {
             if (callback(nx, ny) && stopOnTrue) {
-                return this;
+                break;
             }
         }
 
@@ -202,18 +221,19 @@ export default class Matrix<T = any> {
     }
 
     /**
-     * Convert Matrix to array
+     * Returns a deep copy of the underlying 2D array.
      */
     toArray(): Array2D<T> {
-        return this.__values.map(row => [...row]) as Array2D<T>;
+        return this.__values.map((row) => row.slice());
     }
 
     /**
-     * Get a random element from the matrix
+     * Returns a random element from the matrix in the format [x, y, value].
      */
     getRandomElement(): [number, number, T] {
         const x = Math.floor(Math.random() * this.width);
         const y = Math.floor(Math.random() * this.height);
-        return [x, y, this.getCell(x, y)];
+
+        return [x, y, this.__values[x][y]];
     }
 }

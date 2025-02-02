@@ -5,8 +5,7 @@ import Biome_Grass from "../biomes/Biome_Grass.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 
 export default class CowGenerator extends AnimalGenerator {
-
-    private grassMap: BinaryMatrix | undefined;
+    private grassMap?: BinaryMatrix;
 
     getName(): string {
         return Cow.ANIMAL_NAME;
@@ -17,14 +16,17 @@ export default class CowGenerator extends AnimalGenerator {
     }
 
     updateHabitat(): this {
+
         if (!this.grassMap) {
             this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.name);
         }
 
         const habitat = this.grassMap.clone();
         habitat.diff(this.objects.forestsOperator.getForestMap());
-
         this.setHabitat(habitat);
+
+        // Mark habitat as static since the grass surface does not change.
+        this.staticHabitat = true;
 
         return this;
     }

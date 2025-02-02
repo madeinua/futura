@@ -4,7 +4,7 @@ const Config = {
     LOGS: true,
     STORE_DATA: false,
     RANDOM_WORLD: false,
-    SEED: 12345,
+    SEED: 103,
 
     // Maps
     WORLD_SIZE: 250,
@@ -16,12 +16,21 @@ const Config = {
     // Steps
     STEPS_ENABLED: true,
     STEPS_MIN_INTERVAL: 500,
-    STEPS_LIMIT: 100,
+    STEPS_LIMIT: 500,
     STEPS_BOOST: 5,
-    STEPS_BOOST_STEPS: 80,
+    STEPS_BOOST_STEPS: 400,
 
     // Altitude
-    WORLD_MAP_OCEAN_INTENSITY: 0.5, // [0-1]
+    WORLD_MAP_OCEAN_INTENSITY: 0.2, // [0-1]
+    EROSION_ITERATIONS: 5, // [0-100]
+
+    // Temperature
+    SHOW_TEMPERATURES: false,
+    MIN_TEMPERATURE: 0,
+    LOW_TEMPERATURE: 14,
+    NORMAL_TEMPERATURE: 21,
+    HIGH_TEMPERATURE: 28,
+    MAX_TEMPERATURE: 45,
 
     // Rivers
     RIVERS_DENSITY: 0.5, // [0-1]
@@ -38,14 +47,6 @@ const Config = {
     NORMAL_HUMIDITY: 50,
     HIGH_HUMIDITY: 75,
     MAX_HUMIDITY: 100,
-
-    // Temperature
-    SHOW_TEMPERATURES: false,
-    MIN_TEMPERATURE: 0,
-    LOW_TEMPERATURE: 14,
-    NORMAL_TEMPERATURE: 21,
-    HIGH_TEMPERATURE: 28,
-    MAX_TEMPERATURE: 45,
 
     // Biomes
     SHOW_BIOMES_INFO: false,
@@ -119,7 +120,7 @@ const Config = {
     },
 
     // Forests
-    FOREST_LIMIT: 30, // %, compared to the possible tiles
+    FOREST_LIMIT: 25, // %, compared to the possible tiles
     FOREST_BORN_CHANCE: 0.03, // %
     FOREST_BORN_BOOST: 7,
     FOREST_GROWTH_CHANCE: 0.02, // %
@@ -176,7 +177,7 @@ const Config = {
 
     // Fractions
     FRACTIONS: {
-        COUNT: 5,
+        COUNT: 10,
         AUTO_CREATE_ON_STEP: -1,
         // Note: < 1 --> negative, >= 1 --> positive
         CREATE_PROBABILITIES: {
@@ -217,9 +218,9 @@ const Config = {
             '#31057a',
             '#ff4b89',
             '#ff9100',
-            '#000000',
             '#00ff80',
             '#641841',
+            '#000000',
         ]
     }
 }

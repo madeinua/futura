@@ -9,41 +9,49 @@ Array.prototype.removeElementByValue = function (value) {
 };
 Array.prototype.shuffle = function () {
     const arrayCopy = [...this];
-    let j, x;
+    let j, temp;
     for (let i = arrayCopy.length - 1; i > 0; i--) {
         j = Math.floor(Math.random() * (i + 1));
-        x = arrayCopy[i];
+        temp = arrayCopy[i];
         arrayCopy[i] = arrayCopy[j];
-        arrayCopy[j] = x;
+        arrayCopy[j] = temp;
     }
     return arrayCopy;
 };
 Array.prototype.intersect = function (array) {
-    return this.filter(value => array.includes(value));
+    return this.filter((value) => array.includes(value));
 };
 Array.prototype.diff = function (array) {
-    return this.filter(value => !array.includes(value));
+    return this.filter((value) => !array.includes(value));
 };
 Array.prototype.includesCell = function (cell) {
     return this.some(([x, y]) => x === cell[0] && y === cell[1]);
 };
 Array.prototype.intersectCells = function (array) {
-    return this.filter(cell => array.includesCell(cell));
+    return this.filter((cell) => array.includesCell(cell));
 };
 Array.prototype.diffCells = function (array) {
-    return this.filter(cell => !array.includesCell(cell));
+    return this.filter((cell) => !array.includesCell(cell));
 };
 Array.prototype.unique = function () {
-    return this.filter((value, index, self) => index === self.findIndex((t) => (Array.isArray(value) && Array.isArray(t)
+    return this.filter((value, index, self) => index === self.findIndex((t) => Array.isArray(value) && Array.isArray(t)
         ? value.length === t.length && value.every((val, i) => val === t[i])
-        : t === value)));
+        : t === value));
 };
 Array.prototype.getClosestDistanceTo = function (x, y) {
-    let closestDistance = Number.MAX_SAFE_INTEGER;
-    const distance = (x1, y1, x2, y2) => Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+    let minSq = Number.MAX_SAFE_INTEGER;
+    // Using squared distance to avoid unnecessary sqrt calls in the loop.
     this.forEach(([cx, cy]) => {
-        closestDistance = Math.min(closestDistance, distance(x, y, cx, cy));
+        const dx = x - cx, dy = y - cy;
+        const dSq = dx * dx + dy * dy;
+        if (dSq < minSq) {
+            minSq = dSq;
+        }
     });
-    return closestDistance;
+    return Math.sqrt(minSq);
+};
+Array.prototype.getClosestDistanceToCell = function (cell) {
+    // Delegates to getClosestDistanceTo using the cell's coordinates.
+    return this.getClosestDistanceTo(cell[0], cell[1]);
 };
 export {};

@@ -15,6 +15,8 @@ export default class CowGenerator extends AnimalGenerator {
         const habitat = this.grassMap.clone();
         habitat.diff(this.objects.forestsOperator.getForestMap());
         this.setHabitat(habitat);
+        // Mark habitat as static since the grass surface does not change.
+        this.staticHabitat = true;
         return this;
     }
 }

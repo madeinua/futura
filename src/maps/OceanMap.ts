@@ -13,13 +13,15 @@ export default class OceanMap extends BinaryMatrix {
 
     private includeAllWaterCellsAround(startX: number, startY: number): void {
         this.fill(startX, startY);
-        const activeCells = [[startX, startY]];
+        const activeCells: [number, number][] = [[startX, startY]];
+        // Cache altitudeMap locally for faster access.
+        const altMap = this.altitudeMap;
 
         while (activeCells.length) {
             const [x, y] = activeCells.pop()!;
-            this.altitudeMap.foreachAroundRadius(x, y, 1, (nx: number, ny: number): void => {
-                const altitude = this.altitudeMap.getCell(nx, ny);
-                if (this.altitudeMap.isWater(altitude) && !this.filled(nx, ny)) {
+            altMap.foreachAroundRadius(x, y, 1, (nx, ny) => {
+                const altitude = altMap.getCell(nx, ny);
+                if (altMap.isWater(altitude) && !this.filled(nx, ny)) {
                     this.fill(nx, ny);
                     activeCells.push([nx, ny]);
                 }
@@ -28,38 +30,44 @@ export default class OceanMap extends BinaryMatrix {
     }
 
     private bigLakesToSeas(): void {
-        const tempMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
+        const worldSize = Config.WORLD_SIZE;
+        const altMap = this.altitudeMap;
+        // Create a temporary BinaryMatrix to mark water that is not yet ocean.
+        const tempMap = new BinaryMatrix(worldSize, worldSize, 0);
 
-        this.altitudeMap.foreachValues((altitude: number, x: number, y: number): void => {
-            if (this.altitudeMap.isWater(altitude) && !this.filled(x, y)) {
+        altMap.foreachValues((altitude, x, y) => {
+            if (altMap.isWater(altitude) && !this.filled(x, y)) {
                 tempMap.fill(x, y);
             }
         });
 
-        tempMap.foreachFilled((x: number, y: number): void => {
-            if (!this.filled(x, y) && tempMap.getSizeFromPoint(x, y) > Config.WORLD_SIZE) {
+        tempMap.foreachFilled((x, y) => {
+            // If this water body in tempMap is large enough (exceeds worldSize), include it.
+            if (!this.filled(x, y) && tempMap.getSizeFromPoint(x, y) > worldSize) {
                 this.includeAllWaterCellsAround(x, y);
             }
         });
     }
 
     generateMap(): OceanMap {
-        const startX = 0, startY = 0;
+        const startX = 0,
+            startY = 0;
+        const altMap = this.altitudeMap;
 
-        if (!this.altitudeMap.isWater(this.altitudeMap.getCell(startX, startY))) {
+        // If the top-left cell is not water, return immediately.
+        if (!altMap.isWater(altMap.getCell(startX, startY))) {
             return this;
         }
 
         this.includeAllWaterCellsAround(startX, startY);
         this.bigLakesToSeas();
-
         return this;
     }
 
     getNotOceanMap(): BinaryMatrix {
         const notOceanMap = new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);
 
-        this.foreachUnfilled((x: number, y: number): void => {
+        this.foreachUnfilled((x, y) => {
             notOceanMap.fill(x, y);
         });
 

@@ -23,12 +23,12 @@ export default class List<T> {
         return this.items[this.items.length - 1];
     }
 
-    previous(): T[] | false {
-        return this.items.length > 1 ? this.items[this.items.length - 2] : false;
+    previous(): T[] | undefined {
+        return this.items.length > 1 ? this.items[this.items.length - 2] : undefined;
     }
 
-    get(i: number): T[] | false {
-        return i < this.items.length ? this.items[i] : false;
+    get(i: number): T[] | undefined {
+        return i < this.items.length ? this.items[i] : undefined;
     }
 
     get length(): number {
@@ -36,19 +36,22 @@ export default class List<T> {
     }
 
     includes(item: T[]): boolean {
+        // Note: This uses strict equality.
         return this.items.includes(item);
     }
 
-    foreach(callable: (item: T[]) => void): void {
-        for (const item of this.items) {
-            callable(item);
+    foreach(callback: (item: T[]) => void): void {
+        for (let i = 0, len = this.items.length; i < len; i++) {
+            callback(this.items[i]);
         }
     }
 
-    foreachCell(callable: (x: T, y: T) => void): void {
-        for (const item of this.items) {
+    foreachCell(callback: (x: T, y: T) => void): void {
+        for (let i = 0, len = this.items.length; i < len; i++) {
+            const item = this.items[i];
+            // Check that item has at least two elements
             if (item.length >= 2) {
-                callable(item[0], item[1]);
+                callback(item[0], item[1]);
             }
         }
     }

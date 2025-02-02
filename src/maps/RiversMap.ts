@@ -1,9 +1,9 @@
 import BinaryMatrix from "../structures/BinaryMatrix.js";
-import {fromFraction, distance, randBetweenNumbers, arrayHasPoint} from "../helpers.js";
+import { fromFraction, distance, randBetweenNumbers, arrayHasPoint } from "../helpers.js";
 import Config from "../../config.js";
 import AltitudeMap from "./AltitudeMap.js";
 import LakesMap from "./LakesMap.js";
-import {Cell, CellsArray, CellsList} from "../structures/Cells.js";
+import { Cell, CellsArray, CellsList } from "../structures/Cells.js";
 
 export default class RiversMap extends BinaryMatrix {
 
@@ -53,7 +53,9 @@ export default class RiversMap extends BinaryMatrix {
         const riversLimit = Math.floor(fromFraction(Config.RIVERS_DENSITY, 1, Config.WORLD_SIZE));
         const startCloseness = Math.max(Config.RIVER_MIN_LENGTH, Config.RIVER_START_CLOSENESS);
 
+        // Use an array for distance calculations and a Set for fast membership tests.
         let allRiversPoints: CellsList = [];
+        const allRiversPointsSet = new Set<string>();
 
         for (let i = 0; i < riverSources.length; i++) {
             if (
@@ -76,7 +78,8 @@ export default class RiversMap extends BinaryMatrix {
                 const [x, y] = nextRiverPoint;
                 const altitude = this.altitudeMap.getCell(x, y);
 
-                if (this.altitudeMap.isWater(altitude) || arrayHasPoint(allRiversPoints, x, y)) {
+                // Instead of calling arrayHasPoint (a linear search), we use our Set.
+                if (this.altitudeMap.isWater(altitude) || allRiversPointsSet.has(`${x},${y}`)) {
                     if (this.lakesMap.filled(x, y)) {
                         const lakeSize = this.lakesMap.getSizeFromPoint(x, y);
                         if (lakeSize > river.length * Config.LAKE_TO_RIVER_RATIO) {
@@ -96,8 +99,14 @@ export default class RiversMap extends BinaryMatrix {
 
             if (finished && river.length >= Config.RIVER_MIN_LENGTH) {
                 rivers.push(river);
-                allRiversPoints = allRiversPoints.concat(river).unique();
-
+                // Update both the array and the Set.
+                for (const point of river) {
+                    const key = `${point[0]},${point[1]}`;
+                    if (!allRiversPointsSet.has(key)) {
+                        allRiversPoints.push(point);
+                        allRiversPointsSet.add(key);
+                    }
+                }
                 if (rivers.length === riversLimit) break;
             }
         }

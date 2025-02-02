@@ -2,31 +2,18 @@ import {Cell} from "../structures/Cells.js";
 import {getStep, throwError} from "../helpers.js";
 
 export interface AnimalSettings {
-    /**
-     * @minimum 0
-     * @maximum 100
-     */
+    /** @minimum 0, @maximum 100 */
     intensity: number;
-
-    /**
-     * @minimum 0
-     * @maximum 100
-     */
+    /** @minimum 0, @maximum 100 */
     moveChance: number;
-
-    /**
-     * @minimum 0
-     * @maximum 1
-     */
+    /** @minimum 0, @maximum 1 */
     rarity: number;
-
     color: string;
     image: string | null;
 }
 
 export default class Animal {
-    static ANIMAL_NAME = 'Animal';
-
+    static ANIMAL_NAME = "Animal";
     x: number;
     y: number;
     readonly settings: AnimalSettings;
@@ -77,7 +64,7 @@ export default class Animal {
 
     moveTo(x: number, y: number): void {
         if (x === this.x && y === this.y) {
-            throwError('Cannot move to the same position', 1, true);
+            throwError("Cannot move to the same position", 1, true);
             return;
         }
 

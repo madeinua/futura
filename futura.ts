@@ -45,21 +45,67 @@ function drawColorMap(id: string, map: Matrix) {
     ctx.putImageData(image, 0, 0);
 }
 
-function drawInfoMap(id: string, map: NumericMatrix, reverse: boolean) {
+/**
+ * Linearly interpolates between two colors.
+ *
+ * @param color1 - The start color as [R, G, B]
+ * @param color2 - The end color as [R, G, B]
+ * @param factor - A number between 0 and 1 representing the interpolation factor.
+ * @returns The interpolated color as [R, G, B].
+ */
+function interpolateColor(
+    color1: [number, number, number],
+    color2: [number, number, number],
+    factor: number
+): [number, number, number] {
+    return [
+        Math.round(color1[0] + factor * (color2[0] - color1[0])),
+        Math.round(color1[1] + factor * (color2[1] - color1[1])),
+        Math.round(color1[2] + factor * (color2[2] - color1[2])),
+    ];
+}
 
+/**
+ * Draws a colored map onto a canvas by mapping each cell’s value (assumed to be between 0 and 255)
+ * to a color determined by linear interpolation between the provided start and end colors.
+ *
+ * @param id - The id of the canvas element.
+ * @param map - The NumericMatrix to draw.
+ * @param startColor - The color representing the lowest values (e.g. blue for cold areas).
+ * @param endColor - The color representing the highest values (e.g. orange for hot areas).
+ */
+function drawColoredMap(
+    id: string,
+    map: NumericMatrix,
+    startColor: [number, number, number],
+    endColor: [number, number, number]
+) {
     const canvas = document.getElementById(id) as HTMLCanvasElement;
     canvas.width = map.getWidth();
     canvas.height = map.getHeight();
 
-    const ctx = canvas.getContext('2d'),
-        image = ctx.createImageData(canvas.width, canvas.height);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
+    const image = ctx.createImageData(canvas.width, canvas.height);
+
+    // For each cell, compute its color based on the normalized value.
     map.foreach((x: number, y: number) => {
 
-        let point = (x + y * canvas.width) * 4,
-            gray = reverse ? 255 - map.getGrayscale(x, y) : map.getGrayscale(x, y);
+        const gray = map.getGrayscale(x, y);
+        const factor = gray / 255; // Normalize to [0, 1]
 
-        fillCanvasPixel(image, point, [gray, gray, gray]);
+        // Interpolate between the two provided colors.
+        const color: [number, number, number] = interpolateColor(startColor, endColor, factor);
+
+        // Compute the pixel's starting index in the ImageData array.
+        const point = (x + y * canvas.width) * 4;
+
+        // Set the pixel color.
+        image.data[point] = color[0]; // Red
+        image.data[point + 1] = color[1]; // Green
+        image.data[point + 2] = color[2]; // Blue
+        image.data[point + 3] = 255; // Alpha
     });
 
     ctx.putImageData(image, 0, 0);
@@ -118,37 +164,38 @@ new World(
         if (Config.DRAW_TECHNICAL_MAPS) {
 
             Filters.add('altitudeMap', (map: AltitudeMap) => {
-                drawInfoMap('altitudeMapCanvas', map, false);
+                drawColoredMap('altitudeMapCanvas', map, [34, 139, 34], [255, 255, 255]);
+                document.getElementById('altitudeCellsCount').innerHTML = map.getLandCellsCount().toString();
                 return map;
             });
 
             Filters.add('temperatureMap', (map: TemperatureMap) => {
-                drawInfoMap('temperatureMapCanvas', map, false);
-                return map;
-            });
-
-            Filters.add('humidityMap', (map: HumidityMap) => {
-                drawInfoMap('humidityMapCanvas', map, true);
+                drawColoredMap('temperatureMapCanvas', map, [50, 50, 255], [255, 69, 0]);
                 return map;
             });
 
             Filters.add('oceanMap', (map: OceanMap) => {
-                drawInfoMap('oceanMapCanvas', map, true);
+                drawColoredMap('oceanMapCanvas', map, [255, 255, 255], [0, 105, 148]);
                 return map;
             });
 
             Filters.add('coastMap', (map: CoastMap) => {
-                drawInfoMap('coastMapCanvas', map, true);
+                drawColoredMap('coastMapCanvas', map, [255, 255, 255], [205, 133, 63]);
                 return map;
             });
 
             Filters.add('lakesMap', (map: LakesMap) => {
-                drawInfoMap('lakesMapCanvas', map, true);
+                drawColoredMap('lakesMapCanvas', map, [255, 255, 255], [0, 105, 148]);
                 return map;
             });
 
             Filters.add('riversMap', (map: RiversMap) => {
-                drawInfoMap('riversMapCanvas', map, false);
+                drawColoredMap('riversMapCanvas', map, [255, 255, 255], [0, 105, 148]);
+                return map;
+            });
+
+            Filters.add('humidityMap', (map: HumidityMap) => {
+                drawColoredMap('humidityMapCanvas', map, [210, 180, 140], [34, 139, 34]);
                 return map;
             });
 
@@ -186,7 +233,7 @@ new World(
             });
 
             Filters.add('forestMap', (map: ForestMap) => {
-                drawInfoMap('forestMapCanvas', map, true);
+                drawColoredMap('forestMapCanvas', map, [255, 255, 255], [34, 139, 34]);
                 document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
                 return map;
             });

@@ -15,26 +15,29 @@ export default class List {
         return this.items[this.items.length - 1];
     }
     previous() {
-        return this.items.length > 1 ? this.items[this.items.length - 2] : false;
+        return this.items.length > 1 ? this.items[this.items.length - 2] : undefined;
     }
     get(i) {
-        return i < this.items.length ? this.items[i] : false;
+        return i < this.items.length ? this.items[i] : undefined;
     }
     get length() {
         return this.items.length;
     }
     includes(item) {
+        // Note: This uses strict equality.
         return this.items.includes(item);
     }
-    foreach(callable) {
-        for (const item of this.items) {
-            callable(item);
+    foreach(callback) {
+        for (let i = 0, len = this.items.length; i < len; i++) {
+            callback(this.items[i]);
         }
     }
-    foreachCell(callable) {
-        for (const item of this.items) {
+    foreachCell(callback) {
+        for (let i = 0, len = this.items.length; i < len; i++) {
+            const item = this.items[i];
+            // Check that item has at least two elements
             if (item.length >= 2) {
-                callable(item[0], item[1]);
+                callback(item[0], item[1]);
             }
         }
     }

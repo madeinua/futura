@@ -1,13 +1,14 @@
-import NumericMatrix from './NumericMatrix.js';
+import NumericMatrix from "./NumericMatrix.js";
 import { distance, round, getPolygonAreaSize } from "../helpers.js";
 export default class BinaryMatrix extends NumericMatrix {
-    constructor(width, height, fill) {
+    constructor(width, height, fill = 0) {
         super(width, height);
-        this.map(typeof fill === 'undefined' ? 0 : fill);
+        // Initialize every cell to the provided fill value.
+        this.map(fill);
     }
     clone() {
         const matrix = new BinaryMatrix(this.width, this.height, 0);
-        matrix.__values = this.__values.map(row => [...row]);
+        matrix.__values = this.__values.map((row) => row.slice());
         return matrix;
     }
     getFilledCells() {
@@ -42,8 +43,9 @@ export default class BinaryMatrix extends NumericMatrix {
         return count;
     }
     hasFilled() {
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
+        const { width, height } = this;
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
                 if (this.filled(x, y)) {
                     return true;
                 }
@@ -55,8 +57,9 @@ export default class BinaryMatrix extends NumericMatrix {
         return this.getCell(x, y) === 1;
     }
     foreachFilled(callback) {
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
+        const { width, height } = this;
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
                 if (this.filled(x, y)) {
                     callback(x, y);
                 }
@@ -64,8 +67,9 @@ export default class BinaryMatrix extends NumericMatrix {
         }
     }
     foreachUnfilled(callback) {
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
+        const { width, height } = this;
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
                 if (!this.filled(x, y)) {
                     callback(x, y);
                 }
@@ -74,14 +78,21 @@ export default class BinaryMatrix extends NumericMatrix {
     }
     distanceTo(x, y, max) {
         let result = Number.MAX_SAFE_INTEGER;
+        const { width, height } = this;
         const minX = Math.max(0, x - max);
-        const maxX = Math.min(this.width - 1, x + max);
+        const maxX = Math.min(width - 1, x + max);
         const minY = Math.max(0, y - max);
-        const maxY = Math.min(this.height - 1, y + max);
+        const maxY = Math.min(height - 1, y + max);
         for (let nx = minX; nx <= maxX; nx++) {
             for (let ny = minY; ny <= maxY; ny++) {
                 if (this.filled(nx, ny)) {
-                    result = Math.min(result, distance(nx, ny, x, y));
+                    const d = distance(nx, ny, x, y);
+                    if (d < result) {
+                        result = d;
+                        if (result === 0) {
+                            return 0; // Early exit if exact match found
+                        }
+                    }
                 }
             }
         }
@@ -91,8 +102,10 @@ export default class BinaryMatrix extends NumericMatrix {
         return max >= this.distanceTo(x, y, max);
     }
     combineWith(matrix) {
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
+        const { width, height } = this;
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                // Use logical OR for binary values.
                 this.__values[x][y] = this.__values[x][y] || matrix.__values[x][y];
             }
         }
@@ -103,7 +116,7 @@ export default class BinaryMatrix extends NumericMatrix {
         return this;
     }
     diffCells(cells) {
-        for (let [cx, cy] of cells) {
+        for (const [cx, cy] of cells) {
             if (this.filled(cx, cy)) {
                 this.unfill(cx, cy);
             }
@@ -120,9 +133,18 @@ export default class BinaryMatrix extends NumericMatrix {
         return result;
     }
     hasFilledNeighbors(x, y) {
-        return this.getFilledNeighbors(x, y).length > 0;
+        let found = false;
+        this.foreachNeighbors(x, y, (nx, ny) => {
+            if (this.filled(nx, ny)) {
+                found = true;
+                return true; // stops iteration
+            }
+            return false;
+        });
+        return found;
     }
     hasUnfilledNeighbors(x, y) {
+        // Assuming 8 neighbors in a full grid. If fewer than 8 are filled, at least one is unfilled.
         return this.getFilledNeighbors(x, y).length < 8;
     }
     foreachFilledAround(x, y, callback) {
@@ -142,25 +164,32 @@ export default class BinaryMatrix extends NumericMatrix {
         });
     }
     getSize() {
-        return round(this.getFilledCells().length / (this.width * this.height), 2) * 100;
+        const totalCells = this.width * this.height;
+        const filledCount = this.getFilledCells().length;
+        return round(filledCount / totalCells, 2) * 100;
     }
     getSizeFromPoint(startX, startY) {
         if (!this.filled(startX, startY)) {
             return 0;
         }
         const coords = [];
+        // For each of the four cardinal directions, extend until an unfilled cell or boundary is reached.
         for (let d = 0; d < 4; d++) {
             let sx = startX;
             let sy = startY;
             while (true) {
                 if (d === 0)
-                    sx++;
+                    sx++; // Right
                 else if (d === 1)
-                    sy++;
+                    sy++; // Down
                 else if (d === 2)
-                    sx--;
+                    sx--; // Left
                 else if (d === 3)
-                    sy--;
+                    sy--; // Up
+                // Break if out of bounds.
+                if (sx < 0 || sy < 0 || sx >= this.width || sy >= this.height) {
+                    break;
+                }
                 if (!this.filled(sx, sy)) {
                     coords.push([sx, sy]);
                     break;
