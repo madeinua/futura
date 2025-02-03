@@ -168,9 +168,9 @@ new World(displayMap, displayMapWrapper.offsetWidth, displayMapWrapper.offsetHei
         });
         technicalMaps.style.display = 'block';
     }
-    Filters.add('fractionsUpdated', (fractions) => {
-        document.getElementById('fractionsList').innerHTML = fractions.map((fraction) => {
-            return '<li>' + fraction.getName() + ': <span style="background-color:' + rgbToHex(fraction.getFractionColor()) + '"></span> (' + fraction.getSize() + ' cells)</li>';
+    Filters.add('factionsUpdated', (factions) => {
+        document.getElementById('factionsList').innerHTML = factions.map((faction) => {
+            return '<li>' + faction.getName() + ': <span style="background-color:' + rgbToHex(faction.getFactionColor()) + '"></span> (' + faction.getSize() + ' cells)</li>';
         }).join('');
     });
     coordinatesField.addEventListener("change", () => {
@@ -191,8 +191,8 @@ new World(displayMap, displayMapWrapper.offsetWidth, displayMapWrapper.offsetHei
     world.timer.addStepsHandler((step) => {
         document.getElementById('stepsCounter').innerHTML = String(step);
     });
-    document.getElementById('generateFractions').addEventListener("click", () => {
-        world.generateFractions();
+    document.getElementById('generateFactions').addEventListener("click", () => {
+        world.generateFactions();
     });
     // Timeout is needed to wait for the map to be generated (the process resizes the canvas and triggers scroll event)
     setTimeout(() => {

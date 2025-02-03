@@ -7,9 +7,9 @@ import HumidityOperator from "./operators/HumidityOperator.js";
 import BiomesOperator from "./operators/BiomesOperator.js";
 import ForestsOperator from "./operators/ForestsOperator.js";
 import AnimalsOperator from "./operators/AnimalsOperator.js";
-import FractionsOperator from "./operators/FractionsOperator.js";
+import FactionsOperator from "./operators/FactionsOperator.js";
 import Timer from "./services/Timer.js";
-import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FRACTIONS, LAYER_FRACTIONS_BORDERS, LAYER_HABITAT,} from "./services/Layers.js";
+import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FACTIONS, LAYER_FACTIONS_BORDERS, LAYER_HABITAT,} from "./services/Layers.js";
 import AltitudeMap from "./maps/AltitudeMap.js";
 import TemperatureMap from "./maps/TemperatureMap.js";
 import OceanMap from "./maps/OceanMap.js";
@@ -33,7 +33,7 @@ type WorldType = {
     humidityMap: HumidityMap;
     biomesOperator: BiomesOperator;
     forestOperator: ForestsOperator;
-    fractionsOperator: FractionsOperator;
+    factionsOperator: FactionsOperator;
 };
 
 declare global {
@@ -168,10 +168,10 @@ export default class World {
             timer: this.timer,
         });
 
-        const fractionsOperator = new FractionsOperator({
+        const factionsOperator = new FactionsOperator({
             timer: this.timer,
-            fractionsLayer: this.layers.getLayer(LAYER_FRACTIONS),
-            fractionsBorderLayer: this.layers.getLayer(LAYER_FRACTIONS_BORDERS),
+            factionsLayer: this.layers.getLayer(LAYER_FACTIONS),
+            factionsBorderLayer: this.layers.getLayer(LAYER_FACTIONS_BORDERS),
             oceanMap: oceanMap,
             freshWaterMap: freshWaterMap,
             temperatureMap: temperatureMap,
@@ -191,7 +191,7 @@ export default class World {
             humidityMap,
             biomesOperator,
             forestOperator: forestsOperator,
-            fractionsOperator,
+            factionsOperator,
         };
     }
 
@@ -329,7 +329,7 @@ export default class World {
         const cellSize = Config.CELL_SIZE;
         const offsetX = this.cameraPos[0] * cellSize;
         const offsetY = this.cameraPos[1] * cellSize;
-        
+
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(255,255,255,0.2)';
 
@@ -448,8 +448,8 @@ export default class World {
         ];
     }
 
-    generateFractions(): void {
-        this.world.fractionsOperator.createFractions(Config.FRACTIONS.COUNT);
+    generateFactions(): void {
+        this.world.factionsOperator.createFactions(Config.FACTIONS.COUNT);
         this.update();
     }
 }

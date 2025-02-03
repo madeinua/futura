@@ -14,7 +14,7 @@ import RiversMap from "./src/maps/RiversMap.js";
 import ForestMap from "./src/maps/ForestMap.js";
 import Animal from "./src/animals/Animal.js";
 import Biome from "./src/biomes/Biome.js";
-import Fraction from "./src/human/Fraction.js";
+import Faction from "./src/human/Faction.js";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     displayMapVisibleRange = document.getElementById('displayMapVisibleRange') as HTMLInputElement,
@@ -262,9 +262,9 @@ new World(
             technicalMaps.style.display = 'block';
         }
 
-        Filters.add('fractionsUpdated', (fractions: Fraction[]) => {
-            document.getElementById('fractionsList').innerHTML = fractions.map((fraction: Fraction) => {
-                return '<li>' + fraction.getName() + ': <span style="background-color:' + rgbToHex(fraction.getFractionColor()) + '"></span> (' + fraction.getSize() + ' cells)</li>';
+        Filters.add('factionsUpdated', (factions: Faction[]) => {
+            document.getElementById('factionsList').innerHTML = factions.map((faction: Faction) => {
+                return '<li>' + faction.getName() + ': <span style="background-color:' + rgbToHex(faction.getFactionColor()) + '"></span> (' + faction.getSize() + ' cells)</li>';
             }).join('');
         });
 
@@ -295,8 +295,8 @@ new World(
             document.getElementById('stepsCounter').innerHTML = String(step);
         });
 
-        document.getElementById('generateFractions').addEventListener("click", () => {
-            world.generateFractions();
+        document.getElementById('generateFactions').addEventListener("click", () => {
+            world.generateFactions();
         });
 
         // Timeout is needed to wait for the map to be generated (the process resizes the canvas and triggers scroll event)

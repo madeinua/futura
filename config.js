@@ -175,8 +175,8 @@ const Config = {
         }
     },
 
-    // Fractions
-    FRACTIONS: {
+    // Factions
+    FACTIONS: {
         COUNT: 10,
         AUTO_CREATE_ON_STEP: -1,
         // Note: < 1 --> negative, >= 1 --> positive

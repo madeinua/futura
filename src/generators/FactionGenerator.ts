@@ -3,13 +3,13 @@ import {fromMiddleFractionValue} from "../helpers.js";
 import Biome from "../biomes/Biome.js";
 import BinaryMatrix from "../structures/BinaryMatrix.js";
 import NumericMatrix from "../structures/NumericMatrix.js";
-import Fraction from "../human/Fraction.js";
+import Faction from "../human/Faction.js";
 import ForestMap from "../maps/ForestMap.js";
 import BiomesMap from "../maps/BiomesMap.js";
 import TemperatureMap from "../maps/TemperatureMap.js";
 import IslandsMap from "../maps/IslandsMap.js";
 
-export type FractionsGeneratorArgs = {
+export type FactionsGeneratorArgs = {
     oceanMap: BinaryMatrix;
     freshWaterMap: BinaryMatrix;
     temperatureMap: TemperatureMap;
@@ -18,22 +18,22 @@ export type FractionsGeneratorArgs = {
     islandsMap: IslandsMap;
 };
 
-export default class FractionGenerator {
+export default class FactionGenerator {
 
-    private readonly objects: FractionsGeneratorArgs;
+    private readonly objects: FactionsGeneratorArgs;
     private probabilitiesMap: NumericMatrix<number>;
 
-    constructor(objects: FractionsGeneratorArgs) {
+    constructor(objects: FactionsGeneratorArgs) {
         this.objects = objects;
         this.probabilitiesMap = this.createOccurrenceProbabilityMap();
     }
 
     private getBiomeProbability(biomeName: string): number {
-        return Config.FRACTIONS.CREATE_PROBABILITIES.BIOMES[biomeName] ?? 0;
+        return Config.FACTIONS.CREATE_PROBABILITIES.BIOMES[biomeName] ?? 0;
     }
 
     private isTooSmallIsland(x: number, y: number): boolean {
-        return this.objects.islandsMap.getCell(x, y) < Config.FRACTIONS.CREATE_PROBABILITIES.MIN_ISLAND_SIZE;
+        return this.objects.islandsMap.getCell(x, y) < Config.FACTIONS.CREATE_PROBABILITIES.MIN_ISLAND_SIZE;
     }
 
     private createOccurrenceProbabilityMap(): NumericMatrix<number> {
@@ -48,18 +48,18 @@ export default class FractionGenerator {
             }
 
             const oceanFactor = this.objects.oceanMap.hasFilledNeighbors(biome.x, biome.y)
-                    ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_OCEAN
+                    ? Config.FACTIONS.CREATE_PROBABILITIES.CLOSE_TO_OCEAN
                     : 1,
                 waterFactor = this.objects.freshWaterMap.hasFilledNeighbors(biome.x, biome.y)
-                    ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER
+                    ? Config.FACTIONS.CREATE_PROBABILITIES.CLOSE_TO_WATER
                     : 1,
                 altitudeFactor = Math.max(1 - biome.altitude, Config.MAX_HILLS_LEVEL),
                 temperatureFactor = fromMiddleFractionValue(this.objects.temperatureMap.getCell(biome.x, biome.y)),
                 isForest = this.objects.forestMap.filled(biome.x, biome.y),
                 forestFactor = isForest
-                    ? Config.FRACTIONS.CREATE_PROBABILITIES.IS_FOREST
+                    ? Config.FACTIONS.CREATE_PROBABILITIES.IS_FOREST
                     : this.objects.forestMap.hasFilledNeighbors(biome.x, biome.y)
-                        ? Config.FRACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST
+                        ? Config.FACTIONS.CREATE_PROBABILITIES.CLOSE_TO_FOREST
                         : 1;
 
             map.setCell(
@@ -72,8 +72,8 @@ export default class FractionGenerator {
         return map;
     }
 
-    generateFractions(count: number): Fraction[] {
-        const fractions: Fraction[] = [];
+    generateFactions(count: number): Faction[] {
+        const factions: Faction[] = [];
 
         for (let i = 0; i < count; i++) {
             const point = this.probabilitiesMap.getRandomWeightedPoint();
@@ -84,10 +84,10 @@ export default class FractionGenerator {
 
             const [x, y] = point;
 
-            fractions.push(
-                new Fraction(x, y, {
-                    name: `Fraction #${i + 1}`,
-                    color: Config.FRACTIONS.COLORS[i]
+            factions.push(
+                new Faction(x, y, {
+                    name: `Faction #${i + 1}`,
+                    color: Config.FACTIONS.COLORS[i]
                 })
             );
 
@@ -97,6 +97,6 @@ export default class FractionGenerator {
             });
         }
 
-        return fractions;
+        return factions;
     }
 }

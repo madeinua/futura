@@ -68,7 +68,7 @@ canvas {
 }
 
 #pauseSteps,
-#generateFractions {
+#generateFactions {
     padding: 10px 15px;
 }
 
@@ -95,7 +95,7 @@ button:hover {
     display: inline-block;
 }
 
-#fractionsList li span {
+#factionsList li span {
     display: inline-block;
     width: 20px;
     height: 20px;
