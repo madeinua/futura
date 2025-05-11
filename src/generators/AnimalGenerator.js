@@ -1,6 +1,6 @@
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import { throwError } from "../helpers.js";
 import Config from "../../config.js";
+import { throwError } from "../helpers.js";
+import BinaryMatrix from "../structures/BinaryMatrix.js";
 import Animal from "../animals/Animal.js";
 export default class AnimalGenerator {
     constructor(objects) {
@@ -16,9 +16,6 @@ export default class AnimalGenerator {
     }
     getSettings() {
         return Config.ANIMALS[this.getName()];
-    }
-    getCreateIntensity() {
-        return this.getSettings().intensity;
     }
     getRarity() {
         return this.getSettings().rarity;
@@ -74,7 +71,7 @@ export default class AnimalGenerator {
     createAnimal(anotherAnimalsPositions) {
         // Filter respawn points that are sufficiently far from existing animals and inside the habitat.
         const availableRespawns = this.getRespawnPoints().filter((cell) => {
-            return (anotherAnimalsPositions.getClosestDistanceTo(cell[0], cell[1]) >= 3 &&
+            return (anotherAnimalsPositions.getClosestDistanceTo(cell[0], cell[1]) >= Config.DISTANCE_BETWEEN_ANIMALS &&
                 this.isCellInHabitat(cell[0], cell[1]));
         });
         if (!availableRespawns.length) {
@@ -85,6 +82,7 @@ export default class AnimalGenerator {
             throwError("Cannot create animal", 1, true);
             return null;
         }
+        // @ts-ignore
         return new (this.getAnimalClass())(cell[0], cell[1], this.getSettings());
     }
 }

@@ -1,4 +1,3 @@
-import {CellsList} from "./structures/Cells.js";
 import {Array2D} from "./structures/Array2D.js";
 
 export type RGB = [number, number, number];
@@ -46,84 +45,6 @@ export function getStep(): number {
 /** Rounds the number to a fixed precision. */
 export function round(value: number, precision: number): number {
     return parseFloat(value.toFixed(precision));
-}
-
-/**
- * Returns a list of cells (as [x,y] pairs) within Manhattan distance < (radius+1).
- */
-export function getAroundRadius(
-    x: number,
-    y: number,
-    maxWidth: number,
-    maxHeight: number,
-    radius: number
-): CellsList {
-    const result: CellsList = [];
-    const minX = Math.max(0, x - radius);
-    const minY = Math.max(0, y - radius);
-    const maxX = Math.min(maxWidth - 1, x + radius);
-    const maxY = Math.min(maxHeight - 1, y + radius);
-    const maxRadius = radius + 1;
-
-    for (let nx = minX; nx <= maxX; nx++) {
-        for (let ny = minY; ny <= maxY; ny++) {
-            if ((nx !== x || ny !== y) && (Math.abs(x - nx) + Math.abs(y - ny) < maxRadius)) {
-                result.push([nx, ny]);
-            }
-        }
-    }
-
-    return result;
-}
-
-/**
- * Returns a list of cells (as [x,y] pairs) in the 3×3 rectangle surrounding (x,y).
- */
-export function getRectangleAround(
-    x: number,
-    y: number,
-    maxWidth: number,
-    maxHeight: number
-): CellsList {
-    const result: CellsList = [];
-    const minX = Math.max(0, x - 1);
-    const minY = Math.max(0, y - 1);
-    const maxX = Math.min(maxWidth - 1, x + 1);
-    const maxY = Math.min(maxHeight - 1, y + 1);
-
-    for (let nx = minX; nx <= maxX; nx++) {
-        for (let ny = minY; ny <= maxY; ny++) {
-            if (nx !== x || ny !== y) {
-                result.push([nx, ny]);
-            }
-        }
-    }
-
-    return result;
-}
-
-/**
- * Checks if the given 2D array (list of [x,y] points) contains the specified point.
- */
-export function arrayHasPoint(arr: Array2D, x: number, y: number): boolean {
-    return arr.some(([px, py]) => px === x && py === y);
-}
-
-/**
- * Creates a 2D array of the specified dimensions, filled with the given value.
- */
-export function create2DArray(
-    width: number,
-    height: number,
-    value: any
-): Array2D {
-    const arr: any[][] = new Array(height);
-
-    for (let i = 0; i < height; i++) {
-        arr[i] = new Array(width).fill(value);
-    }
-
-    return arr;
 }
 
 /**

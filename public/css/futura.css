@@ -95,6 +95,10 @@ button:hover {
     display: inline-block;
 }
 
+#timerFps {
+    font-weight: 600;
+}
+
 #factionsList li span {
     display: inline-block;
     width: 20px;

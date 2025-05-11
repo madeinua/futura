@@ -1,4 +1,4 @@
-import { logTimeEvent } from "../helpers.js";
+import { Filters, logTimeEvent } from "../helpers.js";
 import Config from "../../config.js";
 export default class Timer {
     constructor() {
@@ -6,6 +6,7 @@ export default class Timer {
         this.stepsHandlers = [];
         this.timerPaused = false;
         this.timerInterval = null;
+        this.timerFps = 0;
     }
     addStepsHandler(handler) {
         this.stepsHandlers.push(handler);
@@ -16,6 +17,7 @@ export default class Timer {
         let minStepInterval = STEPS_MIN_INTERVAL / STEPS_BOOST;
         let boosted = false;
         this.timerStep = 0;
+        let startTime = Date.now();
         const makeStep = () => {
             if (this.timerPaused) {
                 return;
@@ -43,6 +45,9 @@ export default class Timer {
                 this.timerInterval = setInterval(makeStep, minStepInterval);
                 boosted = true;
             }
+            this.timerFps = Math.round(Date.now() - startTime);
+            startTime = Date.now();
+            Filters.apply('timer', this);
         };
         this.timerInterval = setInterval(makeStep, minStepInterval);
         // Start immediately.
@@ -70,5 +75,8 @@ export default class Timer {
         }
         this.timerPaused = false;
         return true;
+    }
+    getFps() {
+        return this.timerFps;
     }
 }

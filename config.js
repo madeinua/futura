@@ -144,32 +144,29 @@ const Config = {
     FOREST_TUNDRA_IMAGE: 'public/images/forest-3.png',
 
     // Animals
+    DISTANCE_BETWEEN_ANIMALS: 10,
     ANIMALS: {
         'Animal': { // defaults
-            intensity: 100,
-            moveChance: 100,
             rarity: 0.01, // % of all tiles
+            moveChance: 100,
             color: '#000000',
             image: null
         },
         'Fish': {
-            intensity: 75,
-            moveChance: 50,
-            rarity: 0.05,
+            rarity: 0.005,
+            moveChance: 7,
             color: '#4fd0ff',
             image: 'public/images/fish-1.png'
         },
         'Deer': {
-            intensity: 75,
-            moveChance: 30,
             rarity: 0.01,
+            moveChance: 5,
             color: '#ffc800',
             image: 'public/images/deer-1.png'
         },
         'Cow': {
-            intensity: 50,
-            moveChance: 10,
             rarity: 0.01,
+            moveChance: 3,
             color: '#ffffff',
             image: 'public/images/cow-1.png'
         }

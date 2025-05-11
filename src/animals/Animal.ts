@@ -1,12 +1,10 @@
-import {Cell} from "../structures/Cells.js";
 import {getStep, throwError} from "../helpers.js";
+import {Cell} from "../structures/Cells.js";
 
 export interface AnimalSettings {
     /** @minimum 0, @maximum 100 */
-    intensity: number;
-    /** @minimum 0, @maximum 100 */
     moveChance: number;
-    /** @minimum 0, @maximum 1 */
+    /** @minimum 0, @maximum 100 */
     rarity: number;
     color: string;
     image: string | null;

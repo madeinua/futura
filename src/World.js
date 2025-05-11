@@ -133,7 +133,6 @@ export default class World {
         }
         // Add the minimap
         this.drawMiniMap();
-        logTimeEvent('World rendered');
     }
     cacheTerrainLayer(mapCtx) {
         const renderCtx = new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE).getContext('2d');

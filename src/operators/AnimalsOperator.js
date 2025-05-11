@@ -1,9 +1,10 @@
-import { getAroundRadius, getRectangleAround, iAmLucky, hexToRgb, logTimeEvent, Filters, } from "../helpers.js";
 import Config from "../../config.js";
+import { iAmLucky, hexToRgb, logTimeEvent, Filters, throwError } from "../helpers.js";
 import CowGenerator from "../generators/CowGenerator.js";
 import DeerGenerator from "../generators/DeerGenerator.js";
 import FishGenerator from "../generators/FishGenerator.js";
 import DisplayCell from "../render/DisplayCell.js";
+import { getAroundRadius, getRectangleAround, isCellInCellList } from "../structures/Cells.js";
 export default class AnimalsOperator {
     constructor(args) {
         this.animals = [];
@@ -87,7 +88,7 @@ export default class AnimalsOperator {
         this.animalsGenerators.forEach((generator) => {
             const name = generator.getName();
             const animalsCount = this.getAnimalsCountByName(name);
-            if (animalsCount > generator.getMaxAnimals() || !iAmLucky(generator.getCreateIntensity())) {
+            if (animalsCount > generator.getMaxAnimals()) {
                 return;
             }
             generator.checkRespawns(animalsCount);
@@ -110,12 +111,21 @@ export default class AnimalsOperator {
             return null;
         }
         let availableCells = this.getCellsAvailableToMove(animal);
-        let nextPoint = null;
+        // If previous position is available, move there with a 90% chance.
+        const prevPosition = animal.getPrevPosition();
+        if (prevPosition && isCellInCellList(availableCells, prevPosition) && iAmLucky(90)) {
+            return prevPosition;
+        }
+        let tries = 0, maxTries = 10, nextPoint = null;
         while (!nextPoint && availableCells.length) {
             nextPoint = availableCells.randomElement() || null;
             if (nextPoint && this.isAnimalsAroundPoint(nextPoint, animal)) {
                 availableCells = availableCells.filter((cell) => cell !== nextPoint);
                 nextPoint = null;
+            }
+            if (++tries > maxTries) {
+                throwError("Too many tries to find a free cell", 5, false);
+                break;
             }
         }
         return nextPoint;

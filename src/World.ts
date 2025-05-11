@@ -229,8 +229,6 @@ export default class World {
 
         // Add the minimap
         this.drawMiniMap();
-
-        logTimeEvent('World rendered');
     }
 
     private cacheTerrainLayer(mapCtx: CanvasRenderingContext2D): void {

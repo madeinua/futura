@@ -191,6 +191,9 @@ new World(displayMap, displayMapWrapper.offsetWidth, displayMapWrapper.offsetHei
     world.timer.addStepsHandler((step) => {
         document.getElementById('stepsCounter').innerHTML = String(step);
     });
+    Filters.add('timer', (timer) => {
+        document.getElementById('timerFps').innerHTML = timer.getFps().toString();
+    });
     document.getElementById('generateFactions').addEventListener("click", () => {
         world.generateFactions();
     });

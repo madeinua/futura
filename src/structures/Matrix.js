@@ -1,4 +1,5 @@
-import { create2DArray, getRectangleAround, getAroundRadius } from "../helpers.js";
+import { getAroundRadius, getRectangleAround } from "./Cells.js";
+import { create2DArray } from "./Array2D.js";
 /**
  * Matrix<T>
  * A generic 2D matrix wrapper.

@@ -1,17 +1,10 @@
-import {
-    getAroundRadius,
-    getRectangleAround,
-    iAmLucky,
-    hexToRgb,
-    logTimeEvent,
-    Filters,
-} from "../helpers.js";
 import Config from "../../config.js";
+import {iAmLucky, hexToRgb, logTimeEvent, Filters, throwError} from "../helpers.js";
 import CowGenerator from "../generators/CowGenerator.js";
 import DeerGenerator from "../generators/DeerGenerator.js";
 import FishGenerator from "../generators/FishGenerator.js";
 import DisplayCell from "../render/DisplayCell.js";
-import {Cell, CellsList} from "../structures/Cells.js";
+import {Cell, CellsList, getAroundRadius, getRectangleAround, isCellInCellList} from "../structures/Cells.js";
 import Animal from "../animals/Animal.js";
 import AnimalGenerator, {AnimalsGeneratorArgs} from "../generators/AnimalGenerator.js";
 import {Layer} from "../render/Layer.js";
@@ -133,7 +126,7 @@ export default class AnimalsOperator {
             const name = generator.getName();
             const animalsCount = this.getAnimalsCountByName(name);
 
-            if (animalsCount > generator.getMaxAnimals() || !iAmLucky(generator.getCreateIntensity())) {
+            if (animalsCount > generator.getMaxAnimals()) {
                 return;
             }
 
@@ -158,21 +151,34 @@ export default class AnimalsOperator {
     }
 
     private getNextMove(animal: Animal): Cell | null {
-
         if (!iAmLucky(animal.getMoveChance())) {
             return null;
         }
 
         let availableCells = this.getCellsAvailableToMove(animal);
-        let nextPoint: Cell | null = null;
 
+        // If previous position is available, move there with a 90% chance.
+        const prevPosition = animal.getPrevPosition();
+        if (prevPosition && isCellInCellList(availableCells, prevPosition) && iAmLucky(90)) {
+            return prevPosition;
+        }
+
+        let tries = 0,
+            maxTries = 10,
+            nextPoint: Cell | null = null;
         while (!nextPoint && availableCells.length) {
             nextPoint = availableCells.randomElement() || null;
             if (nextPoint && this.isAnimalsAroundPoint(nextPoint, animal)) {
                 availableCells = availableCells.filter((cell) => cell !== nextPoint);
                 nextPoint = null;
             }
+
+            if (++tries > maxTries) {
+                throwError("Too many tries to find a free cell", 5, false);
+                break;
+            }
         }
+
         return nextPoint;
     }
 

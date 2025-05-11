@@ -1,18 +1,17 @@
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import {throwError} from "../helpers.js";
 import Config from "../../config.js";
+import {throwError} from "../helpers.js";
+import BinaryMatrix from "../structures/BinaryMatrix.js";
 import Animal from "../animals/Animal.js";
 import {CellsList, Cell} from "../structures/Cells.js";
 import CoastMap from "../maps/CoastMap.js";
 import ForestsOperator from "../operators/ForestsOperator.js";
 import BiomesOperator from "../operators/BiomesOperator.js";
 import Timer from "../services/Timer.js";
-import AltitudeMap from "../maps/AltitudeMap";
+import AltitudeMap from "../maps/AltitudeMap.js";
 
 type AnimalType = {
-    intensity: number;
-    moveChance: number;
     rarity: number;
+    moveDistance: number;
     color: string;
     image: string | null;
 };
@@ -49,10 +48,6 @@ export default class AnimalGenerator {
         return Config.ANIMALS[this.getName()];
     }
 
-    getCreateIntensity(): number {
-        return this.getSettings().intensity;
-    }
-
     getRarity(): number {
         return this.getSettings().rarity;
     }
@@ -65,6 +60,7 @@ export default class AnimalGenerator {
         if (!this.habitat) {
             this.setHabitat(new BinaryMatrix(Config.WORLD_SIZE, Config.WORLD_SIZE, 1));
         }
+
         return this;
     }
 
@@ -84,15 +80,20 @@ export default class AnimalGenerator {
     createRespawnPoint(): boolean {
         const habitatClone = this.getHabitat().clone();
         habitatClone.diffCells(this.getRespawnPoints());
+
         if (!habitatClone.hasFilled()) {
             return false;
         }
+
         const point = habitatClone.getFilledCells().randomElement();
+
         if (!point) {
             throwError("Cannot create animal", 1, true);
             return false;
         }
+
         this.respawnPoints.push(point);
+
         return true;
     }
 
@@ -102,6 +103,7 @@ export default class AnimalGenerator {
 
     checkRespawns(animalsCount: number): void {
         const respawnChecks = Math.ceil(animalsCount / 3) + 1;
+
         for (let i = 0; i < respawnChecks; i++) {
             this.createRespawnPoint();
         }
@@ -118,7 +120,7 @@ export default class AnimalGenerator {
         // Filter respawn points that are sufficiently far from existing animals and inside the habitat.
         const availableRespawns = this.getRespawnPoints().filter((cell: Cell) => {
             return (
-                anotherAnimalsPositions.getClosestDistanceTo(cell[0], cell[1]) >= 3 &&
+                anotherAnimalsPositions.getClosestDistanceTo(cell[0], cell[1]) >= Config.DISTANCE_BETWEEN_ANIMALS &&
                 this.isCellInHabitat(cell[0], cell[1])
             );
         });
@@ -134,6 +136,7 @@ export default class AnimalGenerator {
             return null;
         }
 
+        // @ts-ignore
         return new (this.getAnimalClass())(cell[0], cell[1], this.getSettings());
     }
 }

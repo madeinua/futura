@@ -1,6 +1,7 @@
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import { fromFraction, distance, randBetweenNumbers, arrayHasPoint } from "../helpers.js";
 import Config from "../../config.js";
+import { fromFraction, distance, randBetweenNumbers } from "../helpers.js";
+import BinaryMatrix from "../structures/BinaryMatrix.js";
+import { arrayHasPoint } from "../structures/Array2D.js";
 export default class RiversMap extends BinaryMatrix {
     constructor(altitudeMap, lakesMap) {
         super(Config.WORLD_SIZE, Config.WORLD_SIZE, 0);

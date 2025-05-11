@@ -15,6 +15,7 @@ import ForestMap from "./src/maps/ForestMap.js";
 import Animal from "./src/animals/Animal.js";
 import Biome from "./src/biomes/Biome.js";
 import Faction from "./src/human/Faction.js";
+import Timer from "./src/services/Timer.js";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     displayMapVisibleRange = document.getElementById('displayMapVisibleRange') as HTMLInputElement,
@@ -293,6 +294,10 @@ new World(
 
         world.timer.addStepsHandler((step: number): void => {
             document.getElementById('stepsCounter').innerHTML = String(step);
+        });
+
+        Filters.add('timer', (timer: Timer) => {
+            document.getElementById('timerFps').innerHTML = timer.getFps().toString();
         });
 
         document.getElementById('generateFactions').addEventListener("click", () => {
