@@ -20,8 +20,6 @@ export default class FishGenerator extends AnimalGenerator {
             // Combine fresh water with coastal water to form the fish habitat.
             const combinedHabitat = this.objects.freshWaterMap.clone().combineWith(this.objects.coastMap);
             this.setHabitat(combinedHabitat);
-
-            this.staticHabitat = true;
         }
 
         return this;

@@ -27,4 +27,8 @@ export default class DeerGenerator extends AnimalGenerator {
 
         return this;
     }
+
+    needUpdateHabitat(): boolean {
+        return true;
+    }
 }

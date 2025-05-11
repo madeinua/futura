@@ -19,4 +19,7 @@ export default class DeerGenerator extends AnimalGenerator {
         this.setHabitat(habitat);
         return this;
     }
+    needUpdateHabitat() {
+        return true;
+    }
 }

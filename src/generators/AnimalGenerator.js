@@ -6,7 +6,6 @@ export default class AnimalGenerator {
     constructor(objects) {
         this.respawnPoints = [];
         this.maxAnimals = -1;
-        this.staticHabitat = false;
         this.objects = objects;
     }
     getName() {
@@ -24,8 +23,8 @@ export default class AnimalGenerator {
     getRarity() {
         return this.getSettings().rarity;
     }
-    isHabitatStatic() {
-        return this.staticHabitat;
+    needUpdateHabitat() {
+        return false;
     }
     updateHabitat() {
         if (!this.habitat) {

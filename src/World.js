@@ -75,6 +75,7 @@ export default class World {
             new AnimalsOperator({
                 habitatLayer: this.layers.getLayer(LAYER_HABITAT),
                 animalsLayer: this.layers.getLayer(LAYER_ANIMALS),
+                altitudeMap: altitudeMap,
                 freshWaterMap: freshWaterMap,
                 coastMap: coastMap,
                 forestsOperator: forestsOperator,

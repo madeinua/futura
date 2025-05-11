@@ -7,6 +7,7 @@ import CoastMap from "../maps/CoastMap.js";
 import ForestsOperator from "../operators/ForestsOperator.js";
 import BiomesOperator from "../operators/BiomesOperator.js";
 import Timer from "../services/Timer.js";
+import AltitudeMap from "../maps/AltitudeMap";
 
 type AnimalType = {
     intensity: number;
@@ -17,6 +18,7 @@ type AnimalType = {
 };
 
 export type AnimalsGeneratorArgs = {
+    altitudeMap: AltitudeMap,
     freshWaterMap: BinaryMatrix;
     coastMap: CoastMap;
     forestsOperator: ForestsOperator;
@@ -30,7 +32,6 @@ export default class AnimalGenerator {
     public habitat: BinaryMatrix;
     private respawnPoints: CellsList = [];
     private maxAnimals = -1;
-    protected staticHabitat: boolean = false;
 
     constructor(objects: AnimalsGeneratorArgs) {
         this.objects = objects;
@@ -56,8 +57,8 @@ export default class AnimalGenerator {
         return this.getSettings().rarity;
     }
 
-    public isHabitatStatic(): boolean {
-        return this.staticHabitat;
+    needUpdateHabitat(): boolean {
+        return false;
     }
 
     updateHabitat(): this {

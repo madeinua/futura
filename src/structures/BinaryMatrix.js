@@ -123,6 +123,17 @@ export default class BinaryMatrix extends NumericMatrix {
         }
         return this;
     }
+    intersect(matrix) {
+        const { width, height } = this;
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                if (this.filled(x, y) && !matrix.filled(x, y)) {
+                    this.unfill(x, y);
+                }
+            }
+        }
+        return this;
+    }
     getFilledNeighbors(x, y) {
         const result = [];
         this.foreachNeighbors(x, y, (nx, ny) => {

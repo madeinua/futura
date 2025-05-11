@@ -11,6 +11,7 @@ export default class AnimalsOperator {
         this.animalsTypesCounter = {};
         this.animalsGenerators = [];
         this.animalImagesCache = {};
+        this.habitatInitialized = false;
         this.initializeAnimalGenerators(args);
         if (Config.LOGS) {
             logTimeEvent("Animals initialized.");
@@ -37,10 +38,11 @@ export default class AnimalsOperator {
     updateHabitats() {
         this.animalsGenerators.forEach(generator => {
             // Only update habitat if it is not static.
-            if (!generator.isHabitatStatic()) {
+            if (!this.habitatInitialized || generator.needUpdateHabitat()) {
                 generator.updateHabitat();
             }
         });
+        this.habitatInitialized = true;
     }
     addAnimalToLayer(animalsLayer, animal) {
         animalsLayer.setCell(animal.x, animal.y, this.getDisplayCell(animal));

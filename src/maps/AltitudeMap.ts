@@ -1,4 +1,5 @@
 import PointMatrix from "../structures/PointMatrix.js";
+import BinaryMatrix from "../structures/BinaryMatrix.js";
 import NoiseMapGenerator from "../generators/NoiseMapGenerator.js";
 import Config from "../../config.js";
 
@@ -154,5 +155,16 @@ export default class AltitudeMap extends PointMatrix {
 
     getWaterCellsCount(): number {
         return this.waterSize;
+    }
+
+    getLowland(): BinaryMatrix {
+        const lowland = new BinaryMatrix(this.width, this.height);
+        this.foreachValues((altitude: number, x: number, y: number): void => {
+            if (this.isLowLand(altitude)) {
+                lowland.setCell(x, y, 1);
+            }
+        });
+
+        return lowland;
     }
 }

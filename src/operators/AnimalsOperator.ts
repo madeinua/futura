@@ -29,6 +29,7 @@ export default class AnimalsOperator {
     animalsTypesCounter: AnimalsTypesCounter = {};
     animalsGenerators: AnimalGenerator[] = [];
     private animalImagesCache: { [key: string]: DisplayCell } = {};
+    private habitatInitialized = false;
 
     constructor(args: AnimalsOperatorArgs) {
         this.initializeAnimalGenerators(args);
@@ -65,10 +66,12 @@ export default class AnimalsOperator {
     private updateHabitats(): void {
         this.animalsGenerators.forEach(generator => {
             // Only update habitat if it is not static.
-            if (!generator.isHabitatStatic()) {
+            if (!this.habitatInitialized || generator.needUpdateHabitat()) {
                 generator.updateHabitat();
             }
         });
+
+        this.habitatInitialized = true;
     }
 
     private addAnimalToLayer(animalsLayer: Layer, animal: Animal): void {
@@ -81,7 +84,6 @@ export default class AnimalsOperator {
 
     private getCellsAvailableToMove(animal: Animal): CellsList {
         const generator = this.getAnimalGeneratorByAnimal(animal);
-
         if (!generator) {
             return [];
         }

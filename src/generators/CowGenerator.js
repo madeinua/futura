@@ -9,14 +9,14 @@ export default class CowGenerator extends AnimalGenerator {
         return Cow;
     }
     updateHabitat() {
-        if (!this.grassMap) {
-            this.grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.name);
+        if (!this.suitableLandMap) {
+            const grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.name);
+            const lowlandsMap = this.objects.altitudeMap.getLowland();
+            this.suitableLandMap = grassMap.intersect(lowlandsMap);
         }
-        const habitat = this.grassMap.clone();
+        const habitat = this.suitableLandMap.clone();
         habitat.diff(this.objects.forestsOperator.getForestMap());
         this.setHabitat(habitat);
-        // Mark habitat as static since the grass surface does not change.
-        this.staticHabitat = true;
         return this;
     }
 }
