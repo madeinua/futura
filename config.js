@@ -107,7 +107,6 @@ const Config = {
         Biome_Tundra: ['#d5d9a6', '#c3c5a5', '#afb09e', '#9d9d95'],
     },
 
-
     BIOME_IMAGES: {
         Ocean: 'public/images/ocean-1.png',
         Water: 'public/images/water-1.png',

@@ -74,7 +74,7 @@ export default class FactionsOperator {
             && faction.influenceTerritory.getCell(positionX, positionY) === 1;
     }
     expandFaction(faction) {
-        faction.borders.foreachFilledAroundRadiusToAllCells((nx, ny, fromCellX, fromCellY) => {
+        faction.borders.foreachFilledAroundRadiusToAllCells((nx, ny) => {
             if (this.canIncreaseCellInfluence(nx, ny)) {
                 this.increaseCellInfluence(nx, ny, faction);
             }

@@ -58,7 +58,11 @@ export default class AltitudeMap extends PointMatrix {
         this.waterSize = 0;
         this.landSize = 0;
         this.foreachValues((altitude: number): void => {
-            this.isWater(altitude) ? this.waterSize++ : this.landSize++;
+            if (this.isWater(altitude)) {
+                this.waterSize++;
+            } else {
+                this.landSize++;
+            }
         });
     }
 

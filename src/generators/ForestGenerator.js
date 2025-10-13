@@ -111,7 +111,7 @@ export default class ForestGenerator {
             return 0;
         }
         const biomeName = biome.getName();
-        if (!this.groundCreateMults.hasOwnProperty(biomeName)) {
+        if (!Object.prototype.hasOwnProperty.call(this.groundCreateMults, biomeName)) {
             return 0;
         }
         const waterMult = Config.FOREST_CREATE_MULTS.WATER;

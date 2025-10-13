@@ -64,7 +64,7 @@ export default class World {
         mapHeight: number,
         miniMapCanvas: HTMLCanvasElement,
         startPoint: Cell,
-        onReady: Function
+        onReady: (world: World) => void
     ) {
         this.visibleCellCols = Math.ceil(mapWidth / Config.CELL_SIZE) + 1;
         this.visibleCellRows = Math.ceil(mapHeight / Config.CELL_SIZE) + 1;

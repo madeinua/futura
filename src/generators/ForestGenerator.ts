@@ -170,7 +170,7 @@ export default class ForestGenerator {
         }
 
         const biomeName = biome.getName();
-        if (!this.groundCreateMults.hasOwnProperty(biomeName)) {
+        if (!Object.prototype.hasOwnProperty.call(this.groundCreateMults, biomeName)) {
             return 0;
         }
 

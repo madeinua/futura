@@ -21,7 +21,7 @@ export default class RiversMap extends BinaryMatrix {
 
     generateMap(): RiversMap {
         const riverSources = this.getRiverSources(this.altitudeMap);
-        let rivers = this.generateRiversCells(riverSources);
+        const rivers = this.generateRiversCells(riverSources);
 
         // Optionally add river delta
         // rivers = this.addRiverDeltaToRiversMaps(rivers);
@@ -55,7 +55,7 @@ export default class RiversMap extends BinaryMatrix {
         const startCloseness = Math.max(Config.RIVER_MIN_LENGTH, Config.RIVER_START_CLOSENESS);
 
         // Use an array for distance calculations and a Set for fast membership tests.
-        let allRiversPoints: CellsList = [];
+        const allRiversPoints: CellsList = [];
         const allRiversPointsSet = new Set<string>();
 
         for (let i = 0; i < riverSources.length; i++) {
@@ -66,7 +66,7 @@ export default class RiversMap extends BinaryMatrix {
                 continue;
             }
 
-            let river: CellsList = [];
+            const river: CellsList = [];
             let finished = false;
 
             river.push(riverSources[i]);

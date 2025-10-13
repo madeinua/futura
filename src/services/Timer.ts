@@ -5,7 +5,7 @@ export default class Timer {
     private timerStep = 0;
     private stepsHandlers: Array<(step: number) => void> = [];
     private timerPaused = false;
-    private timerInterval: NodeJS.Timer | null = null;
+    private timerInterval: ReturnType<typeof setInterval> | null = null;
     private timerFps = 0;
 
     addStepsHandler(handler: (step: number) => void): void {

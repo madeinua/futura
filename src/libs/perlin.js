@@ -14,13 +14,13 @@
  *
  */
 
-(function(global){
-  var module = global.noise = {};
+(function (root) {
+  var module = (root.noise = root.noise || {});
 
   function Grad(x, y, z) {
     this.x = x; this.y = y; this.z = z;
   }
-  
+
   Grad.prototype.dot2 = function(x, y) {
     return this.x*x + this.y*y;
   };
@@ -307,4 +307,10 @@
        v);
   };
 
-})(this);
+})(typeof globalThis !== 'undefined'
+    ? globalThis
+    : typeof window !== 'undefined'
+    ? window
+    : typeof global !== 'undefined'
+    ? global
+    : {});

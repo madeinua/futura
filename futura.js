@@ -63,7 +63,9 @@ function drawColoredMap(id, map, startColor, endColor) {
     ctx.putImageData(image, 0, 0);
 }
 function getCameraPosition() {
-    let point = coordinatesField.value.split(','), x = 0, y = 0;
+    const point = coordinatesField.value.split(',');
+    let x = 0;
+    let y = 0;
     if (point.length === 2) {
         x = parseInt(point[0], 10);
         y = parseInt(point[1], 10);
@@ -139,9 +141,9 @@ new World(displayMap, displayMapWrapper.offsetWidth, displayMapWrapper.offsetHei
                 return result;
             }, {});
             // Add counters as list to <ul> element
-            let list = document.getElementById('biomesTypesCounter');
-            for (let i in biomesTypesCounter) {
-                let item = document.createElement('li');
+            const list = document.getElementById('biomesTypesCounter');
+            for (const i in biomesTypesCounter) {
+                const item = document.createElement('li');
                 item.innerHTML = i.substring(6) + ': ' + biomesTypesCounter[i];
                 list.appendChild(item);
             }
@@ -153,14 +155,15 @@ new World(displayMap, displayMapWrapper.offsetWidth, displayMapWrapper.offsetHei
             return map;
         });
         Filters.add('animalsSteps', (animals) => {
-            let text = '', groups = {};
+            let text = '';
+            const groups = {};
             for (let i = 0; i < animals.length; i++) {
                 if (typeof groups[animals[i].getName()] === 'undefined') {
                     groups[animals[i].getName()] = 0;
                 }
                 groups[animals[i].getName()]++;
             }
-            for (let i in groups) {
+            for (const i in groups) {
                 text += i + ': ' + groups[i] + '<br />';
             }
             document.getElementById('animalsList').innerHTML = text;

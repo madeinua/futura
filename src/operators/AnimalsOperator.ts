@@ -163,8 +163,8 @@ export default class AnimalsOperator {
             return prevPosition;
         }
 
+        const maxTries = 10;
         let tries = 0,
-            maxTries = 10,
             nextPoint: Cell | null = null;
         while (!nextPoint && availableCells.length) {
             nextPoint = availableCells.randomElement() || null;

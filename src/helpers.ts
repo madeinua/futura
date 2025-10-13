@@ -19,20 +19,21 @@ export function throwError(
 }
 
 export const Filters = {
-    filters: {} as { [tag: string]: Function[] },
+    filters: {} as { [tag: string]: Array<(val: unknown) => unknown> },
 
-    add(tag: string, filter: Function): void {
+    add(tag: string, filter: (val: unknown) => unknown): void {
         (this.filters[tag] || (this.filters[tag] = [])).push(filter);
     },
 
-    apply(tag: string, val: any): any {
-        if (this.filters[tag]) {
-            for (let i = 0, len = this.filters[tag].length; i < len; i++) {
-                val = this.filters[tag][i](val);
+    apply(tag: string, val: unknown): unknown {
+        const list = this.filters[tag];
+        if (list) {
+            for (let i = 0, len = list.length; i < len; i++) {
+                val = list[i](val);
             }
         }
         return val;
-    }
+    },
 };
 
 let step: number = 0;
@@ -184,7 +185,7 @@ export function LightenDarkenColor(col: string, amt: number): string {
         usePound = true;
     }
 
-    let num = parseInt(col, 16);
+    const num = parseInt(col, 16);
     let r = (num >> 16) + amt;
     r = r > 255 ? 255 : r < 0 ? 0 : r;
     let g = (num & 0x0000ff) + amt;

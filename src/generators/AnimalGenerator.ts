@@ -136,7 +136,7 @@ export default class AnimalGenerator {
             return null;
         }
 
-        // @ts-ignore
+        // @ts-expect-error Polymorphism
         return new (this.getAnimalClass())(cell[0], cell[1], this.getSettings());
     }
 }

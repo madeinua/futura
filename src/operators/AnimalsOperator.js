@@ -116,7 +116,8 @@ export default class AnimalsOperator {
         if (prevPosition && isCellInCellList(availableCells, prevPosition) && iAmLucky(90)) {
             return prevPosition;
         }
-        let tries = 0, maxTries = 10, nextPoint = null;
+        const maxTries = 10;
+        let tries = 0, nextPoint = null;
         while (!nextPoint && availableCells.length) {
             nextPoint = availableCells.randomElement() || null;
             if (nextPoint && this.isAnimalsAroundPoint(nextPoint, animal)) {

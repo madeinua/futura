@@ -22,13 +22,14 @@ export const Filters = {
         (this.filters[tag] || (this.filters[tag] = [])).push(filter);
     },
     apply(tag, val) {
-        if (this.filters[tag]) {
-            for (let i = 0, len = this.filters[tag].length; i < len; i++) {
-                val = this.filters[tag][i](val);
+        const list = this.filters[tag];
+        if (list) {
+            for (let i = 0, len = list.length; i < len; i++) {
+                val = list[i](val);
             }
         }
         return val;
-    }
+    },
 };
 let step = 0;
 /** Returns a unique auto‐incremented step value. */
@@ -139,7 +140,7 @@ export function LightenDarkenColor(col, amt) {
         col = col.slice(1);
         usePound = true;
     }
-    let num = parseInt(col, 16);
+    const num = parseInt(col, 16);
     let r = (num >> 16) + amt;
     r = r > 255 ? 255 : r < 0 ? 0 : r;
     let g = (num & 0x0000ff) + amt;

@@ -82,7 +82,7 @@ export default class AnimalGenerator {
             throwError("Cannot create animal", 1, true);
             return null;
         }
-        // @ts-ignore
+        // @ts-expect-error Polymorphism
         return new (this.getAnimalClass())(cell[0], cell[1], this.getSettings());
     }
 }

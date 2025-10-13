@@ -1,5 +1,21 @@
 {
+  "type": "module",
+  "scripts": {
+    "build": "webpack --config webpack.config.mjs --mode=development",
+    "watch": "webpack --config webpack.config.mjs --watch --mode=development",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
   "devDependencies": {
-    "webpack": "^5.81.0"
+    "@eslint/js": "^9.37.0",
+    "@types/node": "^24.7.2",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
+    "eslint": "^9.37.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-unused-imports": "^4.2.0",
+    "imports-loader": "^5.0.0",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^6.0.1"
   }
 }
