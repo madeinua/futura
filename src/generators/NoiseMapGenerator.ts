@@ -1,4 +1,4 @@
-import PointMatrix from "../structures/PointMatrix.js";
+import PointMatrix from "../structures/PointMatrix";
 
 declare const noise: any;
 

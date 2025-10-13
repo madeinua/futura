@@ -1,8 +1,8 @@
-import AnimalGenerator from "./AnimalGenerator.js";
-import Cow from "../animals/Cow.js";
-import Animal from "../animals/Animal.js";
-import Biome_Grass from "../biomes/Biome_Grass.js";
-import BinaryMatrix from "../structures/BinaryMatrix.js";
+import AnimalGenerator from "./AnimalGenerator";
+import Cow from "../animals/Cow";
+import Animal from "../animals/Animal";
+import Biome_Grass from "../biomes/Biome_Grass";
+import BinaryMatrix from "../structures/BinaryMatrix";
 
 export default class CowGenerator extends AnimalGenerator {
     private suitableLandMap?: BinaryMatrix;
@@ -18,9 +18,8 @@ export default class CowGenerator extends AnimalGenerator {
     updateHabitat(): this {
 
         if (!this.suitableLandMap) {
-            const grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.name);
+            const grassMap = this.objects.biomesOperator.getSurfaceByBiomeName(Biome_Grass.prototype.getName());
             const lowlandsMap = this.objects.altitudeMap.getLowland();
-
             this.suitableLandMap = grassMap.intersect(lowlandsMap);
         }
 

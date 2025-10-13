@@ -1,7 +1,7 @@
-import PointMatrix from "../structures/PointMatrix.js";
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import NoiseMapGenerator from "../generators/NoiseMapGenerator.js";
-import Config from "../../config.js";
+import Config from "../../config";
+import PointMatrix from "../structures/PointMatrix";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import NoiseMapGenerator from "../generators/NoiseMapGenerator";
 
 declare const noise: any;
 

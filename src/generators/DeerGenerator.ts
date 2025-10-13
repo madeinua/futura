@@ -1,6 +1,6 @@
-import AnimalGenerator from "./AnimalGenerator.js";
-import Deer from "../animals/Deer.js";
-import Animal from "../animals/Animal.js";
+import AnimalGenerator from "./AnimalGenerator";
+import Deer from "../animals/Deer";
+import Animal from "../animals/Animal";
 
 export default class DeerGenerator extends AnimalGenerator {
 

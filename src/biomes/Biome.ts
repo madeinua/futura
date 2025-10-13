@@ -1,6 +1,6 @@
-import Config from "../../config.js";
-import DisplayCell from "../render/DisplayCell.js";
-import {RGB, hexToRgb, LightenDarkenColor} from "../helpers.js";
+import Config from "../../config";
+import DisplayCell from "../render/DisplayCell";
+import {RGB, hexToRgb, LightenDarkenColor} from "../helpers";
 
 export type BiomeArgs = {
     altitude: number;
@@ -16,9 +16,11 @@ export type ColorsMinMax = {
     max: number;
 };
 
-export default class Biome {
+export type BiomeKey = keyof typeof Config.BIOME_COLORS;
 
-    readonly type: string = "Unknown";
+export default abstract class Biome {
+
+    static biomeName: BiomeKey;
     readonly x: number;
     readonly y: number;
     readonly altitude: number;
@@ -39,9 +41,7 @@ export default class Biome {
         this.isMountains = args.isMountains;
     }
 
-    getName(): string {
-        return this.type;
-    }
+    abstract getName(): BiomeKey;
 
     protected getColorsMinMax(): ColorsMinMax {
         return {
@@ -97,7 +97,9 @@ export default class Biome {
     }
 
     getDisplayCell(): DisplayCell {
-        return new DisplayCell(this.getHexColor(), [this.getBackground(), this.getImage()]);
+        const images = [this.getBackground(), this.getImage()]
+            .filter((x): x is string => x !== null);
+        return new DisplayCell(this.getHexColor(), images);
     }
 
     getDistanceToWater(): number {

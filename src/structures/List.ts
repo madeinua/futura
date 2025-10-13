@@ -1,4 +1,4 @@
-import {Array2D} from "./Array2D.js";
+import {Array2D} from "./Array2D";
 
 export default class List<T> {
     protected items: Array2D<T>;

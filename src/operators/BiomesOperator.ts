@@ -1,22 +1,16 @@
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import biomes from "../biomes/Biomes.js";
-import {Cell} from "../structures/Cells.js";
-import {fromFraction, throwError, logTimeEvent, Filters} from "../helpers.js";
-import Config from "../../config.js";
-import AltitudeMap from "../maps/AltitudeMap.js";
-import CoastMap from "../maps/CoastMap.js";
-import TemperatureMap from "../maps/TemperatureMap.js";
-import HumidityMap from "../maps/HumidityMap.js";
-import OceanMap from "../maps/OceanMap.js";
-import {Layer} from "../render/Layer.js";
-import Biome, {BiomeArgs} from "../biomes/Biome.js";
-import BiomesMap from "../maps/BiomesMap.js";
-
-type BiomesConfig = {
-    class: string;
-    h: [number, number];
-    t: [number, number];
-}[];
+import Config, {BiomesConfig} from "../../config";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import biomes from "../biomes/Biomes";
+import {Cell} from "../structures/Cells";
+import {fromFraction, throwError, logTimeEvent, Filters} from "../helpers";
+import AltitudeMap from "../maps/AltitudeMap";
+import CoastMap from "../maps/CoastMap";
+import TemperatureMap from "../maps/TemperatureMap";
+import HumidityMap from "../maps/HumidityMap";
+import OceanMap from "../maps/OceanMap";
+import {Layer} from "../render/Layer";
+import Biome, {BiomeArgs} from "../biomes/Biome";
+import BiomesMap from "../maps/BiomesMap";
 
 export default class BiomesOperator {
 
@@ -117,7 +111,9 @@ export default class BiomesOperator {
             return new biomes.Biome_Grass(x, y, args);
         }
 
-        return new biomes[matchedBiomes[Math.floor(Math.random() * matchedBiomes.length)]](x, y, args);
+        const name = matchedBiomes[Math.floor(Math.random() * matchedBiomes.length)];
+
+        return new biomes[name](x, y, args);
     }
 
     private addBiomesToLayer(biomesLayer: Layer, biomesImagesLayer: Layer): void {

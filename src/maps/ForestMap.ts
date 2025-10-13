@@ -1,6 +1,6 @@
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import Config from "../../config.js";
-import BiomesMap from "./BiomesMap.js";
+import Config from "../../config";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import BiomesMap from "./BiomesMap";
 
 export default class ForestMap extends BinaryMatrix {
 

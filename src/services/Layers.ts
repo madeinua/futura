@@ -1,4 +1,4 @@
-import {Layer} from '../render/Layer.js';
+import {Layer} from '../render/Layer';
 
 export const LAYER_BIOMES = 0;
 export const LAYER_BIOMES_IMAGES = 1;

@@ -1,5 +1,5 @@
-import {Filters, logTimeEvent} from "../helpers.js";
-import Config from "../../config.js";
+import Config from "../../config";
+import {Filters, logTimeEvent} from "../helpers";
 
 export default class Timer {
     private timerStep = 0;

@@ -1,9 +1,9 @@
-import {changeRange, iAmLucky} from "../helpers.js";
-import Config from "../../config.js";
-import {CellsList} from "../structures/Cells.js";
-import ForestMap from "../maps/ForestMap.js";
-import AltitudeMap from "../maps/AltitudeMap.js";
-import HumidityMap from "../maps/HumidityMap.js";
+import Config from "../../config";
+import {changeRange, iAmLucky} from "../helpers";
+import {CellsList} from "../structures/Cells";
+import ForestMap from "../maps/ForestMap";
+import AltitudeMap from "../maps/AltitudeMap";
+import HumidityMap from "../maps/HumidityMap";
 
 type ForestGeneratorMults = {
     [key: string]: number;

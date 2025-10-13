@@ -1,13 +1,13 @@
-import Config from "../../config.js";
-import {iAmLucky, hexToRgb, logTimeEvent, Filters, throwError} from "../helpers.js";
-import CowGenerator from "../generators/CowGenerator.js";
-import DeerGenerator from "../generators/DeerGenerator.js";
-import FishGenerator from "../generators/FishGenerator.js";
-import DisplayCell from "../render/DisplayCell.js";
-import {Cell, CellsList, getAroundRadius, getRectangleAround, isCellInCellList} from "../structures/Cells.js";
-import Animal from "../animals/Animal.js";
-import AnimalGenerator, {AnimalsGeneratorArgs} from "../generators/AnimalGenerator.js";
-import {Layer} from "../render/Layer.js";
+import Config from "../../config";
+import {iAmLucky, hexToRgb, logTimeEvent, Filters, throwError} from "../helpers";
+import CowGenerator from "../generators/CowGenerator";
+import DeerGenerator from "../generators/DeerGenerator";
+import FishGenerator from "../generators/FishGenerator";
+import DisplayCell from "../render/DisplayCell";
+import {Cell, CellsList, getAroundRadius, getRectangleAround, isCellInCellList} from "../structures/Cells";
+import Animal from "../animals/Animal";
+import AnimalGenerator, {AnimalsGeneratorArgs} from "../generators/AnimalGenerator";
+import {Layer} from "../render/Layer";
 
 type AnimalsTypesCounter = { [key: string]: number };
 

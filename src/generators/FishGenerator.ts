@@ -1,11 +1,11 @@
-import AnimalGenerator from "./AnimalGenerator.js";
-import Animal from "../animals/Animal.js";
-import Fish from "../animals/Fish.js";
-import BinaryMatrix from "../structures/BinaryMatrix.js";
+import AnimalGenerator from "./AnimalGenerator";
+import Animal from "../animals/Animal";
+import Fish from "../animals/Fish";
+import BinaryMatrix from "../structures/BinaryMatrix";
 
 export default class FishGenerator extends AnimalGenerator {
 
-    habitat: BinaryMatrix | undefined;
+    public habitat!: BinaryMatrix;
 
     getName(): string {
         return Fish.ANIMAL_NAME;
@@ -18,10 +18,11 @@ export default class FishGenerator extends AnimalGenerator {
     updateHabitat(): this {
         if (!this.habitat) {
             // Combine fresh water with coastal water to form the fish habitat.
-            const combinedHabitat = this.objects.freshWaterMap.clone().combineWith(this.objects.coastMap);
+            const combinedHabitat = this.objects.freshWaterMap
+                .clone()
+                .combineWith(this.objects.coastMap);
             this.setHabitat(combinedHabitat);
         }
-
         return this;
     }
 }

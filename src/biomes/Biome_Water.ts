@@ -1,10 +1,12 @@
-import Config from "../../config.js";
-import Biome from "./Biome.js";
-import {LightenDarkenColor} from "../helpers.js";
+import Config from "../../config";
+import Biome, {BiomeKey} from "./Biome";
+import {LightenDarkenColor} from "../helpers";
 
 export default class Biome_Water extends Biome {
 
-    readonly type: string = "Biome_Water";
+    getName(): BiomeKey {
+        return 'Biome_Water';
+    }
 
     getColor(): string {
         return LightenDarkenColor(super.getColor(), this.altitude * 150);

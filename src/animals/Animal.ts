@@ -1,5 +1,5 @@
-import {getStep, throwError} from "../helpers.js";
-import {Cell} from "../structures/Cells.js";
+import {getStep, throwError} from "../helpers";
+import {Cell} from "../structures/Cells";
 
 export interface AnimalSettings {
     /** @minimum 0, @maximum 100 */

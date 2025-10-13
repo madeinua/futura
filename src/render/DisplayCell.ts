@@ -1,4 +1,4 @@
-import {RGBa} from "../helpers.js";
+import {RGBa} from "../helpers";
 
 export default class DisplayCell {
     readonly color: RGBa;

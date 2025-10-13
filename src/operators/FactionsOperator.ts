@@ -1,13 +1,13 @@
-import FactionGenerator, {FactionsGeneratorArgs} from "../generators/FactionGenerator.js";
-import {Layer} from "../render/Layer.js";
-import Timer from "../services/Timer.js";
-import {Filters, logTimeEvent, resetTimeEvent, throwError} from "../helpers.js";
-import Config from "../../config.js";
-import Faction from "../human/Faction.js";
-import DisplayCell from "../render/DisplayCell.js";
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import {Cell} from "../structures/Cells.js";
-import BiomesMap from "../maps/BiomesMap.js";
+import Config from "../../config";
+import FactionGenerator, {FactionsGeneratorArgs} from "../generators/FactionGenerator";
+import {Layer} from "../render/Layer";
+import Timer from "../services/Timer";
+import {Filters, logTimeEvent, resetTimeEvent, throwError} from "../helpers";
+import Faction from "../human/Faction";
+import DisplayCell from "../render/DisplayCell";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import {Cell} from "../structures/Cells";
+import BiomesMap from "../maps/BiomesMap";
 
 export type FactionsOperatorArgs = FactionsGeneratorArgs & {
     timer: Timer,
@@ -73,11 +73,11 @@ export default class FactionsOperator {
             influence *= Config.FACTIONS.INFLUENCE.FOREST_BOOST;
         } else {
             const infName = biome.getName();
-
-            if (typeof Config.FACTIONS.INFLUENCE[infName] === 'undefined') {
+            const map = Config.FACTIONS.INFLUENCE;
+            if (!(infName in map)) {
                 throwError(`Unknown influence name: ${infName}`, 10, true);
             } else {
-                influence *= Config.FACTIONS.INFLUENCE[infName];
+                influence *= map[infName as keyof typeof map];
             }
         }
 

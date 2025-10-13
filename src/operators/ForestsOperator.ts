@@ -1,12 +1,12 @@
-import ForestMap from "../maps/ForestMap.js";
-import ForestGenerator from "../generators/ForestGenerator.js";
-import DisplayCell from "../render/DisplayCell.js";
-import Timer from "../services/Timer.js";
-import biomes from "../biomes/Biomes.js";
-import {hexToRgb, Filters, logTimeEvent, RGB} from "../helpers.js";
-import Config from "../../config.js";
-import BiomesOperator from "./BiomesOperator.js";
-import {Layer} from "../render/Layer.js";
+import Config from "../../config";
+import ForestMap from "../maps/ForestMap";
+import ForestGenerator from "../generators/ForestGenerator";
+import DisplayCell from "../render/DisplayCell";
+import Timer from "../services/Timer";
+import biomes from "../biomes/Biomes";
+import {hexToRgb, Filters, logTimeEvent, RGB} from "../helpers";
+import BiomesOperator from "./BiomesOperator";
+import {Layer} from "../render/Layer";
 
 export default class ForestsOperator {
     private readonly forestColor: RGB;
@@ -25,7 +25,9 @@ export default class ForestsOperator {
 
         // Cache forest images from config
         const forestImageKeys = Object.keys(Config.FOREST_IMAGES);
-        this.forestImages = forestImageKeys.map((key) => Config.FOREST_IMAGES[key]);
+        this.forestImages = forestImageKeys.map(
+            key => Config.FOREST_IMAGES[key as keyof typeof Config.FOREST_IMAGES]
+        );
 
         this.forestImagesCache = {};
         this.forestMap = new ForestMap(biomesOperator.getBiomes());
@@ -109,7 +111,7 @@ export default class ForestsOperator {
                 this.getForestImage(x, y)
             );
         }
-        
+
         return this.forestImagesCache[key];
     }
 }

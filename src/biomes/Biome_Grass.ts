@@ -1,9 +1,11 @@
-import Config from "../../config.js";
-import Biome, {ColorsMinMax} from "./Biome.js";
+import Config from "../../config";
+import Biome, {BiomeKey, ColorsMinMax} from "./Biome";
 
 export default class Biome_Grass extends Biome {
 
-    readonly type: string = "Biome_Grass";
+    getName(): BiomeKey {
+        return 'Biome_Grass';
+    }
 
     protected getColorsMinMax(): ColorsMinMax {
         return {

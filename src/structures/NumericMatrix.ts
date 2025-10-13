@@ -1,5 +1,5 @@
-import Matrix from "./Matrix.js";
-import {fromFraction, changeRange, round} from "../helpers.js";
+import Matrix from "./Matrix";
+import {fromFraction, changeRange, round} from "../helpers";
 
 export default class NumericMatrix<T extends number = number> extends Matrix<T> {
 

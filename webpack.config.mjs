@@ -11,12 +11,13 @@ export default (_env = {}, argv = {}) => {
 
     return {
         mode: isProd ? 'production' : 'development',
+        bail: true,
         entry: {
             app: [
                 './src/libs/jquery.slim.min.js',
                 './src/libs/perlin.js',
                 './src/libs/seedrandom.min.js',
-                './src/entry.js',
+                './src/entry',
             ],
         },
         output: {

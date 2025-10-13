@@ -1,12 +1,12 @@
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import LakesMap from "../maps/LakesMap.js";
-import RiversMap from "../maps/RiversMap.js";
-import CoastMap from "../maps/CoastMap.js";
-import OceanMap from '../maps/OceanMap.js';
-import {Filters, logTimeEvent} from "../helpers.js";
-import Config from "../../config.js";
-import AltitudeMap from "../maps/AltitudeMap.js";
-import IslandsMap from "../maps/IslandsMap.js";
+import Config from "../../config";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import LakesMap from "../maps/LakesMap";
+import RiversMap from "../maps/RiversMap";
+import CoastMap from "../maps/CoastMap";
+import OceanMap from '../maps/OceanMap';
+import {Filters, logTimeEvent} from "../helpers";
+import AltitudeMap from "../maps/AltitudeMap";
+import IslandsMap from "../maps/IslandsMap";
 
 export default class WaterOperator {
 

@@ -1,26 +1,26 @@
-import Config from "../config.js";
-import {fillCanvasPixel, Filters, logTimeEvent, resetTimeEvent, scaleImageData,} from "./helpers.js";
-import SurfaceOperator from "./operators/SurfaceOperator.js";
-import WeatherOperator from "./operators/WeatherOperator.js";
-import WaterOperator from "./operators/WaterOperator.js";
-import HumidityOperator from "./operators/HumidityOperator.js";
-import BiomesOperator from "./operators/BiomesOperator.js";
-import ForestsOperator from "./operators/ForestsOperator.js";
-import AnimalsOperator from "./operators/AnimalsOperator.js";
-import FactionsOperator from "./operators/FactionsOperator.js";
-import Timer from "./services/Timer.js";
-import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FACTIONS, LAYER_FACTIONS_BORDERS, LAYER_HABITAT,} from "./services/Layers.js";
-import AltitudeMap from "./maps/AltitudeMap.js";
-import TemperatureMap from "./maps/TemperatureMap.js";
-import OceanMap from "./maps/OceanMap.js";
-import CoastMap from "./maps/CoastMap.js";
-import LakesMap from "./maps/LakesMap.js";
-import RiversMap from "./maps/RiversMap.js";
-import BinaryMatrix from "./structures/BinaryMatrix.js";
-import HumidityMap from "./maps/HumidityMap.js";
-import {Cell} from "./structures/Cells.js";
-import DisplayCell from "./render/DisplayCell.js";
-import CellsRenderer from "./render/CellsRenderer.js";
+import Config from "../config";
+import {fillCanvasPixel, Filters, logTimeEvent, resetTimeEvent, scaleImageData,} from "./helpers";
+import SurfaceOperator from "./operators/SurfaceOperator";
+import WeatherOperator from "./operators/WeatherOperator";
+import WaterOperator from "./operators/WaterOperator";
+import HumidityOperator from "./operators/HumidityOperator";
+import BiomesOperator from "./operators/BiomesOperator";
+import ForestsOperator from "./operators/ForestsOperator";
+import AnimalsOperator from "./operators/AnimalsOperator";
+import FactionsOperator from "./operators/FactionsOperator";
+import Timer from "./services/Timer";
+import Layers, {LAYER_ANIMALS, LAYER_BIOMES, LAYER_BIOMES_IMAGES, LAYER_FOREST, LAYER_FACTIONS, LAYER_FACTIONS_BORDERS, LAYER_HABITAT,} from "./services/Layers";
+import AltitudeMap from "./maps/AltitudeMap";
+import TemperatureMap from "./maps/TemperatureMap";
+import OceanMap from "./maps/OceanMap";
+import CoastMap from "./maps/CoastMap";
+import LakesMap from "./maps/LakesMap";
+import RiversMap from "./maps/RiversMap";
+import BinaryMatrix from "./structures/BinaryMatrix";
+import HumidityMap from "./maps/HumidityMap";
+import {Cell} from "./structures/Cells";
+import DisplayCell from "./render/DisplayCell";
+import CellsRenderer from "./render/CellsRenderer";
 
 type WorldType = {
     altitudeMap: AltitudeMap;
@@ -43,19 +43,19 @@ declare global {
 }
 
 export default class World {
-    world: WorldType;
+    world!: WorldType;
     cameraPos: Cell;
     readonly visibleCellCols: number;
     readonly visibleCellRows: number;
     readonly worldWidth: number;
     readonly worldHeight: number;
-    readonly mapCanvas: HTMLCanvasElement;
-    readonly miniMapCanvas: HTMLCanvasElement;
-    timer: Timer;
-    layers: Layers;
-    terrainCanvasCtx: OffscreenCanvasRenderingContext2D;
-    terrainCachedBgImageData: ImageData;
-    cellsRenderer: CellsRenderer;
+    readonly mapCanvas!: HTMLCanvasElement;
+    readonly miniMapCanvas!: HTMLCanvasElement;
+    timer!: Timer;
+    layers!: Layers;
+    terrainCanvasCtx!: OffscreenCanvasRenderingContext2D;
+    terrainCachedBgImageData!: ImageData;
+    cellsRenderer!: CellsRenderer;
     private miniMapBitmap: ImageBitmap | null = null;
 
     constructor(
@@ -198,6 +198,9 @@ export default class World {
 
     update(): void {
         const mapCtx = this.mapCanvas.getContext('2d');
+        if (!mapCtx) {
+            return;
+        }
 
         // Cache terrain layer as it is static
         if (!this.terrainCanvasCtx) {
@@ -233,6 +236,10 @@ export default class World {
 
     private cacheTerrainLayer(mapCtx: CanvasRenderingContext2D): void {
         const renderCtx = new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE).getContext('2d');
+        if (!renderCtx) {
+            return;
+        }
+
         this.terrainCachedBgImageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
         // Fill canvas with terrain colors
@@ -243,7 +250,7 @@ export default class World {
         renderCtx.putImageData(this.terrainCachedBgImageData, 0, 0);
 
         // Scale canvas to actual size of cells
-        this.terrainCanvasCtx = new OffscreenCanvas(this.worldWidth, this.worldHeight).getContext('2d');
+        this.terrainCanvasCtx = new OffscreenCanvas(this.worldWidth, this.worldHeight).getContext('2d')!;
         this.terrainCanvasCtx.putImageData(
             scaleImageData(
                 mapCtx,
@@ -288,10 +295,17 @@ export default class World {
 
     private drawMiniMap(): void {
         const miniMapCtx = this.miniMapCanvas.getContext('2d');
+        if (!miniMapCtx) {
+            return;
+        }
 
         if (!this.miniMapBitmap) {
             const offscreen = new OffscreenCanvas(Config.WORLD_SIZE, Config.WORLD_SIZE);
             const renderCtx = offscreen.getContext('2d');
+            if (!renderCtx) {
+                return;
+            }
+
             const imageData = renderCtx.createImageData(Config.WORLD_SIZE, Config.WORLD_SIZE);
 
             this.layers.foreachMiniMapLayersValues((displayCell: DisplayCell, x: number, y: number): void => {
@@ -329,6 +343,10 @@ export default class World {
         const offsetX = this.cameraPos[0] * cellSize;
         const offsetY = this.cameraPos[1] * cellSize;
 
+        if (!ctx) {
+            return;
+        }
+
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(255,255,255,0.2)';
 
@@ -343,6 +361,10 @@ export default class World {
         const ctx = this.mapCanvas.getContext('2d'),
             worldOffsetLeft = this.cameraPos[0] * Config.CELL_SIZE,
             worldOffsetTop = this.cameraPos[1] * Config.CELL_SIZE;
+
+        if (!ctx) {
+            return;
+        }
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
@@ -365,6 +387,10 @@ export default class World {
             worldOffsetLeft = this.cameraPos[0] * Config.CELL_SIZE,
             worldOffsetTop = this.cameraPos[1] * Config.CELL_SIZE,
             temperatureMap = this.world.temperatureMap;
+
+        if (!ctx) {
+            return;
+        }
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';
@@ -393,6 +419,10 @@ export default class World {
             worldOffsetLeft = this.cameraPos[0] * Config.CELL_SIZE,
             worldOffsetTop = this.cameraPos[1] * Config.CELL_SIZE,
             biomes = this.world.biomesOperator.getBiomes();
+
+        if (!ctx) {
+            return;
+        }
 
         ctx.imageSmoothingEnabled = false;
         ctx.strokeStyle = 'rgba(0,0,0,0.2)';

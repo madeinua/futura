@@ -1,6 +1,6 @@
-import Config from "../../config.js";
-import Matrix from "../structures/Matrix.js";
-import Biome from "../biomes/Biome.js";
+import Config from "../../config";
+import Matrix from "../structures/Matrix";
+import Biome from "../biomes/Biome";
 
 export default class BiomesMap extends Matrix<Biome> {
     constructor() {

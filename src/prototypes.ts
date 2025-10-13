@@ -1,4 +1,4 @@
-import {Cell} from "./structures/Cells.js";
+import {Cell} from "./structures/Cells";
 
 export {};
 

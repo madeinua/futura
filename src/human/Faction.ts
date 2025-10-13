@@ -1,8 +1,8 @@
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import NumericMatrix from "../structures/NumericMatrix.js";
-import Config from "../../config.js";
-import {Cell} from "../structures/Cells.js";
-import {fractionToRGB, hexToRgb, RGB, RGBa, rgbToRgba} from "../helpers.js";
+import Config from "../../config";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import NumericMatrix from "../structures/NumericMatrix";
+import {Cell} from "../structures/Cells";
+import {fractionToRGB, hexToRgb, RGB, RGBa, rgbToRgba} from "../helpers";
 
 export interface FactionSettings {
     name: string;

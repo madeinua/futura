@@ -1,21 +1,21 @@
-import Config from './config.js';
-import {Filters, fillCanvasPixel, rgbToHex} from "./src/helpers.js";
-import World from './src/World.js';
-import {Cell} from "./src/structures/Cells.js";
-import Matrix from "./src/structures/Matrix.js";
-import NumericMatrix from "./src/structures/NumericMatrix.js";
-import AltitudeMap from "./src/maps/AltitudeMap.js";
-import TemperatureMap from "./src/maps/TemperatureMap.js";
-import HumidityMap from "./src/maps/HumidityMap.js";
-import OceanMap from "./src/maps/OceanMap.js";
-import CoastMap from "./src/maps/CoastMap.js";
-import LakesMap from "./src/maps/LakesMap.js";
-import RiversMap from "./src/maps/RiversMap.js";
-import ForestMap from "./src/maps/ForestMap.js";
-import Animal from "./src/animals/Animal.js";
-import Biome from "./src/biomes/Biome.js";
-import Faction from "./src/human/Faction.js";
-import Timer from "./src/services/Timer.js";
+import Config from '../config';
+import {fillCanvasPixel, Filters, rgbToHex} from "./helpers";
+import World from './World';
+import {Cell} from "./structures/Cells";
+import Matrix from "./structures/Matrix";
+import NumericMatrix from "./structures/NumericMatrix";
+import AltitudeMap from "./maps/AltitudeMap";
+import TemperatureMap from "./maps/TemperatureMap";
+import HumidityMap from "./maps/HumidityMap";
+import OceanMap from "./maps/OceanMap";
+import CoastMap from "./maps/CoastMap";
+import LakesMap from "./maps/LakesMap";
+import RiversMap from "./maps/RiversMap";
+import ForestMap from "./maps/ForestMap";
+import Animal from "./animals/Animal";
+import Biome from "./biomes/Biome";
+import Faction from "./human/Faction";
+import Timer from "./services/Timer";
 
 const coordinatesField = document.getElementById('coordinates') as HTMLInputElement,
     displayMapVisibleRange = document.getElementById('displayMapVisibleRange') as HTMLInputElement,
@@ -30,8 +30,12 @@ function drawColorMap(id: string, map: Matrix) {
     canvas.width = map.getWidth();
     canvas.height = map.getHeight();
 
-    const ctx = canvas.getContext('2d'),
-        image = ctx.createImageData(canvas.width, canvas.height);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        return;
+    }
+
+    const image = ctx.createImageData(canvas.width, canvas.height);
 
     for (let x = 0; x < map.getWidth(); x++) {
         for (let y = 0; y < map.getHeight(); y++) {
@@ -160,13 +164,14 @@ new World(
             point = getCameraPointByStartPoint(point);
             coordinatesField.value = point[0] + ',' + point[1];
             displayMapVisibleRange.innerHTML = '[' + world.cameraPos[0] + '-' + (world.cameraPos[1] + world.visibleCellCols) + ' | ' + world.cameraPos[1] + '-' + (world.cameraPos[1] + world.visibleCellRows) + ']';
+            return point;
         });
 
         if (Config.DRAW_TECHNICAL_MAPS) {
 
             Filters.add('altitudeMap', (map: AltitudeMap) => {
                 drawColoredMap('altitudeMapCanvas', map, [34, 139, 34], [255, 255, 255]);
-                document.getElementById('altitudeCellsCount').innerHTML = map.getLandCellsCount().toString();
+                document.getElementById('altitudeCellsCount')!.innerHTML = map.getLandCellsCount().toString();
                 return map;
             });
 
@@ -203,31 +208,25 @@ new World(
             Filters.add('biomes', (biomes: Matrix) => {
                 drawColorMap('biomesCanvas', biomes);
 
-                let biomesTypesCounter: { [key: string]: number } = {};
+                let biomesTypesCounter: Record<string, number> = {};
 
                 biomes.foreachValues((biome: Biome) => {
-                    if (typeof biomesTypesCounter[biome.getName()] === 'undefined') {
-                        biomesTypesCounter[biome.getName()] = 0;
-                    }
-
-                    biomesTypesCounter[biome.getName()]++;
+                    const name = biome.getName();
+                    biomesTypesCounter[name] = (biomesTypesCounter[name] ?? 0) + 1;
                 });
 
-                // Sort by value
-                biomesTypesCounter = Object.keys(biomesTypesCounter).sort((a, b) => {
-                    return biomesTypesCounter[b] - biomesTypesCounter[a];
-                }).reduce((result, key) => {
-                    result[key] = biomesTypesCounter[key];
-                    return result;
-                }, {});
+                biomesTypesCounter = Object.fromEntries(
+                    Object.entries(biomesTypesCounter).sort(([, a], [, b]) => b - a)
+                ) as Record<string, number>;
 
                 // Add counters as list to <ul> element
                 const list = document.getElementById('biomesTypesCounter');
-
-                for (const i in biomesTypesCounter) {
-                    const item = document.createElement('li');
-                    item.innerHTML = i.substring(6) + ': ' + biomesTypesCounter[i];
-                    list.appendChild(item);
+                if (list) {
+                    for (const i in biomesTypesCounter) {
+                        const item = document.createElement('li');
+                        item.innerHTML = i.substring(6) + ': ' + biomesTypesCounter[i];
+                        list.appendChild(item);
+                    }
                 }
 
                 return biomes;
@@ -235,36 +234,33 @@ new World(
 
             Filters.add('forestMap', (map: ForestMap) => {
                 drawColoredMap('forestMapCanvas', map, [255, 255, 255], [34, 139, 34]);
-                document.getElementById('forestCounter').innerHTML = map.countFilled().toString();
+                document.getElementById('forestCounter')!.innerHTML = map.countFilled().toString();
                 return map;
             });
 
-            Filters.add('animalsSteps', (animals: Animal[]) => {
+            Filters.add('animalsSteps', (val) => {
+                const animals = val as Animal[];
 
-                let text: string = '';
-                const groups = {};
-
-                for (let i = 0; i < animals.length; i++) {
-                    if (typeof groups[animals[i].getName()] === 'undefined') {
-                        groups[animals[i].getName()] = 0;
-                    }
-
-                    groups[animals[i].getName()]++;
+                const groups: Record<string, number> = {};
+                for (const a of animals) {
+                    const name = a.getName();
+                    groups[name] = (groups[name] ?? 0) + 1;
                 }
 
-                for (const i in groups) {
-                    text += i + ': ' + groups[i] + '<br />';
-                }
+                (document.getElementById('animalsList') as HTMLElement)!.innerHTML = Object.entries(groups)
+                    .map(([name, count]) => `${name}: ${count}`)
+                    .join('<br />');
+                (document.getElementById('animalsCounter') as HTMLElement)!.textContent = String(animals.length);
 
-                document.getElementById('animalsList').innerHTML = text;
-                document.getElementById('animalsCounter').innerHTML = animals.length.toString();
+                return animals;
             });
+
 
             technicalMaps.style.display = 'block';
         }
 
         Filters.add('factionsUpdated', (factions: Faction[]) => {
-            document.getElementById('factionsList').innerHTML = factions.map((faction: Faction) => {
+            document.getElementById('factionsList')!.innerHTML = factions.map((faction: Faction) => {
                 return '<li>' + faction.getName() + ': <span style="background-color:' + rgbToHex(faction.getFactionColor()) + '"></span> (' + faction.getSize() + ' cells)</li>';
             }).join('');
         });
@@ -288,19 +284,19 @@ new World(
             scrollIntoToView();
         });
 
-        document.getElementById('pauseSteps').addEventListener("click", () => {
+        document.getElementById('pauseSteps')!.addEventListener("click", () => {
             pauseTimer();
         });
 
         world.timer.addStepsHandler((step: number): void => {
-            document.getElementById('stepsCounter').innerHTML = String(step);
+            document.getElementById('stepsCounter')!.innerHTML = String(step);
         });
 
         Filters.add('timer', (timer: Timer) => {
-            document.getElementById('timerFps').innerHTML = timer.getFps().toString();
+            document.getElementById('timerFps')!.innerHTML = timer.getFps().toString();
         });
 
-        document.getElementById('generateFactions').addEventListener("click", () => {
+        document.getElementById('generateFactions')!.addEventListener("click", () => {
             world.generateFactions();
         });
 

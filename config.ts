@@ -1,3 +1,9 @@
+export type BiomesConfig = {
+    class: string;
+    h: [number, number];
+    t: [number, number];
+}[];
+
 const Config = {
 
     // Global
@@ -64,10 +70,10 @@ const Config = {
 
     /**
      * @internal
-     * @return {[]}
+     * @return {BiomesConfig}
      */
-    biomesConfig: function() {
-        const biomesConfig = [];
+    biomesConfig: function (): BiomesConfig {
+        const biomesConfig: BiomesConfig = [];
 
         biomesConfig.push({
             class: 'Biome_Grass',

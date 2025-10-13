@@ -1,4 +1,4 @@
-import {Array2D} from "./structures/Array2D.js";
+import {Array2D} from "./structures/Array2D";
 
 export type RGB = [number, number, number];
 export type RGBa = RGB | [number, number, number, number];
@@ -19,16 +19,16 @@ export function throwError(
 }
 
 export const Filters = {
-    filters: {} as { [tag: string]: Array<(val: unknown) => unknown> },
+    filters: {} as Record<string, Array<(val: any) => any>>,
 
-    add(tag: string, filter: (val: unknown) => unknown): void {
+    add(tag: string, filter: (val: any) => any): void {
         (this.filters[tag] || (this.filters[tag] = [])).push(filter);
     },
 
-    apply(tag: string, val: unknown): unknown {
+    apply(tag: string, val: any): any {
         const list = this.filters[tag];
         if (list) {
-            for (let i = 0, len = list.length; i < len; i++) {
+            for (let i = 0; i < list.length; i++) {
                 val = list[i](val);
             }
         }
@@ -344,7 +344,7 @@ export async function preloadImages(
             await preloadImages(obj[key], container);
         } else if (typeof obj[key] === "string" && obj[key].endsWith(".png")) {
             try {
-                container[obj[key]] = await createImage(obj[key]);
+                (container as (HTMLImageElement[] & Record<string, HTMLImageElement>))[obj[key]] = (await createImage(obj[key]))!;
             } catch (error) {
                 console.error(`Failed to preload image: ${obj[key]}`, error);
             }

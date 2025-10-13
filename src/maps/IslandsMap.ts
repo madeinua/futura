@@ -1,6 +1,6 @@
-import Config from "../../config.js";
-import NumericMatrix from "../structures/NumericMatrix.js";
-import OceanMap from "./OceanMap.js";
+import Config from "../../config";
+import NumericMatrix from "../structures/NumericMatrix";
+import OceanMap from "./OceanMap";
 
 export default class IslandsMap extends NumericMatrix {
   readonly oceanMap: OceanMap;

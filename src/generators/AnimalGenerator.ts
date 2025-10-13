@@ -1,20 +1,16 @@
-import Config from "../../config.js";
-import {throwError} from "../helpers.js";
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import Animal from "../animals/Animal.js";
-import {CellsList, Cell} from "../structures/Cells.js";
-import CoastMap from "../maps/CoastMap.js";
-import ForestsOperator from "../operators/ForestsOperator.js";
-import BiomesOperator from "../operators/BiomesOperator.js";
-import Timer from "../services/Timer.js";
-import AltitudeMap from "../maps/AltitudeMap.js";
+import Config from "../../config";
+import {throwError} from "../helpers";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import Animal from "../animals/Animal";
+import {CellsList, Cell} from "../structures/Cells";
+import CoastMap from "../maps/CoastMap";
+import ForestsOperator from "../operators/ForestsOperator";
+import BiomesOperator from "../operators/BiomesOperator";
+import Timer from "../services/Timer";
+import AltitudeMap from "../maps/AltitudeMap";
 
-type AnimalType = {
-    rarity: number;
-    moveDistance: number;
-    color: string;
-    image: string | null;
-};
+type AnimalKey = keyof typeof Config.ANIMALS;
+type AnimalSettings = typeof Config.ANIMALS[AnimalKey];
 
 export type AnimalsGeneratorArgs = {
     altitudeMap: AltitudeMap,
@@ -28,7 +24,7 @@ export type AnimalsGeneratorArgs = {
 export default class AnimalGenerator {
 
     readonly objects: AnimalsGeneratorArgs;
-    public habitat: BinaryMatrix;
+    public habitat!: BinaryMatrix;
     private respawnPoints: CellsList = [];
     private maxAnimals = -1;
 
@@ -44,8 +40,8 @@ export default class AnimalGenerator {
         return Animal;
     }
 
-    getSettings(): AnimalType {
-        return Config.ANIMALS[this.getName()];
+    getSettings(): AnimalSettings {
+        return Config.ANIMALS[this.getName() as AnimalKey];
     }
 
     getRarity(): number {
@@ -136,7 +132,6 @@ export default class AnimalGenerator {
             return null;
         }
 
-        // @ts-expect-error Polymorphism
         return new (this.getAnimalClass())(cell[0], cell[1], this.getSettings());
     }
 }

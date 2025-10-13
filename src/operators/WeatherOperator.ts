@@ -1,7 +1,7 @@
-import TemperatureMap from "../maps/TemperatureMap.js";
-import {logTimeEvent, Filters} from "../helpers.js";
-import Config from "../../config.js";
-import AltitudeMap from "../maps/AltitudeMap.js";
+import Config from "../../config";
+import TemperatureMap from "../maps/TemperatureMap";
+import {logTimeEvent, Filters} from "../helpers";
+import AltitudeMap from "../maps/AltitudeMap";
 
 export default class WeatherOperator {
 

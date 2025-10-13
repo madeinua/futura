@@ -1,5 +1,5 @@
-import Matrix from "../structures/Matrix.js";
-import DisplayCell from "../render/DisplayCell.js";
+import Matrix from "../structures/Matrix";
+import DisplayCell from "../render/DisplayCell";
 
 export class Layer extends Matrix<null | DisplayCell> {
 

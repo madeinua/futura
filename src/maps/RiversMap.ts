@@ -1,10 +1,10 @@
-import Config from "../../config.js";
-import { fromFraction, distance, randBetweenNumbers } from "../helpers.js";
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import AltitudeMap from "./AltitudeMap.js";
-import LakesMap from "./LakesMap.js";
-import { Cell, CellsArray, CellsList } from "../structures/Cells.js";
-import {arrayHasPoint} from "../structures/Array2D.js";
+import Config from "../../config";
+import { fromFraction, distance, randBetweenNumbers } from "../helpers";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import AltitudeMap from "./AltitudeMap";
+import LakesMap from "./LakesMap";
+import { Cell, CellsArray, CellsList } from "../structures/Cells";
+import {arrayHasPoint} from "../structures/Array2D";
 
 export default class RiversMap extends BinaryMatrix {
 

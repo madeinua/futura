@@ -1,13 +1,13 @@
-import Config from "../../config.js";
-import {fromMiddleFractionValue} from "../helpers.js";
-import Biome from "../biomes/Biome.js";
-import BinaryMatrix from "../structures/BinaryMatrix.js";
-import NumericMatrix from "../structures/NumericMatrix.js";
-import Faction from "../human/Faction.js";
-import ForestMap from "../maps/ForestMap.js";
-import BiomesMap from "../maps/BiomesMap.js";
-import TemperatureMap from "../maps/TemperatureMap.js";
-import IslandsMap from "../maps/IslandsMap.js";
+import Config from "../../config";
+import {fromMiddleFractionValue} from "../helpers";
+import Biome from "../biomes/Biome";
+import BinaryMatrix from "../structures/BinaryMatrix";
+import NumericMatrix from "../structures/NumericMatrix";
+import Faction from "../human/Faction";
+import ForestMap from "../maps/ForestMap";
+import BiomesMap from "../maps/BiomesMap";
+import TemperatureMap from "../maps/TemperatureMap";
+import IslandsMap from "../maps/IslandsMap";
 
 export type FactionsGeneratorArgs = {
     oceanMap: BinaryMatrix;
@@ -29,7 +29,8 @@ export default class FactionGenerator {
     }
 
     private getBiomeProbability(biomeName: string): number {
-        return Config.FACTIONS.CREATE_PROBABILITIES.BIOMES[biomeName] ?? 0;
+        const map = Config.FACTIONS.CREATE_PROBABILITIES.BIOMES;
+        return map[biomeName as keyof typeof map] ?? 0;
     }
 
     private isTooSmallIsland(x: number, y: number): boolean {

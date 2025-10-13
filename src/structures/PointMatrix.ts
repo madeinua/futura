@@ -1,4 +1,4 @@
-import NumericMatrix from './NumericMatrix.js';
+import NumericMatrix from './NumericMatrix';
 
 // PointMatrix is a NumericMatrix with values in the range [0, 1]
 export default class PointMatrix extends NumericMatrix<number> {
