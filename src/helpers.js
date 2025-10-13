@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 const errors = [];
 export function throwError(msg, limit = 5, unique = true) {
     if (errors.length < limit) {
@@ -253,30 +244,26 @@ export function hexToRgb(hex) {
     }
     return hexStorage[hex];
 }
-export function preloadImages(obj, container) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const key in obj) {
-            if (typeof obj[key] === "object") {
-                yield preloadImages(obj[key], container);
+export async function preloadImages(obj, container) {
+    for (const key in obj) {
+        if (typeof obj[key] === "object") {
+            await preloadImages(obj[key], container);
+        }
+        else if (typeof obj[key] === "string" && obj[key].endsWith(".png")) {
+            try {
+                container[obj[key]] = await createImage(obj[key]);
             }
-            else if (typeof obj[key] === "string" && obj[key].endsWith(".png")) {
-                try {
-                    container[obj[key]] = yield createImage(obj[key]);
-                }
-                catch (error) {
-                    console.error(`Failed to preload image: ${obj[key]}`, error);
-                }
+            catch (error) {
+                console.error(`Failed to preload image: ${obj[key]}`, error);
             }
         }
-    });
+    }
 }
-export function createImage(src) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (src === null)
-            return null;
-        const img = new Image();
-        img.src = src;
-        yield img.decode();
-        return img;
-    });
+export async function createImage(src) {
+    if (src === null)
+        return null;
+    const img = new Image();
+    img.src = src;
+    await img.decode();
+    return img;
 }

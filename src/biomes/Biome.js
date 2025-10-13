@@ -3,6 +3,7 @@ import DisplayCell from "../render/DisplayCell.js";
 import { hexToRgb, LightenDarkenColor } from "../helpers.js";
 export default class Biome {
     constructor(x, y, args) {
+        this.type = "Unknown";
         this.x = x;
         this.y = y;
         this.altitude = args.altitude;
@@ -13,7 +14,7 @@ export default class Biome {
         this.isMountains = args.isMountains;
     }
     getName() {
-        return this.constructor.name;
+        return this.type;
     }
     getColorsMinMax() {
         return {

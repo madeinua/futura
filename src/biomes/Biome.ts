@@ -18,6 +18,7 @@ export type ColorsMinMax = {
 
 export default class Biome {
 
+    readonly type: string = "Unknown";
     readonly x: number;
     readonly y: number;
     readonly altitude: number;
@@ -39,7 +40,7 @@ export default class Biome {
     }
 
     getName(): string {
-        return this.constructor.name;
+        return this.type;
     }
 
     protected getColorsMinMax(): ColorsMinMax {
@@ -60,6 +61,7 @@ export default class Biome {
     getColor(): string {
         const {min, max} = this.getColorsMinMax();
         const colors = Config.BIOME_COLORS[this.getName()];
+
         let sliceIndex = 0;
 
         if (this.altitude >= max) {

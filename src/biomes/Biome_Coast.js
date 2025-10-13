@@ -1,6 +1,10 @@
 import Config from "../../config.js";
 import Biome from "./Biome.js";
 export default class Biome_Coast extends Biome {
+    constructor() {
+        super(...arguments);
+        this.type = "Biome_Coast";
+    }
     getColorsMinMax() {
         return {
             min: Config.MIN_COAST_LEVEL,

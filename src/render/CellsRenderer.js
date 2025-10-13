@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import Config from "../../config.js";
 import { preloadImages, rgbToHex } from "../helpers.js";
 export default class CellsRenderer {
@@ -15,11 +6,9 @@ export default class CellsRenderer {
         this.cellHeight = cellHeight;
         this.imagesCache = [];
     }
-    init() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Preload images using the config object.
-            yield preloadImages(Config, this.imagesCache);
-        });
+    async init() {
+        // Preload images using the config object.
+        await preloadImages(Config, this.imagesCache);
     }
     render(ctx, displayCell, x, y) {
         // Retrieve the images for this display cell once.

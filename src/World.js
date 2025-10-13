@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import Config from "../config.js";
 import { fillCanvasPixel, Filters, logTimeEvent, resetTimeEvent, scaleImageData, } from "./helpers.js";
 import SurfaceOperator from "./operators/SurfaceOperator.js";
@@ -67,46 +58,44 @@ export default class World {
             }
         });
     }
-    generateWorld() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), islandsMap = waterOperator.getIslandsMap(oceanMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
-            const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES), this.layers.getLayer(LAYER_BIOMES_IMAGES));
-            const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
-            new AnimalsOperator({
-                habitatLayer: this.layers.getLayer(LAYER_HABITAT),
-                animalsLayer: this.layers.getLayer(LAYER_ANIMALS),
-                altitudeMap: altitudeMap,
-                freshWaterMap: freshWaterMap,
-                coastMap: coastMap,
-                forestsOperator: forestsOperator,
-                biomesOperator: biomesOperator,
-                timer: this.timer,
-            });
-            const factionsOperator = new FactionsOperator({
-                timer: this.timer,
-                factionsLayer: this.layers.getLayer(LAYER_FACTIONS),
-                factionsBorderLayer: this.layers.getLayer(LAYER_FACTIONS_BORDERS),
-                oceanMap: oceanMap,
-                freshWaterMap: freshWaterMap,
-                temperatureMap: temperatureMap,
-                forestMap: forestsOperator.getForestMap(),
-                biomesMap: biomesOperator.getBiomes(),
-                islandsMap: islandsMap,
-            });
-            this.world = {
-                altitudeMap,
-                temperatureMap,
-                oceanMap,
-                coastMap,
-                lakesMap,
-                riversMap,
-                freshWaterMap,
-                humidityMap,
-                biomesOperator,
-                forestOperator: forestsOperator,
-                factionsOperator,
-            };
+    async generateWorld() {
+        const surfaceOperator = new SurfaceOperator(), weatherOperator = new WeatherOperator(), waterOperator = new WaterOperator(), humidityOperator = new HumidityOperator(), altitudeMap = surfaceOperator.generateAltitudeMap(), temperatureMap = weatherOperator.generateTemperatureMap(altitudeMap), oceanMap = waterOperator.generateOceanMap(altitudeMap), islandsMap = waterOperator.getIslandsMap(oceanMap), coastMap = waterOperator.getCoastMap(oceanMap, altitudeMap), lakesMap = waterOperator.generateLakesMap(altitudeMap, oceanMap), riversMap = waterOperator.generateRiversMap(altitudeMap, lakesMap), freshWaterMap = waterOperator.getFreshWaterMap(lakesMap, riversMap), humidityMap = humidityOperator.generateHumidityMap(altitudeMap, riversMap, lakesMap);
+        const biomesOperator = new BiomesOperator(altitudeMap, oceanMap, coastMap, freshWaterMap, temperatureMap, humidityMap, this.layers.getLayer(LAYER_BIOMES), this.layers.getLayer(LAYER_BIOMES_IMAGES));
+        const forestsOperator = new ForestsOperator(biomesOperator, this.timer, this.layers.getLayer(LAYER_FOREST));
+        new AnimalsOperator({
+            habitatLayer: this.layers.getLayer(LAYER_HABITAT),
+            animalsLayer: this.layers.getLayer(LAYER_ANIMALS),
+            altitudeMap: altitudeMap,
+            freshWaterMap: freshWaterMap,
+            coastMap: coastMap,
+            forestsOperator: forestsOperator,
+            biomesOperator: biomesOperator,
+            timer: this.timer,
         });
+        const factionsOperator = new FactionsOperator({
+            timer: this.timer,
+            factionsLayer: this.layers.getLayer(LAYER_FACTIONS),
+            factionsBorderLayer: this.layers.getLayer(LAYER_FACTIONS_BORDERS),
+            oceanMap: oceanMap,
+            freshWaterMap: freshWaterMap,
+            temperatureMap: temperatureMap,
+            forestMap: forestsOperator.getForestMap(),
+            biomesMap: biomesOperator.getBiomes(),
+            islandsMap: islandsMap,
+        });
+        this.world = {
+            altitudeMap,
+            temperatureMap,
+            oceanMap,
+            coastMap,
+            lakesMap,
+            riversMap,
+            freshWaterMap,
+            humidityMap,
+            biomesOperator,
+            forestOperator: forestsOperator,
+            factionsOperator,
+        };
     }
     update() {
         const mapCtx = this.mapCanvas.getContext('2d');

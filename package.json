@@ -1,8 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "build": "webpack --config webpack.config.mjs --mode=development",
-    "watch": "webpack --config webpack.config.mjs --watch --mode=development",
+    "build": "webpack --config webpack.config.mjs --mode=production",
+    "watch": "webpack --config webpack.config.mjs --watch --mode=production",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -11,10 +11,17 @@
     "@types/node": "^24.7.2",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
+    "css-loader": "^7.1.2",
     "eslint": "^9.37.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-unused-imports": "^4.2.0",
     "imports-loader": "^5.0.0",
+    "mini-css-extract-plugin": "^2.9.4",
+    "sass": "^1.93.2",
+    "sass-loader": "^16.0.5",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
     "webpack": "^5.94.0",
     "webpack-cli": "^6.0.1"
   }

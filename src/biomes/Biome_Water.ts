@@ -4,6 +4,8 @@ import {LightenDarkenColor} from "../helpers.js";
 
 export default class Biome_Water extends Biome {
 
+    readonly type: string = "Biome_Water";
+
     getColor(): string {
         return LightenDarkenColor(super.getColor(), this.altitude * 150);
     }

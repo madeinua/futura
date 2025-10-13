@@ -3,6 +3,8 @@ import Biome, {ColorsMinMax} from "./Biome.js";
 
 export default class Biome_Ocean extends Biome {
 
+    readonly type: string = "Biome_Ocean";
+
     protected getColorsMinMax(): ColorsMinMax {
         return {
             min: Config.MIN_LEVEL,

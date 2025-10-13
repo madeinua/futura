@@ -1,3 +1,5 @@
+import './styles/futura.scss';
+
 import './prototypes.js';
 import '../config.js';
 import './helpers.js';
