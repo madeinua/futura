@@ -20,8 +20,8 @@ const Config = {
     SEED: 103,
 
     // Maps
-    WORLD_SIZE: 250,
-    CELL_SIZE: 25, // WORLD_SIZE * CELL_SIZE * 2 < 23.000!
+    WORLD_SIZE: 200,
+    CELL_SIZE: 22, // WORLD_SIZE * CELL_SIZE * 2 < 23.000!
     SHOW_RECTANGLES: false,
     SHOW_COORDINATES: false,
     DRAW_TECHNICAL_MAPS: true,
@@ -32,7 +32,7 @@ const Config = {
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 500,
     STEPS_BOOST: 5,
-    STEPS_BOOST_STEPS: 400,
+    STEPS_BOOST_STEPS: 200,
 
     // Altitude
     WORLD_MAP_OCEAN_INTENSITY: 0.2, // [0-1]

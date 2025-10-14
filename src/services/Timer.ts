@@ -65,7 +65,7 @@ export default class Timer {
                 boosted = true;
             }
 
-            this.timerFps = Math.round(Date.now() - startTime);
+            this.timerFps = 1000 / Math.round(Date.now() - startTime);
             startTime = Date.now();
 
             Filters.apply('timer', this);
@@ -111,6 +111,6 @@ export default class Timer {
     }
 
     getFps(): number {
-        return this.timerFps;
+        return Number(this.timerFps) | 0;
     }
 }

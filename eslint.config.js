@@ -1,4 +1,3 @@
-// eslint.config.js
 import js from '@eslint/js';
 import globals from 'globals';
 
@@ -8,9 +7,9 @@ const importPlugin = (await import('eslint-plugin-import')).default;
 const unusedImports = (await import('eslint-plugin-unused-imports')).default;
 
 export default [
-    // ignore JS & build outputs globally
-    {ignores: ['**/*.js', 'node_modules/**', 'dist/**', 'build/**', 'public/js/**', 'public/css/**', 'src/libs/**']},
-
+    {
+        ignores: ['**/*.js', 'node_modules/**', 'dist/**', 'build/**', 'public/js/**', 'public/css/**', 'src/libs/**']
+    },
     {
         files: ['**/*.ts', '**/*.tsx'],
         languageOptions: {
