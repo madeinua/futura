@@ -1,8 +1,15 @@
-export type BiomesConfig = {
+export type BiomeHTConfig = {
     class: string;
     h: [number, number];
     t: [number, number];
-}[];
+};
+
+export type AnimalConfig = {
+    rarity: number; // % of all tiles
+    moveChance: number; // 1 of X chance to move on each step
+    color: string; // for debug
+    image: string | null; // image path
+};
 
 const Config = {
 
@@ -21,6 +28,7 @@ const Config = {
 
     // Steps
     STEPS_ENABLED: true,
+    STEPS_AUTO_START: false,
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 500,
     STEPS_BOOST: 5,
@@ -70,36 +78,36 @@ const Config = {
 
     /**
      * @internal
-     * @return {BiomesConfig}
+     * @return {BiomeHTConfig[]}
      */
-    biomesConfig: function (): BiomesConfig {
-        const biomesConfig: BiomesConfig = [];
+    biomeHTConfigs: function (): BiomeHTConfig[] {
+        const biomeConfigs: BiomeHTConfig[] = [];
 
-        biomesConfig.push({
+        biomeConfigs.push({
             class: 'Biome_Grass',
             h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
             t: [this.LOW_TEMPERATURE, this.HIGH_TEMPERATURE],
         });
 
-        biomesConfig.push({
+        biomeConfigs.push({
             class: 'Biome_Tundra',
             h: [this.MIN_HUMIDITY, this.MAX_HUMIDITY],
             t: [this.MIN_TEMPERATURE, this.LOW_TEMPERATURE],
         });
 
-        biomesConfig.push({
+        biomeConfigs.push({
             class: 'Biome_Tropic',
             h: [this.NORMAL_HUMIDITY, this.MAX_HUMIDITY],
             t: [this.HIGH_TEMPERATURE, this.MAX_TEMPERATURE],
         });
 
-        biomesConfig.push({
+        biomeConfigs.push({
             class: 'Biome_Desert',
             h: [this.MIN_HUMIDITY, this.NORMAL_HUMIDITY],
             t: [this.HIGH_TEMPERATURE, this.MAX_TEMPERATURE],
         });
 
-        return biomesConfig;
+        return biomeConfigs;
     },
 
     BIOME_COLORS: {
@@ -175,7 +183,7 @@ const Config = {
             color: '#ffffff',
             image: 'public/images/cow-1.png'
         }
-    },
+    } as Record<string, AnimalConfig>,
 
     // Factions
     FACTIONS: {
@@ -225,6 +233,6 @@ const Config = {
             '#000000',
         ]
     }
-}
+} as const;
 
 export default Config;

@@ -284,8 +284,10 @@ new World(
             scrollIntoToView();
         });
 
+        (document.getElementById('pauseSteps') as HTMLButtonElement).innerText = world.timer.isTimerPaused() ? 'Pause' : 'Start';
         document.getElementById('pauseSteps')!.addEventListener("click", () => {
             pauseTimer();
+            (document.getElementById('pauseSteps') as HTMLButtonElement).innerText = world.timer.isTimerPaused() ? 'Resume' : 'Pause';
         });
 
         world.timer.addStepsHandler((step: number): void => {

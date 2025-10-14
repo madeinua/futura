@@ -1,4 +1,4 @@
-import Config, {BiomesConfig} from "../../config";
+import Config, {BiomeHTConfig} from "../../config";
 import BinaryMatrix from "../structures/BinaryMatrix";
 import biomes from "../biomes/Biomes";
 import {Cell} from "../structures/Cells";
@@ -21,7 +21,7 @@ export default class BiomesOperator {
     readonly freshWaterMap: BinaryMatrix;
     readonly temperatureMap: TemperatureMap;
     readonly humidityMap: HumidityMap;
-    readonly biomesConfig: BiomesConfig;
+    readonly biomeHTConfigs: BiomeHTConfig[];
 
     constructor(
         altitudeMap: AltitudeMap,
@@ -40,7 +40,7 @@ export default class BiomesOperator {
         this.freshWaterMap = freshWaterMap;
         this.temperatureMap = temperatureMap;
         this.humidityMap = humidityMap;
-        this.biomesConfig = Config.biomesConfig();
+        this.biomeHTConfigs = Config.biomeHTConfigs();
 
         this.createBiomes();
         this.addBiomesToLayer(biomesLayer, biomesImagesLayer);
@@ -98,7 +98,7 @@ export default class BiomesOperator {
             return new biomes.Biome_Beach(x, y, args);
         }
 
-        const matchedBiomes = this.biomesConfig
+        const matchedBiomes = this.biomeHTConfigs
             .filter(cfg =>
                 this._checkBiomeIndex(cfg.h, fromFraction(args.humidity, Config.MIN_HUMIDITY, Config.MAX_HUMIDITY)) &&
                 this._checkBiomeIndex(cfg.t, fromFraction(args.temperature, Config.MIN_TEMPERATURE, Config.MAX_TEMPERATURE))

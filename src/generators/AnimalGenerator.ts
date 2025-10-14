@@ -1,4 +1,4 @@
-import Config from "../../config";
+import Config, {AnimalConfig} from "../../config";
 import {throwError} from "../helpers";
 import BinaryMatrix from "../structures/BinaryMatrix";
 import Animal from "../animals/Animal";
@@ -8,9 +8,6 @@ import ForestsOperator from "../operators/ForestsOperator";
 import BiomesOperator from "../operators/BiomesOperator";
 import Timer from "../services/Timer";
 import AltitudeMap from "../maps/AltitudeMap";
-
-type AnimalKey = keyof typeof Config.ANIMALS;
-type AnimalSettings = typeof Config.ANIMALS[AnimalKey];
 
 export type AnimalsGeneratorArgs = {
     altitudeMap: AltitudeMap,
@@ -40,8 +37,8 @@ export default class AnimalGenerator {
         return Animal;
     }
 
-    getSettings(): AnimalSettings {
-        return Config.ANIMALS[this.getName() as AnimalKey];
+    getSettings(): AnimalConfig {
+        return Config.ANIMALS[this.getName()];
     }
 
     getRarity(): number {

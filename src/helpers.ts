@@ -335,10 +335,7 @@ export function hexToRgb(hex: string): RGB {
     return hexStorage[hex];
 }
 
-export async function preloadImages(
-    obj: Record<string, any>,
-    container: HTMLImageElement[]
-): Promise<void> {
+export async function preloadImages(obj: Record<string, any>, container: HTMLImageElement[]): Promise<void> {
     for (const key in obj) {
         if (typeof obj[key] === "object") {
             await preloadImages(obj[key], container);

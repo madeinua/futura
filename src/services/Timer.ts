@@ -12,7 +12,7 @@ export default class Timer {
         this.stepsHandlers.push(handler);
     }
 
-    stepsTimer(callback: () => void): void {
+    stepsTimer(callback: () => void, autoStart: boolean = true): void {
         const {
             STEPS_MIN_INTERVAL,
             STEPS_BOOST,
@@ -25,6 +25,7 @@ export default class Timer {
         let minStepInterval = STEPS_MIN_INTERVAL / STEPS_BOOST;
         let boosted = false;
         this.timerStep = 0;
+        this.timerPaused = !autoStart;
         let startTime = Date.now();
 
         const makeStep = (): void => {

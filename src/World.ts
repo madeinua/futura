@@ -121,7 +121,7 @@ export default class World {
             this.update();
 
             if (Config.STEPS_ENABLED) {
-                this.timer.stepsTimer(() => this.update());
+                this.timer.stepsTimer(() => this.update(), Config.STEPS_AUTO_START);
             }
         });
     }

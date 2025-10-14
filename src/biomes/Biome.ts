@@ -63,19 +63,19 @@ export default abstract class Biome {
         const colors = Config.BIOME_COLORS[this.getName()];
 
         let sliceIndex = 0;
-
         if (this.altitude >= max) {
             sliceIndex = colors.length - 1;
         } else if (this.altitude > min) {
             sliceIndex = Math.floor(((this.altitude - min) / (max - min)) * colors.length);
         }
 
-        let color = colors[sliceIndex];
-
+        let color;
         if (this.isHills) {
-            color = LightenDarkenColor(color, this.getHillsBoostColor());
+            color = LightenDarkenColor(colors[sliceIndex], this.getHillsBoostColor());
         } else if (this.isMountains) {
-            color = LightenDarkenColor(color, this.getMountainsBoostColor());
+            color = LightenDarkenColor(colors[sliceIndex], this.getMountainsBoostColor());
+        } else {
+            color = colors[sliceIndex];
         }
 
         return color;
