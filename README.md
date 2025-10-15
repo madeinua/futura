@@ -44,7 +44,13 @@ npm run build
 
 # Testing
 
-## Linting
+To run the tests, use the following command:
+
+```bash
+npm test
+```
+
+# Linting
 
 To run tests, use the following command:
 

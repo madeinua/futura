@@ -36,12 +36,11 @@ export const Filters = {
     },
 };
 
-let step: number = 0;
-
 /** Returns a unique auto‐incremented step value. */
-export function getStep(): number {
-    return ++step;
-}
+export const getStep = (() => {
+    let step = 0;
+    return () => ++step;
+})();
 
 /** Rounds the number to a fixed precision. */
 export function round(value: number, precision: number): number {
@@ -102,11 +101,17 @@ export function toFraction(value: number, min: number, max: number): number {
 }
 
 /**
- * Converts a value to a “middle‐best” score.
- * For example, if 0.5 is optimal in [0,1], then values closer to 0.5 yield higher scores.
+ * Scores how close `value` (0..1) is to `targetValue` (default 0.5).
+ * 1 at the target, linearly down to 0 at the farthest endpoint(s).
+ * Examples (target=0.5): value 0 or 1 -> 0, value 0.5 -> 1.
  */
-export function fromMiddleFractionValue(value: number, targetValue: number = 0.5): number {
-    return Math.max(0, 1 - Math.abs(value - targetValue));
+export function fromMiddleFractionValue(value: number, targetValue = 0.5): number {
+    const v = Math.min(1, Math.max(0, value));
+    const t = Math.min(1, Math.max(0, targetValue));
+    const maxDist = Math.max(t, 1 - t);
+    const score = 1 - Math.abs(v - t) / maxDist;
+
+    return Math.max(0, Math.min(1, score));
 }
 
 /**
@@ -120,32 +125,6 @@ export function changeRange(
     maxNew: number
 ): number {
     return ((value - minOld) * (maxNew - minNew)) / (maxOld - minOld) + minNew;
-}
-
-/**
- * Rounds the number to the next “slice” in the range.
- * Example: roundToNextSlice(0.45, 0, 1, 10) => 0.4
- */
-export function roundToNextSlice(
-    number: number,
-    rangeStart: number,
-    rangeEnd: number,
-    N: number
-): number {
-
-    if (number > rangeEnd || number < rangeStart) {
-        throwError(`Number ${number} is out of range [${rangeStart}, ${rangeEnd}]`, 1, true);
-    }
-
-    const sliceSize = (rangeEnd - rangeStart) / N;
-    const adjustedNumber = (number - rangeStart) / sliceSize;
-    let roundedNumber = Math.ceil(adjustedNumber);
-
-    if (adjustedNumber === Math.floor(adjustedNumber)) {
-        roundedNumber = Math.floor(adjustedNumber);
-    }
-
-    return roundedNumber * sliceSize + rangeStart;
 }
 
 /** Converts a fraction [0,1] to an RGB value [0,255]. */
@@ -314,6 +293,11 @@ export function resetTimeEvent(): void {
 
 const hexStorage: { [hex: string]: RGB } = {};
 
+/**
+ * Converts a hex color string to an RGB array.
+ * @param hex - The hex color string (e.g. "#RRGGBB" or "#RGB").
+ * @returns An array representing the RGB color [R, G, B].
+ */
 export function hexToRgb(hex: string): RGB {
     if (!hex) {
         return [0, 0, 0];
@@ -335,6 +319,11 @@ export function hexToRgb(hex: string): RGB {
     return hexStorage[hex];
 }
 
+/**
+ * Preloads all PNG images found in the given object and its nested objects.
+ * @param {Record<string, any>} obj
+ * @param {HTMLImageElement[]} container
+ */
 export async function preloadImages(obj: Record<string, any>, container: HTMLImageElement[]): Promise<void> {
     for (const key in obj) {
         if (typeof obj[key] === "object") {
