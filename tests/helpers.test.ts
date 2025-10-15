@@ -1,3 +1,5 @@
+import {getTimeForEvent, logTimeEvent, resetTimeEvent} from "../src/helpers";
+
 test('throwError', () => {
     const {throwError} = require("../src/helpers");
 
@@ -96,11 +98,17 @@ test('normalRandBetweenNumbers', () => {
 test('randBetweenNumbers', () => {
     const {randBetweenNumbers} = require("../src/helpers");
 
-    for (let i = 0; i < 100; i++) {
-        const num = randBetweenNumbers(5, 10);
-        expect(num).toBeGreaterThanOrEqual(5);
-        expect(num).toBeLessThanOrEqual(10);
-    }
+    Math.random = jest.fn().mockReturnValue(0.5);
+    expect(randBetweenNumbers(0, 10)).toBe(5);
+
+    Math.random = jest.fn().mockReturnValue(0);
+    expect(randBetweenNumbers(0, 10)).toBe(0);
+
+    Math.random = jest.fn().mockReturnValue(1);
+    expect(randBetweenNumbers(0, 10)).toBe(10);
+
+    Math.random = jest.fn().mockReturnValue(0.25);
+    expect(randBetweenNumbers(0, 10)).toBe(2.5);
 });
 
 test('iAmLucky', () => {
@@ -244,6 +252,60 @@ test('getPolygonAreaSize', () => {
     expect(getPolygonAreaSize([[0, 0], [1, 0], [1, 1], [0, 1]])).toBe(1);
     expect(getPolygonAreaSize([[0, 0], [2, 0], [1, 1]])).toBe(1);
     expect(getPolygonAreaSize([[0, 0], [4, 0], [4, 3], [2, 4], [0, 3]])).toBe(14);
+});
+
+describe('time events utils', () => {
+    let logSpy: jest.SpyInstance;
+
+    beforeAll(() => {
+        jest.useFakeTimers();
+    });
+
+    beforeEach(() => {
+        jest.setSystemTime(new Date('2020-01-01T00:00:00.000Z'));
+        resetTimeEvent();
+        logSpy = jest.spyOn(console, 'log').mockImplementation(() => {
+        });
+    });
+
+    afterEach(() => {
+        logSpy.mockRestore();
+    });
+
+    test('getTimeForEvent()', () => {
+
+        jest.advanceTimersByTime(250);
+        expect(getTimeForEvent()).toBe(250);
+
+        jest.advanceTimersByTime(50);
+        expect(getTimeForEvent()).toBe(300);
+    });
+
+    test('logTimeEvent()', () => {
+
+        jest.advanceTimersByTime(100);
+        logTimeEvent('A');
+        expect(logSpy).toHaveBeenCalledWith('A [100ms]');
+
+        expect(getTimeForEvent()).toBe(0);
+
+        jest.advanceTimersByTime(40);
+        logTimeEvent('B');
+        expect(logSpy).toHaveBeenLastCalledWith('B [40ms]');
+
+        expect(getTimeForEvent()).toBe(0);
+    });
+
+    test('resetTimeEvent()', () => {
+        jest.advanceTimersByTime(500);
+        expect(getTimeForEvent()).toBe(500);
+
+        resetTimeEvent();
+        expect(getTimeForEvent()).toBe(0);
+
+        jest.advanceTimersByTime(5);
+        expect(getTimeForEvent()).toBe(5);
+    });
 });
 
 test('hexToRgb', () => {
