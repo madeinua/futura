@@ -122,14 +122,14 @@ const Config = {
     },
 
     BIOME_IMAGES: {
-        Ocean: 'public/images/ocean-1.png',
-        Water: 'public/images/water-1.png',
-        Rocks: ['public/images/mountains-1.png', 'public/images/mountains-2.png'],
-        Desert: 'public/images/desert-1.png',
-        Beach: 'public/images/beach-1.png',
-        Grass: 'public/images/grass-1.png',
-        Tundra: 'public/images/tundra-1.png',
-        Tropic: 'public/images/tropic-1.png',
+        Ocean: 'images/ocean-1.png',
+        Water: 'images/water-1.png',
+        Rocks: ['images/mountains-1.png', 'images/mountains-2.png'],
+        Desert: 'images/desert-1.png',
+        Beach: 'images/beach-1.png',
+        Grass: 'images/grass-1.png',
+        Tundra: 'images/tundra-1.png',
+        Tropic: 'images/tropic-1.png',
     },
 
     // Forests
@@ -151,10 +151,10 @@ const Config = {
     },
     FOREST_COLOR: '#3c5626',
     FOREST_IMAGES: {
-        'forest_1': 'public/images/forest-1.png',
+        'forest_1': 'images/forest-1.png',
     },
-    FOREST_PALM_IMAGE: 'public/images/palm-1.png',
-    FOREST_TUNDRA_IMAGE: 'public/images/forest-3.png',
+    FOREST_PALM_IMAGE: 'images/palm-1.png',
+    FOREST_TUNDRA_IMAGE: 'images/forest-3.png',
 
     // Animals
     DISTANCE_BETWEEN_ANIMALS: 10,
@@ -169,19 +169,19 @@ const Config = {
             rarity: 0.005,
             moveChance: 7,
             color: '#4fd0ff',
-            image: 'public/images/fish-1.png'
+            image: 'images/fish-1.png'
         },
         'Deer': {
             rarity: 0.01,
             moveChance: 5,
             color: '#ffc800',
-            image: 'public/images/deer-1.png'
+            image: 'images/deer-1.png'
         },
         'Cow': {
             rarity: 0.01,
             moveChance: 3,
             color: '#ffffff',
-            image: 'public/images/cow-1.png'
+            image: 'images/cow-1.png'
         }
     } as Record<string, AnimalConfig>,
 

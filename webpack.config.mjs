@@ -43,12 +43,25 @@ export default (_env = {}, argv = {}) => {
                 },
             ],
         },
+        devServer: {
+            static: {
+                directory: path.resolve(__dirname, 'public'),
+            },
+            port: 8080,
+            hot: true,
+            open: {
+                target: ['/index.html'],
+            },
+            devMiddleware: {
+                writeToDisk: true,
+            },
+        },
         plugins: [
-            new MiniCssExtractPlugin({
-                filename: '../css/futura.css',
-            }),
+            ...(isProd ? [new MiniCssExtractPlugin({filename: '../css/futura.css'})] : []),
         ],
-        resolve: {extensions: ['.ts', '.tsx', '.js', '.scss']},
+        resolve: {
+            extensions: ['.ts', '.tsx', '.js', '.scss']
+        },
         stats: 'minimal',
     };
 };
