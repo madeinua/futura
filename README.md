@@ -40,7 +40,7 @@ To run the tests, use the following command:
 npm run test
 ```
 
-To check the coverage, run the following command:
+To test the coverage, run the following command:
 
 ```bash
 npm run test:cov
