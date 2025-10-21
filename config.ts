@@ -16,7 +16,7 @@ const Config = {
     // Global
     LOGS: true,
     STORE_DATA: false,
-    RANDOM_WORLD: false,
+    RANDOM_WORLD: true,
     SEED: 103,
 
     // Maps
@@ -32,7 +32,7 @@ const Config = {
     STEPS_MIN_INTERVAL: 500,
     STEPS_LIMIT: 500,
     STEPS_BOOST: 5,
-    STEPS_BOOST_STEPS: 200,
+    STEPS_BOOST_STEPS: 100,
 
     // Altitude
     WORLD_MAP_OCEAN_INTENSITY: 0.2, // [0-1]
