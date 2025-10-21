@@ -1,9 +1,8 @@
 import Config from '../config';
-import {fillCanvasPixel, Filters, rgbToHex} from "./helpers";
+import {drawColoredMap, drawColorMap, Filters, getCameraPosition, rgbToHex} from "./helpers";
 import World from './World';
 import {Cell} from "./structures/Cells";
 import Matrix from "./structures/Matrix";
-import NumericMatrix from "./structures/NumericMatrix";
 import AltitudeMap from "./maps/AltitudeMap";
 import TemperatureMap from "./maps/TemperatureMap";
 import HumidityMap from "./maps/HumidityMap";
@@ -24,118 +23,12 @@ const coordinatesField = document.getElementById('coordinates') as HTMLInputElem
     miniMapCanvas = document.getElementById('miniMap') as HTMLCanvasElement,
     technicalMaps = document.getElementById('technicalMaps') as HTMLDivElement;
 
-function drawColorMap(id: string, map: Matrix) {
-
-    const canvas = document.getElementById(id) as HTMLCanvasElement;
-    canvas.width = map.getWidth();
-    canvas.height = map.getHeight();
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        return;
-    }
-
-    const image = ctx.createImageData(canvas.width, canvas.height);
-
-    for (let x = 0; x < map.getWidth(); x++) {
-        for (let y = 0; y < map.getHeight(); y++) {
-            fillCanvasPixel(
-                image,
-                (x + y * canvas.width) * 4,
-                map.getCell(x, y).getHexColor()
-            );
-        }
-    }
-
-    ctx.putImageData(image, 0, 0);
-}
-
-/**
- * Linearly interpolates between two colors.
- *
- * @param color1 - The start color as [R, G, B]
- * @param color2 - The end color as [R, G, B]
- * @param factor - A number between 0 and 1 representing the interpolation factor.
- * @returns The interpolated color as [R, G, B].
- */
-function interpolateColor(
-    color1: [number, number, number],
-    color2: [number, number, number],
-    factor: number
-): [number, number, number] {
-    return [
-        Math.round(color1[0] + factor * (color2[0] - color1[0])),
-        Math.round(color1[1] + factor * (color2[1] - color1[1])),
-        Math.round(color1[2] + factor * (color2[2] - color1[2])),
-    ];
-}
-
-/**
- * Draws a colored map onto a canvas by mapping each cell’s value (assumed to be between 0 and 255)
- * to a color determined by linear interpolation between the provided start and end colors.
- *
- * @param id - The id of the canvas element.
- * @param map - The NumericMatrix to draw.
- * @param startColor - The color representing the lowest values (e.g. blue for cold areas).
- * @param endColor - The color representing the highest values (e.g. orange for hot areas).
- */
-function drawColoredMap(
-    id: string,
-    map: NumericMatrix,
-    startColor: [number, number, number],
-    endColor: [number, number, number]
-) {
-    const canvas = document.getElementById(id) as HTMLCanvasElement;
-    canvas.width = map.getWidth();
-    canvas.height = map.getHeight();
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const image = ctx.createImageData(canvas.width, canvas.height);
-
-    // For each cell, compute its color based on the normalized value.
-    map.foreach((x: number, y: number) => {
-
-        const gray = map.getGrayscale(x, y);
-        const factor = gray / 255; // Normalize to [0, 1]
-
-        // Interpolate between the two provided colors.
-        const color: [number, number, number] = interpolateColor(startColor, endColor, factor);
-
-        // Compute the pixel's starting index in the ImageData array.
-        const point = (x + y * canvas.width) * 4;
-
-        // Set the pixel color.
-        image.data[point] = color[0]; // Red
-        image.data[point + 1] = color[1]; // Green
-        image.data[point + 2] = color[2]; // Blue
-        image.data[point + 3] = 255; // Alpha
-    });
-
-    ctx.putImageData(image, 0, 0);
-}
-
-function getCameraPosition(): Cell {
-
-    const point = coordinatesField.value.split(',');
-    let x = 0;
-    let y = 0;
-
-    if (point.length === 2) {
-        x = parseInt(point[0], 10);
-        y = parseInt(point[1], 10);
-    }
-
-    return [x, y];
-}
-
 new World(
     displayMap,
     displayMapWrapper.offsetWidth,
     displayMapWrapper.offsetHeight,
     miniMapCanvas,
-    getCameraPosition(),
+    getCameraPosition(coordinatesField),
     (world: World) => {
 
         function getCameraPointByStartPoint(point: Cell): Cell {
@@ -266,7 +159,7 @@ new World(
         });
 
         coordinatesField.addEventListener("change", () => {
-            world.moveMapTo(getCameraPosition());
+            world.moveMapTo(getCameraPosition(coordinatesField));
             scrollIntoToView()
         });
 

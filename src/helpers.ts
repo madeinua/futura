@@ -1,4 +1,7 @@
 import {Array2D} from "./structures/Array2D";
+import Matrix from "./structures/Matrix";
+import NumericMatrix from "./structures/NumericMatrix";
+import {Cell} from "./structures/Cells";
 
 export type RGB = [number, number, number];
 export type RGBa = RGB | [number, number, number, number];
@@ -331,6 +334,11 @@ export async function preloadImages(obj: Record<string, any>, container: HTMLIma
     }
 }
 
+/**
+ * Creates and decodes an HTMLImageElement from the given source URL.
+ * @param {string | null} src - The source URL of the image.
+ * @returns {Promise<HTMLImageElement | null>} A promise that resolves to the HTMLImageElement or null.
+ */
 export async function createImage(
     src: string | null
 ): Promise<HTMLImageElement | null> {
@@ -339,4 +347,119 @@ export async function createImage(
     img.src = src;
     await img.decode();
     return img;
+}
+
+/**
+ * Linearly interpolates between two colors.
+ *
+ * @param {number, number, number} color1 - The start color as [R, G, B]
+ * @param {number, number, number} color2 - The end color as [R, G, B]
+ * @param {number} factor - The interpolation factor (0.0 to 1.0)
+ * @returns {number, number, number} The interpolated color as [R, G, B]
+ */
+export function interpolateColor(
+    color1: [number, number, number],
+    color2: [number, number, number],
+    factor: number
+): [number, number, number] {
+    return [
+        Math.round(color1[0] + factor * (color2[0] - color1[0])),
+        Math.round(color1[1] + factor * (color2[1] - color1[1])),
+        Math.round(color1[2] + factor * (color2[2] - color1[2])),
+    ];
+}
+
+/**
+ * Draws a color map on a canvas element with the given ID using the provided matrix.
+ * @param {string} id - The ID of the canvas element.
+ * @param {Matrix} map - The matrix containing color data.
+ */
+export function drawColorMap(id: string, map: Matrix) {
+    const canvas = document.getElementById(id) as HTMLCanvasElement;
+
+    canvas.width = map.getWidth();
+    canvas.height = map.getHeight();
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        return;
+    }
+
+    const image = ctx.createImageData(canvas.width, canvas.height);
+
+    for (let x = 0; x < map.getWidth(); x++) {
+        for (let y = 0; y < map.getHeight(); y++) {
+            fillCanvasPixel(
+                image,
+                (x + y * canvas.width) * 4,
+                map.getCell(x, y).getHexColor()
+            );
+        }
+    }
+
+    ctx.putImageData(image, 0, 0);
+}
+
+/**
+ * Draws a colored map onto a canvas by mapping each cell’s value (assumed to be between 0 and 255)
+ * to a color determined by linear interpolation between the provided start and end colors.
+ *
+ * @param {string} id - The ID of the canvas element to draw on.
+ * @param {NumericMatrix} map - The numeric matrix containing values to map to colors.
+ * @param {number, number, number} startColor - The color representing the lowest values (e.g. blue for cold areas).
+ * @param {number, number, number} endColor - The color representing the highest values (e.g. red for hot areas).
+ */
+export function drawColoredMap(
+    id: string,
+    map: NumericMatrix,
+    startColor: [number, number, number],
+    endColor: [number, number, number]
+) {
+    const canvas = document.getElementById(id) as HTMLCanvasElement;
+    canvas.width = map.getWidth();
+    canvas.height = map.getHeight();
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const image = ctx.createImageData(canvas.width, canvas.height);
+
+    // For each cell, compute its color based on the normalized value.
+    map.foreach((x: number, y: number) => {
+
+        const gray = map.getGrayscale(x, y);
+        const factor = gray / 255; // Normalize to [0, 1]
+
+        // Interpolate between the two provided colors.
+        const color: [number, number, number] = interpolateColor(startColor, endColor, factor);
+
+        // Compute the pixel's starting index in the ImageData array.
+        const point = (x + y * canvas.width) * 4;
+
+        // Set the pixel color.
+        image.data[point] = color[0]; // Red
+        image.data[point + 1] = color[1]; // Green
+        image.data[point + 2] = color[2]; // Blue
+        image.data[point + 3] = 255; // Alpha
+    });
+
+    ctx.putImageData(image, 0, 0);
+}
+
+/***
+ * Retrieves the camera position from the given input field.
+ * @param {HTMLInputElement} coordinatesField - The input field containing the camera coordinates in "x,y" format.
+ * @returns {Cell} The camera position as a Cell [x, y].
+ */
+export function getCameraPosition(coordinatesField: HTMLInputElement): Cell {
+    const point = coordinatesField.value.split(',');
+    let x = 0;
+    let y = 0;
+
+    if (point.length === 2) {
+        x = parseInt(point[0], 10);
+        y = parseInt(point[1], 10);
+    }
+
+    return [x, y];
 }
