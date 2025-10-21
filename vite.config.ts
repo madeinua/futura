@@ -1,6 +1,7 @@
 import {defineConfig} from 'vite';
 
 export default defineConfig({
+    base: '/futura/',
     server: {
         port: 8080,
         open: '/index.html',
