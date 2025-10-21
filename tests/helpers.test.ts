@@ -1,5 +1,12 @@
 import {getTimeForEvent, logTimeEvent, resetTimeEvent} from "../src/helpers";
 
+const realRandom = Math.random;
+
+afterEach(() => {
+    (Math.random as any) = realRandom;
+    jest.restoreAllMocks();
+});
+
 test('throwError', () => {
     const {throwError} = require("../src/helpers");
 

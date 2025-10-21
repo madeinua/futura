@@ -78,16 +78,9 @@ export function randBetweenNumbers(float1: number, float2: number): number {
  * Simulates a coin flip given a chance (0-100).
  */
 export function iAmLucky(chance: number): boolean {
-
-    if (chance >= 100) {
-        return true;
-    }
-
-    if (chance <= 0) {
-        return false;
-    }
-
-    return chance >= randBetweenNumbers(0, 100);
+    if (chance >= 100) return true;
+    if (chance <= 0) return false;
+    return Math.random() < chance / 100;
 }
 
 /** Converts a fraction [0,1] to a value in the specified range [min,max]. */

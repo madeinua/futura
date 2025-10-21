@@ -7,7 +7,6 @@
     <meta http-equiv="cache-control" content="no-cache, no-store, max-age=0"/>
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT"/>
     <meta http-equiv="pragma" content="no-cache"/>
-    <link href="css/futura.css" type="text/css" rel="stylesheet" media="all"/>
 </head>
 <body>
 
@@ -17,7 +16,8 @@
             <canvas id="miniMap"></canvas>
         </div>
         <div class="coordinatesWrapper">
-            <label for="coordinates">X,Y: <input id="coordinates" type="text" value="0,0"/> <span id="displayMapVisibleRange"></span></label>
+            <label for="coordinates">X,Y: <input id="coordinates" type="text" value="0,0"/></label>
+            <div id="displayMapVisibleRange"></div>
         </div>
         <div>
             <label>Steps: <span id="stepsCounter"></span></label>
@@ -100,6 +100,6 @@
     </div>
 </div>
 
-<script src="js/bundle.js"></script>
+<script type="module" src="/src/entry.ts"></script>
 </body>
 </html>

@@ -99,6 +99,11 @@ button:hover {
     font-weight: 600;
 }
 
+#factionsList {
+    padding: 0;
+    list-style: none;
+}
+
 #factionsList li span {
     display: inline-block;
     width: 20px;
