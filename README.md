@@ -29,25 +29,21 @@ npm install
 2. After building, you can serve the production files using a static server. For example, you can use `serve`:
 
     ```bash
-    npx serve dist
+    npm run preview
     ```
-
-# Building
-
-## Production Build
-
-To create an optimized build of the application, use the following command:
-
-```bash
-npm run build
-```
 
 # Testing
 
 To run the tests, use the following command:
 
 ```bash
-npm test
+npm run test
+```
+
+To check the coverage, run the following command:
+
+```bash
+npm run test:cov
 ```
 
 # Linting
