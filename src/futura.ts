@@ -188,7 +188,7 @@ new World(
         });
 
         Filters.add('timer', (timer: Timer) => {
-            document.getElementById('timerFps')!.innerHTML = timer.getFps().toString();
+            document.getElementById('timerFps')!.innerHTML = timer.getFps().toString() + (timer.isBoosted() ? '' : ' [boost]');
         });
 
         document.getElementById('generateFactions')!.addEventListener("click", () => {

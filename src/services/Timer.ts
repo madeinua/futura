@@ -7,6 +7,7 @@ export default class Timer {
     private timerPaused = false;
     private timerInterval: ReturnType<typeof setInterval> | null = null;
     private timerFps = 0;
+    private boosted = false;
 
     addStepsHandler(handler: (step: number) => void): void {
         this.stepsHandlers.push(handler);
@@ -23,7 +24,7 @@ export default class Timer {
 
         const timerStart = Date.now();
         let minStepInterval = STEPS_MIN_INTERVAL / STEPS_BOOST;
-        let boosted = false;
+        this.boosted = false;
         this.timerStep = 0;
         this.timerPaused = !autoStart;
         let startTime = Date.now();
@@ -58,11 +59,11 @@ export default class Timer {
             }
 
             // Boost the timer interval after a given number of steps
-            if (!boosted && this.timerStep > STEPS_BOOST_STEPS) {
+            if (!this.boosted && this.timerStep > STEPS_BOOST_STEPS) {
                 this.clearTimerInterval();
                 minStepInterval *= STEPS_BOOST;
                 this.timerInterval = setInterval(makeStep, minStepInterval);
-                boosted = true;
+                this.boosted = true;
             }
 
             this.timerFps = 1000 / Math.round(Date.now() - startTime);
@@ -112,5 +113,9 @@ export default class Timer {
 
     getFps(): number {
         return Number(this.timerFps) | 0;
+    }
+
+    isBoosted(): boolean {
+        return this.boosted;
     }
 }
